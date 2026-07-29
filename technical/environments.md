@@ -77,6 +77,11 @@ Build Plan §8.1: *one design system exported to two environments.* If tokens ar
 separately per environment they will diverge, and the moment they diverge is the Add-to-Cart
 transition — the exact moment the plan identifies as where trust is lost.
 
+The pipeline exists: `tokens/build.mjs` generates `tokens/dist/tokens.css`, which **both**
+environments import. Run `node tokens/build.mjs --check` in CI for each deployable — it fails
+the build if the committed CSS no longer matches `tokens.json`, so the two environments cannot
+silently ship different design systems. See `tokens/README.md`.
+
 ### Repo layout
 
 One repo, or two with the tokens published as a versioned package. **Start with one.** Two
@@ -168,6 +173,8 @@ no longer exists.
 - [ ] Arabic invoice PDF renders correctly (`C-16` — separate engine, separate failure mode)
 - [ ] Emails render in Gmail, Outlook, and Apple Mail in Arabic
 - [ ] Accessibility gate passes (`node tokens/a11y-gate.mjs`) — zero AA failures
+- [ ] Design tokens are in sync (`node tokens/build.mjs --check`) — both environments ship the
+      same generated CSS
 - [ ] Analytics events fire and cross-domain continuity holds
 - [ ] No console errors on the conversion path
 - [ ] Rollback verified as available

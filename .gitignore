@@ -6,6 +6,12 @@ dist/
 build/
 .cache/
 
+# ...except the generated design tokens. Committed on purpose: both consumers can use the file
+# without running a build, and a token change shows up as a reviewable diff. `node
+# tokens/build.mjs --check` fails if it drifts from tokens.json.
+!tokens/dist/
+!tokens/dist/tokens.css
+
 # Environment / secrets — never commit WHMCS API credentials
 .env
 .env.*

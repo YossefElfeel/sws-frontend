@@ -1,0 +1,185 @@
+/*
+ * SWS design tokens — GENERATED FILE, DO NOT EDIT.
+ *
+ * Source:    tokens/tokens.json
+ * Regenerate: node tokens/build.mjs
+ * Verify:     node tokens/build.mjs --check   (fails if this file is stale)
+ *
+ * Consumed by BOTH the marketing site and the WHMCS Lagom child theme. One source, one
+ * generated file — see Build Plan section 8.1 on why the two must not diverge.
+ *
+ * Primitives are deliberately absent. Components reference the semantic layer only; there
+ * is no --sws-purple-500 to reach for, which makes the rule impossible to break by accident.
+ *
+ * All variables are prefixed --sws- to avoid colliding with Lagom 2's own properties.
+ */
+
+:root {
+
+  /* ── semantic — light theme ────────────────────────────────────────────── */
+  --sws-surface-base: #F8F7FA;
+  --sws-surface-raised: #FFFFFF;
+  --sws-surface-sunken: #F1EFF5;
+  --sws-text-primary: #16131C;
+  --sws-text-secondary: #5C5568;
+  --sws-text-on-action: #FFFFFF;
+  --sws-border-subtle: #E4E1EB;
+  --sws-border-strong: #7B7389;
+  --sws-action-primary: #5B2E91;
+  --sws-action-primary-hover: #4A2578;
+  --sws-action-subtle-bg: #F4F0FA;
+  --sws-focus-ring: #8459C4;
+  --sws-status-success: #1B6E3C;
+  --sws-status-danger: #B3261E;
+  --sws-status-warning: #8A5A00;
+  --sws-status-info: #1A4F8A;
+  --sws-banner-danger-bg: rgba(179, 38, 30, 0.12);
+  --sws-banner-danger-border: rgba(179, 38, 30, 0.4);
+
+  /* ── component — resolves through the semantic layer, so themes follow automatically ── */
+  --sws-button-primary-bg: var(--sws-action-primary);
+  --sws-button-primary-bg-hover: var(--sws-action-primary-hover);
+  --sws-button-primary-text: var(--sws-text-on-action);
+  --sws-button-secondary-border: var(--sws-border-strong);
+  --sws-button-height-sm: 32px;
+  --sws-button-height-md: 44px;
+  --sws-button-height-lg: 48px;
+  --sws-button-focus-ring-width: 2px;
+  --sws-input-bg: var(--sws-surface-sunken);
+  --sws-input-border: var(--sws-border-strong);
+  --sws-input-border-focus: var(--sws-focus-ring);
+  --sws-input-border-error: var(--sws-status-danger);
+  --sws-input-placeholder: var(--sws-text-secondary);
+  --sws-input-focus-ring-width: 2px;
+  --sws-card-bg: var(--sws-surface-raised);
+  --sws-card-border: var(--sws-border-subtle);
+  --sws-table-header-bg: var(--sws-surface-sunken);
+  --sws-table-row-hover: var(--sws-action-subtle-bg);
+  --sws-table-border: var(--sws-border-subtle);
+  --sws-banner-danger-icon: var(--sws-status-danger);
+
+  /* ── spacing — base-4 scale. No value outside this scale. ──────────────── */
+  --sws-space-4: 4px;
+  --sws-space-8: 8px;
+  --sws-space-12: 12px;
+  --sws-space-16: 16px;
+  --sws-space-24: 24px;
+  --sws-space-32: 32px;
+  --sws-space-48: 48px;
+  --sws-space-64: 64px;
+  --sws-space-96: 96px;
+
+  /* ── typography — mobile-first base; desktop overrides in the media query below ── */
+  --sws-font-size-display: 32px;
+  --sws-line-height-display: 1.35;
+  --sws-font-weight-display: 800;
+  --sws-font-size-h1: 26px;
+  --sws-line-height-h1: 1.4;
+  --sws-font-weight-h1: 700;
+  --sws-font-size-h2: 21px;
+  --sws-line-height-h2: 1.45;
+  --sws-font-weight-h2: 700;
+  --sws-font-size-h3: 19px;
+  --sws-line-height-h3: 1.5;
+  --sws-font-weight-h3: 600;
+  --sws-font-size-body-lg: 17px;
+  --sws-line-height-body-lg: 1.8;
+  --sws-font-weight-body-lg: 400;
+  --sws-font-size-body: 15px;
+  --sws-line-height-body: 1.8;
+  --sws-font-weight-body: 400;
+  --sws-font-size-body-sm: 13.5px;
+  --sws-line-height-body-sm: 1.7;
+  --sws-font-weight-body-sm: 400;
+  --sws-font-size-caption: 12px;
+  --sws-line-height-caption: 1.6;
+  --sws-font-weight-caption: 400;
+  --sws-font-size-mono: 13.5px;
+  --sws-line-height-mono: 1.6;
+  --sws-font-weight-mono: 400;
+
+  /* ── accessibility — enforced by tokens/a11y-gate.mjs ──────────────────── */
+  --sws-focus-ring-width: 2px;
+  --sws-touch-target-min: 44px;
+}
+
+/* Dark by OS preference — unless the user has explicitly chosen light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sws-surface-base: #16131C;
+    --sws-surface-raised: #201D28;
+    --sws-surface-sunken: #0E0C12;
+    --sws-text-primary: #F8F7FA;
+    --sws-text-secondary: #A29BB2;
+    --sws-text-on-action: #16131C;
+    --sws-border-subtle: #2A2633;
+    --sws-border-strong: #7B7389;
+    --sws-action-primary: #A98BD9;
+    --sws-action-primary-hover: #CFBDEB;
+    --sws-action-subtle-bg: #2A1444;
+    --sws-focus-ring: #A98BD9;
+    --sws-status-success: #4ADE80;
+    --sws-status-danger: #F87171;
+    --sws-status-warning: #FBBF24;
+    --sws-status-info: #60A5FA;
+    --sws-banner-danger-bg: rgba(248, 113, 113, 0.12);
+    --sws-banner-danger-border: rgba(248, 113, 113, 0.4);
+  }
+}
+
+/* Dark by explicit choice. Spec 4.3 requires the toggle to persist, so the attribute must
+   win over the OS preference in both directions. */
+:root[data-theme="dark"] {
+  --sws-surface-base: #16131C;
+  --sws-surface-raised: #201D28;
+  --sws-surface-sunken: #0E0C12;
+  --sws-text-primary: #F8F7FA;
+  --sws-text-secondary: #A29BB2;
+  --sws-text-on-action: #16131C;
+  --sws-border-subtle: #2A2633;
+  --sws-border-strong: #7B7389;
+  --sws-action-primary: #A98BD9;
+  --sws-action-primary-hover: #CFBDEB;
+  --sws-action-subtle-bg: #2A1444;
+  --sws-focus-ring: #A98BD9;
+  --sws-status-success: #4ADE80;
+  --sws-status-danger: #F87171;
+  --sws-status-warning: #FBBF24;
+  --sws-status-info: #60A5FA;
+  --sws-banner-danger-bg: rgba(248, 113, 113, 0.12);
+  --sws-banner-danger-border: rgba(248, 113, 113, 0.4);
+}
+
+/* Desktop type sizes. Mobile-first: the base values above are the small ones. */
+@media (min-width: 768px) {
+  :root {
+    --sws-font-size-display: 40px;
+    --sws-font-size-h1: 32px;
+    --sws-font-size-h2: 24px;
+  }
+}
+
+/* ── BREAKPOINTS — reference values ──────────────────────────────────────────
+ *
+ * CSS custom properties CANNOT be used in media query conditions. These are documented
+ * here so the numbers are in front of you when writing one, but they must be typed as
+ * literals. If a build step needs them programmatically, read tokens.json directly.
+ *
+ *   mobile   360–767    4 cols · 16px gutter · 16 margin
+ *   tablet   768–1023   8 cols · 24px gutter · 24 margin
+ *   laptop   1024–1439  12 cols · 24px gutter · 32 margin
+ *   wide     1440+      12 cols · 32px gutter · auto margin
+ *
+ * Design starts at 360px. Most of the Egyptian and Gulf market arrives on a phone.
+ */
+
+/* ── RTL ─────────────────────────────────────────────────────────────────────
+ *
+ * These tokens are direction-neutral values. Direction is handled where they are USED:
+ * always reach for logical properties — margin-inline-start, padding-inline-end,
+ * inset-inline-start, border-inline-start — never the physical left/right equivalents.
+ * With dir="rtl" on the document the browser then mirrors the layout on its own.
+ *
+ * Playbook 4.1: think in start/end, not left/right. The alternative — a separate rtl.css —
+ * costs 30–40% ongoing maintenance and is where most RTL bugs come from.
+ */

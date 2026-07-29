@@ -186,26 +186,98 @@ changes, re-run the gate before approving it.
 
 ---
 
-## Exporting to two environments
+## Export pipeline
 
-One source, two consumers. Generate, never hand-copy.
+```bash
+node tokens/build.mjs           # validate, then write dist/tokens.css
+node tokens/build.mjs --check   # validate, then fail if dist/ is stale  (CI)
+```
+
+One source, one generated file, two consumers. Nobody hand-copies a value.
 
 ```
 tokens.json
    │
-   ├──▶  marketing/    CSS custom properties  :root { --color-action-primary: … }
-   │                                          [data-theme="dark"] { … }
+   ▼  node tokens/build.mjs
+dist/tokens.css                115 custom properties
    │
-   └──▶  whmcs-theme/  the same CSS custom properties, imported by the Lagom child theme
+   ├──▶  marketing/            imported directly
+   └──▶  whmcs-theme/          imported by the Lagom 2 child theme
 ```
 
-Both consumers get the **same generated file**. The build fails if the export is stale relative
-to `tokens.json`, so drift is impossible rather than merely discouraged.
+`dist/tokens.css` is **committed** — same reasoning as `prices.json` in
+`technical/pricing-sync.md`. Consumers can use it without running a build, a token change shows
+up as a reviewable diff, and `--check` makes drift a build failure rather than a discovery.
 
-For RTL, the generated CSS uses logical properties — `margin-inline-start`, not `margin-left`.
-Playbook §4.1: think in *start/end*, not *left/right*, and the browser handles both directions
-from `dir="rtl"` on the document. The alternative — a separate `rtl.css` — costs 30–40% ongoing
-maintenance and is where most RTL bugs come from.
+### Three choices worth knowing about
+
+**1. Primitives are not exported.** There is no `--sws-purple-500` in the output. The rule that
+components must not reference primitives is not documented and hoped for — it is unbreakable,
+because the variable a developer would need simply does not exist in CSS. The rule is enforced
+at the API boundary rather than in review.
+
+**2. Component tokens are emitted once, as `var()` references.**
+
+```css
+--sws-button-primary-bg: var(--sws-action-primary);
+```
+
+Emitted a single time in `:root`. When the theme flips, the semantic variable changes and every
+component follows through the cascade. No component token is duplicated per theme — which is
+the three-layer structure paying off in the generated output, not just in the source.
+
+**3. Everything is prefixed `--sws-`.** Lagom 2 ships its own custom properties; an unprefixed
+`--surface-base` would be a collision waiting to happen inside the WHMCS theme.
+
+### What the build validates
+
+The build **fails** — it does not warn — on any of these:
+
+| Check | Why it matters |
+|---|---|
+| A component references a primitive | The governing rule. Breaks dark mode the moment it happens. |
+| A semantic token exists in one theme but not the other | Silently breaks the missing theme; nothing else would catch it. |
+| Any reference does not resolve | Would emit a broken or empty value. |
+| `dist/` is stale (`--check`) | The whole point of a single source. |
+
+All five paths are tested: injecting a primitive reference, deleting a dark-theme token,
+hand-editing the generated file, and changing `tokens.json` without rebuilding all exit 1.
+
+### Theme switching
+
+```css
+:root                                   { /* light */ }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"])       { /* dark by OS preference */ }
+}
+:root[data-theme="dark"]                { /* dark by explicit choice */ }
+```
+
+Spec §4.3 requires the toggle to persist the user's choice, so `data-theme` must win over the
+OS preference **in both directions** — a user who picks light on a dark-mode OS gets light.
+
+### Alpha-composited tokens
+
+The banner tints (a status colour at 12% over a surface) are the one exception to "emitted
+once": the composite differs per theme, so they are pre-computed as `rgba()` in each theme
+block. `color-mix()` would allow a single emission, but browser support scope is still open
+(**C23**), and verbosity is free in a generated file while a broken banner on an older Safari
+is not.
+
+### Breakpoints are reference-only
+
+CSS custom properties **cannot** be used in media query conditions. The breakpoint values are
+emitted as a comment block so the numbers are in front of you when writing one, but they have
+to be typed as literals. If a build step needs them programmatically, read `tokens.json`
+directly rather than adding a second generated format.
+
+### RTL
+
+These tokens are direction-neutral values; direction is handled where they are *used*. Always
+reach for logical properties — `margin-inline-start`, `padding-inline-end`, `inset-inline-start`
+— never the physical equivalents. With `dir="rtl"` on the document the browser mirrors the
+layout itself. Playbook §4.1: think in *start/end*, not *left/right*. The alternative, a
+separate `rtl.css`, costs 30–40% ongoing maintenance and is where most RTL bugs come from.
 
 ---
 
