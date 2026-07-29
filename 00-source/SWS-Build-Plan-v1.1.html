@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWS — خطة بناء المنتج (تحليل، معمارية، تدفقات، جدول زمني)</title>
+<style>
+:root{
+  --pur:#5B2E91; --pur2:#7B4FB5; --pur-l:#F3EEFA; --pur-xl:#FAF8FD;
+  --ink:#16121F; --ink2:#3D3550; --mute:#6B6280; --line:#E4DFEC;
+  --red:#B3261E; --red-bg:#FDECEA; --amb:#8A5A00; --amb-bg:#FFF6E5;
+  --grn:#1B6E3C; --grn-bg:#E9F6EE; --blu:#1A4F8A; --blu-bg:#EAF2FB;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:#fff; color:var(--ink);
+  font-family:"Segoe UI","Noto Sans Arabic","Tahoma",Arial,sans-serif;
+  font-size:15.5px; line-height:1.85;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px 100px}
+code,.mono{font-family:"Consolas","Courier New",monospace;font-size:.88em;direction:ltr;unicode-bidi:embed;display:inline-block}
+
+/* cover */
+.cover{background:linear-gradient(135deg,var(--pur) 0%,#3E1E66 100%);color:#fff;padding:64px 28px 56px;margin-bottom:44px}
+.cover .in{max-width:1080px;margin:0 auto}
+.cover .kick{opacity:.72;letter-spacing:.14em;font-size:12px;font-weight:700;margin-bottom:14px}
+.cover h1{font-size:38px;line-height:1.35;margin:0 0 14px;font-weight:800}
+.cover p{opacity:.9;max-width:640px;margin:0 0 26px;font-size:16px}
+.meta{display:flex;flex-wrap:wrap;gap:10px}
+.meta span{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);padding:6px 13px;border-radius:99px;font-size:12.5px}
+
+h2{font-size:25px;font-weight:800;color:var(--pur);margin:56px 0 6px;padding-bottom:12px;border-bottom:3px solid var(--pur-l)}
+h3{font-size:19px;font-weight:700;margin:34px 0 8px;color:var(--ink)}
+h4{font-size:16px;font-weight:700;margin:22px 0 6px;color:var(--ink2)}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 14px;padding-inline-start:22px}
+li{margin-bottom:7px}
+a{color:var(--pur);text-decoration:none;border-bottom:1px solid var(--pur-l)}
+
+.lede{font-size:16.5px;color:var(--ink2);background:var(--pur-xl);border-inline-start:4px solid var(--pur2);padding:16px 20px;border-radius:0 var(--r) var(--r) 0;margin:0 0 20px}
+
+table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13.8px}
+th{background:var(--pur);color:#fff;text-align:start;padding:10px 12px;font-weight:700;font-size:13px}
+td{border:1px solid var(--line);padding:9px 12px;vertical-align:top}
+tbody tr:nth-child(even){background:var(--pur-xl)}
+td strong{color:var(--ink)}
+
+.box{border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;margin:0 0 18px;background:#fff}
+.box.red{background:var(--red-bg);border-color:#F3CFCB}
+.box.amb{background:var(--amb-bg);border-color:#F0DFB8}
+.box.grn{background:var(--grn-bg);border-color:#C8E6D3}
+.box.blu{background:var(--blu-bg);border-color:#C9DDF2}
+.box h4{margin-top:0}
+.box.red h4{color:var(--red)} .box.amb h4{color:var(--amb)}
+.box.grn h4{color:var(--grn)} .box.blu h4{color:var(--blu)}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap;line-height:1.7}
+.t-red{background:var(--red-bg);color:var(--red)}
+.t-amb{background:var(--amb-bg);color:var(--amb)}
+.t-grn{background:var(--grn-bg);color:var(--grn)}
+.t-blu{background:var(--blu-bg);color:var(--blu)}
+.t-gry{background:#EFEDF3;color:var(--mute)}
+
+.flow{background:#1E1830;color:#E8E3F2;border-radius:var(--r);padding:18px 22px;margin:14px 0 22px;
+  font-family:"Consolas","Courier New",monospace;font-size:12.6px;line-height:2;direction:ltr;text-align:left;overflow-x:auto;white-space:pre}
+.flow b{color:#C4A6F0;font-weight:700}
+.flow i{color:#F2B872;font-style:normal}
+.flow s{color:#F08A82;text-decoration:none}
+
+.toc{background:var(--pur-xl);border:1px solid var(--line);border-radius:var(--r);padding:20px 26px;margin-bottom:20px}
+.toc ol{margin:0;padding-inline-start:20px;columns:2;column-gap:34px}
+.toc li{margin-bottom:5px;break-inside:avoid}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.stat{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;text-align:center;background:#fff}
+.stat .n{font-size:26px;font-weight:800;color:var(--pur);line-height:1.3}
+.stat .l{font-size:12.5px;color:var(--mute)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 26px}
+
+.q{border-inline-start:3px solid var(--pur2);padding:2px 14px;margin:0 0 14px}
+.q b{display:block;color:var(--pur);font-size:14.5px}
+.q span{font-size:13.5px;color:var(--mute)}
+
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+.foot{text-align:center;color:var(--mute);font-size:13px;padding-top:30px;border-top:1px solid var(--line);margin-top:60px}
+
+@media print{
+  .cover{padding:40px 0}
+  h2{page-break-after:avoid} table,.box,.flow{page-break-inside:avoid}
+  body{font-size:11pt}
+}
+@media(max-width:760px){
+  .grid2,.grid4{grid-template-columns:1fr}
+  .toc ol{columns:1}
+  .cover h1{font-size:27px}
+  table{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="in">
+  <div class="kick">SWS — SOMION WEB SERVICES</div>
+  <h1>خطة بناء المنتج<br>تحليل المواصفات · المعمارية · التدفقات · الجدول الزمني</h1>
+  <p>مستند عمل مبني على «SWS — مستند مواصفات UI/UX v2.1». يغطي التحليل النقدي للمتطلبات، معمارية المعلومات، جرد الشاشات، التدفقات الحرجة، الربط التقني بـ WHMCS، وخطة تنفيذ بمراحل وتقديرات ومخاطر.</p>
+  <div class="meta">
+    <span>الإصدار 1.1 — بعد تدقيق الموقع الحالي</span>
+    <span>يوليو 2026</span>
+    <span>النطاق: تصميم مخصص كامل</span>
+    <span>الفريق: تصميم + تطوير</span>
+    <span>المرجع: Lagom 2 / WHMCS</span>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<h2>0. الملخص التنفيذي</h2>
+
+<div class="lede">
+المواصفات الحالية وثيقة <b>وصف واجهات</b> جيدة، لكنها ليست وثيقة <b>متطلبات منتج</b>. هي تصف «كيف تبدو الشاشات» بدقة، ولا تجيب على «ماذا نبني، لمن، بأي أولوية، وبأي معيار نعتبره ناجحًا». الفجوة بين الاثنين هي ما يحوّل مشروعًا مدته ٤ أشهر إلى مشروع مدته ٨.
+</div>
+
+<div class="grid4">
+  <div class="stat"><div class="n">٧</div><div class="l">تناقضات تقنية جوهرية</div></div>
+  <div class="stat"><div class="n">٢٦+</div><div class="l">شاشة ناقصة من المواصفات</div></div>
+  <div class="stat"><div class="n">٧٤</div><div class="l">شاشة في الجرد الكامل</div></div>
+  <div class="stat"><div class="n">٢٨</div><div class="l">أسبوعًا تقديريًا للتنفيذ</div></div>
+</div>
+
+<h3>أهم ما يجب أن يعرفه المدير قبل أي التزام بموعد</h3>
+
+<div class="box red">
+<h4>١ — «تصميم مخصص لكل الشاشات» غير قابل للتحقق حرفيًا فوق WHMCS</h4>
+<p>هذا قيد معماري وليس رأيًا تصميميًا. توجد مناطق داخل WHMCS لا يملك فريق التصميم سيطرة كاملة عليها: مخرجات وحدات الدومين (DNS/Nameservers)، إطارات بوابات الدفع (Stripe Elements و3-D Secure)، فواتير PDF (تُولَّد بمحرك منفصل)، قوالب البريد (~٥٠ قالبًا بـ HTML محدود)، ولوحة cPanel بعد الـ SSO (تصميم طرف ثالث بالكامل).</p>
+<p><b>الترجمة العملية:</b> من أصل ٧٤ شاشة في الجرد، ~٤٦ قابلة للتخصيص الكامل، ~١٩ مقيدة جزئيًا، ~٩ خارج السيطرة. لا بد من تثبيت هذا التصنيف في نطاق العمل قبل التوقيع، وإلا سيُقاس الفريق على وعد مستحيل.</p>
+</div>
+
+<div class="box red">
+<h4>٢ — العربية RTL كلغة افتراضية فوق قالب مبني بالكامل لـ LTR = أعلى خطر في المشروع</h4>
+<p>كل لقطة في المواصفات إنجليزية LTR. دعم RTL في WHMCS ليس أصليًا (لا يزال طلب ميزة مفتوحًا لدى WHMCS نفسها)، ودعم Lagom يعتمد على ملفات لغة وليس على انعكاس تخطيطي كامل. المناطق التي تنكسر عادة: الأيقونات الاتجاهية، أشرطة التقدم، الجداول، منتقيات التاريخ، المخططات، الرسائل المضمّنة في نواة WHMCS.</p>
+<p><b>القرار المطلوب اليوم صفر:</b> بناء نظام التصميم على الخصائص المنطقية (<code>margin-inline-start</code> بدل <code>margin-left</code>) بدل ترقيع RTL في نهاية المشروع. الفرق في التكلفة بين النهجين يقارب ٣٠٪ من جهد الواجهة.</p>
+</div>
+
+<div class="box red">
+<h4>٣ — تعدد العملات كما هو موصوف غير مدعوم في WHMCS</h4>
+<p>المواصفة (بند ٤.٢) تقول: «تغيير العملة يُحدِّث كل الأسعار فورًا دون إعادة تحميل كاملة للصفحة». WHMCS لا يحوّل العملات حيًّا — بل يخزّن <b>سعرًا منفصلًا مُدخلًا يدويًا لكل عملة لكل منتج لكل دورة فوترة</b>. النتيجة ثلاث مشاكل متتابعة:</p>
+<ul>
+<li><b>عبء بيانات:</b> <span class="tag t-amb">مُحدَّث v1.1</span> النظام الحيّ يشغّل <b>٨ عملات</b> لا سبعًا (بإضافة SYP). أي ٨ × ~٢٥ منتجًا × ٦ دورات فوترة ≈ <b>١٢٠٠ حقل سعر</b> يجب ملؤها وصيانتها. لم تُسنَد هذه المهمة لأحد في المواصفات.</li>
+<li><b>الدينار الكويتي يستخدم ٣ خانات عشرية</b> بينما WHMCS يفترض خانتين افتراضيًا — يكسر التنسيق والتقريب.</li>
+<li><b>لا يمكن خلط عملتين في سلة واحدة</b>، وتغيير العملة بعد إضافة منتجات يستلزم قرار منتج: نُفرِغ السلة أم نمنع التبديل؟ غير محسوم.</li>
+</ul>
+</div>
+
+<div class="box amb">
+<h4>٤ — بوابات الدفع: بندان من الخمسة بلا حل جاهز</h4>
+<ul>
+<li><b>InstaPay:</b> لا توجد وحدة WHMCS رسمية أو معروفة في السوق. يحتاج تطويرًا مخصصًا أو وسيطًا (Paymob يدعمها ضمن محفظته). هذا بند تطوير خلفي وليس بند تصميم.</li>
+<li><b>«Card & Mobile Wallet (EGP Only)» مع Meeza:</b> يتطلب مزودًا مصريًا محددًا — Paymob أو Fawry أو Kashier. لكل منهم تدفق واجهة مختلف جذريًا (إعادة توجيه مقابل iframe مقابل OTP داخلي). <b>لا يمكن تصميم شاشة الدفع قبل اختيار المزود.</b> هذا حاجز أمام مرحلة التصميم وليس بعدها.</li>
+<li><b>Klarna</b> خيار «اشترِ الآن وادفع لاحقًا» يظهر ويختفي حسب البلد والمبلغ — منطق شرطي في الواجهة لم تصفه المواصفات.</li>
+<li><b>3-D Secure / SCA:</b> إلزامي لبطاقات أوروبا. لا توجد شاشة له في التدفق الموصوف رغم أنه خطوة إجبارية.</li>
+</ul>
+</div>
+
+<div class="box amb">
+<h4>٥ — «Guest Checkout» غير موجود في WHMCS</h4>
+<p>البند ٧.٣ يذكر «نموذج تسجيل مختصر لعميل جديد (Guest Checkout)». WHMCS يُنشئ حساب عميل في كل طلب — دائمًا. الوحدات المتاحة في السوق تغطي <b>دفع فاتورة كضيف</b> فقط، لا <b>الطلب كضيف</b>.</p>
+<p><b>أقصى ما يمكن تصميمه:</b> إخفاء خطوة إنشاء كلمة المرور وتوليدها تلقائيًا وإرسالها بالبريد، بحيث يشعر المستخدم أنه لم يسجّل. يجب إعادة صياغة المتطلب بهذه الكلمات، لا كما هو.</p>
+</div>
+
+<div class="box amb">
+<h4>٦ — كل اللقطات المرجعية تعرض الحالة الفارغة</h4>
+<p>لوحة التحكم في اللقطة تعرض <span class="mono">0 Services / 0 Domains / 0 Invoices / 0 Tickets</span>، وقائمة التذاكر تعرض «No Recent Tickets». هذا مؤشر على أن أحدًا لم يفكّر بعد في <b>الحالة الممتلئة</b>: عميل لديه ٤٠ خدمة، ١٢ دومينًا بتواريخ تجديد متداخلة، وفاتورة متأخرة. الجداول والفرز والترشيح والصفحات والحالة المتأخرة — كلها غير موصوفة. هذه ليست تفصيلة؛ إنها ٦٠٪ من تجربة العميل الفعلية بعد الشهر الأول.</p>
+</div>
+
+<div class="box amb">
+<h4>٧ — الضريبة ثابتة عند ١٤٪ في اللقطة، والمشروع يبيع في سبع أسواق</h4>
+<p>اللقطة تُظهر <span class="mono">Tax @ 14.00%</span>. لكن السوق يشمل سويسرا (VAT ٨٫١٪)، السعودية (١٥٪)، الإمارات (٥٪)، مصر (١٤٪)، الاتحاد الأوروبي (متغيرة حسب الدولة وقواعد B2B العكسية). قاعدة ضريبية واحدة ثابتة خطأ محاسبي وقانوني، ويتطلب تصميم شاشة الفوترة إظهار سطر ضريبي متغير ورقم تسجيل ضريبي للشركات.</p>
+</div>
+
+<h3>التوصية المختصرة</h3>
+<div class="box grn">
+<p><b>لا تبدأ التصميم بالشاشات. ابدأ بأسبوعين من الحسم.</b> سبعة قرارات (المزود المصري، نطاق التخصيص، استراتيجية RTL، مالك بيانات الأسعار، مزود مولّد الدومين بالذكاء الاصطناعي، سياسة الضرائب، مصير العملاء الحاليين) تحدد شكل ٧٠٪ من الشاشات. تصميم أي شاشة دفع أو تسعير قبل حسمها يعني إعادة عمل مؤكدة.</p>
+<p style="margin-top:10px"><b>ثم نفّذ على تسلسل القيمة لا تسلسل المستند:</b> مسار التحويل (تسويق ← دومين ← طلب ← دفع) أولًا لأنه مصدر الإيراد، ثم لوحة التحكم، ثم الدعم والأفلييت. المواصفات مرتبة ترتيبًا وصفيًا لا ترتيب أولوية.</p>
+</div>
+
+<h2>★ تدقيق الوضع القائم <span style="font-size:16px;font-weight:400;color:var(--mute)">— إضافة الإصدار 1.1</span></h2>
+
+<div class="lede">
+المواصفات مكتوبة كأن المنتج يُبنى من الصفر. الواقع أن نصفه يعمل بالفعل ومنشور للعملاء. تدقيق <span class="mono">sws.somion.ch</span> و<span class="mono">clients.somion.ch</span> غيّر ستة بنود في هذه الخطة — بعضها لصالحنا.
+</div>
+
+<h3>١. المعمارية الموصى بها منفَّذة بالفعل — لكن الخط الفاصل في المكان الخطأ</h3>
+<div class="box grn">
+<h4>الخبر الجيد</h4>
+<p>الخيار (ب) الذي أوصيت به في القسم ٨ قائم فعلًا: <span class="mono">sws.somion.ch</span> موقع تسويقي منفصل، ثنائي اللغة، وترجمته العربية <b>حقيقية وجيدة</b> لا آلية. و<span class="mono">clients.somion.ch</span> هو WHMCS بقالب Lagom2. القرار المعماري لم يعد مفتوحًا — نصف العمل مبني.</p>
+</div>
+<div class="box red">
+<h4>الخبر السيئ — وهو أهم اكتشاف في هذا التدقيق</h4>
+<p><b>لا يوجد سعر واحد على الموقع التسويقي.</b> صفحة <span class="mono">/en/vps-hosting</span> دعائية بلا أرقام وزرها «Try VPS» يقفز إلى <span class="mono">clients.somion.ch/store/vps</span>. صفحة <span class="mono">/en/domains</span> بلا أسعار امتدادات. زر «View Hosting Plans» يقفز مباشرة إلى المتجر داخل WHMCS. و<span class="mono">/en/hosting</span> لا تفتح أصلًا (404) رغم وجود «Hosting» في القائمة.</p>
+<p style="margin-top:10px"><b>النتيجة:</b> أعلى صفحات المشروع قيمةً — صفحات التسعير — تعيش داخل النظام <b>المقيَّد والبطيء وغير القابل للفهرسة جيدًا</b>، بينما الموقع الحر والسريع يحتوي بروشورات بلا أرقام. <b>الخط الفاصل معكوس.</b></p>
+<p style="margin-top:10px"><b>التعديل على الخطة:</b> M-02→M-09 لم تعد «إعادة تصميم صفحات موجودة» بل <b>نقل الأسعار من WHMCS إلى الموقع التسويقي + بناء الصفحات</b>. يبدأ دور WHMCS من السلة فقط. هذا يحوّل ٨ شاشات من <span class="tag t-amb">مقيدة</span> إلى <span class="tag t-grn">كاملة</span> — مكسب تصميمي كبير، وأهم بند SEO في المشروع.</p>
+</div>
+
+<h3>٢. اللغات سبع لا اثنتان، والعملات ثمانٍ لا سبع</h3>
+<table>
+<thead><tr><th style="width:22%">البند</th><th style="width:39%">في المواصفات</th><th style="width:39%">على النظام الحيّ</th></tr></thead>
+<tbody>
+<tr><td><b>اللغات</b></td><td>العربية + الإنجليزية</td><td><b>٧ مفعّلة:</b> العربية · الإنجليزية · الفرنسية · الألمانية · الإيطالية · الإسبانية · التركية</td></tr>
+<tr><td><b>العملات</b></td><td>٧: USD, AED, CHF, EGP, EUR, KWD, SAR</td><td><b>٨:</b> نفسها + <b>SYP</b> (الليرة السورية) — غير مذكورة إطلاقًا في المواصفات</td></tr>
+</tbody>
+</table>
+<div class="box amb">
+<h4>ماذا يعني هذا</h4>
+<ul>
+<li>مصفوفة الأسعار ترتفع من ~١٠٥٠ إلى <b>~١٢٠٠ حقل</b>.</li>
+<li>مصفوفة الترجمة تصبح <b>٧ لغات × ٧٤ شاشة</b> بدل اثنتين.</li>
+<li><b>التفسير الأرجح:</b> هذه اللغات هي الافتراضية في WHMCS/Lagom تُركت مفعّلة بترجمات غير مراجَعة. لغة مفعّلة وغير مصانة <b>أسوأ من لغة غير معروضة</b> — تنتج واجهة نصفها مترجم ونصفها إنجليزي، وتضرب الثقة بدل أن تبنيها.</li>
+<li><b>توصيتي:</b> أبقِ العربية والإنجليزية. أضف الفرنسية والألمانية <b>فقط</b> إن كان السوق السويسري حقيقيًا لا رمزيًا. أغلق الباقي حتى يوجد من يصونه. كل لغة تُبقى مفتوحة هي التزام صيانة دائم لا ميزة تُضاف مرة.</li>
+</ul>
+</div>
+
+<h3>٣. طرق الدفع المعلَنة في الفوتر لا تطابق المواصفات</h3>
+<table>
+<thead><tr><th style="width:34%">معلَن للعميل في الفوتر</th><th style="width:33%">في مواصفات UI/UX</th><th style="width:33%">الحكم</th></tr></thead>
+<tbody>
+<tr><td>Vodafone Cash · Etisalat Cash · Orange Cash · WE Pay</td><td>«Card &amp; Mobile Wallet (EGP Only)» بلا تسمية مزود</td><td><span class="tag t-blu">مؤشر مهم</span> هذه بالضبط تغطية Paymob</td></tr>
+<tr><td>Visa · Mastercard · Meeza</td><td>Stripe (Card) + بوابة مصرية</td><td><span class="tag t-grn">متوافق</span></td></tr>
+<tr><td><b>PayPal</b></td><td>غير موجودة</td><td><span class="tag t-red">تناقض</span></td></tr>
+<tr><td><b>Cryptocurrency</b></td><td>غير موجودة</td><td><span class="tag t-red">تناقض</span></td></tr>
+<tr><td>غير معلَنة</td><td>InstaPay</td><td><span class="tag t-amb">فجوة</span></td></tr>
+<tr><td>غير معلَنة</td><td>Stripe Twint &amp; Klarna</td><td><span class="tag t-amb">فجوة</span></td></tr>
+<tr><td>غير معلَنة</td><td>Bank Transfer</td><td><span class="tag t-amb">فجوة</span></td></tr>
+</tbody>
+</table>
+<div class="box red">
+<h4>بندان يستحقان تصرفًا هذا الأسبوع</h4>
+<ol>
+<li><b>المحافظ المصرية الأربع في الفوتر هي تغطية Paymob بالضبط.</b> هذا مؤشر قوي على أن إجابة السؤال الحاجز الأول (أي مزود مصري؟) <b>موجودة داخل الشركة بالفعل</b>. اسأل من ركّب الفوتر قبل أن تفتح نقاشًا جديدًا — قد توفّر أسبوعين.</li>
+<li><b>إعلان PayPal والعملات الرقمية بينما لا وجود لهما في أي تدفق دفع.</b> عرض شعار وسيلة دفع لا تقبلها مشكلة ثقة مباشرة عند الخروج، وفي سويسرا والاتحاد الأوروبي قد يُنظر إليها كإعلان مضلّل. <b>الحسم بسيط: إما تُنفَّذ أو تُزال من الفوتر — لا خيار ثالث.</b></li>
+</ol>
+</div>
+
+<h3>٤. تناقضات تسعيرية ومحتوى عالي الخطورة</h3>
+<table>
+<thead><tr><th style="width:26%">ما هو منشور الآن</th><th style="width:38%">المشكلة</th><th style="width:36%">التصرف المقترح</th></tr></thead>
+<tbody>
+<tr><td>الهيرو: <span class="mono">«…for just $2.50 in the first year»</span></td><td>أرخص باقة في المتجر <b>$5.00/شهر</b>. الرقم ٢٫٥٠ لا يقابل أي باقة معروضة. العميل ينقر على ٢٫٥٠ ويصل إلى ٥٫٠٠</td><td>من أسرع طرق فقدان الثقة وأعلى أسباب التخلي عن السلة. <b>يُصحَّح فورًا</b> — إما عرض حقيقي مطابق أو رقم مطابق للمتجر</td></tr>
+<tr><td>«Free Domain for the first year» على Pro/Ultra/Unlimited فقط</td><td>الهيرو يروّج لأرخص سعر، والباقة الأرخص (Single) لا تشمل الدومين المجاني. ولا إفصاح عن سعر التجديد في أي مكان</td><td>إظهار سعر تجديد الدومين داخل بطاقة الباقة — وليس في الشروط. هذا أكبر مصدر منفرد لشكاوى الفوترة في القطاع</td></tr>
+<tr><td>«Unlimited SSD Storage / Unlimited Bandwidth»</td><td>بلا سياسة استخدام عادل منشورة</td><td>نشر السياسة وربطها من بطاقة الباقة</td></tr>
+<tr><td><b>«1+ Million Active Websites»<br>«500K Global Servers»<br>«+48 Web Apps»</b></td><td>شركة تبيع أربع باقات استضافة مشتركة لا تشغّل نصف مليون خادم — رقم كهذا يضع صاحبه ضمن أكبر مشغّلي البنية التحتية في العالم</td><td><span class="tag t-red">أكبر خطر مصداقية على الموقع.</span> مع علامة سويسرية وأسواق أوروبية، الادعاء المبالغ فيه مسألة تنظيمية لا تجميلية. <b>تُستبدل بأرقام حقيقية قابلة للإثبات:</b> وقت التشغيل الفعلي، زمن الاستجابة، عدد العملاء، سنوات التشغيل</td></tr>
+</tbody>
+</table>
+
+<h3>٥. الصفحات القانونية غائبة فعليًا لا نظريًا</h3>
+<div class="box red">
+<p>الموقع يحتوي <b>«About Us» و«Contact Us» فقط</b>. لا سياسة خصوصية، لا شروط وأحكام، لا سياسة استرداد، لا SLA، لا سياسة استخدام مقبول. لشركة تحمل علم سويسرا وتبيع في الاتحاد الأوروبي، غياب سياسة الخصوصية ليس فجوة تصميم — بل مسألة امتثال (قانون حماية البيانات السويسري nFADP وGDPR).</p>
+<p style="margin-top:8px"><b>التعديل:</b> M-20 (الصفحات القانونية) ترتفع من <span class="tag t-amb">P1</span> إلى <span class="tag t-red">P0</span>، وتُنفَّذ في المرحلة الأولى لا السابعة. تكلفتها التصميمية منخفضة (قالب نصي واحد) — التأخير فيها لا يُبرَّر بالجهد.</p>
+</div>
+
+<h3>٦. توتر غير محسوم في تحديد الهوية</h3>
+<p>نطاق <span class="mono">.ch</span>، علم سويسري في الفوتر، «Made by Somion» — مع محافظ دفع مصرية بالكامل، وليرة سورية ضمن العملات، ودعم عربي. هذا ليس خطأً بالضرورة؛ الثقة السويسرية أصل تسويقي حقيقي في السوق العربي. لكنه <b>قرار وضع (Positioning) غير معلَن</b>، ويجب أن يُحسم صراحةً لأنه يحدد نبرة كل نص وكل صورة:</p>
+<p style="margin-inline-start:20px"><b>هل نحن مزوّد سويسري يخدم الشرق الأوسط؟ أم مزوّد مصري بواجهة سويسرية؟</b></p>
+<p>الإجابة تغيّر التصميم أكثر مما تبدو: الأولى تعني إبراز مراكز البيانات والامتثال والخصوصية؛ الثانية تعني إبراز الدعم بالعربية وطرق الدفع المحلية والسعر. حاليًا الموقع يحاول الاثنين معًا فلا يقنع بأيهما.</p>
+
+<h3>ملخص ما تغيّر في الخطة</h3>
+<table>
+<thead><tr><th style="width:24%">البند</th><th style="width:34%">قبل التدقيق</th><th style="width:42%">بعد التدقيق</th></tr></thead>
+<tbody>
+<tr><td>المعمارية</td><td>قرار مفتوح بين ٣ خيارات</td><td><span class="tag t-grn">محسوم</span> (ب) قائم — السؤال صار: أين الخط الفاصل</td></tr>
+<tr><td>صفحات التسعير</td><td>تُصمَّم داخل WHMCS (مقيدة)</td><td><b>تنتقل للموقع التسويقي</b> — ٨ شاشات تتحول إلى حرية كاملة</td></tr>
+<tr><td>العملات</td><td>٧ · ~١٠٥٠ حقل سعر</td><td>٨ (+SYP) · <b>~١٢٠٠ حقل</b></td></tr>
+<tr><td>اللغات</td><td>٢</td><td><b>٧ مفعّلة</b> — قرار تقليم مطلوب فورًا</td></tr>
+<tr><td>الصفحات القانونية</td><td>P1 · المرحلة ٧</td><td><span class="tag t-red">P0 · المرحلة ١</span> — مسألة امتثال</td></tr>
+<tr><td>بوابات الدفع</td><td>٥ في المواصفات</td><td>٩ معلَنة في الفوتر — تناقض يُحسم · <b>Paymob مرجّح</b></td></tr>
+<tr><td>مراجعة الادعاءات التسويقية</td><td>غير مذكورة</td><td><b>بند إلزامي جديد قبل الإطلاق</b></td></tr>
+<tr><td>النص العربي</td><td>«من يكتبه؟»</td><td>موجود وجيد على التسويق · افتراضي على WHMCS — <b>مشكلة صوتين لا مشكلة غياب</b></td></tr>
+<tr><td>خط الأساس للقياس</td><td>«يُقاس»</td><td>ممكن قياسه <b>الآن</b> — النظام حيّ ويستقبل زوارًا</td></tr>
+</tbody>
+</table>
+
+<h2>1. فهرس المستند</h2>
+<div class="toc"><ol>
+<li>الملخص التنفيذي وأهم المخاطر</li>
+<li><b>★ تدقيق الوضع القائم (إضافة v1.1)</b></li>
+<li>فهرس المستند</li>
+<li>التحليل النقدي للمواصفات (الثغرات)</li>
+<li>ما تفتقده المواصفات: الأهداف والقياس والشخصيات</li>
+<li>معمارية المعلومات الكاملة</li>
+<li>جرد الشاشات الكامل (٧٤ شاشة)</li>
+<li>التدفقات الحرجة (٨ تدفقات)</li>
+<li>نظام التصميم: RTL، الوضع الليلي، الرموز</li>
+<li>المعمارية التقنية وخيارات التنفيذ</li>
+<li>ربط الشاشات بـ WHMCS API</li>
+<li>خطة المشروع: المراحل والمعالم</li>
+<li>تقدير الجهد وتوزيع الفريق</li>
+<li>مصفوفة المسؤوليات RACI</li>
+<li>سجل المخاطر</li>
+<li>الأسئلة المفتوحة المطلوب حسمها</li>
+<li>معايير القبول وتعريف «منتهٍ»</li>
+</ol></div>
+
+<h2>2. التحليل النقدي للمواصفات</h2>
+
+<p>هذا القسم لا يهدف إلى انتقاد المستند الأصلي — بل إلى تحويله من وصف بصري إلى وثيقة قابلة للتقدير والتنفيذ. الملاحظات مرتبة بحسب أثرها على الجدول الزمني.</p>
+
+<h3>2.1 ثغرات المتطلبات الوظيفية</h3>
+
+<table>
+<thead><tr><th style="width:16%">البند</th><th style="width:30%">ما تقوله المواصفات</th><th style="width:34%">الواقع التقني / الفجوة</th><th style="width:20%">الأثر</th></tr></thead>
+<tbody>
+<tr><td><b>٤.٢ تعدد العملات</b></td><td>تحديث فوري للأسعار دون إعادة تحميل</td><td>WHMCS يخزّن أسعارًا ثابتة لكل عملة ولا يحوّل حيًّا. التحديث الفوري يتطلب طبقة AJAX مخصصة + منطق سلة</td><td><span class="tag t-red">حاجز</span> يمنع تقدير صفحات التسعير</td></tr>
+<tr><td><b>٤.١ RTL افتراضي</b></td><td>«RTL بالكامل — تخطيط، أيقونات، اتجاه، أرقام»</td><td>لا يوجد دعم RTL أصلي في WHMCS. «الأرقام» غامضة: هندية (٠١٢) أم عربية (012)؟ قرار غير محسوم يؤثر على كل رقم في المنتج</td><td><span class="tag t-red">حاجز</span> يحدد بنية نظام التصميم</td></tr>
+<tr><td><b>٧.٣ Guest Checkout</b></td><td>نموذج تسجيل مختصر لعميل جديد</td><td>غير مدعوم — WHMCS ينشئ حسابًا دائمًا. البدائل تغطي دفع الفواتير فقط</td><td><span class="tag t-amb">إعادة صياغة</span> المتطلب</td></tr>
+<tr><td><b>١١ بوابات الدفع</b></td><td>خمس بوابات كخيارات Radio</td><td>InstaPay بلا وحدة جاهزة؛ «Card & Mobile Wallet» بلا مزود محدد؛ 3DS بلا شاشة</td><td><span class="tag t-red">حاجز</span> يمنع تصميم الدفع</td></tr>
+<tr><td><b>٦.٤ AI Generator</b></td><td>حقل نصي لوصف الفكرة + زر توليد</td><td>لا مزود محدد، لا سقف تكلفة، لا زمن استجابة مستهدف، لا سلوك عند الفشل، لا حد استخدام لمنع الإساءة</td><td><span class="tag t-amb">قرار منتج</span> + تكلفة تشغيل</td></tr>
+<tr><td><b>٤.٣ الوضع الليلي</b></td><td>زر تبديل + تذكّر الاختيار</td><td>مذكور جيدًا، لكنه يضاعف مصفوفة الاختبار: ٢ سمة × ٢ اتجاه × ٣ نقاط توقف = ١٢ تركيبة لكل شاشة</td><td><span class="tag t-amb">×٢ جهد QA</span></td></tr>
+<tr><td><b>٩.٢ الترقية/التخفيض</b></td><td>سطر واحد: «ترقية/تخفيض الباقة»</td><td>تدفق كامل من ٤ شاشات: اختيار الباقة ← حساب الفرق التناسبي ← فاتورة الفرق ← تأكيد وتفعيل. غير موصوف إطلاقًا</td><td><span class="tag t-amb">نقص نطاق</span></td></tr>
+<tr><td><b>٩.٢ الإلغاء</b></td><td>سطر واحد: «إلغاء الخدمة»</td><td>يحتاج: فوري أم نهاية الدورة، سبب الإلغاء، عرض احتفاظ، تأكيد مزدوج، أثر على الدومين المرتبط</td><td><span class="tag t-amb">نقص نطاق</span></td></tr>
+<tr><td><b>—</b></td><td>غير مذكور</td><td><b>استرداد الدفع الفاشل (Dunning):</b> أهم مسار إيراد في أي منتج اشتراكات. لا شاشة، لا سلسلة بريد، لا سياسة تعليق</td><td><span class="tag t-red">فجوة إيراد</span></td></tr>
+<tr><td><b>—</b></td><td>غير مذكور</td><td><b>الطلبات المعلّقة / مراجعة الاحتيال:</b> WHMCS يعلّق طلبات تلقائيًا. لا توجد شاشة تشرح للعميل ماذا يحدث</td><td><span class="tag t-amb">فجوة CX</span></td></tr>
+<tr><td><b>٥.٥ Network Status</b></td><td>يظهر في مخطط الموقع وفي لقطة الدعم</td><td>بلا مواصفة صفحة إطلاقًا. صفحة حالة الشبكة متطلب أساسي لشركة استضافة</td><td><span class="tag t-amb">نقص نطاق</span></td></tr>
+</tbody>
+</table>
+
+<h3>2.2 الصفحات الناقصة تمامًا</h3>
+<p>المواصفات تغطي المسار السعيد فقط. الصفحات التالية موجودة في أي منتج استضافة حقيقي وغائبة عن المستند:</p>
+
+<table>
+<thead><tr><th style="width:22%">المجموعة</th><th>الصفحات الناقصة</th><th style="width:14%">الأولوية</th></tr></thead>
+<tbody>
+<tr><td><b>تسويقية إلزامية</b></td><td>من نحن · اتصل بنا · الشروط والأحكام · سياسة الخصوصية · سياسة الاسترداد · اتفاقية مستوى الخدمة (SLA) · سياسة الاستخدام المقبول (AUP) · مراكز البيانات · صفحة المقارنة بين الباقات</td><td><span class="tag t-red">إلزامي قانونيًا</span></td></tr>
+<tr><td><b>تحويل</b></td><td>جدول مقارنة الباقات جنبًا إلى جنب · حاسبة الموارد · صفحة العروض/الكوبونات · صفحة نقل الموقع المجاني (Migration Request)</td><td><span class="tag t-amb">أثر مباشر على البيع</span></td></tr>
+<tr><td><b>دورة حياة الخدمة</b></td><td>الترقية (٤ شاشات) · التخفيض · الإلغاء + عرض الاحتفاظ · التجديد اليدوي · فشل التجديد · إعادة التفعيل بعد التعليق</td><td><span class="tag t-red">حرج</span></td></tr>
+<tr><td><b>الدفع والفوترة</b></td><td>فشل الدفع + إعادة المحاولة · شاشة 3-D Secure · الطلب المعلّق · مراجعة الاحتيال · سجل المعاملات · إيصال/فاتورة PDF · الفوترة التلقائية وإدارتها</td><td><span class="tag t-red">حرج</span></td></tr>
+<tr><td><b>نظامية</b></td><td>404 · 500 · صفحة الصيانة · انتهاء الجلسة · حظر الوصول · تأكيد البريد الإلكتروني · صفحة نجاح/فشل عامة</td><td><span class="tag t-amb">مطلوب للإطلاق</span></td></tr>
+<tr><td><b>محيطة بالمنتج</b></td><td>~٥٠ قالب بريد إلكتروني · قالب فاتورة PDF · إشعارات داخل التطبيق · تفضيلات الإشعارات</td><td><span class="tag t-amb">غالبًا يُنسى ثم يُستعجل</span></td></tr>
+<tr><td><b>بحث ومعرفة</b></td><td>نتائج البحث في قاعدة المعرفة · البحث العام في الموقع · صفحة الأسئلة الشائعة</td><td><span class="tag t-gry">متوسط</span></td></tr>
+</tbody>
+</table>
+
+<h3>2.3 ما هو غائب على مستوى المنهجية لا الشاشات</h3>
+
+<div class="grid2">
+<div class="box">
+<h4>لا توجد شخصيات مستخدمين</h4>
+<p>من نصمم له؟ صاحب مشروع مصري غير تقني يشتري أول موقع له، ووكالة ويب تدير ٤٠ حسابًا، ومطور يريد VPS — ثلاثتهم يحتاجون تجارب متعارضة. المواصفات تفترض مستخدمًا واحدًا مجهولًا.</p>
+</div>
+<div class="box">
+<h4>لا توجد معايير قبول</h4>
+<p>ولا شاشة واحدة لديها تعريف لـ«منتهية». متى نعتبر صفحة السلة جاهزة؟ ما حالات الخطأ التي يجب أن تتعامل معها؟ بدون هذا لا يوجد أساس للمراجعة أو التسليم.</p>
+</div>
+<div class="box">
+<h4>لا توجد خطة قياس</h4>
+<p>لا أحداث تتبع، لا قمع تحويل، لا مؤشرات. النتيجة: بعد الإطلاق لن نعرف أين يسقط المستخدمون، ولن نستطيع إثبات أن إعادة التصميم حسّنت أي شيء.</p>
+</div>
+<div class="box">
+<h4>لا ذكر لإمكانية الوصول</h4>
+<p>رغم أن المواصفات تذكر «تباين واضح» في الوضع الليلي، لا يوجد التزام بمعيار (WCAG 2.2 AA)، ولا ذكر للتنقل بلوحة المفاتيح أو قارئات الشاشة — وهو أمر يزداد أهمية في العقود الحكومية والمؤسسية.</p>
+</div>
+<div class="box">
+<h4>لا ذكر لـ SEO أو الأداء</h4>
+<p>شركة استضافة تُقيَّم على سرعة موقعها قبل أي شيء آخر. لا هدف لـ Core Web Vitals، لا بنية روابط، لا بيانات منظمة، لا استراتيجية محتوى. وWHMCS بطيء افتراضيًا.</p>
+</div>
+<div class="box">
+<h4>لا مالك للمحتوى</h4>
+<p>من يكتب النصوص العربية؟ الترجمة الحرفية من الإنجليزية ستنتج تجربة ركيكة. كتابة تجربة المستخدم (UX Writing) بندٌ عملٍ حقيقي غير مخصص لأحد.</p>
+</div>
+</div>
+
+<div class="box blu">
+<h4>ملاحظات إضافية تستحق الانتباه</h4>
+<ul>
+<li><b>بيانات دخول تجريبية داخل مستند مشترك</b> (صفحة الغلاف). مهما كانت بيئة تجريبية، هذه ممارسة يجب إيقافها.</li>
+<li><b>«Unlimited» في وصف الباقات</b> — مصطلح مثير للجدل قانونيًا في عدة أسواق ويحتاج إفصاحًا واضحًا عن سياسة الاستخدام العادل، وإلا فهو مصدر شكاوى واسترداد مدفوعات.</li>
+<li><b>«Free Domain 1st yr»</b> — أكبر مصدر منفرد لشكاوى الفوترة في قطاع الاستضافة. يجب أن يُظهر التصميم سعر التجديد بعد السنة الأولى في نفس البطاقة، لا في الشروط.</li>
+<li><b>هل هناك عملاء حاليون على clients.somion.ch؟</b> إن كان نعم، فهناك مسار ترحيل وتواصل واختبار انحدار غير محسوب في أي مكان.</li>
+<li><b>لا ذكر للوحة الإدارة (Admin)</b>. هل تُعاد تصميمها؟ إن كان نعم فهو مشروع منفصل بحجم مماثل. يجب استبعادها صراحةً.</li>
+</ul>
+</div>
+
+<h2>3. ما تفتقده المواصفات: الأهداف والشخصيات والقياس</h2>
+
+<p>قبل أي شاشة، يجب أن يوافق الفريق على هذه الطبقة. هذه مقترحات مبدئية للنقاش لا قرارات نهائية.</p>
+
+<h3>3.1 مؤشرات النجاح المقترحة</h3>
+<table>
+<thead><tr><th style="width:26%">المؤشر</th><th style="width:26%">التعريف</th><th style="width:22%">خط الأساس</th><th style="width:26%">الهدف بعد ٩٠ يومًا</th></tr></thead>
+<tbody>
+<tr><td><b>معدل إتمام الطلب</b></td><td>سلة ← طلب مدفوع</td><td>يُقاس من النظام الحالي</td><td>+٢٥٪ نسبيًا</td></tr>
+<tr><td><b>التخلي عن السلة</b></td><td>سلة بها منتج ولم تُدفع خلال ٢٤ ساعة</td><td>يُقاس</td><td>−١٥ نقطة مئوية</td></tr>
+<tr><td><b>الزمن حتى أول خدمة نشطة</b></td><td>من الزيارة الأولى إلى تفعيل الاستضافة</td><td>يُقاس</td><td>أقل من ١٠ دقائق للمسار المدفوع بالبطاقة</td></tr>
+<tr><td><b>تذاكر «كيف أفعل كذا»</b></td><td>نسبة تذاكر الاستفسار من إجمالي التذاكر</td><td>يُقاس</td><td>−٣٠٪ عبر اقتراحات قاعدة المعرفة</td></tr>
+<tr><td><b>نجاح التجديد التلقائي</b></td><td>نسبة الفواتير المتكررة المدفوعة من أول محاولة</td><td>يُقاس</td><td>≥ ٩٢٪</td></tr>
+<tr><td><b>LCP للصفحات التسويقية</b></td><td>أكبر عنصر مرئي</td><td>يُقاس</td><td>&lt; ٢٫٥ ثانية على 4G</td></tr>
+<tr><td><b>حصة اللغة العربية</b></td><td>نسبة الجلسات بالعربية</td><td>—</td><td>مؤشر تحقق من صحة الرهان على RTL</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 الشخصيات المقترحة</h3>
+<table>
+<thead><tr><th style="width:18%">الشخصية</th><th style="width:24%">السياق</th><th style="width:29%">ما يحتاجه من الواجهة</th><th style="width:29%">ما يكسر تجربته</th></tr></thead>
+<tbody>
+<tr><td><b>سامي — صاحب مشروع صغير</b><br><span class="tag t-blu">الشريحة الأكبر</span></td><td>مصر، غير تقني، يشتري أول موقع، يدفع بمحفظة أو InstaPay</td><td>لغة عربية بشرية بلا مصطلحات، ٣ باقات لا ٧، شرح «ما هو الدومين»، سعر شامل الضريبة واضح</td><td>مصطلحات مثل Nameservers وSSL Wildcard بلا شرح؛ الدفع بالبطاقة كخيار وحيد بارز</td></tr>
+<tr><td><b>ندى — وكالة ويب</b></td><td>تدير ١٥–٥٠ موقع عميل، تدخل يوميًا</td><td>جداول قابلة للفرز والترشيح، بحث سريع، حسابات فرعية بصلاحيات، فوترة مجمّعة، تجديد جماعي</td><td>لوحة تحكم مصممة لخدمة واحدة؛ لا بحث؛ لا إجراءات جماعية</td></tr>
+<tr><td><b>خالد — مطور</b></td><td>خليجي، يشتري VPS، يقارن المواصفات التقنية</td><td>جدول مقارنة تقني دقيق، وصول SSH، وثائق، حالة الشبكة، API</td><td>تسويق مبالغ فيه بلا أرقام؛ إخفاء المواصفات خلف «اتصل بنا»</td></tr>
+<tr><td><b>ليلى — مسؤولة مشتريات</b></td><td>شركة، تحتاج فاتورة رسمية ورقم ضريبي</td><td>تحويل بنكي، فاتورة PDF بالرقم الضريبي، بيانات شركة، أمر شراء</td><td>لا حقل رقم ضريبي؛ فاتورة بلا بيانات قانونية</td></tr>
+</tbody>
+</table>
+
+<h2>4. معمارية المعلومات الكاملة</h2>
+
+<p>هذه نسخة موسّعة من مخطط الموقع في البند ٥ بعد إضافة كل ما كان ناقصًا (بعلامة <span class="tag t-amb">جديد</span>).</p>
+
+<div class="flow">
+<b>SWS</b>
+│
+├── <b>الموقع التسويقي (Marketing)</b>
+│   ├── الرئيسية
+│   ├── الاستضافة
+│   │   ├── Shared Hosting (cPanel)
+│   │   ├── WordPress Hosting (cPanel)
+│   │   ├── Cloud Hosting (cPanel)
+│   │   ├── Email Hosting
+│   │   ├── VPS Hosting
+│   │   └── <i>مقارنة الباقات جنبًا إلى جنب</i>            <s>[جديد]</s>
+│   ├── الدومينات
+│   │   ├── البحث عن دومين (كلاسيكي + AI)
+│   │   ├── نقل دومين
+│   │   └── <i>أسعار كل الامتدادات</i>
+│   ├── منتجات إضافية
+│   │   ├── SSL Certificates
+│   │   ├── Website Builder
+│   │   └── Site &amp; Server Monitoring
+│   ├── <i>نقل موقعك مجانًا (Migration)</i>               <s>[جديد]</s>
+│   ├── <i>حالة الشبكة (Network Status)</i>               <s>[جديد]</s>
+│   ├── الشركة
+│   │   ├── <i>من نحن · مراكز البيانات · اتصل بنا</i>      <s>[جديد]</s>
+│   │   └── <i>المدونة / المركز التعليمي</i>              <s>[اختياري]</s>
+│   └── قانوني
+│       └── <i>الشروط · الخصوصية · الاسترداد · SLA · AUP</i> <s>[جديد]</s>
+│
+├── <b>مسار الطلب (Ordering)</b>
+│   ├── تفاصيل المنتج ← تهيئة المنتج
+│   ├── اختيار الدومين (٤ خيارات)
+│   ├── تهيئة الدومين (DNS / ID Protection / Forwarding)
+│   ├── المراجعة والسلة + كود الخصم
+│   ├── بيانات الفوترة + بيانات مُسجِّل الدومين
+│   ├── اختيار بوابة الدفع
+│   ├── <i>3-D Secure / تحقق البوابة</i>                  <s>[جديد]</s>
+│   ├── تأكيد الطلب
+│   └── <i>حالات: فشل الدفع · طلب معلّق · مراجعة احتيال</i> <s>[جديد]</s>
+│
+├── <b>المصادقة (Auth)</b>
+│   ├── تسجيل الدخول · إنشاء حساب
+│   ├── استعادة كلمة المرور (٣ شاشات)
+│   ├── التحقق بخطوتين (تفعيل · إدخال · رموز احتياطية)     <s>[موسّع]</s>
+│   └── <i>تأكيد البريد الإلكتروني · انتهاء الجلسة</i>     <s>[جديد]</s>
+│
+├── <b>لوحة تحكم العميل (Client Area)</b>
+│   ├── لوحة القيادة
+│   ├── خدماتي
+│   │   ├── قائمة الخدمات (فرز/ترشيح/بحث)               <s>[موسّع]</s>
+│   │   ├── تفاصيل خدمة + SSO إلى cPanel
+│   │   ├── <i>الترقية / التخفيض (٤ شاشات)</i>            <s>[جديد]</s>
+│   │   ├── <i>التجديد اليدوي · فشل التجديد</i>           <s>[جديد]</s>
+│   │   └── <i>الإلغاء + عرض احتفاظ</i>                   <s>[جديد]</s>
+│   ├── دوماييناتي
+│   │   ├── القائمة · إدارة دومين · Nameservers · DNS
+│   │   ├── خصوصية WHOIS · قفل المُسجِّل
+│   │   └── <i>نقل الدومين للخارج (EPP)</i>               <s>[جديد]</s>
+│   ├── الفوترة
+│   │   ├── الفواتير · فاتورة مفردة · إضافة رصيد
+│   │   ├── طرق الدفع المحفوظة + الفوترة المتكررة
+│   │   └── <i>سجل المعاملات · إعدادات الضريبة</i>        <s>[جديد]</s>
+│   ├── الدعم
+│   │   ├── التذاكر · فتح تذكرة · محادثة تذكرة
+│   │   ├── قاعدة المعرفة + <i>نتائج البحث</i>            <s>[جديد]</s>
+│   │   └── الإعلانات / الأخبار
+│   ├── الأفلييت
+│   ├── الحساب والأمان
+│   │   ├── البيانات الشخصية · كلمة المرور · 2FA
+│   │   ├── جهات الاتصال الفرعية والصلاحيات
+│   │   ├── سجل النشاط الأمني
+│   │   └── <i>تفضيلات الإشعارات · حذف الحساب</i>         <s>[جديد]</s>
+│   └── <i>الإشعارات داخل التطبيق</i>                     <s>[جديد]</s>
+│
+└── <b>نظامية</b>
+    └── <i>404 · 500 · صيانة · محظور</i>                  <s>[جديد]</s>
+</div>
+
+<h2>5. جرد الشاشات الكامل</h2>
+
+<div class="lede">
+٧٤ شاشة. عمود <b>«التخصيص»</b> هو أهم عمود في المستند: يحدد أين يستطيع فريق التصميم أن يعمل بحرية وأين سيصطدم بحدود WHMCS. أي التزام بموعد قبل مراجعة هذا العمود هو التزام بالحدس.
+</div>
+
+<p><b>مفتاح التخصيص:</b>
+<span class="tag t-grn">كامل</span> حرية تصميمية تامة ·
+<span class="tag t-amb">مقيد</span> بنية HTML يفرضها WHMCS أو وحدة، التصميم ممكن لكن ضمن حدود ·
+<span class="tag t-red">مغلق</span> مخرجات طرف ثالث أو محرك خارجي، التأثير على المظهر محدود جدًا</p>
+
+<h3>5.1 الموقع التسويقي</h3>
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:24%">الشاشة</th><th style="width:34%">الحالات المطلوب تصميمها</th><th style="width:12%">التخصيص</th><th style="width:12%">الأولوية</th><th style="width:12%">تعقيد التصميم</th></tr></thead>
+<tbody>
+<tr><td>M-01</td><td>الرئيسية</td><td>افتراضية · بحث دومين نشط · بحث فارغ · تحميل</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>M-02</td><td>Shared Hosting</td><td>٤ باقات · باقة مميزة · تبديل دورة الفوترة · تبديل العملة</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>M-03</td><td>WordPress Hosting</td><td>نفس النمط + محتوى مخصص</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>منخفض (قالب مُعاد)</td></tr>
+<tr><td>M-04</td><td>Cloud Hosting</td><td>نفس النمط</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>M-05</td><td>Email Hosting</td><td>باقات بريد (عدد الصناديق/المساحة)</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>M-06</td><td>VPS Hosting</td><td>جدول مقارنة مواصفات · اختيار نظام التشغيل · اختيار الموقع</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>عالٍ</td></tr>
+<tr><td>M-07</td><td>SSL Certificates</td><td>DV / OV / Wildcard · شارة «الأكثر طلبًا» · جدول مقارنة</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>M-08</td><td>Website Builder</td><td>عرض تفاعلي للقوالب · تجربة مجانية</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>عالٍ</td></tr>
+<tr><td>M-09</td><td>Site &amp; Server Monitoring</td><td>باقات مراقبة · شرح التنبيهات</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>متوسط</td></tr>
+<tr><td>M-10</td><td>مقارنة الباقات <span class="tag t-amb">جديد</span></td><td>جدول مقارنة كامل · نسخة موبايل (تمرير أفقي / أكورديون)</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>عالٍ</td></tr>
+<tr><td>M-11</td><td>البحث عن دومين</td><td>خامل · جارٍ البحث · متاح · غير متاح + بدائل · خطأ · مقترحات AI · فشل AI</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ جدًا</td></tr>
+<tr><td>M-12</td><td>أسعار كل الامتدادات</td><td>جدول + ترشيح بالفئة + بحث + ترقيم صفحات</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>M-13</td><td>نقل دومين</td><td>إدخال الدومين · التحقق من الأهلية · إدخال كود EPP · خطأ</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>M-14</td><td>تفاصيل منتج مفردة</td><td>وصف · مواصفات · أسئلة شائعة · CTA لزج</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>M-15</td><td>طلب نقل موقع <span class="tag t-amb">جديد</span></td><td>نموذج + تأكيد + تتبع الحالة</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>M-16</td><td>حالة الشبكة <span class="tag t-amb">جديد</span></td><td>كل الأنظمة تعمل · عطل جزئي · عطل كامل · صيانة مجدولة · سجل الأعطال</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>متوسط</td></tr>
+<tr><td>M-17</td><td>من نحن <span class="tag t-amb">جديد</span></td><td>افتراضية</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>M-18</td><td>اتصل بنا <span class="tag t-amb">جديد</span></td><td>نموذج · نجاح · خطأ · تحقق</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>M-19</td><td>مراكز البيانات <span class="tag t-amb">جديد</span></td><td>خريطة + بطاقات</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>متوسط</td></tr>
+<tr><td>M-20</td><td>٥ صفحات قانونية <span class="tag t-amb">جديد</span></td><td>قالب نصي واحد بفهرس جانبي</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>M-21</td><td>المدونة / المركز التعليمي</td><td>قائمة · مقال · فئة · بحث</td><td><span class="tag t-grn">كامل</span></td><td>P3</td><td>متوسط</td></tr>
+</tbody>
+</table>
+
+<h3>5.2 مسار الطلب</h3>
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:24%">الشاشة</th><th style="width:34%">الحالات المطلوب تصميمها</th><th style="width:12%">التخصيص</th><th style="width:12%">الأولوية</th><th style="width:12%">تعقيد التصميم</th></tr></thead>
+<tbody>
+<tr><td>O-01</td><td>تهيئة المنتج</td><td>اختيار دورة الفوترة · إضافات · ملخص لزج · خطأ تحقق · جارٍ التحديث</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>O-02</td><td>اختيار الدومين</td><td>٤ بطاقات × حالاتها: من السلة · تسجيل جديد (متاح/غير متاح/جارٍ) · نقل + EPP · دوميني الخاص</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ جدًا</td></tr>
+<tr><td>O-03</td><td>تهيئة الدومين</td><td>إضافات الدومين · دومين متعدد · تحذير Nameservers</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>O-04</td><td>السلة / المراجعة</td><td>ممتلئة · فارغة · كود خصم (صالح/غير صالح/منتهٍ) · حذف عنصر · تحديث الكمية</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>O-05</td><td>بيانات الفوترة</td><td>عميل جديد · عميل مسجل · شركة + رقم ضريبي · أخطاء الحقول · اختيار الدولة يغيّر الضريبة</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>O-06</td><td>بيانات مُسجِّل الدومين</td><td>افتراضية (نفس بيانات الحساب) · بيانات مخصصة · حقول إضافية حسب الامتداد</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>O-07</td><td>اختيار بوابة الدفع</td><td>٥ بوابات × حالة مختارة/غير مختارة · بوابة غير متاحة لهذه العملة · تفاصيل ديناميكية لكل بوابة</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ جدًا</td></tr>
+<tr><td>O-08</td><td>إدخال بيانات البطاقة</td><td>Stripe Elements — التنسيق فقط · خطأ بطاقة · جارٍ المعالجة</td><td><span class="tag t-red">مغلق</span></td><td>P0</td><td>منخفض (محدود)</td></tr>
+<tr><td>O-09</td><td>3-D Secure <span class="tag t-amb">جديد</span></td><td>صفحة انتظار + إعادة توجيه · فشل التحقق</td><td><span class="tag t-red">مغلق</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>O-10</td><td>تعليمات التحويل البنكي</td><td>بيانات الحساب · رقم مرجعي · رفع إيصال</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>O-11</td><td>تعليمات InstaPay / المحفظة</td><td>QR أو رقم · تعليمات مصورة · تأكيد يدوي · مهلة</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>O-12</td><td>تأكيد الطلب</td><td>مدفوع ومُفعَّل · مدفوع وقيد التجهيز · بانتظار الدفع</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>O-13</td><td>فشل الدفع <span class="tag t-amb">جديد</span></td><td>سبب الفشل + إعادة المحاولة + تغيير البوابة دون فقدان السلة</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>O-14</td><td>طلب معلّق / مراجعة احتيال <span class="tag t-amb">جديد</span></td><td>شرح واضح + خطوات التحقق + مدة متوقعة</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+</tbody>
+</table>
+
+<h3>5.3 المصادقة</h3>
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:24%">الشاشة</th><th style="width:34%">الحالات المطلوب تصميمها</th><th style="width:12%">التخصيص</th><th style="width:12%">الأولوية</th><th style="width:12%">تعقيد التصميم</th></tr></thead>
+<tbody>
+<tr><td>A-01</td><td>تسجيل الدخول</td><td>افتراضية · بيانات خاطئة · حساب مقفل · تذكرني · دخول عبر Google</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>A-02</td><td>إدخال رمز 2FA</td><td>إدخال · رمز خاطئ · استخدام رمز احتياطي · فقدان الجهاز</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>A-03</td><td>إنشاء حساب</td><td>نموذج · قوة كلمة المرور · بريد مستخدم · تحقق حقول · شروط</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>A-04</td><td>طلب استعادة كلمة المرور</td><td>إدخال البريد · تم الإرسال (بصرف النظر عن وجود الحساب)</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>A-05</td><td>تعيين كلمة مرور جديدة</td><td>نموذج · رابط منتهٍ · نجاح</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>A-06</td><td>تأكيد البريد <span class="tag t-amb">جديد</span></td><td>بانتظار التأكيد · تم · رابط منتهٍ · إعادة إرسال</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>A-07</td><td>انتهاء الجلسة <span class="tag t-amb">جديد</span></td><td>تحذير قبل الانتهاء + إعادة دخول تحفظ السياق</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>منخفض</td></tr>
+</tbody>
+</table>
+
+<h3>5.4 لوحة تحكم العميل</h3>
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:24%">الشاشة</th><th style="width:34%">الحالات المطلوب تصميمها</th><th style="width:12%">التخصيص</th><th style="width:12%">الأولوية</th><th style="width:12%">تعقيد التصميم</th></tr></thead>
+<tbody>
+<tr><td>C-01</td><td>لوحة القيادة</td><td><b>فارغة (عميل جديد)</b> · عميل بخدمة واحدة · عميل بـ٤٠ خدمة · فاتورة متأخرة · خدمة معلّقة</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>C-02</td><td>قائمة خدماتي</td><td>فارغة · قائمة · فرز · ترشيح بالحالة · بحث · ترقيم · حالات (نشط/معلّق/ملغى/قيد التجهيز)</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>C-03</td><td>تفاصيل خدمة</td><td>نشطة · معلّقة · ملغاة · بيانات الخادم · استهلاك الموارد · زر SSO</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>C-04</td><td>الترقية: اختيار الباقة <span class="tag t-amb">جديد</span></td><td>الباقات الأعلى · الحالية معطّلة · مقارنة الفروق</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-05</td><td>الترقية: حساب الفرق <span class="tag t-amb">جديد</span></td><td>تفصيل الحساب التناسبي · التاريخ الفعّال</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-06</td><td>الترقية: تأكيد ونتيجة <span class="tag t-amb">جديد</span></td><td>نجاح فوري · بانتظار الدفع · فشل</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>C-07</td><td>الإلغاء <span class="tag t-amb">جديد</span></td><td>اختيار التوقيت · سبب الإلغاء · عرض احتفاظ · تأكيد نهائي · تراجع</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-08</td><td>التجديد اليدوي <span class="tag t-amb">جديد</span></td><td>خدمة قاربت الانتهاء · خدمة منتهية · تجديد متعدد</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-09</td><td>قائمة دوماييناتي</td><td>فارغة · قائمة · قرب الانتهاء · منتهٍ · فترة استرداد · فرز/ترشيح</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-10</td><td>إدارة دومين</td><td>نظرة عامة · تجديد تلقائي · قفل المُسجِّل · خصوصية WHOIS</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-11</td><td>Nameservers</td><td>افتراضية · مخصصة · تحقق · خطأ</td><td><span class="tag t-red">مغلق</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>C-12</td><td>سجلات DNS</td><td>جدول · إضافة/تعديل/حذف · أنواع السجلات · تحقق · فارغ</td><td><span class="tag t-red">مغلق</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-13</td><td>نقل الدومين للخارج (EPP) <span class="tag t-amb">جديد</span></td><td>طلب الكود · عرض الكود · قفل يمنع النقل</td><td><span class="tag t-red">مغلق</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>C-14</td><td>قائمة الفواتير</td><td>فارغة · مدفوعة · غير مدفوعة · متأخرة · ملغاة · مستردة · ترشيح بالفترة</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-15</td><td>فاتورة مفردة</td><td>غير مدفوعة (مع زر دفع) · مدفوعة · متأخرة · جزئية · تحميل PDF</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-16</td><td>فاتورة PDF</td><td>قالب TCPDF منفصل — يحتاج تصميم مستقل بالعربية RTL</td><td><span class="tag t-red">مغلق</span></td><td>P1</td><td>عالٍ (RTL في PDF)</td></tr>
+<tr><td>C-17</td><td>دفع فاتورة</td><td>اختيار البوابة · استخدام الرصيد · استخدام بطاقة محفوظة · فشل</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-18</td><td>إضافة رصيد</td><td>إدخال المبلغ · حد أدنى/أقصى · تأكيد</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>C-19</td><td>طرق الدفع المحفوظة</td><td>فارغة · بطاقات محفوظة · إضافة · حذف · تعيين افتراضية · بطاقة منتهية</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-20</td><td>سجل المعاملات <span class="tag t-amb">جديد</span></td><td>جدول + ترشيح + تصدير</td><td><span class="tag t-amb">مقيد</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>C-21</td><td>استرداد الدفع الفاشل <span class="tag t-amb">جديد</span></td><td>لافتة تحذير · صفحة تحديث البطاقة · عدّاد قبل التعليق · خدمة معلّقة</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-22</td><td>قائمة التذاكر</td><td>فارغة · مفتوحة/بانتظار الرد/مغلقة · ترشيح بالقسم والأولوية</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-23</td><td>فتح تذكرة</td><td>اختيار القسم · النموذج · محرر نصوص · مرفقات (رفع/خطأ/حجم) · اقتراحات KB حيّة</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>عالٍ</td></tr>
+<tr><td>C-24</td><td>محادثة تذكرة</td><td>تسلسل زمني · رد العميل · رد الفريق · مرفقات · إغلاق · إعادة فتح</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-25</td><td>قاعدة المعرفة — الفئات</td><td>شبكة فئات · فارغة</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>C-26</td><td>مقال معرفي</td><td>محتوى · تقييم «هل كان مفيدًا» · مقالات ذات صلة</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>C-27</td><td>نتائج بحث المعرفة <span class="tag t-amb">جديد</span></td><td>نتائج · لا نتائج + اقتراح فتح تذكرة</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>C-28</td><td>الإعلانات</td><td>قائمة · إعلان مفرد · فارغة</td><td><span class="tag t-amb">مقيد</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>C-29</td><td>الأفلييت — لوحة</td><td>غير مفعّل · مفعّل · إحصائيات · رابط الإحالة · مواد تسويقية</td><td><span class="tag t-amb">مقيد</span></td><td>P2</td><td>متوسط</td></tr>
+<tr><td>C-30</td><td>الأفلييت — طلب سحب</td><td>نموذج · حد أدنى غير مستوفى · قيد المعالجة · سجل</td><td><span class="tag t-amb">مقيد</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>C-31</td><td>بيانات الحساب</td><td>عرض/تعديل · تغيير البريد (يتطلب تأكيد) · تغيير الدولة (يؤثر على الضريبة)</td><td><span class="tag t-amb">مقيد</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>C-32</td><td>الأمان و2FA</td><td>تفعيل (QR) · رموز احتياطية · تعطيل · تغيير كلمة المرور</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-33</td><td>جهات الاتصال الفرعية</td><td>فارغة · قائمة · إضافة · مصفوفة صلاحيات · حذف</td><td><span class="tag t-amb">مقيد</span></td><td>P1</td><td>متوسط</td></tr>
+<tr><td>C-34</td><td>سجل النشاط الأمني</td><td>جدول + ترشيح + جهاز/موقع/وقت</td><td><span class="tag t-amb">مقيد</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>C-35</td><td>تفضيلات الإشعارات <span class="tag t-amb">جديد</span></td><td>مصفوفة قنوات × أنواع</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>منخفض</td></tr>
+<tr><td>C-36</td><td>الإشعارات داخل التطبيق <span class="tag t-amb">جديد</span></td><td>قائمة منسدلة · فارغة · غير مقروء · صفحة الكل</td><td><span class="tag t-grn">كامل</span></td><td>P2</td><td>متوسط</td></tr>
+</tbody>
+</table>
+
+<h3>5.5 نظامية ومحيطة</h3>
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:24%">الشاشة / المكوّن</th><th style="width:34%">ملاحظات</th><th style="width:12%">التخصيص</th><th style="width:12%">الأولوية</th><th style="width:12%">تعقيد التصميم</th></tr></thead>
+<tbody>
+<tr><td>S-01</td><td>404 / 500 / صيانة / محظور</td><td>٤ صفحات بقالب واحد + مسارات خروج ذكية</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>S-02</td><td>قوالب البريد الإلكتروني (~٥٠)</td><td>HTML محدود، RTL في عملاء البريد صعب، اختبار عبر Outlook/Gmail إلزامي. <b>أكبر بند منسي في المشروع</b></td><td><span class="tag t-red">مغلق</span></td><td>P1</td><td>عالٍ جدًا</td></tr>
+<tr><td>S-03</td><td>لوحة cPanel بعد SSO</td><td>خارج السيطرة تمامًا. أقصى ما يمكن: تصميم شاشة انتقالية تشرح للمستخدم أنه ينتقل لواجهة أخرى</td><td><span class="tag t-red">مغلق</span></td><td>P1</td><td>منخفض</td></tr>
+<tr><td>S-04</td><td>مبدّل اللغة/العملة/السمة</td><td>مكوّن مشترك في الهيدر — أثره على كل شاشة</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>متوسط</td></tr>
+<tr><td>S-05</td><td>لافتات النظام (Banners)</td><td>فاتورة متأخرة · بريد غير مؤكد · خدمة معلّقة · صيانة قادمة</td><td><span class="tag t-grn">كامل</span></td><td>P0</td><td>منخفض</td></tr>
+<tr><td>S-06</td><td>موافقة الكوكيز</td><td>مطلوب لسوق الاتحاد الأوروبي/سويسرا</td><td><span class="tag t-grn">كامل</span></td><td>P1</td><td>منخفض</td></tr>
+</tbody>
+</table>
+
+<div class="box blu">
+<h4>الخلاصة العددية</h4>
+<p><b>٧٤ شاشة</b> · منها <b>٢٦ لم تكن في المواصفات الأصلية</b> · التوزيع بحسب حرية التصميم: <b>~٣١ كامل</b>، <b>~٣٥ مقيد</b>، <b>~٨ مغلق</b>.</p>
+<p>عدد <b>الحالات</b> (states) الفعلية المطلوب تصميمها يقارب <b>٢٦٠ حالة</b> — وهذا الرقم، لا رقم الشاشات، هو ما يجب أن يُبنى عليه التقدير الزمني. ثم يُضرب في مصفوفة <b>فاتح/داكن × RTL/LTR</b> لأغراض المراجعة (لا لأغراض الرسم، إذا بُني نظام التصميم صحيحًا).</p>
+</div>
+
+<h2>6. التدفقات الحرجة</h2>
+
+<p>ثمانية تدفقات تغطي ٩٠٪ من القيمة. المواصفات وثّقت الأول فقط جزئيًا.</p>
+
+<h3>6.1 المسار الذهبي — من زائر إلى خدمة نشطة</h3>
+<div class="flow">
+<b>الرئيسية</b>
+  │
+  ├─◆ يبحث عن دومين مباشرة ──────────────┐
+  │                                       │
+  └─◆ يتصفح فئة استضافة                   │
+        │                                 │
+        ▼                                 │
+  <b>صفحة الباقات</b>                            │
+   • تبديل دورة الفوترة (يُظهر نسبة التوفير) │
+   • تبديل العملة  <s>← يعيد التحميل، قرار مطلوب</s> │
+        │                                 │
+        ▼ [Order Now]                     │
+  <b>تهيئة المنتج</b>                            │
+   • دورة الفوترة  • الإضافات              │
+   • ملخص لزج يحدّث الإجمالي لحظيًا          │
+        │                                 │
+        ▼                                 │
+  <b>اختيار الدومين</b>  ◄────────────────────┘
+   ├─ من السلة        → متابعة مباشرة
+   ├─ تسجيل جديد      → بحث (AI/كلاسيكي) → <i>متاح؟</i>
+   │                     ├─ نعم → إضافة
+   │                     └─ لا  → <i>عرض بدائل</i>
+   ├─ نقل دومين       → كود EPP → <i>تحقق أهلية</i>
+   └─ دوميني الخاص    → <s>تحذير: يجب تحديث Nameservers</s>
+        │
+        ▼
+  <b>تهيئة الدومين</b>  (DNS · ID Protection · Forwarding)
+        │
+        ▼
+  <b>المراجعة والسلة</b>  → كود خصم → <i>صالح / غير صالح</i>
+        │
+        ▼
+  <b>بيانات الفوترة</b>
+   • عميل مسجل؟ ملء تلقائي
+   • عميل جديد؟ نموذج <s>← «Guest» غير ممكن فعليًا</s>
+   • الدولة تُحدد الضريبة <s>← غير موصوف</s>
+        │
+        ▼
+  <b>اختيار البوابة</b>  (٥ خيارات، بعضها مشروط بالعملة)
+        │
+        ├─ Stripe        → 3-D Secure → <i>نجاح / فشل</i>
+        ├─ EGP Wallet    → OTP / إعادة توجيه
+        ├─ InstaPay      → تعليمات + تأكيد يدوي  <s>← بلا وحدة جاهزة</s>
+        └─ تحويل بنكي     → تعليمات + رفع إيصال
+        │
+        ▼
+  <i>نجاح؟</i>
+   ├─ نعم → <b>تأكيد الطلب</b> → التفعيل → <b>لوحة التحكم</b>
+   ├─ لا  → <s>فشل الدفع</s> → إعادة محاولة / تغيير بوابة <s>[دون فقدان السلة]</s>
+   └─ معلّق → <s>مراجعة احتيال</s> → إشعار بالبريد
+</div>
+
+<div class="box amb">
+<h4>ثلاث نقاط تسرّب في هذا المسار لم تعالجها المواصفات</h4>
+<ol>
+<li><b>تبديل العملة داخل التدفق:</b> ماذا يحدث للسلة؟ WHMCS لا يخلط عملات. القرار: منع التبديل بعد أول إضافة، أو تفريغ السلة بتحذير صريح.</li>
+<li><b>«دوميني الخاص»:</b> المستخدم غير التقني يختار هذا الخيار ثم لا يعرف كيف يوجّه الـ Nameservers فينتهي بتذكرة دعم. يحتاج شاشة إرشادية بعد الشراء، لا مجرد تحذير نصي.</li>
+<li><b>فشل الدفع:</b> السلوك الافتراضي في WHMCS يترك المستخدم على فاتورة غير مدفوعة بلا سياق. هذه أكبر فرصة تحسين تحويل في المشروع كله.</li>
+</ol>
+</div>
+
+<h3>6.2 استرداد الدفع الفاشل (Dunning) — غائب تمامًا وهو الأهم ماليًا</h3>
+<div class="flow">
+<b>يوم -7</b>   فاتورة تجديد تُنشأ  → بريد تذكير + <i>لافتة في لوحة التحكم</i>
+<b>يوم 0</b>    محاولة خصم تلقائي
+             ├─ نجاح → <i>إيصال</i>
+             └─ فشل  → <s>بريد «فشل الدفع» + سبب مفهوم بالعربية</s>
+<b>يوم +1</b>   محاولة ثانية  →  <i>لافتة حمراء ثابتة + زر «تحديث البطاقة»</i>
+<b>يوم +3</b>   محاولة ثالثة  →  <s>تحذير: التعليق بعد X أيام</s> + عدّاد مرئي
+<b>يوم +7</b>   <s>تعليق الخدمة</s> → صفحة خدمة معلّقة + مسار إعادة تفعيل بنقرة
+<b>يوم +30</b>  إنهاء الخدمة → <s>بريد أخير + مهلة استرداد البيانات</s>
+</div>
+<p><b>ما يحتاجه هذا التدفق من التصميم:</b> ٥ رسائل بريد، ٣ حالات لافتة، شاشة تحديث البطاقة، شاشة خدمة معلّقة، وصفحة إعادة التفعيل. <b>لا شيء من هذا في المواصفات.</b> في منتجات الاشتراك، تحسين هذا المسار وحده يعيد عادةً ٣–٧٪ من الإيراد المفقود.</p>
+
+<h3>6.3 الترقية (Upgrade)</h3>
+<div class="flow">
+<b>تفاصيل الخدمة</b> → [ترقية]
+      ▼
+<b>اختيار الباقة الجديدة</b>  (الحالية معطّلة، الأعلى فقط، مقارنة الفروق)
+      ▼
+<b>حساب الفرق التناسبي</b>  → «تدفع X مقابل Y يومًا متبقيًا»
+      ▼
+<b>فاتورة الفرق</b> → دفع
+      ▼
+<i>نجاح؟</i> ├─ نعم → تفعيل فوري أو قائمة انتظار → <b>تفاصيل الخدمة (محدّثة)</b>
+          └─ لا  → فاتورة معلّقة + الخدمة تبقى على الباقة القديمة
+</div>
+
+<h3>6.4 الإلغاء + عرض الاحتفاظ</h3>
+<div class="flow">
+<b>تفاصيل الخدمة</b> → [إلغاء]
+      ▼
+<b>توقيت الإلغاء</b>  ( فوري | نهاية دورة الفوترة )
+      ▼
+<b>سبب الإلغاء</b>  (سعر · ميزة ناقصة · أداء · دعم · لم أعد أحتاج · أخرى)
+      ▼
+<i>هل السبب قابل للمعالجة؟</i>
+   ├─ سعر     → <s>عرض خصم / باقة أصغر</s>
+   ├─ أداء    → <s>عرض ترقية / فتح تذكرة فنية</s>
+   └─ أخرى    → مباشرة للتأكيد
+      ▼
+<b>تأكيد نهائي</b>  (تحذير: أثر على الدومين المرتبط · نسخة احتياطية)
+      ▼
+<b>تم</b> + <i>إمكانية التراجع قبل التاريخ الفعّال</i>
+</div>
+
+<h3>6.5 فتح تذكرة مع تقليل التذاكر</h3>
+<div class="flow">
+<b>الدعم</b> → [فتح تذكرة]
+      ▼
+<b>اختيار القسم</b>  (إداري · مبيعات وفوترة · دعم فني · نقل مواقع)
+      ▼
+<b>نموذج التذكرة</b>
+   • الموضوع  ──[أثناء الكتابة]──▶ <i>اقتراحات حيّة من قاعدة المعرفة</i>
+   • الرسالة (محرر نصوص)                     │
+   • المرفقات (jpg/gif/png/txt/pdf ≤ الحد)   │
+   • الخدمة المرتبطة  <s>← مفقود من المواصفات</s>  │
+   • الأولوية                                │
+      │                                      ▼
+      │                             <i>هل حلّ المقال المشكلة؟</i>
+      │                              ├─ نعم → <b>خروج بلا تذكرة</b> ✓
+      ▼                              └─ لا  → متابعة
+<b>إرسال</b> → رقم التذكرة + وقت استجابة متوقع <s>← مفقود</s>
+</div>
+<p class="q"><b>ملاحظة تصميمية:</b> <span>المواصفات تذكر «اقتراحات قاعدة المعرفة» لكن لا تحدد متى تظهر ولا كيف تُقاس فعاليتها. الاقتراح: تظهر بعد ٤ أحرف في حقل الموضوع، وتُتتبع بحدث تحليلي «kb_suggestion_resolved» لقياس الأثر على حجم التذاكر.</span></p>
+
+<h3>6.6 التدفقات الثلاثة المتبقية (ملخصة)</h3>
+<table>
+<thead><tr><th style="width:20%">التدفق</th><th style="width:44%">الخطوات</th><th style="width:36%">النقاط الحرجة</th></tr></thead>
+<tbody>
+<tr><td><b>تسجيل دومين منفرد</b></td><td>بحث ← نتائج ← إضافة (متعدد) ← تهيئة ← بيانات المُسجِّل ← دفع ← تأكيد ← إرشاد Nameservers</td><td>الحقول الإضافية الإلزامية لبعض الامتدادات (.ae, .sa) · التحقق من صحة بيانات المُسجِّل لدى السجل</td></tr>
+<tr><td><b>نقل دومين</b></td><td>إدخال ← فحص الأهلية ← إلغاء القفل لدى المُسجِّل الحالي ← كود EPP ← دفع ← <b>انتظار ٥–٧ أيام</b> ← تأكيد</td><td>الانتظار الطويل هو التجربة كلها. يحتاج صفحة تتبع حالة النقل + إشعارات — غير موجودة في المواصفات</td></tr>
+<tr><td><b>الدخول + 2FA</b></td><td>بريد وكلمة مرور ← رمز 2FA ← الوجهة المقصودة</td><td>الحفاظ على الوجهة الأصلية بعد الدخول (deep link) · مسار «فقدت جهازي» عبر الرموز الاحتياطية · قفل الحساب بعد محاولات فاشلة</td></tr>
+</tbody>
+</table>
+
+<h2>7. نظام التصميم — الأساس التقني</h2>
+
+<div class="lede">
+مع تصميم مخصص لـ٧٤ شاشة و~٢٦٠ حالة، نظام التصميم ليس رفاهية — بدونه يستحيل الحفاظ على الاتساق أو تسليم العمل للمطورين. <b>يجب أن يسبق أول شاشة نهائية، لا أن يُستخرج منها.</b>
+</div>
+
+<h3>7.1 استراتيجية RTL — القرار الأهم</h3>
+<table>
+<thead><tr><th style="width:24%">النهج</th><th style="width:38%">كيف يعمل</th><th style="width:19%">التكلفة</th><th style="width:19%">التقييم</th></tr></thead>
+<tbody>
+<tr><td><b>الخصائص المنطقية</b><br><span class="mono">margin-inline-start</span></td><td>تصميم وتطوير باتجاه محايد؛ المتصفح ينعكس تلقائيًا عند <span class="mono">dir="rtl"</span></td><td>+١٥٪ في البداية، ~٠ لاحقًا</td><td><span class="tag t-grn">موصى به بشدة</span></td></tr>
+<tr><td>ملف CSS منفصل لـRTL</td><td>ملف <span class="mono">rtl.css</span> يعكس القيم يدويًا</td><td>+٣٠–٤٠٪ صيانة دائمة</td><td><span class="tag t-amb">النهج الشائع، ومصدر معظم الأعطال</span></td></tr>
+<tr><td>أداة انعكاس آلي (RTLCSS)</td><td>معالجة بعد البناء</td><td>+١٠٪ لكنها تفشل في الحالات المعقّدة</td><td><span class="tag t-amb">حل وسط مقبول</span></td></tr>
+</tbody>
+</table>
+
+<h4>ما ينكسر عادة في RTL ويجب اختباره صراحة</h4>
+<div class="grid2">
+<div class="box">
+<ul style="margin-bottom:0">
+<li>الأيقونات الاتجاهية (سهم «التالي» يجب أن ينعكس، أيقونة «تحميل» لا)</li>
+<li>أشرطة التقدم وخطوات الطلب (Stepper)</li>
+<li>الجداول: محاذاة الأعمدة الرقمية تبقى LTR</li>
+<li>منتقي التاريخ والتقويم</li>
+<li>المخططات والرسوم البيانية</li>
+</ul>
+</div>
+<div class="box">
+<ul style="margin-bottom:0">
+<li>القوائم المنسدلة وموضع ظهورها</li>
+<li>حقول تحتوي محتوى LTR إجباري: البريد، الدومين، IP، رقم البطاقة، كود EPP</li>
+<li>سلاسل نصية مضمّنة في نواة WHMCS</li>
+<li>الظلال والحدود غير المتماثلة</li>
+<li>الرسائل التي تخلط عربي وإنجليزي (مشكلة bidi)</li>
+</ul>
+</div>
+</div>
+
+<div class="box red">
+<h4>قرار مطلوب: الأرقام الهندية أم العربية؟</h4>
+<p>المواصفات تقول «أرقام» ضمن متطلبات RTL دون تحديد. الفرق جوهري: <b>٠١٢٣٤</b> مقابل <b>01234</b>. الأسعار وأرقام الفواتير وعناوين IP وأرقام البطاقات ومعرّفات التذاكر — كلها متأثرة. التوصية العملية: <b>أرقام عربية (Latin) في كل السياقات المالية والتقنية</b> لأنها المعيار في الفواتير والبوابات وتجنّب أخطاء النسخ واللصق، مع إبقاء النص العربي RTL. لكن هذا قرار منتج يجب أن يُحسم مكتوبًا.</p>
+</div>
+
+<h3>7.2 الرموز التصميمية (Design Tokens)</h3>
+<p>البنية المقترحة على ثلاث طبقات لضمان أن الوضع الليلي والعلامة التجارية لا يتطلبان إعادة رسم:</p>
+<div class="flow">
+<b>الطبقة 1 — بدائية (Primitive)</b>     purple-500: #5B2E91   gray-100: #F3F1F7
+        ▼
+<b>الطبقة 2 — دلالية (Semantic)</b>      color-action-primary     → { light: purple-500, dark: purple-300 }
+                                  color-surface-raised     → { light: white,       dark: gray-850 }
+                                  color-text-primary       → { light: gray-900,    dark: gray-50  }
+                                  color-status-danger      → { light: red-600,     dark: red-400  }
+        ▼
+<b>الطبقة 3 — مكوّناتية (Component)</b>   button-primary-bg → color-action-primary
+                                  card-price-border → color-border-subtle
+</div>
+<p><b>القاعدة الحاكمة:</b> لا يشير أي مكوّن إلى رمز بدائي مباشرة. هكذا يصبح الوضع الليلي تبديل قيم في الطبقة الثانية فقط — لا إعادة تصميم ٧٤ شاشة.</p>
+
+<h3>7.3 الخطوط العربية</h3>
+<table>
+<thead><tr><th style="width:20%">الخيار</th><th style="width:32%">الملاءمة</th><th style="width:26%">أرقام لاتينية مصاحبة</th><th style="width:22%">ملاحظة الأداء</th></tr></thead>
+<tbody>
+<tr><td><b>IBM Plex Sans Arabic</b></td><td>واجهات منتجات، أوزان متعددة، ممتاز للقراءة في الأحجام الصغيرة</td><td>متناسق أصلًا</td><td><span class="tag t-grn">موصى به</span></td></tr>
+<tr><td>Cairo</td><td>شائع وودود، جيد للعناوين</td><td>مقبول</td><td>أوزان كثيرة تزيد الحجم</td></tr>
+<tr><td>Almarai</td><td>نظيف، لكن أوزان محدودة</td><td>مقبول</td><td>خفيف</td></tr>
+<tr><td>Noto Sans Arabic</td><td>تغطية محارف واسعة، محايد</td><td>متناسق</td><td>ملف كبير</td></tr>
+</tbody>
+</table>
+<p class="q"><b>تحذير أداء:</b> <span>الخطوط العربية أثقل من اللاتينية بشكل ملحوظ. مع هدف LCP أقل من ٢٫٥ ثانية، يجب تقليم الخط (subsetting)، وتحميل وزنين بحد أقصى للنص، واستخدام <span class="mono">font-display: swap</span> مع خط احتياطي مضبوط لتفادي القفزة التخطيطية.</span></p>
+
+<h3>7.4 مكتبة المكوّنات المطلوبة</h3>
+<table>
+<thead><tr><th style="width:22%">المجموعة</th><th style="width:56%">المكوّنات</th><th style="width:22%">العدد التقريبي</th></tr></thead>
+<tbody>
+<tr><td><b>أساسية</b></td><td>الأزرار (٥ أنواع × ٣ أحجام × ٦ حالات) · الحقول · القوائم المنسدلة · مربعات الاختيار · أزرار الراديو · المفاتيح · المحدّدات · الشارات · الأيقونات</td><td>~١٤</td></tr>
+<tr><td><b>تخطيط</b></td><td>الهيدر (تسويقي/لوحة تحكم) · القائمة الجانبية (مطوية/موسّعة) · الفوتر · مسار التنقل · حاوية الصفحة · الشبكة</td><td>~٨</td></tr>
+<tr><td><b>عرض بيانات</b></td><td>جدول (فرز/ترشيح/ترقيم/تحديد متعدد/فارغ/تحميل) · بطاقة خدمة · بطاقة باقة · بطاقة فاتورة · بطاقة إحصائية · قائمة وصفية</td><td>~١٢</td></tr>
+<tr><td><b>ملاحظات</b></td><td>لافتة نظام (٤ درجات) · إشعار منبثق · نافذة حوارية · تلميح · حالة فارغة (٦ صور توضيحية) · حالة تحميل هيكلية · حالة خطأ</td><td>~١٠</td></tr>
+<tr><td><b>خاصة بالنطاق</b></td><td>مبدّل دورة الفوترة · مبدّل العملة · مبدّل السمة · مبدّل اللغة · بطاقة نتيجة بحث دومين · ملخص طلب لزج · خطوات الطلب · بطاقة بوابة دفع · محرر نصوص التذاكر · رافع الملفات · محادثة التذكرة</td><td>~١٢</td></tr>
+</tbody>
+</table>
+<p><b>الإجمالي: ~٥٦ مكوّنًا.</b> ببناء هذه المكتبة أولًا، ينخفض زمن تصميم كل شاشة تالية بنسبة تقارب ٦٠٪. بدونها، سيُعاد رسم نفس الجدول ثماني مرات بثمانية أشكال.</p>
+
+<h3>7.5 نقاط التوقف وإمكانية الوصول</h3>
+<div class="grid2">
+<div class="box">
+<h4>نقاط التوقف</h4>
+<ul style="margin-bottom:0">
+<li><b>موبايل:</b> 360–767 (الأولوية — الأغلبية في السوق المصري والخليجي)</li>
+<li><b>تابلت:</b> 768–1023</li>
+<li><b>لابتوب:</b> 1024–1439</li>
+<li><b>واسع:</b> 1440+</li>
+</ul>
+</div>
+<div class="box">
+<h4>معيار الوصول المقترح: WCAG 2.2 AA</h4>
+<ul style="margin-bottom:0">
+<li>تباين ٤٫٥:١ للنص — <b>في السمتين</b></li>
+<li>هدف لمس ≥ ٤٤×٤٤ بكسل</li>
+<li>تنقل كامل بلوحة المفاتيح + حلقة تركيز مرئية</li>
+<li>تسميات ARIA بالعربية على كل الحقول</li>
+<li>لا اعتماد على اللون وحده لنقل الحالة</li>
+</ul>
+</div>
+</div>
+
+<h2>8. المعمارية التقنية</h2>
+
+<h3>8.1 ثلاثة خيارات — والقرار يحدد ما يستطيع التصميم فعله</h3>
+<table>
+<thead><tr><th style="width:16%">الخيار</th><th style="width:26%">الوصف</th><th style="width:19%">المكاسب</th><th style="width:23%">التكاليف والمخاطر</th><th style="width:16%">التقييم</th></tr></thead>
+<tbody>
+<tr>
+<td><b>أ — قالب WHMCS مخصص</b><br>(Smarty)</td>
+<td>بناء ثيم كامل داخل WHMCS، إما من الصفر أو فوق Lagom 2</td>
+<td>أرخص · أسرع · تحديثات WHMCS تعمل · كل الوحدات تعمل</td>
+<td>حرية التصميم مقيدة ببنية WHMCS · أداء الصفحات التسويقية ضعيف · SEO محدود · تجربة الطلب متعددة الصفحات صعبة التحسين</td>
+<td><span class="tag t-amb">لا يحقق «تصميم مخصص كامل»</span></td>
+</tr>
+<tr>
+<td><b>ب — هجين</b><br>(موصى به)</td>
+<td>موقع تسويقي منفصل (Next.js/Astro) + WHMCS للطلب ولوحة العميل بثيم مخصص</td>
+<td>حرية كاملة وأداء وSEO ممتاز حيث يهم (التسويق) · استقرار وموثوقية حيث يهم (الفوترة) · فرق عمل متوازية</td>
+<td>نظامان للصيانة · تكرار طبقة التصميم في بيئتين · انتقال بين نطاقين يجب أن يبدو سلسًا · مزامنة الأسعار عبر API</td>
+<td><span class="tag t-grn">أفضل توازن</span></td>
+</tr>
+<tr>
+<td><b>ج — Headless كامل</b></td>
+<td>واجهة أمامية واحدة تستهلك WHMCS API بالكامل</td>
+<td>حرية تصميمية مطلقة · تجربة تطبيق أحادي الصفحة</td>
+<td><b>مخاطرة عالية:</b> الـAPI لا يغطي كل شيء (بوابات الدفع، تدفقات الوحدات، cPanel SSO) · كل تحديث WHMCS تهديد · وحدات الطرف الثالث لن تعمل · تكلفة ×٢–٣</td>
+<td><span class="tag t-red">غير موصى به لهذا النطاق</span></td>
+</tr>
+</tbody>
+</table>
+
+<div class="box blu">
+<h4>تحديث v1.1 — هذا القرار مُتَّخذ بالفعل</h4>
+<p>تدقيق النظام الحيّ أثبت أن الخيار (ب) منفَّذ: موقع تسويقي منفصل + WHMCS/Lagom2 للعميل. <b>السؤال لم يعد «أي خيار» بل «أين الخط الفاصل».</b> وهو حاليًا في المكان الخطأ: كل صفحات التسعير داخل WHMCS بينما الموقع التسويقي بروشورات بلا أرقام. راجع قسم «★ تدقيق الوضع القائم».</p>
+<p style="margin-top:8px"><b>الخط الفاصل الصحيح:</b> كل ما يسبق «أضف إلى السلة» على الموقع التسويقي (حرية · سرعة · فهرسة). كل ما بعده داخل WHMCS (موثوقية · فوترة · وحدات).</p>
+</div>
+
+<div class="box grn">
+<h4>التوصية: الخيار (ب)</h4>
+<p>موقع استضافة يكسب من محرك البحث وسرعة الصفحة. إبقاء الصفحات التسويقية داخل WHMCS يعني التنازل عن أهم ميزة تنافسية للشركة. في المقابل، محاولة إعادة بناء الفوترة والدفع خارج WHMCS تعني إعادة بناء أصعب جزء في النظام دون مكسب حقيقي للعميل.</p>
+<p style="margin-top:8px"><b>الشرط الحاسم لنجاح هذا الخيار:</b> نظام تصميم واحد يُصدَّر لبيئتين (رموز CSS مشتركة). بدونه سيبدو الموقعان كشركتين مختلفتين عند الانتقال من زر «اطلب الآن» إلى السلة — وهي بالضبط اللحظة التي تُفقد فيها الثقة.</p>
+</div>
+
+<h3>8.2 ما هو أصلي، وما يحتاج تطويرًا</h3>
+<table>
+<thead><tr><th style="width:30%">القدرة</th><th style="width:22%">التصنيف</th><th style="width:48%">ملاحظة</th></tr></thead>
+<tbody>
+<tr><td>المصادقة · 2FA · استعادة كلمة المرور</td><td><span class="tag t-grn">أصلي</span></td><td>تخصيص واجهة فقط</td></tr>
+<tr><td>المنتجات · الطلب · الفوترة · الفواتير</td><td><span class="tag t-grn">أصلي</span></td><td>—</td></tr>
+<tr><td>الدومينات · WHOIS · DNS · Nameservers</td><td><span class="tag t-grn">أصلي</span></td><td>عبر وحدة المُسجِّل (Registrar Module)</td></tr>
+<tr><td>التذاكر · قاعدة المعرفة · الإعلانات</td><td><span class="tag t-grn">أصلي</span></td><td>—</td></tr>
+<tr><td>الأفلييت · جهات الاتصال الفرعية</td><td><span class="tag t-grn">أصلي</span></td><td>—</td></tr>
+<tr><td>cPanel SSO</td><td><span class="tag t-grn">أصلي</span></td><td>عبر وحدة السيرفر</td></tr>
+<tr><td>Stripe (بطاقة · Twint · Klarna)</td><td><span class="tag t-grn">أصلي</span></td><td>وحدة Stripe الرسمية</td></tr>
+<tr><td>تعدد اللغات</td><td><span class="tag t-amb">أصلي بحدود</span></td><td>ملفات لغة موجودة، لكن الترجمة العربية الافتراضية ناقصة وتحتاج مراجعة كاملة</td></tr>
+<tr><td>تعدد العملات</td><td><span class="tag t-amb">أصلي بحدود</span></td><td>أسعار ثابتة لكل عملة، لا تحويل حي، لا خلط في سلة واحدة، مشكلة الخانات العشرية للدينار</td></tr>
+<tr><td>الوضع الليلي</td><td><span class="tag t-amb">من الثيم</span></td><td>Lagom يدعمه؛ التصميم المخصص يحتاج بناء طبقة الرموز كاملة</td></tr>
+<tr><td><b>RTL</b></td><td><span class="tag t-red">غير أصلي</span></td><td>لا دعم أصلي في نواة WHMCS — يُبنى بالكامل في الثيم</td></tr>
+<tr><td><b>بوابة مصرية (Meeza/محفظة)</b></td><td><span class="tag t-red">طرف ثالث</span></td><td>يحتاج اختيار مزود (Paymob / Fawry / Kashier) وشراء أو تطوير وحدة</td></tr>
+<tr><td><b>InstaPay</b></td><td><span class="tag t-red">تطوير مخصص</span></td><td>لا وحدة معروفة. البديل: عبر Paymob، أو كتحويل يدوي مع رفع إيصال</td></tr>
+<tr><td><b>مولّد الدومين بالذكاء الاصطناعي</b></td><td><span class="tag t-red">تطوير مخصص</span></td><td>يحتاج مزود نموذج + تخزين مؤقت + سقف تكلفة + معالجة الفشل</td></tr>
+<tr><td><b>تبديل العملة الفوري بلا إعادة تحميل</b></td><td><span class="tag t-red">تطوير مخصص</span></td><td>طبقة AJAX + منطق سلة</td></tr>
+<tr><td><b>صفحة حالة الشبكة</b></td><td><span class="tag t-red">خارجي أو مخصص</span></td><td>خدمة مثل Statuspace/Instatus، أو بناء داخلي</td></tr>
+<tr><td><b>Guest Checkout حقيقي</b></td><td><span class="tag t-red">غير ممكن</span></td><td>يُعاد تعريف المتطلب</td></tr>
+</tbody>
+</table>
+
+<h2>9. ربط الشاشات بـ WHMCS API</h2>
+
+<p>الجدول في البند ١٠ من المواصفات صحيح في معظمه لكنه ناقص وغير دقيق في نقطتين. النسخة المصححة والموسّعة:</p>
+
+<table>
+<thead><tr><th style="width:26%">الشاشة</th><th style="width:40%">الإجراءات</th><th style="width:34%">ملاحظات</th></tr></thead>
+<tbody>
+<tr><td>تسجيل الدخول</td><td><span class="mono">ValidateLogin</span></td><td>2FA يُدار في طبقة الجلسة لا عبر الـAPI</td></tr>
+<tr><td>إنشاء حساب</td><td><span class="mono">AddClient</span></td><td>الحقول الإلزامية تعتمد على إعدادات التثبيت</td></tr>
+<tr><td>استعادة كلمة المرور</td><td><span class="mono">SendPasswordResetEmail</span></td><td>المواصفات ذكرت اسمين — يجب التثبيت على الاسم الفعلي في نسخة WHMCS المستخدمة</td></tr>
+<tr><td>صفحات الباقات</td><td><span class="mono">GetProducts</span></td><td>يُرجع الأسعار بكل العملات المعرّفة</td></tr>
+<tr><td>السلة والطلب</td><td><span class="mono">AddOrder</span> · <span class="mono">GetPromotions</span></td><td>الطلب يُنشئ فاتورة تلقائيًا حسب الإعداد</td></tr>
+<tr><td>بحث الدومين</td><td><span class="mono">DomainWhois</span> · <span class="mono">GetTLDPricing</span></td><td>المواصفات كتبت <span class="mono">DomainGetPricing</span> — يُتحقق من الاسم الصحيح في نسخة WHMCS</td></tr>
+<tr><td>الفواتير</td><td><span class="mono">GetInvoices</span> · <span class="mono">GetInvoice</span></td><td>—</td></tr>
+<tr><td>البوابات المتاحة</td><td><span class="mono">GetPaymentMethods</span></td><td>يُرجع البوابات <b>المفعّلة في النظام</b></td></tr>
+<tr><td><b>طرق الدفع المحفوظة</b></td><td><span class="mono">GetPayMethods</span> · <span class="mono">AddPayMethod</span> · <span class="mono">UpdatePayMethod</span> · <span class="mono">DeletePayMethod</span></td><td><b>ناقص من المواصفات.</b> <span class="mono">GetPayMethods</span> ≠ <span class="mono">GetPaymentMethods</span> — الأول للبطاقات المحفوظة للعميل، الثاني لقائمة البوابات. الخلط بينهما خطأ شائع</td></tr>
+<tr><td>تسجيل الدفع</td><td><span class="mono">AddInvoicePayment</span> · <span class="mono">CapturePayment</span></td><td><span class="mono">AddInvoicePayment</span> إجراء إداري — الاستخدام الصحيح في تدفق العميل هو <span class="mono">CapturePayment</span></td></tr>
+<tr><td>خدماتي</td><td><span class="mono">GetClientsProducts</span></td><td>—</td></tr>
+<tr><td>الترقية/التخفيض</td><td><span class="mono">UpgradeProduct</span> · <span class="mono">ModuleChangePackage</span></td><td>الحساب التناسبي يعتمد على إعدادات الفوترة</td></tr>
+<tr><td>دخول cPanel</td><td><span class="mono">CreateSsoToken</span></td><td>—</td></tr>
+<tr><td>دوماييناتي</td><td><span class="mono">GetClientsDomains</span></td><td>—</td></tr>
+<tr><td>Nameservers / DNS</td><td><span class="mono">DomainUpdateNameservers</span> · <span class="mono">DomainGetDNS</span> · <span class="mono">DomainUpdateDNS</span></td><td>يعتمد على دعم وحدة المُسجِّل — ليست كل الوحدات تدعم إدارة DNS</td></tr>
+<tr><td>التذاكر</td><td><span class="mono">OpenTicket</span> · <span class="mono">GetTickets</span> · <span class="mono">GetTicket</span> · <span class="mono">AddTicketReply</span></td><td>المواصفات ذكرت <span class="mono">UpdateTicket</span> وهو إداري؛ رد العميل يحتاج إجراءً مختلفًا</td></tr>
+<tr><td>قاعدة المعرفة</td><td><span class="mono">GetKBCategories</span> · <span class="mono">GetKBArticles</span> · <span class="mono">GetKBArticle</span></td><td>—</td></tr>
+<tr><td>الأفلييت</td><td><span class="mono">AffiliateActivate</span> · <span class="mono">GetAffiliates</span></td><td>—</td></tr>
+<tr><td>بيانات الحساب</td><td><span class="mono">GetClientsDetails</span> · <span class="mono">UpdateClient</span></td><td>—</td></tr>
+<tr><td>الإعلانات</td><td><span class="mono">GetAnnouncements</span></td><td>—</td></tr>
+<tr><td><b>الرصيد وإضافة الأموال</b></td><td><span class="mono">GetCredits</span> · <span class="mono">AddCredit</span></td><td><b>ناقص من المواصفات</b></td></tr>
+<tr><td><b>سجل المعاملات</b></td><td><span class="mono">GetTransactions</span></td><td><b>ناقص من المواصفات</b></td></tr>
+<tr><td><b>الإلغاء</b></td><td><span class="mono">AddCancelRequest</span></td><td><b>ناقص من المواصفات</b></td></tr>
+</tbody>
+</table>
+
+<div class="box amb">
+<h4>ملاحظة إلزامية لفريق التطوير</h4>
+<p>أسماء إجراءات WHMCS API تتغير بين الإصدارات وبعضها إداري لا يصح استدعاؤه من سياق العميل. <b>يجب تثبيت رقم إصدار WHMCS في وثيقة المشروع، والتحقق من كل إجراء في هذا الجدول مقابل التوثيق الرسمي لذلك الإصدار تحديدًا قبل الاعتماد على التقدير.</b> هذا الجدول مرجع تخطيطي وليس بديلًا عن التوثيق.</p>
+</div>
+
+<h2>10. خطة المشروع</h2>
+
+<div class="lede">
+٢٨ أسبوعًا (~٦٫٥ أشهر) للتصميم والتطوير المتوازيين بفريق تصميم وفريق تطوير. المرحلة صفر ليست تأخيرًا — بل هي ما يمنع إعادة عمل تُقدَّر بـ٤–٦ أسابيع لاحقًا.
+</div>
+
+<table>
+<thead><tr><th style="width:6%">م</th><th style="width:19%">المرحلة</th><th style="width:8%">المدة</th><th style="width:40%">المخرجات</th><th style="width:27%">معيار الخروج (Gate)</th></tr></thead>
+<tbody>
+<tr>
+<td><b>٠</b></td><td><b>الاكتشاف والحسم</b></td><td>أسبوعان</td>
+<td>حسم الأسئلة الـ٢٤ · اختيار المزود المصري · تثبيت نطاق التخصيص لكل شاشة · تدقيق تنافسي (٥ منافسين محليين وعالميين) · خطة القياس · تثبيت إصدار WHMCS</td>
+<td>وثيقة قرارات موقّعة من المدير · لا يبدأ التصميم قبلها</td>
+</tr>
+<tr>
+<td><b>١</b></td><td><b>الأسس</b></td><td>٣ أسابيع</td>
+<td>نظام التصميم (٥٦ مكوّنًا) · طبقات الرموز الثلاث · استراتيجية RTL مثبتة · شبكة ونقاط توقف · اختيار الخط · مبدّلات الهيدر · قالب الحالات الفارغة والأخطاء</td>
+<td>مراجعة وصول ناجحة على ١٠ مكوّنات أساسية في السمتين والاتجاهين</td>
+</tr>
+<tr>
+<td><b>٢</b></td><td><b>مسار التحويل</b><br><span class="tag t-red">الأعلى قيمة</span></td><td>٦ أسابيع</td>
+<td>الرئيسية · ٦ صفحات باقات · المقارنة · بحث الدومين بكل حالاته · تدفق الطلب كاملًا (O-01→O-14) · شاشات الدفع لكل بوابة</td>
+<td>اختبار قابلية استخدام على ٥ مستخدمين حقيقيين من شريحة «سامي» · معدل إتمام مهمة ≥ ٨٠٪</td>
+</tr>
+<tr>
+<td><b>٣</b></td><td><b>المصادقة ولوحة القيادة</b></td><td>٣ أسابيع</td>
+<td>٧ شاشات مصادقة · لوحة القيادة بحالاتها الخمس · التخطيط العام للوحة التحكم · نظام اللافتات والإشعارات</td>
+<td>لوحة القيادة تعمل بحالة فارغة وبحالة ٤٠ خدمة</td>
+</tr>
+<tr>
+<td><b>٤</b></td><td><b>الخدمات والدومينات</b></td><td>٤ أسابيع</td>
+<td>C-02 → C-13: قوائم وتفاصيل وترقية وإلغاء وتجديد · إدارة الدومين وDNS</td>
+<td>تدفق الترقية والإلغاء مختبران من طرف إلى طرف</td>
+</tr>
+<tr>
+<td><b>٥</b></td><td><b>الفوترة والاسترداد</b></td><td>٣ أسابيع</td>
+<td>C-14 → C-21 · قالب فاتورة PDF بالعربية · تدفق Dunning كاملًا · طرق الدفع المحفوظة</td>
+<td>فاتورة PDF عربية تُطبع صحيحة · دورة Dunning مختبرة زمنيًا</td>
+</tr>
+<tr>
+<td><b>٦</b></td><td><b>الدعم والحساب</b></td><td>٣ أسابيع</td>
+<td>C-22 → C-36 · التذاكر · قاعدة المعرفة · الأفلييت · الأمان والصلاحيات</td>
+<td>اقتراحات KB تعمل وتُقاس</td>
+</tr>
+<tr>
+<td><b>٧</b></td><td><b>المحيط المنسي</b></td><td>٣ أسابيع</td>
+<td>~٥٠ قالب بريد · الصفحات النظامية · الصفحات القانونية · حالة الشبكة · موافقة الكوكيز</td>
+<td>البريد يُعرض صحيحًا في Gmail وOutlook وApple Mail بالعربية</td>
+</tr>
+<tr>
+<td><b>٨</b></td><td><b>الضبط والإطلاق</b></td><td>٣ أسابيع</td>
+<td>مراجعة وصول شاملة · تحسين الأداء · اختبار المتصفحات · اختبار قبول المستخدم · ترحيل العملاء الحاليين · خطة التراجع</td>
+<td>LCP &lt; ٢٫٥ث · WCAG AA · صفر عطل حرج</td>
+</tr>
+</tbody>
+</table>
+
+<div class="box blu">
+<h4>ملاحظة على التسلسل</h4>
+<p>المرحلتان ٢ و٣ يمكن أن تتوازيا جزئيًا إذا كان فريق التصميم أكثر من شخص: مسار التحويل مستقل عن لوحة التحكم بعد اكتمال المرحلة ١. هذا يوفّر ~٣ أسابيع. لكن <b>لا شيء يتوازى مع المرحلة ١</b> — نظام التصميم عنق زجاجة إجباري، ومحاولة تجاوزه هي السبب الأول لتفكك المشاريع المشابهة.</p>
+</div>
+
+<h3>10.1 نسخة مختصرة إن كان الموعد أضيق (MVP)</h3>
+<p>إذا فُرض موعد أقصر، هذا هو القطع الذي أوصي به — وهو قطع نطاق صريح، لا تسريع:</p>
+<div class="grid2">
+<div class="box grn">
+<h4>يبقى (١٦ أسبوعًا)</h4>
+<ul style="margin-bottom:0">
+<li>نظام التصميم كاملًا (غير قابل للقطع)</li>
+<li>الرئيسية + ٣ فئات استضافة فقط</li>
+<li>بحث الدومين + تدفق الطلب كاملًا</li>
+<li>بوابتان فقط: Stripe + بوابة مصرية واحدة</li>
+<li>المصادقة + لوحة القيادة + الخدمات + الفواتير</li>
+<li>التذاكر · Dunning · الصفحات القانونية والنظامية</li>
+<li>عربي فقط + عملتان (EGP, USD)</li>
+</ul>
+</div>
+<div class="box amb">
+<h4>يُؤجَّل للمرحلة الثانية</h4>
+<ul style="margin-bottom:0">
+<li>مولّد الدومين بالذكاء الاصطناعي</li>
+<li>Website Builder · Monitoring · VPS</li>
+<li>الأفلييت · جهات الاتصال الفرعية</li>
+<li>باقي العملات الخمس والإنجليزية</li>
+<li>الوضع الليلي <span class="tag t-amb">إن قُطع، يجب أن تُبنى الرموز له من الآن</span></li>
+<li>حالة الشبكة · المدونة · مراكز البيانات</li>
+</ul>
+</div>
+</div>
+
+<h2>11. تقدير الجهد وتوزيع الفريق</h2>
+
+<p>التقدير بوحدة <b>يوم-شخص</b>. الأرقام تفترض تصميمًا مخصصًا كاملًا كما تم اختياره، وتشمل جولتي مراجعة لكل مخرج.</p>
+
+<table>
+<thead><tr><th style="width:26%">المرحلة</th><th style="width:12%">تصميم</th><th style="width:12%">تطوير أمامي</th><th style="width:12%">تطوير خلفي</th><th style="width:11%">اختبار</th><th style="width:11%">إدارة</th><th style="width:16%">الإجمالي</th></tr></thead>
+<tbody>
+<tr><td>٠ — الاكتشاف والحسم</td><td>٦</td><td>٢</td><td>٤</td><td>١</td><td>٦</td><td><b>١٩</b></td></tr>
+<tr><td>١ — الأسس</td><td>٢٢</td><td>٢٠</td><td>٤</td><td>٤</td><td>٤</td><td><b>٥٤</b></td></tr>
+<tr><td>٢ — مسار التحويل</td><td>٤٠</td><td>٤٥</td><td>٢٥</td><td>١٢</td><td>٨</td><td><b>١٣٠</b></td></tr>
+<tr><td>٣ — المصادقة ولوحة القيادة</td><td>١٦</td><td>١٨</td><td>١٠</td><td>٦</td><td>٤</td><td><b>٥٤</b></td></tr>
+<tr><td>٤ — الخدمات والدومينات</td><td>٢٤</td><td>٢٦</td><td>١٨</td><td>٨</td><td>٥</td><td><b>٨١</b></td></tr>
+<tr><td>٥ — الفوترة والاسترداد</td><td>١٨</td><td>٢٠</td><td>١٨</td><td>٨</td><td>٤</td><td><b>٦٨</b></td></tr>
+<tr><td>٦ — الدعم والحساب</td><td>١٨</td><td>٢٠</td><td>١٠</td><td>٦</td><td>٤</td><td><b>٥٨</b></td></tr>
+<tr><td>٧ — المحيط المنسي</td><td>١٦</td><td>١٨</td><td>٨</td><td>٨</td><td>٣</td><td><b>٥٣</b></td></tr>
+<tr><td>٨ — الضبط والإطلاق</td><td>١٠</td><td>١٤</td><td>١٠</td><td>١٦</td><td>٦</td><td><b>٥٦</b></td></tr>
+<tr style="background:var(--pur-l);font-weight:700"><td><b>الإجمالي (يوم-شخص)</b></td><td><b>١٧٠</b></td><td><b>١٨٣</b></td><td><b>١٠٧</b></td><td><b>٦٩</b></td><td><b>٤٤</b></td><td><b>٥٧٣</b></td></tr>
+</tbody>
+</table>
+
+<h3>11.1 قراءة الأرقام</h3>
+<div class="grid2">
+<div class="box">
+<h4>الفريق الأدنى لإنجاز ٢٨ أسبوعًا</h4>
+<ul style="margin-bottom:0">
+<li><b>١٫٥ مصمم</b> (١٧٠ يومًا ÷ ١٤٠ يوم عمل متاح) — أي مصمم أساسي + نصف مصمم مساند</li>
+<li><b>١٫٥ مطور أمامي</b></li>
+<li><b>١ مطور خلفي</b> (تكامل WHMCS والوحدات)</li>
+<li><b>٠٫٥ مختبر</b> — يزيد إلى ١ في المرحلة ٨</li>
+<li><b>٠٫٥ مدير مشروع / محلل أعمال</b></li>
+</ul>
+</div>
+<div class="box amb">
+<h4>ما لم يُدرج في التقدير</h4>
+<ul style="margin-bottom:0">
+<li>كتابة المحتوى العربي وUX Writing (~٢٠ يومًا إضافيًا)</li>
+<li>الرسوم التوضيحية والأيقونات المخصصة (~١٥ يومًا)</li>
+<li>تصوير/تجهيز الأصول البصرية</li>
+<li>تكلفة تراخيص الوحدات وبوابات الدفع</li>
+<li>تكلفة تشغيل مولّد الذكاء الاصطناعي</li>
+<li>ترحيل بيانات العملاء الحاليين (غير معروف الحجم)</li>
+</ul>
+</div>
+</div>
+
+<div class="box red">
+<h4>هامش عدم اليقين</h4>
+<p>هذا التقدير <b>±٣٠٪</b> حتى تكتمل المرحلة صفر. أكبر ثلاثة مصادر لعدم اليقين: (١) المزود المصري غير المحدد — قد يضيف ١٠–٢٥ يومًا حسب جودة وحدته؛ (٢) عمق أعطال RTL في نواة WHMCS — لا يُعرف إلا بالتجريب العملي؛ (٣) وجود عملاء حاليين يحتاجون ترحيلًا. <b>أي رقم يُعطى للإدارة قبل المرحلة صفر يجب أن يُقدَّم كنطاق لا كرقم واحد.</b></p>
+</div>
+
+<h2>12. مصفوفة المسؤوليات (RACI)</h2>
+<p><b>م</b> مسؤول التنفيذ · <b>ح</b> صاحب القرار النهائي · <b>ش</b> يُستشار · <b>ط</b> يُطلَع</p>
+<table>
+<thead><tr><th style="width:28%">النشاط</th><th style="width:12%">UI/UX</th><th style="width:12%">مدير المشروع</th><th style="width:12%">معماري/تقني</th><th style="width:12%">تطوير</th><th style="width:12%">مالك المنتج</th><th style="width:12%">التسويق</th></tr></thead>
+<tbody>
+<tr><td>حسم أسئلة المرحلة صفر</td><td>ش</td><td>م</td><td>ش</td><td>ش</td><td><b>ح</b></td><td>ش</td></tr>
+<tr><td>اختيار بوابات الدفع</td><td>ط</td><td>ش</td><td>م</td><td>ش</td><td><b>ح</b></td><td>ط</td></tr>
+<tr><td>قرار معمارية التنفيذ (أ/ب/ج)</td><td>ش</td><td>ش</td><td><b>م ح</b></td><td>ش</td><td>ط</td><td>ط</td></tr>
+<tr><td>نظام التصميم والرموز</td><td><b>م ح</b></td><td>ط</td><td>ش</td><td>ش</td><td>ط</td><td>ش</td></tr>
+<tr><td>استراتيجية RTL</td><td><b>م</b></td><td>ط</td><td><b>ح</b></td><td>ش</td><td>ط</td><td>ط</td></tr>
+<tr><td>معمارية المعلومات والتدفقات</td><td><b>م ح</b></td><td>ش</td><td>ش</td><td>ط</td><td>ش</td><td>ش</td></tr>
+<tr><td>تصميم الشاشات وحالاتها</td><td><b>م ح</b></td><td>ط</td><td>ط</td><td>ش</td><td>ش</td><td>ط</td></tr>
+<tr><td>نصوص الواجهة (UX Writing)</td><td><b>م</b></td><td>ط</td><td>ط</td><td>ط</td><td>ش</td><td><b>ح</b></td></tr>
+<tr><td>الأسعار وبيانات المنتجات (١٠٥٠ حقلًا)</td><td>ط</td><td>ش</td><td>ط</td><td>ش</td><td><b>م ح</b></td><td>ش</td></tr>
+<tr><td>تنفيذ الواجهة الأمامية</td><td>ش</td><td>ط</td><td>ش</td><td><b>م ح</b></td><td>ط</td><td>ط</td></tr>
+<tr><td>تكامل WHMCS والوحدات</td><td>ط</td><td>ط</td><td><b>ح</b></td><td><b>م</b></td><td>ط</td><td>ط</td></tr>
+<tr><td>قوالب البريد وفاتورة PDF</td><td><b>م</b></td><td>ش</td><td>ش</td><td>ش</td><td><b>ح</b></td><td>ش</td></tr>
+<tr><td>مراجعة إمكانية الوصول</td><td><b>م ح</b></td><td>ط</td><td>ط</td><td>ش</td><td>ط</td><td>ط</td></tr>
+<tr><td>خطة القياس والتحليلات</td><td>ش</td><td><b>م</b></td><td>ش</td><td>ش</td><td><b>ح</b></td><td>ش</td></tr>
+<tr><td>اختبار قابلية الاستخدام</td><td><b>م ح</b></td><td>ش</td><td>ط</td><td>ط</td><td>ش</td><td>ش</td></tr>
+<tr><td>قرار الإطلاق</td><td>ش</td><td><b>م</b></td><td>ش</td><td>ش</td><td><b>ح</b></td><td>ش</td></tr>
+</tbody>
+</table>
+
+<div class="box amb">
+<h4>ملاحظة على دورك تحديدًا</h4>
+<p>في هذه المصفوفة أنت <b>مسؤول التنفيذ في ٧ أنشطة وصاحب القرار في ٥</b>. الخطر المهني الأوضح: بند «الأسعار وبيانات المنتجات» و«اختيار بوابات الدفع» ليسا مسؤوليتك، لكن <b>تعطّلهما يوقف تصميمك</b>. اجعلهما بندين مكتوبين بتاريخ استحقاق وصاحب اسم صريح في المرحلة صفر — وإلا سيُنسب التأخير للتصميم.</p>
+</div>
+
+<h2>13. سجل المخاطر</h2>
+<table>
+<thead><tr><th style="width:5%">#</th><th style="width:26%">المخاطرة</th><th style="width:9%">الاحتمال</th><th style="width:9%">الأثر</th><th style="width:33%">التخفيف</th><th style="width:18%">المالك</th></tr></thead>
+<tbody>
+<tr><td>R1</td><td>أعطال RTL في نواة WHMCS ووحدات الطرف الثالث تتكشف متأخرًا</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-red">عالٍ</span></td><td><b>نموذج أولي تقني في الأسبوع الأول</b> لثلاث شاشات مقيدة (DNS، فاتورة، سلة) بالعربية قبل أي تصميم نهائي</td><td>معماري تقني</td></tr>
+<tr><td>R2</td><td>عدم اختيار المزود المصري يوقف تصميم الدفع</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-red">عالٍ</span></td><td>قرار إلزامي في المرحلة صفر · تصميم شاشة دفع بمعمارية «قابس» تستوعب أي مزود</td><td>مالك المنتج</td></tr>
+<tr><td>R3</td><td>«تصميم مخصص كامل» يصطدم بحدود WHMCS فتُتَّهم جودة التصميم</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-amb">متوسط</span></td><td><b>تثبيت جدول التخصيص (القسم ٥) في نطاق العمل الموقّع</b> قبل بدء التصميم</td><td>مدير المشروع</td></tr>
+<tr><td>R4</td><td>١٠٥٠ حقل سعر لا يملؤها أحد فتتعطل صفحات التسعير</td><td><span class="tag t-amb">متوسط</span></td><td><span class="tag t-red">عالٍ</span></td><td>مالك مسمّى + قالب استيراد جماعي + <b>تقليص العملات في الإطلاق الأول إلى ٣</b></td><td>مالك المنتج</td></tr>
+<tr><td>R5</td><td>تكلفة أو بطء مولّد الدومين بالذكاء الاصطناعي يفسد التجربة</td><td><span class="tag t-amb">متوسط</span></td><td><span class="tag t-amb">متوسط</span></td><td>سقف تكلفة يومي · تخزين مؤقت للنتائج · هدف زمن استجابة &lt; ١٫٥ث · تدهور رشيق إلى البحث الكلاسيكي</td><td>تطوير خلفي</td></tr>
+<tr><td>R6</td><td>~٥٠ قالب بريد بالعربية تُكتشف في آخر شهر</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-amb">متوسط</span></td><td>مرحلة مخصصة (٧) وتخطيط مبكر · نظام قالب بريد موحّد بدل ٥٠ قالبًا منفصلًا</td><td>UI/UX</td></tr>
+<tr><td>R7</td><td>الضريبة الثابتة ١٤٪ عبر ٧ أسواق — مشكلة قانونية ومحاسبية</td><td><span class="tag t-amb">متوسط</span></td><td><span class="tag t-red">عالٍ</span></td><td>استشارة محاسبية في المرحلة صفر · قواعد ضريبية حسب الدولة · حقل رقم تسجيل ضريبي للشركات</td><td>مالك المنتج</td></tr>
+<tr><td>R8</td><td>عملاء حاليون على النظام القديم يتأثرون بالإطلاق</td><td><span class="tag t-amb">متوسط</span></td><td><span class="tag t-red">عالٍ</span></td><td>حصر العملاء الحاليين في المرحلة صفر · إطلاق تدريجي · خطة تراجع · تواصل مسبق</td><td>مدير المشروع</td></tr>
+<tr><td>R9</td><td>الوضع الليلي يضاعف QA ويؤخر الإطلاق</td><td><span class="tag t-amb">متوسط</span></td><td><span class="tag t-amb">متوسط</span></td><td>بناء الرموز الدلالية من الأسبوع الأول · أتمتة فحص التباين · اختبار السمة الداكنة بالعينة لا بالكامل</td><td>UI/UX</td></tr>
+<tr><td>R10</td><td>تحديث WHMCS أثناء المشروع يكسر التخصيصات</td><td><span class="tag t-gry">منخفض</span></td><td><span class="tag t-red">عالٍ</span></td><td>تجميد الإصدار طوال المشروع · بيئة تجريبية · تجنّب تعديل ملفات النواة</td><td>معماري تقني</td></tr>
+<tr><td>R11</td><td>غياب معايير القبول يؤدي إلى جولات مراجعة لا تنتهي</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-amb">متوسط</span></td><td>تعريف «منتهٍ» مكتوب (القسم ١٥) · حد أقصى جولتا مراجعة لكل مخرج · قرار مكتوب لكل ملاحظة</td><td>مدير المشروع</td></tr>
+<tr><td>R12</td><td>لا خطة قياس ⇒ لا إثبات لقيمة إعادة التصميم</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-amb">متوسط</span></td><td>قياس خط الأساس على النظام الحالي <b>قبل</b> الإطلاق · أحداث القمع في المرحلة ٢ لا بعدها</td><td>مدير المشروع</td></tr>
+<tr><td>R13</td><td><b>v1.1</b> — الادعاءات الرقمية غير القابلة للإثبات على الموقع الحيّ (٥٠٠ ألف خادم، مليون موقع)</td><td><span class="tag t-red">قائم الآن</span></td><td><span class="tag t-red">عالٍ</span></td><td>مراجعة كل ادعاء رقمي وتوثيق مصدره أو حذفه · استبداله بمؤشرات حقيقية · بند «مراجعة الادعاءات» في بوابة الإطلاق</td><td>مالك المنتج + التسويق</td></tr>
+<tr><td>R14</td><td><b>v1.1</b> — وسائل دفع معلَنة في الفوتر وغير مقبولة فعليًا (PayPal، عملات رقمية)</td><td><span class="tag t-red">قائم الآن</span></td><td><span class="tag t-amb">متوسط</span></td><td>قرار ثنائي فوري: تنفيذ أو إزالة · مراجعة تطابق الشعارات مع البوابات المفعّلة كبند دائم</td><td>مالك المنتج</td></tr>
+<tr><td>R15</td><td><b>v1.1</b> — ٧ لغات مفعّلة بترجمات غير مصانة تنتج واجهة نصفها مترجم</td><td><span class="tag t-red">عالٍ</span></td><td><span class="tag t-amb">متوسط</span></td><td>تقليم اللغات إلى ما يمكن صيانته · مراجعة تغطية ملفات اللغة لكل لغة مُبقاة قبل الإطلاق</td><td>مالك المنتج</td></tr>
+<tr><td>R16</td><td><b>v1.1</b> — تعارض السعر المعلَن (٢٫٥٠$) مع سعر المتجر (٥٫٠٠$) يسرّب تحويلًا الآن</td><td><span class="tag t-red">قائم الآن</span></td><td><span class="tag t-amb">متوسط</span></td><td>تصحيح فوري مستقل عن مسار إعادة التصميم · قاعدة: أي سعر معروض تسويقيًا يُشتق من مصدر واحد</td><td>التسويق</td></tr>
+</tbody>
+</table>
+
+<h2>14. الأسئلة المفتوحة المطلوب حسمها</h2>
+<div class="lede">
+هذه أهم صفحة في المستند من ناحية عملية. خذها إلى مديرك كما هي. كل سؤال بلا إجابة هنا هو أسبوع تأخير محتمل لاحقًا.
+</div>
+
+<h3>حاجزة — تمنع بدء التصميم</h3>
+<div class="q"><b>١. ما مزود الدفع المصري؟ Paymob أم Fawry أم Kashier أم غيرهم؟</b><span>يحدد شكل شاشة الدفع بالكامل. لا يمكن تصميم O-07 وO-11 قبله. <b>v1.1 — ابدأ من هنا:</b> فوتر الموقع الحالي يعرض Vodafone Cash وEtisalat Cash وOrange Cash وWE Pay، وهي تغطية Paymob بالضبط. اسأل من ركّب الفوتر — الجواب على الأرجح موجود في الشركة.</span></div>
+<div class="q"><b>٢. InstaPay: عبر وسيط، أم تطوير مخصص، أم يُعامل كتحويل يدوي مع رفع إيصال؟</b><span>الخيار الثالث هو الأسرع والأرخص وأوصي به للإطلاق الأول.</span></div>
+<div class="q"><b>٣. هل يقبل المدير جدول التخصيص في القسم ٥ (٣١ كامل / ٣٥ مقيد / ٨ مغلق) كتعريف رسمي لـ«تصميم مخصص»؟</b><span>بدون موافقة مكتوبة، سيُقاس الفريق على وعد لا يمكن تحقيقه تقنيًا.</span></div>
+<div class="q"><b>٤. الأرقام: هندية (٠١٢٣) أم عربية (0123)؟</b><span>يؤثر على كل رقم في المنتج بما فيها الفواتير والبطاقات.</span></div>
+<div class="q"><b>٥. هل نبدأ بـ٨ عملات أم بثلاث؟ ومن يملك ملء ~١٢٠٠ حقل سعر وبأي موعد؟</b><span>بند عمل حقيقي لم يُسنَد لأحد. <b>v1.1:</b> النظام الحيّ يشغّل ٨ عملات بالفعل بإضافة SYP — تحقق هل الأسعار مملوءة فيها فعلًا أم أنها تعرض تحويلًا افتراضيًا.</span></div>
+<div class="q"><b>٦. ما إصدار WHMCS المستهدف، وهل يُجمَّد طوال المشروع؟</b><span>يحدد صحة نصف جدول الـAPI.</span></div>
+<div class="q"><b>٧. أين الخط الفاصل بين الموقع التسويقي وWHMCS؟</b><span><b>v1.1 — تغيّر السؤال:</b> المعمارية (ب) قائمة بالفعل. السؤال الآن: هل تنتقل صفحات التسعير إلى الموقع التسويقي؟ توصيتي نعم — هي أعلى صفحات المشروع قيمةً وهي اليوم محبوسة داخل النظام المقيَّد.</span></div>
+<div class="q"><b>٧-أ. اللغات السبع المفعّلة: قرار تجاري أم بقايا إعدادات افتراضية؟</b><span><b>سؤال جديد v1.1.</b> النظام الحيّ يعرض ٧ لغات. إن لم يوجد من يصون الفرنسية والألمانية والإيطالية والإسبانية والتركية، فإغلاقها أفضل من إبقائها بترجمة نصفية. القرار يغيّر مصفوفة الاختبار ٣٫٥ أضعاف.</span></div>
+<div class="q"><b>٧-ب. PayPal والعملات الرقمية المعلَنتان في الفوتر: تُنفَّذان أم تُزالان؟</b><span><b>سؤال جديد v1.1.</b> لا يوجد خيار ثالث. عرض شعار وسيلة دفع غير مقبولة يضرب الثقة عند الخروج وقد يُعدّ إعلانًا مضلّلًا في السوق السويسري والأوروبي.</span></div>
+<div class="q"><b>٧-ج. الادعاءات الرقمية على الصفحة الرئيسية («500K Global Servers» و«1+ Million Active Websites») — ما مصدرها؟</b><span><b>سؤال جديد v1.1، وهو الأكثر إلحاحًا من ناحية المصداقية.</b> إن لم تكن قابلة للإثبات فيجب استبدالها بأرقام حقيقية قبل أي عمل تصميمي على الصفحة الرئيسية — لا معنى لتصميم قسم حول رقم سيُحذف.</span></div>
+<div class="q"><b>٧-د. الهيرو يعلن ‎$2.50‎ والمتجر يبدأ من ‎$5.00‎ — أيهما الصحيح؟</b><span><b>سؤال جديد v1.1.</b> هذا تسريب تحويل يعمل الآن على موقع حيّ. يُصحَّح هذا الأسبوع بصرف النظر عن مسار إعادة التصميم.</span></div>
+
+<h3>مهمة — تؤثر على النطاق والجدول</h3>
+<div class="q"><b>٨. هل هناك عملاء حاليون على clients.somion.ch؟ كم عددهم؟ ما خطة ترحيلهم؟</b></div>
+<div class="q"><b>٩. هل لوحة إدارة WHMCS داخل النطاق أم مستبعدة صراحةً؟</b><span>التوصية: استبعادها كتابةً.</span></div>
+<div class="q"><b>١٠. مولّد الدومين بالذكاء الاصطناعي: أي مزود؟ ما سقف التكلفة الشهري؟ ما السلوك عند الفشل؟</b></div>
+<div class="q"><b>١١. من يكتب النصوص العربية؟ وهل الإنجليزية ترجمة أم محتوى أصلي؟</b></div>
+<div class="q"><b>١٢. ما قواعد الضريبة لكل سوق من السبعة؟ هل استُشير محاسب؟</b></div>
+<div class="q"><b>١٣. سياسة الاستخدام العادل خلف كلمة «Unlimited» — أين تُعرض؟</b></div>
+<div class="q"><b>١٤. سعر تجديد الدومين المجاني بعد السنة الأولى — هل يُعرض في بطاقة الباقة أم في الشروط فقط؟</b><span>توصيتي: في البطاقة. إخفاؤه يولّد شكاوى واسترداد مدفوعات.</span></div>
+<div class="q"><b>١٥. تبديل العملة بعد إضافة منتجات للسلة: نمنع أم نفرّغ السلة بتحذير؟</b></div>
+<div class="q"><b>١٦. الوضع الليلي: إلزامي في الإطلاق الأول أم يمكن تأجيله (مع بناء الرموز له من الآن)؟</b></div>
+<div class="q"><b>١٧. هل نلتزم بمعيار WCAG 2.2 AA رسميًا؟</b><span>يؤثر على التقدير بـ~٨٪ لكنه يفتح أبواب العملاء المؤسسيين.</span></div>
+<div class="q"><b>١٨. ما أدوات القياس؟ ومن يركّبها ومتى يُقاس خط الأساس؟</b></div>
+
+<h3>تحتاج توضيحًا</h3>
+<div class="q"><b>١٩. صفحة حالة الشبكة: خدمة خارجية أم بناء داخلي؟</b></div>
+<div class="q"><b>٢٠. الدخول عبر Google: داخل النطاق أم مؤجل؟ (المواصفات كتبته «يُحدَّد لاحقًا»)</b></div>
+<div class="q"><b>٢١. هل نحتفظ بلقطات Lagom 2 كمرجع بصري ملزم أم كمرجع وظيفي فقط؟</b><span>الفرق كبير: الأول يقيّد التصميم، الثاني يحرره.</span></div>
+<div class="q"><b>٢٢. هل توجد هوية بصرية معتمدة لـSWS (شعار، ألوان، خط)؟ أم تُبنى ضمن المشروع؟</b><span>إن كانت تُبنى، فهذه ١٠–١٥ يومًا إضافية غير محسوبة.</span></div>
+<div class="q"><b>٢٣. ما نطاق دعم المتصفحات؟ هل يشمل Safari على iOS القديم؟</b></div>
+<div class="q"><b>٢٤. ما ميزانية تراخيص الوحدات والقوالب والخدمات الخارجية؟</b></div>
+
+<h2>15. معايير القبول وتعريف «منتهٍ»</h2>
+
+<h3>15.1 تعريف الجاهزية للتصميم (DoR)</h3>
+<p>لا تبدأ شاشة قبل توفر: هدفها المكتوب · شخصية المستخدم المستهدفة · قائمة حالاتها · مصدر بياناتها (إجراء API) · قيود التخصيص الخاصة بها · نصوصها العربية الأولية · معيار قبولها.</p>
+
+<h3>15.2 تعريف الانتهاء (DoD) لأي شاشة</h3>
+<table>
+<thead><tr><th style="width:24%">البُعد</th><th>المعيار</th></tr></thead>
+<tbody>
+<tr><td><b>الحالات</b></td><td>كل الحالات مصممة: افتراضية · فارغة · تحميل · خطأ · نجاح · صلاحيات ناقصة · بيانات كثيرة</td></tr>
+<tr><td><b>الاستجابة</b></td><td>مصممة عند ٣٦٠ و٧٦٨ و١٤٤٠ بكسل على الأقل</td></tr>
+<tr><td><b>الاتجاه</b></td><td>مراجعة بصرية في RTL <b>وLTR</b> — الشاشة العربية ليست مقلوب الإنجليزية دائمًا</td></tr>
+<tr><td><b>السمة</b></td><td>فاتح وداكن، مع فحص تباين آلي ناجح</td></tr>
+<tr><td><b>الوصول</b></td><td>ترتيب تنقل بلوحة المفاتيح موثّق · تسميات ARIA · حلقة تركيز مرئية</td></tr>
+<tr><td><b>النصوص</b></td><td>نصوص عربية نهائية معتمدة، لا نص مؤقت — بما فيها رسائل الخطأ</td></tr>
+<tr><td><b>البيانات</b></td><td>كل عنصر بيانات مربوط بمصدره · سلوك محدد عند غياب البيانات</td></tr>
+<tr><td><b>التسليم</b></td><td>مواصفة تفاعل مكتوبة · مكوّنات من المكتبة لا نسخ منفصلة · أصول مصدّرة</td></tr>
+<tr><td><b>القياس</b></td><td>أحداث التتبع محددة ومسمّاة للشاشات ضمن قمع التحويل</td></tr>
+</tbody>
+</table>
+
+<h3>15.3 بوابات الجودة قبل الإطلاق</h3>
+<div class="grid2">
+<div class="box grn">
+<h4>أداء</h4>
+<ul style="margin-bottom:0">
+<li>LCP &lt; ٢٫٥ث على 4G للصفحات التسويقية</li>
+<li>CLS &lt; ٠٫١ (حرج مع الخطوط العربية)</li>
+<li>INP &lt; ٢٠٠ مللي ثانية</li>
+<li>حجم الخطوط بعد التقليم &lt; ١٥٠ كيلوبايت</li>
+</ul>
+</div>
+<div class="box grn">
+<h4>وظيفي</h4>
+<ul style="margin-bottom:0">
+<li>مسار الشراء يعمل من طرف إلى طرف على كل بوابة مفعّلة</li>
+<li>فاتورة PDF عربية تُطبع صحيحة</li>
+<li>البريد يُعرض صحيحًا في Gmail وOutlook وApple Mail</li>
+<li>صفر عطل حرج · صفر عطل عالي في مسار التحويل</li>
+</ul>
+</div>
+</div>
+
+<hr>
+
+<h2>16. الخطوات التالية</h2>
+
+<div class="box red">
+<h4>إصلاحات مستقلة عن المشروع — تُنفَّذ هذا الأسبوع على الموقع الحيّ</h4>
+<p>هذه لا تنتظر إعادة التصميم ولا المرحلة صفر. كلها منخفضة الجهد وتعمل ضدك الآن على موقع يستقبل زوارًا:</p>
+<ol>
+<li><b>تصحيح تعارض ‎$2.50‎ / ‎$5.00‎</b> بين الصفحة الرئيسية والمتجر.</li>
+<li><b>حسم PayPal والعملات الرقمية</b> في الفوتر: تُنفَّذ أو تُزال.</li>
+<li><b>مراجعة الادعاءات الرقمية</b> واستبدال ما لا يمكن إثباته.</li>
+<li><b>نشر سياسة الخصوصية والشروط وسياسة الاسترداد</b> — أدنى مستوى امتثال، وتكلفتها التصميمية شبه صفر.</li>
+<li><b>إصلاح 404 على <span class="mono">/en/hosting</span></b> — عنصر قائمة يقود إلى لا شيء.</li>
+<li><b>تركيب القياس وبدء جمع خط الأساس</b> — كل أسبوع بلا قياس هو أسبوع لن تستطيع مقارنة النتيجة به لاحقًا.</li>
+</ol>
+<p style="margin-top:8px">هذه القائمة أيضًا ورقة تفاوض جيدة: تُظهر للإدارة قيمة ملموسة خلال أسبوع، وتشتري لك المساحة اللازمة للمرحلة صفر بدل أن تبدو تأخيرًا.</p>
+</div>
+
+<table>
+<thead><tr><th style="width:6%">#</th><th style="width:52%">الخطوة</th><th style="width:20%">المالك</th><th style="width:22%">التوقيت</th></tr></thead>
+<tbody>
+<tr><td>١</td><td>عرض قسمَي «الملخص التنفيذي» و«الأسئلة المفتوحة» على المدير — قبل أي عمل تصميمي</td><td>أنت</td><td>هذا الأسبوع</td></tr>
+<tr><td>٢</td><td>الحصول على موافقة مكتوبة على جدول التخصيص (٣١/٣٥/٨)</td><td>أنت + مدير المشروع</td><td>هذا الأسبوع</td></tr>
+<tr><td>٣</td><td>نموذج أولي تقني: ٣ شاشات مقيدة بالعربية RTL لقياس حجم المشكلة فعليًا</td><td>مطور أمامي</td><td>الأسبوع الأول</td></tr>
+<tr><td>٤</td><td>تدقيق تنافسي: ٥ منافسين (٢ مصريان، ٢ خليجيان، ١ عالمي) — تحديدًا مسار الشراء</td><td>أنت</td><td>الأسبوع الأول</td></tr>
+<tr><td>٥</td><td>حسم مزود الدفع المصري وInstaPay</td><td>مالك المنتج</td><td>الأسبوع الثاني</td></tr>
+<tr><td>٦</td><td>قياس خط الأساس على النظام الحالي (تحويل، تخلٍّ، حجم تذاكر)</td><td>مدير المشروع</td><td>الأسبوع الثاني</td></tr>
+<tr><td>٧</td><td>تثبيت الشخصيات ومؤشرات النجاح مع مالك المنتج</td><td>أنت</td><td>الأسبوع الثاني</td></tr>
+<tr><td>٨</td><td>بدء نظام التصميم: الرموز الثلاث + ١٠ مكوّنات أساسية</td><td>أنت</td><td>الأسبوع الثالث</td></tr>
+<tr><td>٩</td><td>مقابلة ٣–٥ عملاء حاليين أو محتملين (٣٠ دقيقة لكل منهم)</td><td>أنت</td><td>الأسبوع الثالث</td></tr>
+<tr><td>١٠</td><td>تحديث هذا المستند بنتائج المرحلة صفر وإعادة التقدير بهامش أضيق</td><td>مدير المشروع</td><td>الأسبوع الرابع</td></tr>
+</tbody>
+</table>
+
+<div class="box blu">
+<h4>ملاحظة أخيرة، بصراحة</h4>
+<p>أخطر ما في هذا المشروع ليس تقنيًا. هو أن المواصفات <b>تبدو</b> مكتملة: فيها لقطات ومخططات وجدول API وقائمة صفحات. هذا الاكتمال الظاهري يجعل الجميع يفترض أن التخطيط انتهى وأن ما تبقى مجرد تنفيذ. والحقيقة أن المستند يصف <b>الشكل</b> ولا يصف <b>القرارات</b> — والقرارات هي ما يستهلك الوقت.</p>
+<p style="margin-top:8px">أفضل ما يمكنك فعله كمصمم في هذه اللحظة ليس فتح Figma. هو أن تعود بأسئلة القسم ١٤ إلى مديرك مع جملة واحدة: <b>«أستطيع تصميم كل هذا، لكن سبعة قرارات تحدد شكل ٧٠٪ منه، ولا أستطيع البدء بها مفتوحة.»</b> هذا يحوّلك من منفّذ إلى شريك في القرار — وهو أيضًا ما يحميك عندما يُسأل لاحقًا عن سبب التأخير.</p>
+</div>
+
+
+</div>
+<div class="foot">SWS — خطة بناء المنتج · مستند داخلي · الإصدار 1.0</div>
+</body>
+</html>

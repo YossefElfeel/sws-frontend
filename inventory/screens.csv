@@ -1,0 +1,85 @@
+﻿id,name_ar,name_en,group,customization,priority,design_complexity,states,states_count,phase,owner,status,api_actions,blocked_by,notes
+M-01,الرئيسية,Homepage,marketing,full,P0,high,default;domain-search-active;search-empty;loading,4,2,,not-started,,B7c,"Stats section blocked until homepage numeric claims are approved or replaced"
+M-02,استضافة مشتركة,Shared Hosting,marketing,full,P0,high,4-plans;featured-plan;billing-cycle-toggle;currency-toggle,4,2,,not-started,GetProducts,B5;B7;I13;I14,"Pricing relocation target. Renewal price of free domain must appear on the card, not in terms"
+M-03,استضافة ووردبريس,WordPress Hosting,marketing,full,P0,low,same-pattern-custom-content,1,2,,not-started,GetProducts,B5;B7,"Reuses M-02 template"
+M-04,استضافة سحابية,Cloud Hosting,marketing,full,P0,low,same-pattern,1,2,,not-started,GetProducts,B5;B7,"Reuses M-02 template"
+M-05,استضافة البريد,Email Hosting,marketing,full,P1,medium,mailbox-plans,1,2,,not-started,GetProducts,B5;B7,
+M-06,استضافة VPS,VPS Hosting,marketing,full,P1,high,spec-comparison-table;os-selection;location-selection,3,2,,not-started,GetProducts,B5;B7,"Only marketing page with a real product page today"
+M-07,شهادات SSL,SSL Certificates,marketing,full,P1,medium,DV-OV-Wildcard;most-popular-badge;comparison-table,3,2,,not-started,GetProducts,B5;B7,
+M-08,منشئ المواقع,Website Builder,marketing,full,P2,high,interactive-template-preview;free-trial,2,2,,not-started,GetProducts,B5;B7,
+M-09,مراقبة الموقع والخادم,Site & Server Monitoring,marketing,full,P2,medium,monitoring-plans;alerts-explainer,2,2,,not-started,GetProducts,B5;B7,
+M-10,مقارنة الباقات,Plan Comparison,marketing,full,P1,high,full-comparison-table;mobile-horizontal-scroll-or-accordion,2,2,,not-started,GetProducts,B5;B7,"NEW in v1.1 — not in original spec"
+M-11,البحث عن دومين,Domain Search,marketing,limited,P0,very-high,idle;searching;available;unavailable-with-alternatives;error;ai-suggestions;ai-failure,7,2,,not-started,DomainWhois;GetTLDPricing,B4;I10,"Hardest screen in the project. AI failure must degrade gracefully to classic search"
+M-12,أسعار كل الامتدادات,All TLD Pricing,marketing,limited,P1,medium,table;category-filter;search;pagination,4,2,,not-started,GetTLDPricing,B5;B7,"Genuinely limited today — becomes free if pricing relocates"
+M-13,نقل دومين,Domain Transfer,marketing,limited,P1,medium,domain-entry;eligibility-check;epp-code-entry;error,4,2,,not-started,DomainWhois,,
+M-14,تفاصيل منتج مفردة,Product Detail,marketing,full,P1,medium,description;specs;faq;sticky-cta,4,2,,not-started,GetProducts,B5,
+M-15,طلب نقل موقع,Site Migration Request,marketing,full,P2,low,form;confirmation;status-tracking,3,4,,not-started,,,"NEW in v1.1. Footer already advertises a Transfer Sites support department"
+M-16,حالة الشبكة,Network Status,marketing,full,P2,medium,all-operational;partial-outage;full-outage;scheduled-maintenance;incident-history,5,4,,not-started,,C19,"NEW in v1.1. Build-vs-buy decision open"
+M-17,من نحن,About Us,marketing,full,P1,low,default,1,3,,not-started,,,"Page exists on the live site — redesign not net-new"
+M-18,اتصل بنا,Contact Us,marketing,full,P1,low,form;success;error;validation,4,3,,not-started,,,"Page exists on the live site — redesign not net-new"
+M-19,مراكز البيانات,Data Centres,marketing,full,P2,medium,map;cards,1,4,,not-started,,,"NEW in v1.1. Supports the Swiss positioning if that is the chosen answer"
+M-20,الصفحات القانونية (٥),Legal Pages (5),marketing,full,P0,low,single-text-template-with-side-index,1,1,,not-started,,I12;I13,"PRIORITY OVERRIDE: §5 table says P1/phase 7; v1.1 audit raises to P0/phase 1 as an nFADP+GDPR compliance matter. Needs subprocessor inventory first — see gaps/gap-register.md G6"
+M-21,المدونة / المركز التعليمي,Blog / Learning Centre,marketing,full,P3,medium,list;article;category;search,4,7,,not-started,,,
+O-01,تهيئة المنتج,Product Configuration,ordering,limited,P0,high,billing-cycle;addons;sticky-summary;validation-error;updating,5,2,,not-started,GetProducts,B5,"WHMCS constraints begin here — this is the line of demarcation"
+O-02,اختيار الدومين,Domain Selection,ordering,limited,P0,very-high,from-cart;register-available;register-unavailable;register-checking;transfer-with-epp;use-own-domain;nameserver-warning,7,2,,not-started,DomainWhois,B4,"'Use own domain' produces support tickets — needs a post-purchase guidance screen, not just a text warning"
+O-03,تهيئة الدومين,Domain Configuration,ordering,limited,P0,medium,domain-addons;multi-domain;nameserver-warning,3,2,,not-started,,,
+O-04,السلة / المراجعة,Cart / Review,ordering,limited,P0,high,filled;empty;promo-valid;promo-invalid;promo-expired;remove-item;update-quantity,7,2,,not-started,AddOrder;GetPromotions,I15,"Currency switch after items added is an unresolved product decision: block the switch or empty the cart"
+O-05,بيانات الفوترة,Billing Details,ordering,limited,P0,high,new-customer;existing-customer;company-with-vat-id;field-errors;country-changes-tax,5,2,,not-started,AddClient,I12,"True guest checkout is not possible in WHMCS — requirement must be reworded, not designed as specified"
+O-06,بيانات مُسجِّل الدومين,Domain Registrant Details,ordering,limited,P1,medium,default-same-as-account;custom;extension-specific-extra-fields,3,2,,not-started,,,".ae and .sa require mandatory extra fields"
+O-07,اختيار بوابة الدفع,Payment Gateway Selection,ordering,limited,P0,very-high,5-gateways-selected;5-gateways-unselected;unavailable-for-currency;dynamic-per-gateway-detail,7,2,,not-started,GetPaymentMethods,B1;B7b,"BLOCKED. Design a plug architecture that absorbs redirect / iframe / inline-OTP flows"
+O-08,إدخال بيانات البطاقة,Card Entry,ordering,closed,P0,low,stripe-elements-styling-only;card-error;processing,3,2,,not-started,,,"Stripe Elements — font, colour, radius only. Do not design a custom field layout"
+O-09,3-D Secure,3-D Secure,ordering,closed,P0,low,waiting-and-redirect;verification-failure,2,2,,not-started,,,"NEW in v1.1. Bank-hosted page. Design only the before and after screens"
+O-10,تعليمات التحويل البنكي,Bank Transfer Instructions,ordering,full,P1,low,account-details;reference-number;receipt-upload,3,2,,not-started,,,
+O-11,تعليمات InstaPay / المحفظة,InstaPay / Wallet Instructions,ordering,limited,P0,medium,qr-or-number;illustrated-instructions;manual-confirmation;timeout,4,2,,not-started,,B1;B2,"BLOCKED. Recommended launch approach is manual transfer with receipt upload"
+O-12,تأكيد الطلب,Order Confirmation,ordering,full,P0,medium,paid-and-active;paid-and-provisioning;awaiting-payment,3,2,,not-started,AddOrder,,
+O-13,فشل الدفع,Payment Failure,ordering,full,P0,medium,failure-reason;retry;switch-gateway-without-losing-cart,3,2,,not-started,,,"NEW in v1.1. Single biggest conversion-recovery opportunity in the project"
+O-14,طلب معلّق / مراجعة احتيال,Pending Order / Fraud Review,ordering,full,P1,low,explanation;verification-steps;expected-duration,3,2,,not-started,,,"NEW in v1.1. WHMCS holds orders automatically with no customer-facing explanation"
+A-01,تسجيل الدخول,Login,auth,limited,P0,low,default;wrong-credentials;locked-account;remember-me;google-login,5,3,,not-started,ValidateLogin,C20,"Google login scope is undecided — spec says 'to be determined later'"
+A-02,إدخال رمز 2FA,2FA Code Entry,auth,limited,P0,low,entry;wrong-code;backup-code;lost-device,4,3,,not-started,,,"2FA is handled in the session layer, not via the API"
+A-03,إنشاء حساب,Register,auth,limited,P0,medium,form;password-strength;email-taken;field-validation;terms,5,3,,not-started,AddClient,,"Required fields depend on the WHMCS installation settings"
+A-04,طلب استعادة كلمة المرور,Password Reset Request,auth,limited,P0,low,email-entry;sent-regardless-of-account-existence,2,3,,not-started,SendPasswordResetEmail,B6,"Spec named two different actions — pin to the actual name in the frozen WHMCS version"
+A-05,تعيين كلمة مرور جديدة,Set New Password,auth,limited,P0,low,form;expired-link;success,3,3,,not-started,,B6,
+A-06,تأكيد البريد,Email Verification,auth,full,P1,low,awaiting;confirmed;expired-link;resend,4,3,,not-started,,,"NEW in v1.1"
+A-07,انتهاء الجلسة,Session Expiry,auth,full,P2,low,warning-before-expiry;re-login-preserving-context,2,3,,not-started,,,"NEW in v1.1"
+C-01,لوحة القيادة,Dashboard,client-area,full,P0,high,empty-new-customer;single-service;forty-services;overdue-invoice;suspended-service,5,3,,not-started,GetClientsProducts,,"Reference screenshot shows four zero counters — worst possible first screen. New customers need a path, not counters"
+C-02,قائمة خدماتي,My Services List,client-area,limited,P0,high,empty;list;sort;filter-by-status;search;pagination;active;suspended;cancelled;provisioning,10,4,,not-started,GetClientsProducts,,"Designed for Nada persona — 40 services, find one in under 20 seconds. Table fails at 360px; use stacked cards"
+C-03,تفاصيل خدمة,Service Detail,client-area,limited,P0,high,active;suspended;cancelled;server-details;resource-usage;sso-button,6,4,,not-started,GetClientsProducts;CreateSsoToken,,
+C-04,الترقية: اختيار الباقة,Upgrade — Plan Selection,client-area,limited,P1,medium,higher-plans;current-plan-disabled;difference-comparison,3,4,,not-started,UpgradeProduct,,"NEW in v1.1. Spec covered the entire upgrade flow in one line"
+C-05,الترقية: حساب الفرق,Upgrade — Proration,client-area,limited,P1,medium,proration-breakdown;effective-date,2,4,,not-started,UpgradeProduct,,"NEW in v1.1"
+C-06,الترقية: تأكيد ونتيجة,Upgrade — Confirm & Result,client-area,limited,P1,low,immediate-success;awaiting-payment;failure,3,4,,not-started,ModuleChangePackage,,"NEW in v1.1"
+C-07,الإلغاء,Cancellation,client-area,full,P1,medium,timing-choice;cancellation-reason;retention-offer;final-confirmation;undo,5,4,,not-started,AddCancelRequest,,"NEW in v1.1. AddCancelRequest was missing from the spec's API table"
+C-08,التجديد اليدوي,Manual Renewal,client-area,limited,P1,medium,expiring-soon;expired;multi-renew,3,4,,not-started,,,"NEW in v1.1"
+C-09,قائمة دوماييناتي,My Domains List,client-area,limited,P0,medium,empty;list;expiring-soon;expired;redemption-period;sort-filter,6,4,,not-started,GetClientsDomains,,
+C-10,إدارة دومين,Domain Management,client-area,limited,P0,medium,overview;auto-renew;registrar-lock;whois-privacy,4,4,,not-started,GetClientsDomains,,
+C-11,خوادم الأسماء,Nameservers,client-area,closed,P1,low,default;custom;validation;error,4,4,,not-started,DomainUpdateNameservers,,"Registrar module output. Styling possible, restructuring not"
+C-12,سجلات DNS,DNS Records,client-area,closed,P1,medium,table;add-edit-delete;record-types;validation;empty,5,4,,not-started,DomainGetDNS;DomainUpdateDNS,,"Not every registrar module supports DNS management — confirm before designing"
+C-13,نقل الدومين للخارج (EPP),Outbound Transfer (EPP),client-area,closed,P2,low,request-code;display-code;lock-prevents-transfer,3,4,,not-started,,,"NEW in v1.1"
+C-14,قائمة الفواتير,Invoice List,client-area,limited,P0,medium,empty;paid;unpaid;overdue;cancelled;refunded;period-filter,7,5,,not-started,GetInvoices,,
+C-15,فاتورة مفردة,Single Invoice,client-area,limited,P0,medium,unpaid-with-pay-button;paid;overdue;partial;pdf-download,5,5,,not-started,GetInvoice,I12,"Variable tax line + company VAT registration number required across 7 markets"
+C-16,فاتورة PDF,Invoice PDF,client-area,closed,P1,high,tcpdf-template,1,5,,not-started,,I12,"Separate TCPDF engine. Arabic RTL in PDF is harder than on the web — budget separate time"
+C-17,دفع فاتورة,Pay Invoice,client-area,limited,P0,medium,gateway-selection;use-credit;use-saved-card;failure,4,5,,not-started,CapturePayment,B1,"Use CapturePayment — AddInvoicePayment is an admin action and is wrong in the customer flow"
+C-18,إضافة رصيد,Add Funds,client-area,limited,P1,low,amount-entry;min-max-limits;confirmation,3,5,,not-started,GetCredits;AddCredit,,"Both actions missing from the spec's API table"
+C-19,طرق الدفع المحفوظة,Saved Payment Methods,client-area,limited,P1,medium,empty;saved-cards;add;delete;set-default;expired-card,6,5,,not-started,GetPayMethods;AddPayMethod;UpdatePayMethod;DeletePayMethod,,"GetPayMethods is NOT GetPaymentMethods. The spec conflated them — this is the customer's saved cards, not the system's gateway list"
+C-20,سجل المعاملات,Transaction History,client-area,limited,P2,low,table;filter;export,3,5,,not-started,GetTransactions,,"NEW in v1.1. Missing from the spec's API table"
+C-21,استرداد الدفع الفاشل,Dunning / Failed Payment Recovery,client-area,full,P0,medium,warning-banner-3-levels;update-card-page;countdown-to-suspension;suspended-service,4,5,,not-started,,,"NEW in v1.1 and entirely absent from the spec. Highest financial impact in the project — typically recovers 3-7% of lost revenue. Needs 5 emails + 3 banner states"
+C-22,قائمة التذاكر,Ticket List,client-area,limited,P0,medium,empty;open;awaiting-reply;closed;filter-by-department-and-priority,5,6,,not-started,GetTickets,,
+C-23,فتح تذكرة,Open Ticket,client-area,limited,P0,high,department-selection;empty-form;live-kb-suggestions;no-suggestions;attachment-uploading;attachment-rejected-type;attachment-too-large,7,6,,not-started,OpenTicket,,"Add a 'related service' field — missing from the spec and it saves a full round of support questions. KB suggestions after 4 characters, max 3 articles"
+C-24,محادثة تذكرة,Ticket Thread,client-area,limited,P0,medium,timeline;customer-reply;staff-reply;attachments;closed;reopened,6,6,,not-started,GetTicket;AddTicketReply,,"Customer reply needs AddTicketReply — the spec listed UpdateTicket, which is an admin action"
+C-25,قاعدة المعرفة — الفئات,Knowledgebase Categories,client-area,limited,P1,low,category-grid;empty,2,6,,not-started,GetKBCategories,,
+C-26,مقال معرفي,Knowledgebase Article,client-area,limited,P1,low,content;was-this-helpful;related-articles,3,6,,not-started,GetKBArticle,,
+C-27,نتائج بحث المعرفة,Knowledgebase Search Results,client-area,limited,P1,low,results;no-results-with-ticket-suggestion,2,6,,not-started,GetKBArticles,,"NEW in v1.1"
+C-28,الإعلانات,Announcements,client-area,limited,P2,low,list;single;empty,3,6,,not-started,GetAnnouncements,,
+C-29,الأفلييت — لوحة,Affiliate Dashboard,client-area,limited,P2,medium,not-activated;activated;statistics;referral-link;marketing-materials,5,6,,not-started,AffiliateActivate;GetAffiliates,,
+C-30,الأفلييت — طلب سحب,Affiliate Withdrawal,client-area,limited,P2,low,form;minimum-not-met;processing;history,4,6,,not-started,GetAffiliates,,
+C-31,بيانات الحساب,Account Details,client-area,limited,P0,medium,view-edit;email-change-requires-confirmation;country-change-affects-tax,3,6,,not-started,GetClientsDetails;UpdateClient,I12,
+C-32,الأمان و2FA,Security & 2FA,client-area,limited,P1,medium,enable-with-qr;backup-codes;disable;change-password,4,6,,not-started,,,
+C-33,جهات الاتصال الفرعية,Sub-accounts / Contacts,client-area,limited,P1,medium,empty;list;add;permissions-matrix;delete,5,6,,not-started,,,"Required by the Nada persona — agency managing many client accounts"
+C-34,سجل النشاط الأمني,Security Activity Log,client-area,limited,P2,low,table;filter-by-device-location-time,2,6,,not-started,,,
+C-35,تفضيلات الإشعارات,Notification Preferences,client-area,full,P2,low,channel-x-type-matrix,1,6,,not-started,,,"NEW in v1.1"
+C-36,الإشعارات داخل التطبيق,In-app Notifications,client-area,full,P2,medium,dropdown;empty;unread;view-all-page,4,6,,not-started,,,"NEW in v1.1"
+S-01,صفحات الأخطاء,Error Pages (404/500/maintenance/forbidden),system,full,P1,low,404;500;maintenance;forbidden,4,7,,not-started,,,"One template, four pages, with intelligent exit paths. /en/hosting currently returns a bare 404"
+S-02,قوالب البريد الإلكتروني,Email Templates,system,closed,P1,very-high,~50-templates,50,7,,not-started,,B7a,"LARGEST FORGOTTEN ITEM. Template count was never multiplied by language — see gaps/gap-register.md G4. Build one unified template in phase 1, not 50 separate ones in the final 3 weeks"
+S-03,شاشة الانتقال إلى cPanel,cPanel SSO Transition,system,closed,P1,low,transition-screen,1,7,,not-started,CreateSsoToken,,"cPanel itself is entirely outside our control. Design only the screen that prepares the user for a different interface"
+S-04,مبدّل اللغة/العملة/السمة,Language / Currency / Theme Switcher,system,full,P0,medium,closed;open;cart-empty-warning,3,1,,not-started,,B7a;I15;I16,"Shared header component — affects every screen. Build in phase 1"
+S-05,لافتات النظام,System Banners,system,full,P0,low,overdue-invoice;unverified-email;suspended-service;upcoming-maintenance,4,1,,not-started,,,"Shared component — build in phase 1 alongside Banner/Alert"
+S-06,موافقة الكوكيز,Cookie Consent,system,full,P1,low,default,1,7,,not-started,,,"Required for the EU and Swiss markets. Choose the most privacy-preserving default"

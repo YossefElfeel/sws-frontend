@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWS — دليل فريق التصميم (Design Playbook)</title>
+<style>
+:root{
+  --pur:#5B2E91; --pur2:#7B4FB5; --pur-l:#F3EEFA; --pur-xl:#FAF8FD;
+  --tl:#0E7490; --tl-l:#E6F5F8;
+  --ink:#16121F; --ink2:#3D3550; --mute:#6B6280; --line:#E4DFEC;
+  --red:#B3261E; --red-bg:#FDECEA; --amb:#8A5A00; --amb-bg:#FFF6E5;
+  --grn:#1B6E3C; --grn-bg:#E9F6EE; --blu:#1A4F8A; --blu-bg:#EAF2FB;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);
+  font-family:"Segoe UI","Noto Sans Arabic","Tahoma",Arial,sans-serif;font-size:15.5px;line-height:1.85}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px 100px}
+code,.mono{font-family:"Consolas","Courier New",monospace;font-size:.88em;direction:ltr;unicode-bidi:embed;display:inline-block}
+
+.cover{background:linear-gradient(135deg,#0E7490 0%,#134E6F 55%,#3A1C5E 100%);color:#fff;padding:64px 28px 56px;margin-bottom:44px}
+.cover .in{max-width:1080px;margin:0 auto}
+.cover .kick{opacity:.75;letter-spacing:.14em;font-size:12px;font-weight:700;margin-bottom:14px}
+.cover h1{font-size:38px;line-height:1.35;margin:0 0 14px;font-weight:800}
+.cover p{opacity:.92;max-width:680px;margin:0 0 26px;font-size:16px}
+.meta{display:flex;flex-wrap:wrap;gap:10px}
+.meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);padding:6px 13px;border-radius:99px;font-size:12.5px}
+
+h2{font-size:25px;font-weight:800;color:var(--tl);margin:56px 0 6px;padding-bottom:12px;border-bottom:3px solid var(--tl-l)}
+h3{font-size:19px;font-weight:700;margin:34px 0 8px;color:var(--ink)}
+h4{font-size:16px;font-weight:700;margin:22px 0 6px;color:var(--ink2)}
+p{margin:0 0 12px} ul,ol{margin:0 0 14px;padding-inline-start:22px} li{margin-bottom:7px}
+
+.lede{font-size:16.5px;color:var(--ink2);background:var(--tl-l);border-inline-start:4px solid var(--tl);padding:16px 20px;border-radius:0 var(--r) var(--r) 0;margin:0 0 20px}
+
+table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13.6px}
+th{background:var(--tl);color:#fff;text-align:start;padding:10px 12px;font-weight:700;font-size:13px}
+td{border:1px solid var(--line);padding:9px 12px;vertical-align:top}
+tbody tr:nth-child(even){background:#F7FBFC}
+
+.box{border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;margin:0 0 18px;background:#fff}
+.box.red{background:var(--red-bg);border-color:#F3CFCB}
+.box.amb{background:var(--amb-bg);border-color:#F0DFB8}
+.box.grn{background:var(--grn-bg);border-color:#C8E6D3}
+.box.blu{background:var(--blu-bg);border-color:#C9DDF2}
+.box h4{margin-top:0}
+.box.red h4{color:var(--red)} .box.amb h4{color:var(--amb)}
+.box.grn h4{color:var(--grn)} .box.blu h4{color:var(--blu)}
+.box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap;line-height:1.7}
+.t-red{background:var(--red-bg);color:var(--red)}
+.t-amb{background:var(--amb-bg);color:var(--amb)}
+.t-grn{background:var(--grn-bg);color:var(--grn)}
+.t-blu{background:var(--blu-bg);color:var(--blu)}
+.t-gry{background:#EFEDF3;color:var(--mute)}
+
+.tree{background:#14262B;color:#DCEEF2;border-radius:var(--r);padding:18px 22px;margin:14px 0 22px;
+  font-family:"Consolas","Courier New",monospace;font-size:12.6px;line-height:2;direction:ltr;text-align:left;overflow-x:auto;white-space:pre}
+.tree b{color:#7DD3E0;font-weight:700}
+.tree i{color:#F2C87A;font-style:normal}
+.tree s{color:#F0968E;text-decoration:none}
+
+.sw{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 20px}
+.sw div{width:76px;text-align:center;font-size:10.5px;color:var(--mute)}
+.sw div span{display:block;height:44px;border-radius:7px;border:1px solid rgba(0,0,0,.08);margin-bottom:4px}
+.sw div b{display:block;font-family:"Consolas",monospace;font-size:9.5px;color:var(--ink2);font-weight:400;direction:ltr}
+
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.dd>div{padding:14px 18px}
+.dd .do{background:var(--grn-bg);border-inline-end:1px solid var(--line)}
+.dd .dont{background:var(--red-bg)}
+.dd h4{margin:0 0 8px}
+.dd .do h4{color:var(--grn)} .dd .dont h4{color:var(--red)}
+.dd ul{margin:0;padding-inline-start:20px;font-size:14px}
+
+.brief{border:1px solid var(--line);border-inline-start:4px solid var(--tl);border-radius:0 var(--r) var(--r) 0;padding:14px 18px;margin-bottom:14px;background:#fff}
+.brief .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.brief .hd b{font-size:16px;color:var(--ink)}
+.brief dl{margin:0;font-size:13.8px}
+.brief dt{font-weight:700;color:var(--tl);margin-top:7px;font-size:13px}
+.brief dd{margin:0 0 0 0;padding-inline-start:0;color:var(--ink2)}
+
+.ck{list-style:none;padding:0;margin:0 0 14px}
+.ck li{padding-inline-start:26px;position:relative;margin-bottom:6px;font-size:14.2px}
+.ck li:before{content:"☐";position:absolute;inset-inline-start:0;color:var(--tl);font-size:16px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 26px}
+.stat{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;text-align:center;background:#fff}
+.stat .n{font-size:26px;font-weight:800;color:var(--tl);line-height:1.3}
+.stat .l{font-size:12.5px;color:var(--mute)}
+
+.toc{background:#F7FBFC;border:1px solid var(--line);border-radius:var(--r);padding:20px 26px;margin-bottom:20px}
+.toc ol{margin:0;padding-inline-start:20px;columns:2;column-gap:34px}
+.toc li{margin-bottom:5px;break-inside:avoid}
+
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+.foot{text-align:center;color:var(--mute);font-size:13px;padding-top:30px;border-top:1px solid var(--line);margin-top:60px}
+
+@media print{.cover{padding:40px 0} h2{page-break-after:avoid} table,.box,.brief,.tree{page-break-inside:avoid} body{font-size:11pt}}
+@media(max-width:760px){.grid2,.grid4,.dd{grid-template-columns:1fr} .toc ol{columns:1} .cover h1{font-size:27px} table{font-size:12.5px}}
+</style>
+</head>
+<body>
+
+<div class="cover"><div class="in">
+  <div class="kick">SWS — SOMION WEB SERVICES · فريق التصميم</div>
+  <h1>دليل فريق التصميم<br>Design Team Playbook</h1>
+  <p>المستند التشغيلي اليومي لفريق UI/UX. ليس مستند إدارة ولا عرضًا للمدير — هذا ما يفتحه المصمم قبل أن يفتح Figma. يحدد كيف نبني، بأي قواعد، وبأي معيار نعتبر الشاشة جاهزة للتسليم.</p>
+  <div class="meta">
+    <span>الإصدار 1.1 — بعد تدقيق الموقع الحالي</span>
+    <span>يوليو 2026</span>
+    <span>مرافق لـ: خطة بناء المنتج v1.1</span>
+    <span>الجمهور: فريق التصميم فقط</span>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<div class="box amb">
+<h4>اقرأ هذا أولًا — علاقة هذا المستند بالمستند الآخر</h4>
+<p>هناك مستندان لهذا المشروع ولا يُستبدل أحدهما بالآخر:</p>
+<ul>
+<li><b>خطة بناء المنتج</b> — للمدير وأصحاب القرار. تحتوي التحليل النقدي، الجدول الزمني، التقديرات، المخاطر، والأسئلة المفتوحة. <b>لا يحتاج فريق التصميم لقراءتها كاملة.</b></li>
+<li><b>هذا المستند</b> — لفريق التصميم. قواعد وقوالب وقوائم تدقيق. <b>لا يُعرض على المدير</b>، لأنه لا يحتوي على ما يهمه.</li>
+</ul>
+<p><b>لكن قاعدتان من المستند الآخر ملزمتان لكم:</b> (١) جدول قابلية التخصيص — ٣١ شاشة حرة، ٣٥ مقيدة، ٨ مغلقة. (٢) القرارات السبعة الحاجزة. <b>لا تُصمَّم شاشة دفع أو تسعير قبل حسمها.</b> ملخصهما في القسم ١٢ هنا.</p>
+</div>
+
+<h2>0. الفهرس</h2>
+<div class="toc"><ol>
+<li><b>★ الوضع القائم وما يعنيه لك (v1.1)</b></li>
+<li>طريقة عمل الفريق والأدوار</li>
+<li>بنية ملفات Figma وقواعد التسمية</li>
+<li>الرموز التصميمية بقيم فعلية</li>
+<li>قواعد RTL — افعل ولا تفعل</li>
+<li>قواعد الوضع الليلي</li>
+<li>الطباعة والمسافات والشبكة</li>
+<li>مكتبة المكونات وواجهاتها</li>
+<li>أنماط الحالات الإلزامية</li>
+<li>قواعد الكتابة العربية في الواجهة</li>
+<li>موجزات التصميم لكل شاشة</li>
+<li>إمكانية الوصول عمليًا</li>
+<li>القيود الملزمة من الطرف التقني</li>
+<li>قائمة التدقيق الذاتي قبل المراجعة</li>
+<li>قائمة تدقيق التسليم للمطورين</li>
+<li>نقد التصميم وإدارة الدين التصميمي</li>
+<li>توزيع العمل على أعضاء الفريق</li>
+</ol></div>
+
+<h2>★ الوضع القائم وما يعنيه لك مباشرة <span style="font-size:16px;font-weight:400;color:var(--mute)">— إضافة v1.1</span></h2>
+
+<div class="lede">
+المنتج ليس ورقة بيضاء. <span class="mono">sws.somion.ch</span> منشور ويستقبل زوارًا، و<span class="mono">clients.somion.ch</span> يعمل بقالب Lagom2 شبه افتراضي. خمس نتائج من تدقيق النظام الحيّ تغيّر عملك اليومي.
+</div>
+
+<h3>١. عندك صوتان عربيان — لا غياب للنص العربي</h3>
+<p>الموقع التسويقي مترجم للعربية <b>ترجمة حقيقية جيدة</b> («استضافة ويب فائقة السرعة»، «احجز دومينك وابدأ رحلتك»). لوحة العميل تستخدم الترجمة العربية الافتراضية لـWHMCS/Lagom، وهي بمستوى مختلف تمامًا.</p>
+<div class="box amb">
+<h4>ما يعنيه هذا لك</h4>
+<ul>
+<li>مهمتك ليست «اخترع صوتًا عربيًا» بل <b>وحّد صوتين قائمين</b>. ابدأ من نصوص الموقع التسويقي — هي المرجع لأنها مكتوبة لا مترجمة آليًا.</li>
+<li>جدول المصطلحات في القسم ٩ يجب أن يُراجَع مقابل ما هو منشور فعلًا اليوم قبل اعتماده. لا تعتمد مصطلحًا يخالف ما يراه العميل الآن دون قرار واعٍ بتغييره.</li>
+<li>اللحظة الأخطر في التجربة كلها: الانتقال من زر «Order Now» في الموقع التسويقي إلى المتجر داخل WHMCS. <b>اذهب وجرّب هذا الانتقال بنفسك اليوم</b> — بالعربية. الفرق في النبرة والشكل هو تحديدًا ما ستُقاس عليه.</li>
+</ul>
+</div>
+
+<h3>٢. صفحات التسعير تنتقل إليك — ٨ شاشات تتحرر من القيد</h3>
+<p>حاليًا لا يوجد سعر واحد على الموقع التسويقي. صفحات المنتجات بروشورات، وكل زر يقفز إلى المتجر داخل WHMCS. التوصية المعتمدة في الخطة: <b>نقل صفحات التسعير إلى الموقع التسويقي</b>.</p>
+<div class="box grn">
+<h4>الأثر عليك</h4>
+<p>M-02 → M-09 تنتقل من <span class="tag t-amb">مقيدة</span> إلى <span class="tag t-grn">حرية كاملة</span>. هذه أفضل أخبار المشروع بالنسبة لفريق التصميم: أهم صفحات التحويل تصبح بلا قيود بنيوية. لكن هذا يعني أيضًا أن الاعتذار عن ضعفها لن يكون متاحًا — <b>لا قيد تقني تختبئ خلفه في هذه الثمانية</b>.</p>
+<p style="margin-top:8px">راجع جدول القيود في القسم ١٢ بهذا التحديث: بنود «الجداول والنماذج الأساسية» لا تنطبق على صفحات التسعير بعد الآن.</p>
+</div>
+
+<h3>٣. سبع لغات مفعّلة — وهذا يغيّر قاعدة التوسّع النصي</h3>
+<p>النظام الحيّ يشغّل: العربية · الإنجليزية · الفرنسية · الألمانية · الإيطالية · الإسبانية · التركية. حتى لو قُلِّمت لاحقًا، صمّم على افتراض أكثر من لغتين.</p>
+<table>
+<thead><tr><th style="width:22%">اللغة</th><th style="width:26%">الطول مقابل الإنجليزية</th><th style="width:52%">أثرها على التصميم</th></tr></thead>
+<tbody>
+<tr><td>العربية</td><td>~−٢٠٪ عادة، لكن +٥٠٪ في المصطلحات التقنية</td><td>«Nameservers» ← «خوادم أسماء النطاقات»</td></tr>
+<tr><td><b>الألمانية</b></td><td><b>+٣٠٪ وأحيانًا أكثر</b></td><td>الكلمات المركبة الطويلة تكسر الأزرار ورؤوس الجداول. <b>هي اللغة الحاكمة لعرض الأزرار لا الإنجليزية</b></td></tr>
+<tr><td>الفرنسية</td><td>+١٥–٢٠٪</td><td>عبارات أطول في التسميات والأزرار</td></tr>
+<tr><td>التركية</td><td>+١٠–٢٠٪</td><td>لواحق تصريفية طويلة</td></tr>
+</tbody>
+</table>
+<div class="box red">
+<h4>القاعدة تتغيّر</h4>
+<p>ما كان في القسم ٤: «صمّم بحيث يتحمّل ±٣٠٪». <b>الصيغة الجديدة: صمّم على أطول لغة لا على أقصرها.</b> عمليًا — اختبر كل زر وتسمية ورأس عمود بالنص الألماني قبل اعتماده. وامتنع نهائيًا عن النصوص داخل مكوّنات ثابتة العرض.</p>
+</div>
+
+<h3>٤. Lagom2 شبه افتراضي — خذ لقطات «قبل» الآن</h3>
+<div class="box blu">
+<p>قبل أي تغيير، صوّر الحالة الحالية لكل شاشة في لوحة العميل (فاتح/داكن، عربي/إنجليزي) واحفظها في <span class="mono">99 · Archive</span>. سببان:</p>
+<ul style="margin-bottom:0">
+<li><b>مرجع القيود:</b> اللقطة تُظهر لك ما يفرضه WHMCS فعلًا قبل أن تصمم شيئًا لن يُنفَّذ.</li>
+<li><b>إثبات القيمة:</b> مقارنة «قبل/بعد» هي أفضل ما يمكن أن يعرضه فريق تصميم في نهاية مشروع. لن تستطيع إنتاجها لاحقًا إن لم تلتقطها الآن.</li>
+</ul>
+</div>
+
+<h3>٥. أشياء ستراها على الموقع وليست من اختصاصك — أبلغ ولا تصلح</h3>
+<p>ستلاحظ أثناء العمل: تعارض السعر المعلَن (‎$2.50‎) مع سعر المتجر (‎$5.00‎)، ووسائل دفع في الفوتر غير مقبولة فعليًا، وادعاءات رقمية ضخمة على الصفحة الرئيسية، وغياب الصفحات القانونية.</p>
+<div class="box amb">
+<p><b>موقفك منها:</b> هذه قرارات منتج وتسويق وامتثال، لا قرارات تصميم. لكن <b>سُجِّلت كلها في خطة بناء المنتج ورُفعت للإدارة</b>. لا تصلحها من طرفك ولا تصمّم حولها بصمت.</p>
+<p style="margin-top:8px">القاعدة العملية: <b>لا تصمّم قسمًا مبنيًا على رقم قد يُحذف.</b> قسم الإحصاءات في الصفحة الرئيسية تحديدًا — لا تبدأ فيه قبل أن تُعتمد أرقامه، وإلا صممته مرتين.</p>
+</div>
+
+<h2>1. طريقة عمل الفريق والأدوار</h2>
+
+<div class="lede">
+٧٤ شاشة و~٢٦٠ حالة على مدى ٢٨ أسبوعًا. بدون قواعد عمل مكتوبة، سينتج فريق من ثلاثة مصممين ثلاثة أنظمة تصميم مختلفة خلال شهر — وهذا ليس تشاؤمًا بل النتيجة الافتراضية.
+</div>
+
+<h3>1.1 الأدوار</h3>
+<table>
+<thead><tr><th style="width:20%">الدور</th><th style="width:40%">المسؤولية</th><th style="width:40%">صاحب القرار في</th></tr></thead>
+<tbody>
+<tr><td><b>قائد التصميم</b></td><td>نظام التصميم · اتساق التجربة · المراجعة النهائية · التفاوض على النطاق مع الإدارة</td><td>الرموز · المكونات · قبول أي شاشة · قرار «هذا خارج النطاق»</td></tr>
+<tr><td><b>مصمم منتج (تحويل)</b></td><td>الموقع التسويقي ومسار الطلب (M-01→M-21, O-01→O-14)</td><td>تفاصيل التفاعل داخل مسار الشراء</td></tr>
+<tr><td><b>مصمم منتج (لوحة التحكم)</b></td><td>المصادقة ولوحة التحكم (A-*, C-*)</td><td>أنماط الجداول والقوائم والحالات</td></tr>
+<tr><td><b>كاتب تجربة (UX Writer)</b></td><td>كل النصوص العربية: التسميات · رسائل الخطأ · الحالات الفارغة · البريد</td><td>الصياغة والمصطلحات الموحدة</td></tr>
+</tbody>
+</table>
+<p class="mono" style="color:var(--mute)">ملاحظة: إن كان الفريق أصغر، تُدمج الأدوار — لكن <b>مسؤولية نظام التصميم لا تُوزَّع أبدًا</b>. شخص واحد يملكها.</p>
+
+<h3>1.2 دورة العمل الأسبوعية</h3>
+<table>
+<thead><tr><th style="width:16%">اليوم</th><th style="width:28%">النشاط</th><th style="width:18%">المدة</th><th style="width:38%">المخرج</th></tr></thead>
+<tbody>
+<tr><td>الأحد</td><td>تخطيط الأسبوع + توزيع الشاشات</td><td>٤٥ دقيقة</td><td>قائمة شاشات لكل مصمم بمعايير قبولها</td></tr>
+<tr><td>الثلاثاء</td><td><b>نقد تصميم داخلي</b> (بدون إدارة)</td><td>٦٠ دقيقة</td><td>ملاحظات مكتوبة، قرار لكل ملاحظة</td></tr>
+<tr><td>الأربعاء</td><td>مزامنة مع المطورين على الشاشات المسلّمة</td><td>٣٠ دقيقة</td><td>قائمة قيود تقنية جديدة</td></tr>
+<tr><td>الخميس</td><td>مراجعة قائد التصميم + تسليم</td><td>٦٠ دقيقة</td><td>شاشات معتمدة تنتقل لحالة «جاهزة للتطوير»</td></tr>
+</tbody>
+</table>
+
+<div class="box red">
+<h4>قاعدتان غير قابلتين للتفاوض</h4>
+<ol>
+<li><b>حد أقصى جولتا مراجعة لكل شاشة.</b> بعد الجولة الثانية، أي ملاحظة جديدة تُسجَّل في «الدين التصميمي» (القسم ١٥) ولا توقف التسليم. بدون هذا الحد، المشروع لا ينتهي.</li>
+<li><b>لا شاشة تدخل مرحلة التطوير بنص مؤقت.</b> «Lorem ipsum» أو نص إنجليزي مكانه العربية = الشاشة غير منتهية. النص العربي أطول وأقصر بشكل غير متوقع ويكسر التخطيطات — اكتشاف ذلك في التطوير يكلف ثلاثة أضعاف.</li>
+</ol>
+</div>
+
+<h2>2. بنية ملفات Figma وقواعد التسمية</h2>
+
+<h3>2.1 تقسيم الملفات</h3>
+<div class="tree">
+<b>SWS — Design</b> (مشروع Figma)
+│
+├── <b>00 · Foundations</b>              <i>ملف واحد — قائد التصميم فقط له حق التعديل</i>
+│    ├── Page: Tokens                 (الرموز الثلاث بصريًا + Variables)
+│    ├── Page: Typography             (السلّم + أمثلة عربية وإنجليزية)
+│    ├── Page: Grid &amp; Spacing
+│    ├── Page: Iconography            (مع تصنيف: يُعكس / لا يُعكس)
+│    └── Page: Illustrations          (الحالات الفارغة)
+│
+├── <b>01 · Component Library</b>        <i>مكتبة منشورة — التعديل عبر طلب فقط</i>
+│    ├── Page: Primitives             (أزرار، حقول، شارات…)
+│    ├── Page: Layout                 (هيدر، سايدبار، فوتر…)
+│    ├── Page: Data Display           (جداول، بطاقات…)
+│    ├── Page: Feedback               (لافتات، نوافذ، حالات فارغة…)
+│    └── Page: Domain                 (مبدّل العملة، بطاقة باقة…)
+│
+├── <b>02 · Marketing</b>                <i>مصمم التحويل</i>
+│    ├── Page: M-01 Homepage
+│    ├── Page: M-02..M-09 Product Pages
+│    └── Page: M-10..M-21
+│
+├── <b>03 · Ordering</b>                 <i>مصمم التحويل</i>
+│    └── Page: O-01..O-14
+│
+├── <b>04 · Auth</b>                     <i>مصمم لوحة التحكم</i>
+├── <b>05 · Client Area</b>              <i>مصمم لوحة التحكم</i>
+├── <b>06 · System &amp; Email</b>
+│
+├── <b>90 · Flows (FigJam)</b>            <i>التدفقات الثمانية</i>
+├── <b>91 · Explorations</b>              <i>مسوّدات — لا يُبنى منها شيء</i>
+└── <b>99 · Archive</b>                   <i>نسخ قديمة، لا تُحذف أبدًا</i>
+</div>
+
+<div class="box blu">
+<h4>لماذا الفصل بين «Explorations» وباقي الملفات؟</h4>
+<p>أكبر مصدر أخطاء في التسليم هو أن المطور يفتح إطارًا كان مسوّدة. الفصل الصارم يحل هذا. القاعدة: <b>أي إطار خارج ملفات 02–06 غير موجود بالنسبة للتطوير.</b></p>
+</div>
+
+<h3>2.2 تسمية الإطارات (Frames)</h3>
+<p>الصيغة الإلزامية: <span class="mono">[ID] / [اسم الشاشة] / [الحالة] / [الجهاز]</span></p>
+<table>
+<thead><tr><th style="width:50%">مثال صحيح</th><th style="width:50%">مثال خاطئ</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">C-01 / Dashboard / Empty / Desktop</span></td><td><span class="mono">Dashboard final v3 NEW</span></td></tr>
+<tr><td><span class="mono">O-07 / Payment Method / Stripe Selected / Mobile</span></td><td><span class="mono">payment 2</span></td></tr>
+<tr><td><span class="mono">M-11 / Domain Search / No Results / Desktop</span></td><td><span class="mono">Domain search - Ahmed edit</span></td></tr>
+</tbody>
+</table>
+<p><b>حالات معيارية للاستخدام في اسم الإطار:</b> <span class="mono">Default · Empty · Loading · Error · Success · Partial · Overflow · NoPermission</span></p>
+
+<h3>2.3 تسمية المكونات</h3>
+<p>الصيغة: <span class="mono">Category/ComponentName</span> مع الخصائص كـVariants لا كمكونات منفصلة.</p>
+<div class="dd">
+<div class="do"><h4>افعل</h4><ul>
+<li><span class="mono">Button</span> بخصائص: <span class="mono">variant, size, state, icon, fullWidth</span></li>
+<li>خاصية <span class="mono">state</span> تشمل: <span class="mono">default, hover, active, focus, disabled, loading</span></li>
+<li>أسماء الخصائص بالإنجليزية دائمًا (تطابق الكود)</li>
+</ul></div>
+<div class="dont"><h4>لا تفعل</h4><ul>
+<li><span class="mono">Button Primary Large</span> و<span class="mono">Button Primary Small</span> كمكونين</li>
+<li>نسيان حالة <span class="mono">focus</span> — وهي الأكثر نسيانًا والأهم للوصول</li>
+<li>خلط العربية والإنجليزية في أسماء الخصائص</li>
+</ul></div>
+</div>
+
+<h2>3. الرموز التصميمية بقيم فعلية</h2>
+
+<div class="lede">
+هذه قيم مقترحة للبدء، لا نهائية. لكن <b>البنية الثلاثية إلزامية</b>: لا يشير أي مكون إلى لون بدائي مباشرة. من يخالف هذه القاعدة يجعل الوضع الليلي مستحيلًا لاحقًا.
+</div>
+
+<h3>3.1 الطبقة الأولى — بدائية</h3>
+<h4>Purple (اللون الأساسي)</h4>
+<div class="sw">
+<div><span style="background:#F4F0FA"></span>50<b>#F4F0FA</b></div>
+<div><span style="background:#E7DEF5"></span>100<b>#E7DEF5</b></div>
+<div><span style="background:#CFBDEB"></span>200<b>#CFBDEB</b></div>
+<div><span style="background:#A98BD9"></span>300<b>#A98BD9</b></div>
+<div><span style="background:#8459C4"></span>400<b>#8459C4</b></div>
+<div><span style="background:#5B2E91"></span>500<b>#5B2E91</b></div>
+<div><span style="background:#4A2578"></span>600<b>#4A2578</b></div>
+<div><span style="background:#3A1C5E"></span>700<b>#3A1C5E</b></div>
+<div><span style="background:#2A1444"></span>800<b>#2A1444</b></div>
+<div><span style="background:#1B0D2C"></span>900<b>#1B0D2C</b></div>
+</div>
+
+<h4>Neutral</h4>
+<div class="sw">
+<div><span style="background:#FFFFFF;border-color:#ddd"></span>0<b>#FFFFFF</b></div>
+<div><span style="background:#F8F7FA"></span>50<b>#F8F7FA</b></div>
+<div><span style="background:#F1EFF5"></span>100<b>#F1EFF5</b></div>
+<div><span style="background:#E4E1EB"></span>200<b>#E4E1EB</b></div>
+<div><span style="background:#CBC6D6"></span>300<b>#CBC6D6</b></div>
+<div><span style="background:#A29BB2"></span>400<b>#A29BB2</b></div>
+<div><span style="background:#7B7389"></span>500<b>#7B7389</b></div>
+<div><span style="background:#5C5568"></span>600<b>#5C5568</b></div>
+<div><span style="background:#423C4D"></span>700<b>#423C4D</b></div>
+<div><span style="background:#2A2633"></span>800<b>#2A2633</b></div>
+<div><span style="background:#201D28"></span>850<b>#201D28</b></div>
+<div><span style="background:#16131C"></span>900<b>#16131C</b></div>
+</div>
+
+<h4>Status</h4>
+<div class="sw">
+<div><span style="background:#1B6E3C"></span>success<b>#1B6E3C</b></div>
+<div><span style="background:#4ADE80"></span>success-d<b>#4ADE80</b></div>
+<div><span style="background:#B3261E"></span>danger<b>#B3261E</b></div>
+<div><span style="background:#F87171"></span>danger-d<b>#F87171</b></div>
+<div><span style="background:#8A5A00"></span>warning<b>#8A5A00</b></div>
+<div><span style="background:#FBBF24"></span>warning-d<b>#FBBF24</b></div>
+<div><span style="background:#1A4F8A"></span>info<b>#1A4F8A</b></div>
+<div><span style="background:#60A5FA"></span>info-d<b>#60A5FA</b></div>
+</div>
+
+<h3>3.2 الطبقة الثانية — دلالية (هنا يحدث الوضع الليلي)</h3>
+<table>
+<thead><tr><th style="width:34%">الرمز الدلالي</th><th style="width:22%">فاتح</th><th style="width:22%">داكن</th><th style="width:22%">الاستخدام</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">surface-base</span></td><td>neutral-50</td><td>neutral-900</td><td>خلفية الصفحة</td></tr>
+<tr><td><span class="mono">surface-raised</span></td><td>neutral-0</td><td>neutral-850</td><td>البطاقات واللوحات</td></tr>
+<tr><td><span class="mono">surface-sunken</span></td><td>neutral-100</td><td>#0E0C12</td><td>الحقول، المناطق الغائرة</td></tr>
+<tr><td><span class="mono">text-primary</span></td><td>neutral-900</td><td>neutral-50</td><td>النص الأساسي</td></tr>
+<tr><td><span class="mono">text-secondary</span></td><td>neutral-600</td><td>neutral-400</td><td>النص المساند</td></tr>
+<tr><td><span class="mono">text-on-action</span></td><td>neutral-0</td><td>neutral-900</td><td>النص فوق الزر الأساسي</td></tr>
+<tr><td><span class="mono">border-subtle</span></td><td>neutral-200</td><td>neutral-800</td><td>حدود البطاقات والجداول</td></tr>
+<tr><td><span class="mono">border-strong</span></td><td>neutral-300</td><td>neutral-700</td><td>حدود الحقول</td></tr>
+<tr><td><span class="mono">action-primary</span></td><td>purple-500</td><td>purple-300</td><td>الزر الأساسي، الروابط</td></tr>
+<tr><td><span class="mono">action-primary-hover</span></td><td>purple-600</td><td>purple-200</td><td>—</td></tr>
+<tr><td><span class="mono">action-subtle-bg</span></td><td>purple-50</td><td>purple-800</td><td>الخلفيات الملوّنة الخفيفة</td></tr>
+<tr><td><span class="mono">focus-ring</span></td><td>purple-400</td><td>purple-300</td><td>حلقة التركيز — إلزامية</td></tr>
+<tr><td><span class="mono">status-success</span></td><td>success</td><td>success-d</td><td>—</td></tr>
+<tr><td><span class="mono">status-danger</span></td><td>danger</td><td>danger-d</td><td>—</td></tr>
+<tr><td><span class="mono">status-warning</span></td><td>warning</td><td>warning-d</td><td>—</td></tr>
+<tr><td><span class="mono">status-info</span></td><td>info</td><td>info-d</td><td>—</td></tr>
+</tbody>
+</table>
+
+<div class="box red">
+<h4>لا تصدّق أرقام التباين — افحصها</h4>
+<p>كل زوج (نص/خلفية) في الجدول أعلاه <b>يجب أن يُفحص بأداة تباين فعلية في السمتين</b> قبل الاعتماد. الأزواج الأخطر التي تفشل عادة: النص الثانوي على الخلفية المرفوعة في الوضع الداكن، والنص فوق خلفيات الحالة الملوّنة، والنص المعطّل (disabled). لا تفترض أن قيمة تبدو مقبولة بصريًا تحقق ٤٫٥:١.</p>
+</div>
+
+<h3>3.3 الطبقة الثالثة — مكوّناتية</h3>
+<div class="tree">
+button-primary-bg          → action-primary
+button-primary-bg-hover    → action-primary-hover
+button-primary-text        → text-on-action
+button-secondary-border    → border-strong
+
+input-bg                   → surface-sunken
+input-border               → border-strong
+input-border-focus         → focus-ring
+input-border-error         → status-danger
+input-placeholder          → text-secondary
+
+card-bg                    → surface-raised
+card-border                → border-subtle
+
+table-header-bg            → surface-sunken
+table-row-hover            → action-subtle-bg
+table-border               → border-subtle
+
+banner-danger-bg           → status-danger @ 12%
+banner-danger-border       → status-danger @ 40%
+banner-danger-icon         → status-danger
+</div>
+
+<h2>4. قواعد RTL — افعل ولا تفعل</h2>
+
+<div class="lede">
+هذا أكثر قسم سيُرجَع إليه يوميًا. العربية هي اللغة الافتراضية للمنتج، والقالب المرجعي (Lagom) مبني بالكامل لـLTR. <b>كل خطأ RTL يُكتشف في التطوير يكلف ثلاثة أضعاف تكلفة تجنّبه في التصميم.</b>
+</div>
+
+<h3>4.1 القاعدة الأساسية</h3>
+<div class="box grn">
+<h4>فكّر بـ«بداية/نهاية» لا بـ«يمين/يسار»</h4>
+<p>في Figma استخدم Auto Layout دائمًا واضبط الاتجاه على RTL في الإطار الأصلي. عند التسليم، صف المسافات بلغة منطقية: «مسافة ٢٤ من بداية السطر» لا «٢٤ من اليمين». المطور سيكتب <span class="mono">margin-inline-start: 24px</span> فيعمل في الاتجاهين تلقائيًا.</p>
+</div>
+
+<h3>4.2 الأيقونات: ما يُعكس وما لا يُعكس</h3>
+<div class="dd">
+<div class="do"><h4>تُعكس مع RTL</h4><ul>
+<li>أسهم التنقل: التالي / السابق / رجوع</li>
+<li>سهم القائمة المنسدلة الجانبية</li>
+<li>أشرطة التقدم واتجاه امتلائها</li>
+<li>خطوات الطلب (Stepper)</li>
+<li>أيقونة «مشاركة» ذات الاتجاه</li>
+<li>الاقتباس والقوائم النقطية</li>
+</ul></div>
+<div class="dont"><h4>لا تُعكس أبدًا</h4><ul>
+<li>التحميل والرفع (سهم عمودي)</li>
+<li>الساعة والتقويم</li>
+<li>التشغيل/الإيقاف في الوسائط</li>
+<li>الشعارات وعلامات البوابات</li>
+<li>أيقونات العملة والبطاقات</li>
+<li>الأيقونات التمثيلية (سيرفر، سحابة، درع)</li>
+</ul></div>
+</div>
+<p><b>إلزامي:</b> في ملف <span class="mono">00 · Foundations / Iconography</span>، كل أيقونة تحمل وسمًا: <span class="tag t-blu">mirror</span> أو <span class="tag t-gry">no-mirror</span>. بدون هذا التصنيف سيقرر المطور بنفسه وسيخطئ.</p>
+
+<h3>4.3 المحتوى الذي يبقى LTR داخل واجهة RTL</h3>
+<table>
+<thead><tr><th style="width:30%">النوع</th><th style="width:34%">السلوك الصحيح</th><th style="width:36%">الخطأ الشائع</th></tr></thead>
+<tbody>
+<tr><td>البريد الإلكتروني</td><td>الحقل والنص LTR، التسمية RTL</td><td>النقطة والـ@ تقفز لأول السطر</td></tr>
+<tr><td>اسم الدومين</td><td>LTR دائمًا حتى داخل جملة عربية</td><td><span class="mono">com.example</span> معكوسًا</td></tr>
+<tr><td>عنوان IP وNameservers</td><td>LTR + خط أحادي المسافة</td><td>ترتيب المقاطع ينعكس</td></tr>
+<tr><td>رقم البطاقة وCVV</td><td>LTR + إدخال من اليسار</td><td>المؤشر يبدأ من اليمين فيربك المستخدم</td></tr>
+<tr><td>كود EPP ومفاتيح API</td><td>LTR + خط أحادي + زر نسخ</td><td>مسافات تُفقد عند النسخ</td></tr>
+<tr><td>المبالغ والعملات</td><td>الرقم LTR، رمز العملة بعده في بداية السطر</td><td><span class="mono">00.5$</span> بدل <span class="mono">$5.00</span></td></tr>
+<tr><td>التاريخ والوقت</td><td>صيغة موحّدة متفق عليها للمنتج كله</td><td>خلط صيغ مختلفة بين الشاشات</td></tr>
+</tbody>
+</table>
+
+<h3>4.4 المصائد التي يجب اختبارها صراحة في كل شاشة</h3>
+<div class="grid2">
+<div class="box">
+<ul style="margin-bottom:0">
+<li><b>الجداول:</b> ترتيب الأعمدة ينعكس، لكن محاذاة الأرقام تبقى كما هي</li>
+<li><b>القوائم المنسدلة:</b> تُفتح من الجهة الصحيحة ولا تخرج خارج الشاشة</li>
+<li><b>التلميحات (Tooltips):</b> موضع السهم</li>
+<li><b>الظلال:</b> الظل الجانبي يجب أن ينعكس</li>
+</ul>
+</div>
+<div class="box">
+<ul style="margin-bottom:0">
+<li><b>النص المختلط:</b> «تم تفعيل <span class="mono">example.com</span> بنجاح» — اختبرها فعليًا</li>
+<li><b>الاقتطاع (Truncation):</b> النقاط الثلاث تظهر في النهاية الصحيحة</li>
+<li><b>أشرطة التمرير الأفقية:</b> تبدأ من الجهة الصحيحة</li>
+<li><b>الرسوم البيانية:</b> محور الزمن — قرار مكتوب مطلوب</li>
+</ul>
+</div>
+</div>
+
+<div class="box amb">
+<h4>طول النص العربي</h4>
+<p>العربية أقصر من الإنجليزية بـ~٢٠–٢٥٪ في المتوسط، لكنها <b>أطول بكثير في بعض المصطلحات التقنية</b> («Nameservers» = «خوادم أسماء النطاقات»). صمّم كل زر وتسمية بحيث يتحمّل ±٣٠٪ في الطول. الاختبار العملي: ضع أطول نص متوقع في المكوّن ثم انظر هل ينكسر.</p>
+</div>
+
+<h2>5. قواعد الوضع الليلي</h2>
+
+<div class="dd">
+<div class="do"><h4>افعل</h4><ul>
+<li>ارفع الأسطح بالإضاءة لا بالظل — في الداكن، البطاقة <b>أفتح</b> من الخلفية</li>
+<li>خفّف تشبّع الألوان في الداكن (استخدم purple-300 لا purple-500)</li>
+<li>اجعل النص الأساسي neutral-50 لا أبيض نقيًا — الأبيض النقي يُجهد العين</li>
+<li>افحص كل صورة توضيحية في السمتين — بعضها يختفي</li>
+<li>الشعارات والصور تحتاج نسخة داكنة أو خلفية محايدة</li>
+</ul></div>
+<div class="dont"><h4>لا تفعل</h4><ul>
+<li>عكس الألوان آليًا — النتيجة دائمًا سيئة</li>
+<li>الاعتماد على الظلال لتمييز العمق (تختفي على خلفية داكنة)</li>
+<li>استخدام نفس لون الحالة في السمتين — الأحمر الداكن يصبح غير مقروء</li>
+<li>خلفية سوداء نقية <span class="mono">#000</span> — استخدم neutral-900</li>
+<li>ترك الوضع الليلي لآخر المشروع — يجب أن يُبنى مع كل مكوّن</li>
+</ul></div>
+</div>
+
+<div class="box blu">
+<h4>ما يُختبر في الداكن وما يُكتفى بعيّنة منه</h4>
+<p>اختبار ٧٤ شاشة × سمتين × اتجاهين مكلف. القاعدة العملية: <b>اختبر المكوّنات كلها في السمتين، والشاشات بالعيّنة</b> — كل شاشة تستخدم نمطًا جديدًا فقط. إن كان نظام الرموز صحيحًا، الشاشات تتبع المكونات تلقائيًا. إن كنت تجد نفسك تصلح شاشات فردية في الوضع الداكن، فالمشكلة في الرموز لا في الشاشة.</p>
+</div>
+
+<h2>6. الطباعة والمسافات والشبكة</h2>
+
+<h3>6.1 سلّم الطباعة</h3>
+<table>
+<thead><tr><th style="width:18%">الرمز</th><th style="width:14%">الحجم</th><th style="width:14%">الارتفاع</th><th style="width:14%">الوزن</th><th style="width:40%">الاستخدام</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">display</span></td><td>40 / 32*</td><td>1.35</td><td>800</td><td>عنوان الصفحة الرئيسية فقط</td></tr>
+<tr><td><span class="mono">h1</span></td><td>32 / 26*</td><td>1.4</td><td>700</td><td>عنوان الصفحة</td></tr>
+<tr><td><span class="mono">h2</span></td><td>24 / 21*</td><td>1.45</td><td>700</td><td>عنوان القسم</td></tr>
+<tr><td><span class="mono">h3</span></td><td>19</td><td>1.5</td><td>600</td><td>عنوان البطاقة</td></tr>
+<tr><td><span class="mono">body-lg</span></td><td>17</td><td>1.8</td><td>400</td><td>فقرة تمهيدية</td></tr>
+<tr><td><span class="mono">body</span></td><td>15</td><td>1.8</td><td>400</td><td>النص الافتراضي</td></tr>
+<tr><td><span class="mono">body-sm</span></td><td>13.5</td><td>1.7</td><td>400</td><td>الجداول، النص المساند</td></tr>
+<tr><td><span class="mono">caption</span></td><td>12</td><td>1.6</td><td>400</td><td>التسميات، الحواشي</td></tr>
+<tr><td><span class="mono">mono</span></td><td>13.5</td><td>1.6</td><td>400</td><td>الدومين، IP، الأكواد</td></tr>
+</tbody>
+</table>
+<p><span class="mono">*</span> القيمة الثانية للموبايل.</p>
+
+<div class="box amb">
+<h4>ملاحظتان خاصتان بالعربية</h4>
+<ul>
+<li><b>ارتفاع السطر أكبر من المعتاد.</b> العربية تحتاج ١٫٧–١٫٩ حيث تكتفي اللاتينية بـ١٫٥، بسبب التشكيل والنقاط تحت السطر. لا تنسخ سلالم طباعة إنجليزية كما هي.</li>
+<li><b>لا تستخدم أوزانًا أخف من 400 للعربية.</b> الوزن 300 يجعل النص العربي شبه غير مقروء على الشاشات العادية.</li>
+</ul>
+</div>
+
+<h3>6.2 المسافات والشبكة</h3>
+<p>سلّم المسافات بأساس ٤: <span class="mono">4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96</span>. لا قيم خارج السلّم.</p>
+<table>
+<thead><tr><th style="width:22%">نقطة التوقف</th><th style="width:18%">العرض</th><th style="width:18%">الأعمدة</th><th style="width:20%">المزراب</th><th style="width:22%">الهامش</th></tr></thead>
+<tbody>
+<tr><td>موبايل</td><td>360–767</td><td>4</td><td>16</td><td>16</td></tr>
+<tr><td>تابلت</td><td>768–1023</td><td>8</td><td>24</td><td>24</td></tr>
+<tr><td>لابتوب</td><td>1024–1439</td><td>12</td><td>24</td><td>32</td></tr>
+<tr><td>واسع</td><td>1440+</td><td>12</td><td>32</td><td>auto (حد أقصى 1280)</td></tr>
+</tbody>
+</table>
+<p class="mono" style="color:var(--mute)">التصميم يبدأ من الموبايل. أغلب مستخدمي السوق المصري والخليجي يصلون من الهاتف.</p>
+
+<h2>7. مكتبة المكونات وواجهاتها</h2>
+
+<div class="lede">
+٥٦ مكوّنًا. تُبنى في المرحلة ١ قبل أي شاشة نهائية. المكوّن غير المكتمل الحالات يُنتج شاشات ناقصة الحالات — وهذا أكثر ما يتكرر في المراجعات.
+</div>
+
+<h3>7.1 مثال على «واجهة مكوّن» — هكذا يُوثَّق كل مكوّن</h3>
+<table>
+<thead><tr><th style="width:20%">الخاصية</th><th style="width:34%">القيم</th><th style="width:16%">الافتراضي</th><th style="width:30%">ملاحظة</th></tr></thead>
+<tbody>
+<tr><td colspan="4" style="background:var(--tl-l);font-weight:700">Button</td></tr>
+<tr><td><span class="mono">variant</span></td><td>primary · secondary · ghost · danger · link</td><td>primary</td><td>—</td></tr>
+<tr><td><span class="mono">size</span></td><td>sm (32) · md (40) · lg (48)</td><td>md</td><td>lg للأزرار الأساسية في الموبايل</td></tr>
+<tr><td><span class="mono">state</span></td><td>default · hover · active · focus · disabled · loading</td><td>default</td><td><b>focus إلزامية</b></td></tr>
+<tr><td><span class="mono">icon</span></td><td>none · start · end · only</td><td>none</td><td>«only» يتطلب aria-label</td></tr>
+<tr><td><span class="mono">fullWidth</span></td><td>true · false</td><td>false</td><td>true افتراضيًا في الموبايل</td></tr>
+</tbody>
+</table>
+<p><b>قاعدة:</b> كل مكوّن في المكتبة يجب أن يحمل جدولًا كهذا في وصفه داخل Figma. المطور يقرأه ويحوّله إلى props مباشرة.</p>
+
+<h3>7.2 قائمة المكونات وترتيب بنائها</h3>
+<table>
+<thead><tr><th style="width:8%">الترتيب</th><th style="width:26%">المكوّن</th><th style="width:14%">الأسبوع</th><th style="width:52%">الحالات الإلزامية</th></tr></thead>
+<tbody>
+<tr><td>١</td><td>Button</td><td>١</td><td>٥ أنواع × ٣ أحجام × ٦ حالات + الأيقونات</td></tr>
+<tr><td>٢</td><td>Input / Textarea</td><td>١</td><td>فارغ · مملوء · تركيز · خطأ + رسالة · معطّل · للقراءة فقط · مع أيقونة · مع لاحقة</td></tr>
+<tr><td>٣</td><td>Select / Combobox</td><td>١</td><td>مغلق · مفتوح · بحث · لا نتائج · متعدد · معطّل</td></tr>
+<tr><td>٤</td><td>Checkbox / Radio / Switch</td><td>١</td><td>غير محدد · محدد · غير محسوم · معطّل · خطأ</td></tr>
+<tr><td>٥</td><td>Badge / Tag / Status Pill</td><td>١</td><td>٦ حالات خدمة: نشط · معلّق · ملغى · قيد التجهيز · منتهٍ · فشل</td></tr>
+<tr><td>٦</td><td>Card</td><td>١</td><td>افتراضية · قابلة للنقر · محددة · معطّلة · تحميل هيكلي</td></tr>
+<tr><td>٧</td><td>Banner / Alert</td><td>٢</td><td>٤ درجات × (قابل للإغلاق / غير قابل) × (مع إجراء / بدون)</td></tr>
+<tr><td>٨</td><td>Modal / Dialog</td><td>٢</td><td>٣ أحجام · تأكيد · تأكيد خطر · نموذج · تمرير داخلي</td></tr>
+<tr><td>٩</td><td>Toast</td><td>٢</td><td>٤ درجات · مع تراجع · مكدّس</td></tr>
+<tr><td>١٠</td><td>Table</td><td>٢</td><td><b>الأهم:</b> فارغ · تحميل · صف واحد · ٥٠ صفًا · فرز · ترشيح نشط · تحديد متعدد · ترقيم · تمرير أفقي في الموبايل · خطأ تحميل</td></tr>
+<tr><td>١١</td><td>Empty State</td><td>٢</td><td>٦ صور توضيحية: لا خدمات · لا دومينات · لا فواتير · لا تذاكر · لا نتائج بحث · خطأ</td></tr>
+<tr><td>١٢</td><td>Skeleton Loader</td><td>٢</td><td>سطر · بطاقة · جدول · صفحة كاملة</td></tr>
+<tr><td>١٣</td><td>Header (تسويقي / لوحة)</td><td>٣</td><td>زائر · مسجّل · موبايل مفتوح · مع لافتة نظام</td></tr>
+<tr><td>١٤</td><td>Sidebar</td><td>٣</td><td>موسّع · مطوي · موبايل (Drawer) · عنصر نشط · مع عدّاد</td></tr>
+<tr><td>١٥</td><td>Breadcrumb · Tabs · Pagination</td><td>٣</td><td>عادي · طويل مع اقتطاع · موبايل</td></tr>
+<tr><td>١٦</td><td>Stepper (خطوات الطلب)</td><td>٣</td><td>٥ خطوات · مكتملة · حالية · قادمة · بها خطأ · موبايل مضغوط</td></tr>
+<tr><td>١٧</td><td>Price Card</td><td>٣</td><td>عادية · مميزة · مع خصم · نفدت · مع دومين مجاني</td></tr>
+<tr><td>١٨</td><td>Billing Cycle Toggle</td><td>٣</td><td>٦ دورات مع شارات التوفير · مختارة · معطّلة</td></tr>
+<tr><td>١٩</td><td>Currency / Language / Theme Switcher</td><td>٣</td><td>مغلق · مفتوح · تحذير تفريغ السلة</td></tr>
+<tr><td>٢٠</td><td>Domain Result Row</td><td>٣</td><td>متاح · غير متاح · مميز · قيد الفحص · خطأ · في السلة · اقتراح AI</td></tr>
+<tr><td>٢١</td><td>Order Summary (لزج)</td><td>٣</td><td>فارغ · بعنصر · متعدد · مع ضريبة · مع خصم · موبايل (منسدل سفلي)</td></tr>
+<tr><td>٢٢</td><td>Payment Gateway Option</td><td>٣</td><td>٥ بوابات × مختارة/غير مختارة/غير متاحة للعملة</td></tr>
+<tr><td>٢٣</td><td>File Uploader</td><td>٤</td><td>خامل · سحب · جارٍ الرفع · نجح · فشل · نوع غير مدعوم · حجم كبير</td></tr>
+<tr><td>٢٤</td><td>Rich Text Editor (التذاكر)</td><td>٤</td><td>أدوات التنسيق · عدّاد الأحرف · معاينة</td></tr>
+<tr><td>٢٥</td><td>Ticket Thread</td><td>٤</td><td>رسالة عميل · رسالة فريق · مرفق · نظام · مغلقة</td></tr>
+<tr><td>—</td><td>باقي المكونات المساندة</td><td>٤–٥</td><td>Tooltip · Avatar · Progress · Divider · Accordion · Date Picker · Copy Field …</td></tr>
+</tbody>
+</table>
+
+<h2>8. أنماط الحالات الإلزامية</h2>
+
+<div class="box red">
+<h4>القاعدة الحاكمة</h4>
+<p>كل لقطة في المواصفات الأصلية تعرض الحالة الفارغة (<span class="mono">0 Services · 0 Domains · No Recent Tickets</span>). <b>هذا يعني أن أحدًا لم يفكر في الحالة الممتلئة بعد.</b> عند تصميم أي شاشة تعرض بيانات، صمّم <b>ثلاث نسخ</b>: صفر عنصر، عنصر واحد، وأربعون عنصرًا. النسخة الثالثة هي التي تكشف مشاكل التصميم الحقيقية.</p>
+</div>
+
+<table>
+<thead><tr><th style="width:16%">الحالة</th><th style="width:38%">ما يجب أن تحتويه</th><th style="width:46%">الخطأ الشائع</th></tr></thead>
+<tbody>
+<tr><td><b>فارغة (عميل جديد)</b></td><td>صورة توضيحية · جملة تشرح ما سيظهر هنا · <b>إجراء أساسي واحد</b></td><td>«لا توجد بيانات» بلا مخرج — العميل الجديد يرى هذه الشاشة أولًا، فهي أهم شاشة تسويقية داخل المنتج</td></tr>
+<tr><td><b>فارغة (نتيجة ترشيح)</b></td><td>«لا نتائج لهذا البحث» + زر مسح الترشيح</td><td>الخلط بينها وبين الحالة السابقة — رسالتان مختلفتان تمامًا</td></tr>
+<tr><td><b>تحميل</b></td><td>هيكل عظمي يطابق شكل المحتوى القادم</td><td>دوّارة في منتصف الصفحة — تسبب قفزة تخطيطية عند الانتهاء</td></tr>
+<tr><td><b>خطأ</b></td><td>ماذا حدث · لماذا · <b>ما يفعله المستخدم الآن</b> · رقم مرجعي للدعم</td><td>«حدث خطأ ما» — عديمة الفائدة وتنتج تذكرة دعم</td></tr>
+<tr><td><b>جزئية</b></td><td>عرض ما نجح + توضيح ما فشل مع إمكانية إعادة المحاولة للجزء الفاشل</td><td>إخفاء كل شيء لأن جزءًا فشل</td></tr>
+<tr><td><b>بيانات كثيرة</b></td><td>ترقيم أو تمرير لانهائي · فرز · ترشيح · بحث</td><td>عرض ٤٠٠ صف دفعة واحدة</td></tr>
+<tr><td><b>صلاحيات ناقصة</b></td><td>شرح سبب عدم الظهور ومن يستطيع منح الصلاحية</td><td>إخفاء العنصر بصمت فيظن المستخدم أن المنتج معطّل</td></tr>
+<tr><td><b>معطّل</b></td><td>سبب التعطيل عبر تلميح — لا تعطيل صامت أبدًا</td><td>زر رمادي بلا تفسير</td></tr>
+</tbody>
+</table>
+
+<h2>9. قواعد الكتابة العربية في الواجهة</h2>
+
+<div class="lede">
+النص جزء من التصميم لا زينة توضع بعده. أكثر ما يفسد تجربة المنتجات العربية هو الترجمة الحرفية من الإنجليزية.
+</div>
+
+<h3>9.1 المصطلحات الموحّدة</h3>
+<table>
+<thead><tr><th style="width:26%">الإنجليزية</th><th style="width:26%">المعتمد</th><th style="width:48%">لا تستخدم</th></tr></thead>
+<tbody>
+<tr><td>Domain</td><td>دومين</td><td>نطاق (مربك مع «النطاق» بمعنى scope)</td></tr>
+<tr><td>Hosting</td><td>استضافة</td><td>هوستنج</td></tr>
+<tr><td>Nameservers</td><td>خوادم الأسماء (Nameservers)</td><td>سيرفرات الأسماء — واذكر الإنجليزية بين قوسين لأن المستخدم سيبحث عنها</td></tr>
+<tr><td>Invoice</td><td>فاتورة</td><td>إنفويس</td></tr>
+<tr><td>Ticket</td><td>تذكرة دعم</td><td>تيكت</td></tr>
+<tr><td>Upgrade</td><td>ترقية</td><td>تحديث (يختلط بـUpdate)</td></tr>
+<tr><td>Renew</td><td>تجديد</td><td>—</td></tr>
+<tr><td>Cancel (خدمة)</td><td>إلغاء الخدمة</td><td>«إلغاء» وحدها — تختلط بـCancel في النوافذ</td></tr>
+<tr><td>Cancel (في نافذة)</td><td>تراجع</td><td>إلغاء</td></tr>
+<tr><td>Suspended</td><td>موقوفة</td><td>معلّقة (تختلط بـPending)</td></tr>
+<tr><td>Pending</td><td>قيد المعالجة</td><td>معلّقة</td></tr>
+<tr><td>Add-ons</td><td>إضافات</td><td>أدونز</td></tr>
+</tbody>
+</table>
+
+<h3>9.2 نبرة الكتابة</h3>
+<div class="dd">
+<div class="do"><h4>افعل</h4><ul>
+<li>خاطب المستخدم مباشرة: «اختر باقتك»</li>
+<li>الأزرار تصف الفعل: «أكمل الطلب» لا «التالي»</li>
+<li>رسائل الخطأ تقول ما يُفعل: «رقم البطاقة يجب أن يكون ١٦ رقمًا»</li>
+<li>الأرقام قبل الكلمات: «٣ خدمات نشطة»</li>
+<li>عربية فصحى مبسّطة — لا عامية ولا تكلّف</li>
+</ul></div>
+<div class="dont"><h4>لا تفعل</h4><ul>
+<li>«يُرجى من المستخدم الكريم التفضل بـ…»</li>
+<li>«خطأ غير معروف» أو «فشلت العملية»</li>
+<li>مصطلحات تقنية بلا شرح لشريحة غير التقنيين</li>
+<li>علامات تعجب في رسائل النظام</li>
+<li>الاعتذار المفرط — اذكر الحل لا الأسف</li>
+</ul></div>
+</div>
+
+<h3>9.3 قالب رسالة الخطأ</h3>
+<div class="box grn">
+<p><b>البنية:</b> [ما حدث] + [لماذا إن كان مفيدًا] + [ماذا تفعل الآن] + [مخرج بديل]</p>
+<p style="margin-top:8px"><b>مثال سيئ:</b> «فشل الدفع.»</p>
+<p><b>مثال جيد:</b> «لم يتم قبول البطاقة من البنك. جرّب بطاقة أخرى، أو ادفع عبر InstaPay أو التحويل البنكي. طلبك محفوظ ولن تفقده. — رقم مرجعي ‎#48213»</p>
+</div>
+
+<h2>10. موجزات التصميم — الشاشات ذات الأولوية القصوى</h2>
+
+<p>لكل شاشة موجز قبل بدء العمل عليها. هذه نماذج مكتملة للشاشات الأصعب؛ باقي الشاشات تُكتب بنفس القالب في بداية كل مرحلة.</p>
+
+<div class="brief">
+<div class="hd"><b>M-11 · البحث عن دومين</b><span><span class="tag t-red">أصعب شاشة في المشروع</span> <span class="tag t-amb">مقيدة</span></span></div>
+<dl>
+<dt>الهدف</dt><dd>تحويل نية «أريد موقعًا» إلى دومين في السلة بأقل احتكاك، مع التعامل مع أن ٧٠٪+ من عمليات البحث الأولى تعطي نتيجة «غير متاح».</dd>
+<dt>المستخدم</dt><dd>سامي — غير تقني، لا يعرف الفرق بين الامتدادات، ولا يعرف أن الاسم الذي يريده محجوز منذ ٢٠٠٤.</dd>
+<dt>الحالات الإلزامية</dt><dd>خامل · جارٍ البحث · متاح · غير متاح + بدائل مقنعة · مميز (Premium) بسعر مرتفع · خطأ اتصال بالمُسجِّل · مدخل غير صالح · مقترحات AI · <b>فشل AI (تدهور رشيق للبحث الكلاسيكي)</b> · تمت الإضافة للسلة · بحث متعدد</dd>
+<dt>البيانات</dt><dd><span class="mono">DomainWhois</span> للتوفر · <span class="mono">GetTLDPricing</span> للأسعار · مزود AI للاقتراحات</dd>
+<dt>القيود</dt><dd>زمن استجابة WHOIS متغير (قد يتجاوز ٣ ثوانٍ) — التصميم يجب أن يتحمل ذلك بحالة انتظار مقنعة لا بتجميد. مزود AI قد يفشل أو يتأخر — لا تجعل التجربة تعتمد عليه.</dd>
+<dt>معيار القبول</dt><dd>مستخدم اختبار يصل إلى دومين في السلة خلال أقل من ٩٠ ثانية رغم أن اختياره الأول غير متاح.</dd>
+<dt>ما يجب تجنّبه</dt><dd>عرض ٤٠ امتدادًا دفعة واحدة. اعرض ٥ بدائل مرتّبة بالصلة والسعر، مع «عرض المزيد».</dd>
+</dl>
+</div>
+
+<div class="brief">
+<div class="hd"><b>O-07 · اختيار بوابة الدفع</b><span><span class="tag t-red">محجوبة حتى حسم المزود</span> <span class="tag t-amb">مقيدة</span></span></div>
+<dl>
+<dt>الهدف</dt><dd>إيصال المستخدم إلى دفعة ناجحة من أول محاولة، مع خمس بوابات مختلفة السلوك جذريًا.</dd>
+<dt>الحالات الإلزامية</dt><dd>٥ بوابات × (مختارة / غير مختارة / غير متاحة لهذه العملة) · تفاصيل ديناميكية أسفل كل بوابة · جارٍ المعالجة · فشل مع سبب مفهوم · إعادة محاولة</dd>
+<dt>القيود الحرجة</dt><dd><b>لا يمكن إنهاء هذه الشاشة قبل اختيار المزود المصري</b> (Paymob / Fawry / Kashier) — كل واحد له تدفق مختلف: إعادة توجيه أم iframe أم OTP داخلي. صمّم بنية «قابس» تستوعب الثلاثة.<br>حقول البطاقة نفسها من Stripe Elements — <b>التنسيق فقط، لا تصميم كامل</b>.<br>3-D Secure صفحة خارجية — صمّم شاشة الانتظار قبلها وشاشة العودة بعدها فقط.</dd>
+<dt>معيار القبول</dt><dd>تبديل البوابة لا يفقد أي بيانات مدخلة. رسالة الفشل تذكر سببًا وبديلًا محددين.</dd>
+</dl>
+</div>
+
+<div class="brief">
+<div class="hd"><b>C-01 · لوحة القيادة</b><span><span class="tag t-grn">حرة</span></span></div>
+<dl>
+<dt>الهدف</dt><dd>إجابة سؤال واحد خلال ٣ ثوانٍ: «هل كل شيء بخير، وإن لا فماذا أفعل؟»</dd>
+<dt>الحالات الإلزامية</dt><dd><b>فارغة تمامًا (عميل اشترى للتو ولم يُفعَّل بعد)</b> · خدمة واحدة · ٤٠ خدمة · فاتورة متأخرة · خدمة موقوفة · بريد غير مؤكد · طلب قيد المراجعة</dd>
+<dt>القرار التصميمي الأهم</dt><dd>اللقطة المرجعية تعرض أربعة عدادات أصفار. <b>هذه أسوأ شاشة أولى ممكنة.</b> العميل الجديد لا يحتاج عدادات — يحتاج مسارًا: «خدمتك قيد التجهيز، وستصلك بيانات الدخول خلال ١٠ دقائق. في الأثناء: وجّه دومينك / اطلع على دليل البداية».</dd>
+<dt>الأولوية البصرية</dt><dd>١ — ما يحتاج إجراءً عاجلًا (فاتورة متأخرة، خدمة موقوفة). ٢ — حالة الخدمات. ٣ — الاختصارات. ٤ — الإعلانات. الترتيب معكوس في اللقطة المرجعية.</dd>
+<dt>معيار القبول</dt><dd>مستخدم لديه فاتورة متأخرة يجدها ويصل لصفحة دفعها خلال أقل من ١٥ ثانية.</dd>
+</dl>
+</div>
+
+<div class="brief">
+<div class="hd"><b>C-02 · قائمة خدماتي (الحالة الممتلئة)</b><span><span class="tag t-amb">مقيدة</span></span></div>
+<dl>
+<dt>الهدف</dt><dd>تمكين «ندى» (وكالة بـ٤٠ خدمة) من العثور على خدمة محددة والتصرف بها في أقل من ٢٠ ثانية.</dd>
+<dt>الحالات الإلزامية</dt><dd>فارغة · ٣ خدمات · ٤٠ خدمة · فرز نشط · ترشيح نشط · بحث بلا نتائج · تحديد متعدد · حالات الخدمة الست · تحميل هيكلي · خطأ</dd>
+<dt>ما يجب إضافته فوق المرجع</dt><dd>بحث فوري · ترشيح بالحالة وبالنوع · فرز بتاريخ التجديد · <b>عمود «التجديد القادم» بارز</b> · إجراءات جماعية (تجديد متعدد)</dd>
+<dt>الموبايل</dt><dd>الجدول لا يعمل في ٣٦٠ بكسل. البديل: بطاقات مكدّسة، بحقل الحالة وتاريخ التجديد ظاهرين دائمًا.</dd>
+<dt>معيار القبول</dt><dd>مع ٤٠ صفًا: العثور على خدمة بالاسم أقل من ٢٠ ثانية، ولا تمرير أفقي في الموبايل.</dd>
+</dl>
+</div>
+
+<div class="brief">
+<div class="hd"><b>C-21 · استرداد الدفع الفاشل (Dunning)</b><span><span class="tag t-red">غائبة من المواصفات · الأعلى أثرًا ماليًا</span></span></div>
+<dl>
+<dt>الهدف</dt><dd>استرجاع دفعة فاشلة قبل أن تتحول إلى خدمة موقوفة ثم عميل مفقود.</dd>
+<dt>الشاشات المطلوبة</dt><dd>لافتة تحذير (٣ درجات تصاعدية) · صفحة تحديث طريقة الدفع · صفحة الخدمة الموقوفة · صفحة إعادة التفعيل · ٥ رسائل بريد</dd>
+<dt>مبدأ التصميم</dt><dd>التصعيد التدريجي: تذكير هادئ (يوم ٠) ← تحذير واضح (يوم ٣) ← عدّاد قبل الإيقاف (يوم ٥) ← موقوفة مع مسار استرداد بنقرة (يوم ٧).</dd>
+<dt>ما يجب تجنّبه</dt><dd>لهجة عقابية. المستخدم غالبًا نسي أو انتهت بطاقته — عامله كذلك. «انتهت صلاحية بطاقتك — حدّثها لتستمر خدمتك» لا «فشل الدفع، ستُوقف خدمتك».</dd>
+<dt>معيار القبول</dt><dd>من اللافتة إلى بطاقة محدّثة ودفعة ناجحة: نقرتان كحد أقصى.</dd>
+</dl>
+</div>
+
+<div class="brief">
+<div class="hd"><b>C-23 · فتح تذكرة دعم</b><span><span class="tag t-amb">مقيدة</span></span></div>
+<dl>
+<dt>الهدف المزدوج</dt><dd>(١) تسهيل طلب المساعدة، و(٢) <b>منع التذكرة غير الضرورية</b> عبر اقتراحات قاعدة المعرفة. الهدفان متعارضان ظاهريًا — التصميم يوازن بينهما.</dd>
+<dt>الحالات الإلزامية</dt><dd>اختيار القسم · نموذج فارغ · اقتراحات KB تظهر أثناء الكتابة · لا اقتراحات · رفع مرفق (جارٍ/نجح/نوع مرفوض/حجم كبير) · أخطاء تحقق · تم الإرسال</dd>
+<dt>ما ينقص المرجع</dt><dd>حقل «الخدمة المرتبطة» (يوفّر جولة أسئلة كاملة مع الدعم) · عرض وقت الاستجابة المتوقع لكل قسم</dd>
+<dt>توقيت الاقتراحات</dt><dd>تظهر بعد ٤ أحرف في حقل الموضوع، بحد أقصى ٣ مقالات، مع زر «هذا حلّ مشكلتي» يُغلق التدفق ويُسجَّل كحدث قياس.</dd>
+<dt>معيار القبول</dt><dd>حدث <span class="mono">kb_suggestion_resolved</span> مركّب ويعمل — بدونه لا نستطيع إثبات أن الميزة قللت التذاكر.</dd>
+</dl>
+</div>
+
+<div class="box blu">
+<h4>قالب الموجز — انسخه لكل شاشة جديدة</h4>
+<p><b>الهدف</b> (جملة واحدة، من منظور المستخدم) · <b>المستخدم المستهدف</b> · <b>الحالات الإلزامية</b> · <b>مصدر البيانات</b> · <b>القيود التقنية</b> · <b>معيار القبول</b> (قابل للقياس) · <b>ما يجب تجنّبه</b></p>
+</div>
+
+<h2>11. إمكانية الوصول عمليًا</h2>
+<table>
+<thead><tr><th style="width:22%">البند</th><th style="width:34%">القاعدة</th><th style="width:44%">كيف تتحقق منه في Figma</th></tr></thead>
+<tbody>
+<tr><td>تباين النص</td><td>٤٫٥:١ للنص العادي · ٣:١ للنص الكبير (≥ 24px)</td><td>إضافة فحص تباين — تُشغَّل على المكوّن لا على الشاشة</td></tr>
+<tr><td>تباين غير النص</td><td>٣:١ لحدود الحقول والأيقونات الدالة</td><td>الحدود الرمادية الفاتحة تفشل غالبًا — افحصها</td></tr>
+<tr><td>حلقة التركيز</td><td>مرئية على كل عنصر تفاعلي، ٢ بكسل، بتباين ٣:١</td><td>حالة <span class="mono">focus</span> إلزامية في كل مكوّن تفاعلي</td></tr>
+<tr><td>هدف اللمس</td><td>≥ ٤٤×٤٤ بكسل</td><td>الأيقونات الصغيرة تحتاج منطقة نقر أوسع من شكلها المرئي</td></tr>
+<tr><td>ترتيب التنقل</td><td>منطقي ويتبع الترتيب البصري في RTL</td><td>أضف طبقة ترقيم على الإطار عند التسليم</td></tr>
+<tr><td>لا لون وحده</td><td>الحالة تُنقل بأيقونة أو نص أيضًا</td><td>شارات الحالة الست: لكل منها أيقونة مميزة لا لون فقط</td></tr>
+<tr><td>التسميات</td><td>كل حقل له تسمية مرئية — لا placeholder كتسمية</td><td>placeholder يختفي عند الكتابة فيفقد المستخدم السياق</td></tr>
+<tr><td>الحركة</td><td>احترام <span class="mono">prefers-reduced-motion</span></td><td>وثّق أي حركة تتجاوز ٣٠٠ مللي ثانية</td></tr>
+</tbody>
+</table>
+
+<h2>12. القيود الملزمة من الطرف التقني</h2>
+
+<div class="box red">
+<h4>لا تصمّم هذه قبل حسمها — القرارات السبعة الحاجزة</h4>
+<ol>
+<li><b>المزود المصري</b> (Paymob / Fawry / Kashier) → يحجب O-07 وO-11</li>
+<li><b>مصير InstaPay</b> (وحدة / وسيط / تحويل يدوي) → يحجب O-11</li>
+<li><b>اعتماد جدول التخصيص</b> (٣١/٣٥/٨) → يحجب تقدير كل شيء</li>
+<li><b>الأرقام: هندية أم عربية</b> → يحجب كل شاشة فيها رقم (أي شاشة تقريبًا)</li>
+<li><b>عدد العملات في الإطلاق</b> → يحجب M-02→M-09 وO-01</li>
+<li><b>إصدار WHMCS المجمّد</b> → يحجب صحة نصف افتراضات البيانات</li>
+<li><s style="opacity:.55">الخيار المعماري (قالب / هجين / headless)</s> → <span class="tag t-grn">مُغلق v1.1</span> الهجين قائم بالفعل. حلّ محله: <b>هل تنتقل صفحات التسعير إلى الموقع التسويقي؟</b> يحجب M-02→M-09</li>
+<li><span class="tag t-amb">جديد v1.1</span> <b>كم لغة نبقي؟</b> سبع مفعّلة اليوم → يحجب قرار عرض كل زر وتسمية في المكتبة</li>
+<li><span class="tag t-amb">جديد v1.1</span> <b>اعتماد الأرقام على الصفحة الرئيسية</b> → يحجب M-01 (قسم الإحصاءات)</li>
+</ol>
+</div>
+
+<div class="box grn">
+<h4>تحديث v1.1 على جدول القيود أدناه</h4>
+<p>عند اعتماد نقل التسعير إلى الموقع التسويقي، تخرج <b>M-02 → M-09 و M-10 و M-12</b> من دائرة «مقيدة» إلى حرية كاملة. قيود WHMCS تبدأ من <b>O-01 (تهيئة المنتج)</b> فصاعدًا، لا من صفحة الباقات.</p>
+</div>
+
+<h3>12.1 حدود لا يتجاوزها التصميم</h3>
+<table>
+<thead><tr><th style="width:30%">المنطقة</th><th style="width:22%">الدرجة</th><th style="width:48%">ما يعنيه ذلك عمليًا للمصمم</th></tr></thead>
+<tbody>
+<tr><td>حقول البطاقة (Stripe Elements)</td><td><span class="tag t-red">مغلقة</span></td><td>تتحكم في الخط واللون ونصف القطر فقط. لا تصمّم تخطيطًا مخصصًا للحقول — لن يُنفَّذ.</td></tr>
+<tr><td>صفحة 3-D Secure</td><td><span class="tag t-red">مغلقة</span></td><td>صفحة البنك. صمّم ما قبلها وما بعدها فقط.</td></tr>
+<tr><td>سجلات DNS وNameservers</td><td><span class="tag t-red">مغلقة</span></td><td>مخرجات وحدة المُسجِّل. التنسيق ممكن، إعادة الهيكلة لا.</td></tr>
+<tr><td>فاتورة PDF</td><td><span class="tag t-red">مغلقة</span></td><td>محرك منفصل (TCPDF). تصميم مستقل تمامًا، وRTL فيه أصعب من الويب. خصص له وقتًا منفصلًا.</td></tr>
+<tr><td>قوالب البريد (~٥٠)</td><td><span class="tag t-red">مغلقة</span></td><td>HTML بدائي، لا Flexbox ولا Grid. صمّم بجداول ذهنيًا. اختبر في Outlook.</td></tr>
+<tr><td>cPanel بعد SSO</td><td><span class="tag t-red">خارج السيطرة</span></td><td>صمّم شاشة انتقالية تهيّئ المستخدم لواجهة مختلفة.</td></tr>
+<tr><td>الجداول والنماذج الأساسية</td><td><span class="tag t-amb">مقيدة</span></td><td>البنية يفرضها WHMCS. التنسيق حر، إعادة ترتيب الأعمدة والحقول تحتاج تأكيدًا من المطور <b>قبل</b> التصميم.</td></tr>
+</tbody>
+</table>
+
+<h2>13. قائمة التدقيق الذاتي قبل المراجعة</h2>
+<p>يشغّلها المصمم على شاشته قبل عرضها. الشاشة التي تدخل النقد بأخطاء من هذه القائمة تهدر وقت الفريق كله.</p>
+
+<div class="grid2">
+<div class="box">
+<h4>الحالات والمحتوى</h4>
+<ul class="ck">
+<li>كل الحالات الإلزامية مصممة ومسمّاة</li>
+<li>النسخة بـ٤٠ عنصرًا موجودة</li>
+<li>لا نص مؤقت — كل النصوص عربية نهائية</li>
+<li>رسائل الخطأ تقول ماذا يفعل المستخدم</li>
+<li>أطول نص محتمل مُختبر في كل زر وتسمية</li>
+</ul>
+</div>
+<div class="box">
+<h4>النظام</h4>
+<ul class="ck">
+<li>كل الألوان من الرموز الدلالية — صفر لون مباشر</li>
+<li>كل المسافات من سلّم الـ٤</li>
+<li>كل المكونات من المكتبة — لا نسخ منفصلة</li>
+<li>أي مكوّن جديد رُفع للمكتبة لا تُرك في الشاشة</li>
+<li>الطباعة من السلّم — لا أحجام مخصصة</li>
+</ul>
+</div>
+<div class="box">
+<h4>RTL والسمات</h4>
+<ul class="ck">
+<li>مراجعة بصرية في RTL <b>وLTR</b></li>
+<li>الأيقونات الاتجاهية موسومة mirror / no-mirror</li>
+<li>المحتوى LTR (بريد، دومين، IP، بطاقة) صحيح</li>
+<li>النسخة الداكنة موجودة وفُحص تباينها</li>
+<li>نص مختلط عربي/إنجليزي مُختبر فعليًا</li>
+</ul>
+</div>
+<div class="box">
+<h4>الاستجابة والوصول</h4>
+<ul class="ck">
+<li>مصممة عند ٣٦٠ و٧٦٨ و١٤٤٠</li>
+<li>لا تمرير أفقي في الموبايل</li>
+<li>أهداف اللمس ≥ ٤٤ بكسل</li>
+<li>حالة focus موجودة على كل عنصر تفاعلي</li>
+<li>الحالة لا تُنقل باللون وحده</li>
+</ul>
+</div>
+</div>
+
+<h2>14. قائمة تدقيق التسليم للمطورين</h2>
+<ul class="ck">
+<li>الإطارات مسمّاة بالصيغة المعيارية <span class="mono">[ID] / [الشاشة] / [الحالة] / [الجهاز]</span></li>
+<li>الشاشة في ملفها الصحيح (02–06) لا في Explorations</li>
+<li>كل مكوّن يحمل جدول خصائصه (Component API)</li>
+<li>ترتيب التنقل بلوحة المفاتيح موثّق كطبقة ملاحظات</li>
+<li>سلوك كل عنصر عند تغيّر البيانات موصوف (ماذا لو كان الاسم طويلًا؟ فارغًا؟)</li>
+<li>مصدر كل بيان مذكور (اسم إجراء API إن عُرف)</li>
+<li>الحركات موصوفة: المدة والمنحنى والمشغّل</li>
+<li>الأصول مصدّرة بالصيغ المطلوبة (SVG للأيقونات، WebP للصور)</li>
+<li>أحداث القياس مسمّاة على الشاشات ضمن قمع التحويل</li>
+<li>قيود التخصيص المعروفة مذكورة صراحة على الشاشة</li>
+<li>رابط الموجز الأصلي مرفق بالإطار</li>
+</ul>
+
+<div class="box amb">
+<h4>الجملة التي توفّر أسبوعًا</h4>
+<p>في كل تسليم، أضف ملاحظة واحدة: <b>«ما الذي في هذا التصميم قد يكون صعبًا أو مستحيلًا تقنيًا؟»</b> واسأل المطور قبل أن يبدأ. اكتشاف الاستحالة في المراجعة أرخص عشر مرات من اكتشافها بعد التنفيذ.</p>
+</div>
+
+<h2>15. نقد التصميم وإدارة الدين التصميمي</h2>
+
+<h3>15.1 قواعد جلسة النقد</h3>
+<table>
+<thead><tr><th style="width:24%">القاعدة</th><th style="width:76%">التفصيل</th></tr></thead>
+<tbody>
+<tr><td>يبدأ بالسياق</td><td>صاحب الشاشة يعرض: الهدف، المستخدم، القيود، وما يريد رأيًا فيه تحديدًا. بدون هذا يصبح النقد آراء ذوق.</td></tr>
+<tr><td>الملاحظة تُصاغ كمشكلة</td><td>«لا أرى كيف يعرف المستخدم أن الدفع نجح» لا «اجعل الزر أخضر».</td></tr>
+<tr><td>كل ملاحظة تُصنَّف</td><td><span class="tag t-red">حاجزة</span> تمنع التسليم · <span class="tag t-amb">مهمة</span> تُعالج الآن · <span class="tag t-gry">لاحقًا</span> تذهب لسجل الدين</td></tr>
+<tr><td>القرار لصاحب الشاشة</td><td>عدا الملاحظات الحاجزة، وقرارها لقائد التصميم.</td></tr>
+<tr><td>مكتوبة دائمًا</td><td>ملاحظة شفهية غير مكتوبة = ملاحظة لم تحدث.</td></tr>
+</tbody>
+</table>
+
+<h3>15.2 سجل الدين التصميمي</h3>
+<p>ملف واحد مشترك. كل بند: الوصف · لماذا أُجِّل · الأثر على المستخدم · تكلفة الإصلاح · متى يُراجَع.</p>
+<div class="box grn">
+<p><b>لماذا هذا مهم لك مهنيًا:</b> السجل يحوّل «تنازلات اضطررنا لها» إلى قائمة موثّقة بقرارات واعية. عندما يُسأل الفريق لاحقًا «لماذا هذه الشاشة ضعيفة؟» يكون الجواب سطرًا مكتوبًا بتاريخ وسبب، لا دفاعًا ارتجاليًا. راجع السجل مرة كل مرحلة، وأدرج أعلى ثلاثة بنود في خطة المرحلة التالية.</p>
+</div>
+
+<h2>16. توزيع العمل على أعضاء الفريق</h2>
+<table>
+<thead><tr><th style="width:14%">المرحلة</th><th style="width:10%">الأسابيع</th><th style="width:26%">قائد التصميم</th><th style="width:25%">مصمم التحويل</th><th style="width:25%">مصمم لوحة التحكم</th></tr></thead>
+<tbody>
+<tr><td>٠ — الحسم</td><td>١–٢</td><td>متابعة القرارات السبعة · تدقيق تنافسي</td><td>تدقيق تنافسي لمسارات الشراء</td><td>حصر الحالات الممتلئة المطلوبة</td></tr>
+<tr><td>١ — الأسس</td><td>٣–٥</td><td><b>الرموز + ٢٥ مكوّنًا أساسيًا</b></td><td>مكونات النطاق (باقة، دومين، سلة)</td><td>مكونات الجداول والحالات</td></tr>
+<tr><td>٢ — التحويل</td><td>٦–١١</td><td>مراجعة + حل القيود التقنية</td><td><b>M-01→M-21 · O-01→O-14</b></td><td>يبدأ A-* وC-01 بالتوازي</td></tr>
+<tr><td>٣ — المصادقة واللوحة</td><td>١٢–١٤</td><td>مراجعة</td><td>يكمل O-* المتبقي · يبدأ الصفحات القانونية</td><td><b>A-01→A-07 · C-01</b></td></tr>
+<tr><td>٤ — الخدمات والدومينات</td><td>١٥–١٨</td><td>مراجعة + الفاتورة PDF</td><td>M-16, M-19 · دعم</td><td><b>C-02→C-13</b></td></tr>
+<tr><td>٥ — الفوترة</td><td>١٩–٢١</td><td>قالب البريد الموحّد</td><td><b>C-21 (Dunning)</b></td><td><b>C-14→C-20</b></td></tr>
+<tr><td>٦ — الدعم والحساب</td><td>٢٢–٢٤</td><td>مراجعة</td><td>C-29, C-30 (الأفلييت)</td><td><b>C-22→C-28 · C-31→C-36</b></td></tr>
+<tr><td>٧ — المحيط</td><td>٢٥–٢٧</td><td><b>~٥٠ قالب بريد</b></td><td>S-01→S-06 · الصفحات القانونية</td><td>الحالات المتبقية</td></tr>
+<tr><td>٨ — الإطلاق</td><td>٢٨</td><td>مراجعة وصول شاملة</td><td>إصلاحات</td><td>إصلاحات</td></tr>
+</tbody>
+</table>
+
+<div class="box red">
+<h4>ملاحظتان على هذا التوزيع</h4>
+<ol>
+<li><b>لا شيء يتوازى مع المرحلة ١.</b> نظام التصميم عنق زجاجة إجباري. إن بدأ أحد بتصميم شاشات نهائية في الأسبوع ٣، ستُعاد كلها في الأسبوع ٦.</li>
+<li><b>قوالب البريد الخمسون في المرحلة ٧ خطر مؤجل.</b> إن أمكن، ابدأ بتصميم <b>قالب بريد موحّد واحد</b> في المرحلة ١ ثم املأه بالمحتوى لاحقًا — بدل تصميم ٥٠ قالبًا منفصلًا في آخر ثلاثة أسابيع من المشروع، وهو سيناريو يفشل عادةً.</li>
+</ol>
+</div>
+
+<hr>
+
+<div class="box blu">
+<h4>آخر شيء</h4>
+<p>هذا المستند سيتقادم. أول قرار تقني يُحسم، وأول عطل RTL يُكتشف، وأول قيد يقوله المطور — كلها تغيّر شيئًا هنا. <b>حدّثه، ولا تتركه يصبح مرجعًا ميتًا يخالفه العمل الفعلي.</b> مستند قواعد لا يطابق ما يحدث فعلًا أسوأ من عدم وجوده، لأن الفريق يتوقف عن الوثوق به ثم يعود كل مصمم لقواعده الخاصة — وهي بالضبط المشكلة التي وُجد هذا المستند ليمنعها.</p>
+</div>
+
+</div>
+<div class="foot">SWS — دليل فريق التصميم · للاستخدام الداخلي · الإصدار 1.0</div>
+</body>
+</html>
