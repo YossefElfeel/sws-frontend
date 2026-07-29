@@ -64,52 +64,52 @@ Playbook §3.2 is explicit that this must be automated:
 > *"Do not trust the contrast numbers — test them. The pairs that usually fail: secondary text
 > on raised surfaces in dark mode, text over coloured status backgrounds, and disabled text."*
 
-### Current result: 4 failures out of 42
+### Current result: 42 / 42 pass
 
-**Run on 2026-07-29 against the values as transcribed from the Playbook.**
+**Run on 2026-07-29, after the `border-strong` fix below.**
 
-| Theme | Pair | Ratio | Required |
-|---|---|---|---|
-| light | `border-strong` on `surface-base` | **1.56:1** | 3:1 |
-| light | `border-strong` on `surface-raised` | **1.67:1** | 3:1 |
-| dark | `border-strong` on `surface-base` | **1.74:1** | 3:1 |
-| dark | `border-strong` on `surface-raised` | **1.57:1** | 3:1 |
+### Resolved — `border-strong` raised to `neutral-500`
 
-`border-strong` is the **input field border**. Failing WCAG 2.2 SC 1.4.11 (Non-text Contrast)
-means the boundary of every text input, select, and textarea is not perceivable to low-vision
-users. It is not a cosmetic finding — form fields are how every purchase and every support
-request is made.
+On first run the gate failed **4 of 42** pairs, all on `border-strong` — the **input field
+border** — in both themes:
 
-The Playbook predicted this exact class of failure: *"light grey borders usually fail — test
-them."* They do, in both themes, by a wide margin.
+| Theme | Pair | Was | Now | Required |
+|---|---|---|---|---|
+| light | `border-strong` on `surface-base` | 1.56:1 ❌ | **4.23:1** ✅ | 3:1 |
+| light | `border-strong` on `surface-raised` | 1.67:1 ❌ | **4.51:1** ✅ | 3:1 |
+| dark | `border-strong` on `surface-base` | 1.74:1 ❌ | **4.07:1** ✅ | 3:1 |
+| dark | `border-strong` on `surface-raised` | 1.57:1 ❌ | **3.67:1** ✅ | 3:1 |
 
-### Recommended fix
+Failing WCAG 2.2 SC 1.4.11 (Non-text Contrast) meant the boundary of every text input, select
+and textarea was not perceivable to low-vision users. Not a cosmetic finding — form fields are
+how every purchase and every support request is made. The Playbook predicted exactly this
+class of failure: *"light grey borders usually fail — test them."* They did, in both themes,
+by a wide margin.
 
-Move `border-strong` to `neutral-500` (`#7B7389`) in **both** themes. Verified ratios:
-
-| | vs `surface-base` | vs `surface-raised` |
-|---|---|---|
-| light | 4.23:1 ✅ | 4.51:1 ✅ |
-| dark | 4.07:1 ✅ | 3.67:1 ✅ |
-
-`neutral-400` is not enough (2.50:1 / 2.67:1 in light — still fails). `neutral-500` is the
-first step that clears 3:1 everywhere, and it happens to work for both themes, so one value
-serves both.
-
-**Not applied.** Changing a foundational border colour is the design lead's decision, and
-brand identity (**C22**) is not settled. The finding is recorded; the fix is one line in
-`tokens.json` when it is approved:
+**Applied 2026-07-29:**
 
 ```jsonc
 // semantic.light.border-strong   {primitive.neutral.300} → {primitive.neutral.500}
 // semantic.dark.border-strong    {primitive.neutral.700} → {primitive.neutral.500}
 ```
 
-Then re-run the gate. It should report 42/42.
+`neutral-400` was not enough (2.50:1 / 2.67:1 in light — still failing). `neutral-500`
+(`#7B7389`) is the first step that clears 3:1 everywhere, and it happens to serve **both**
+themes, so one value covers the light and dark cases.
 
-**Fix in the semantic layer only.** Every component that references `border-strong` — inputs,
-selects, textareas, secondary buttons — corrects at once. Patching an individual component is
-how the three-layer structure gets destroyed.
+> ⚠️ **This value now differs from the Design Playbook §3.2 table on purpose.** The Playbook is
+> a dated snapshot; this file is the living state (see the governance rule in the root
+> `README.md`). Do not "correct" `border-strong` back to `neutral-300` / `neutral-700` to make
+> it match the document — that reintroduces the accessibility failure. The `$description` on
+> both tokens records this. If the Playbook is reissued, the table should be updated to match
+> this file, not the reverse.
+
+**Fixed in the semantic layer only.** Every component referencing `border-strong` — inputs,
+selects, textareas, secondary buttons — corrected at once. That is the three-layer structure
+doing its job: one value changed, no component touched, no screen revisited.
+
+Brand identity (**C22**) is still open, so all values here remain proposed. If the palette
+changes, re-run the gate before approving it.
 
 ---
 
