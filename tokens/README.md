@@ -1,7 +1,7 @@
 # Design Tokens
 
 `tokens.json` — the Design Playbook §3 token system in machine-readable form, plus
-`contrast-check.mjs`, an automated WCAG gate.
+`a11y-gate.mjs`, an automated WCAG gate covering contrast, target size, and focus indicators.
 
 ---
 
@@ -47,26 +47,97 @@ is in the tokens, not the screen.*
 
 ---
 
-## Contrast gate
+## Accessibility gate
 
 ```bash
-node tokens/contrast-check.mjs          # exits 1 on any failure
-node tokens/contrast-check.mjs --warn   # report only, always exits 0
+node tokens/a11y-gate.mjs            # exits 1 on any AA failure
+node tokens/a11y-gate.mjs --strict   # also exits 1 on AAA warnings
+node tokens/a11y-gate.mjs --warn     # report only, always exits 0
 ```
 
-Checks 21 foreground/background pairs across both themes — 42 checks — against the thresholds
-in `tokens.accessibility`. It includes the composited banner backgrounds (a status colour at
-12% over a surface, with status-coloured text on top), which are the case a designer is least
-likely to check by eye.
+**64 checks in three groups**, all read from `tokens.accessibility`:
 
-Playbook §3.2 is explicit that this must be automated:
+| Group | What it checks | Count |
+|---|---|---|
+| **Contrast** | 21 foreground/background pairs × 2 themes, including composited banner backgrounds (a status colour at 12% over a surface, with status-coloured text on it) — the case a designer is least likely to catch by eye | 42 |
+| **Target size** | Declared interactive dimensions against the 24px AA and 44px project minimums | 12 |
+| **Focus indicator** | Every interactive component declares a focus ring, and it is thick enough | 10 |
 
-> *"Do not trust the contrast numbers — test them. The pairs that usually fail: secondary text
-> on raised surfaces in dark mode, text over coloured status backgrounds, and disabled text."*
+Playbook §3.2 and §2.3 both demand this be automated:
 
-### Current result: 42 / 42 pass
+> *"Do not trust the contrast numbers — test them."*
+>
+> *"Forgetting the `focus` state — the most forgotten and the most important for accessibility."*
 
-**Run on 2026-07-29, after the `border-strong` fix below.**
+### Verdicts
+
+| | Meaning | Blocks? |
+|---|---|---|
+| `pass` | Meets the threshold | — |
+| `FAIL` | Violates **WCAG 2.2 AA** | Yes — exit 1 |
+| `WARN` | Violates an **AAA** rule the Playbook states as if it were AA | Only with `--strict` |
+| `TODO` | No token declared — **nothing was verified** | No, but it is not a pass |
+
+`TODO` exists so an unchecked component never reads as a compliant one. 17 of the 64 checks are
+currently `TODO`, which is the honest state of a component library that is 2 components deep on
+dimensions out of the 56 planned.
+
+### The Playbook mixes AA and AAA rules
+
+Worth knowing before anyone reports "we are WCAG 2.2 AA compliant". Two of the Playbook §11
+rules are not AA:
+
+| Playbook rule | Actual criterion | Level | The real AA bar |
+|---|---|---|---|
+| Touch target ≥ 44×44 | SC 2.5.5 Target Size (Enhanced) | **AAA** | SC 2.5.8 — 24×24 |
+| Focus ring 2px | SC 2.4.13 Focus Appearance | **AAA** | SC 2.4.7 — visible, no thickness specified |
+| Contrast 4.5:1 / 3:1 | SC 1.4.3 / 1.4.11 | AA ✓ | — |
+
+Decision **I17** commits to AA, so the gate treats AAA violations as warnings. The team is
+either committing to more than it realises, or will quietly drop these and still believe it is
+compliant. Either is fine — but decide it rather than drift into it.
+
+### Current result — 2026-07-29
+
+```
+64 checks: 45 pass · 0 fail · 2 warn · 17 not specified      exit 0
+```
+
+**Contrast: 42 / 42 pass** in both themes, after the `border-strong` fix below.
+
+**Target size: 2 warnings.** Both are the Playbook's own button sizes falling under its own
+44px rule:
+
+| Component | Size | Verdict |
+|---|---|---|
+| Button `sm` | 32px | ⚠️ meets AA (24px), under the 44px project rule |
+| Button `md` — **the default** | 40px | ⚠️ meets AA (24px), under the 44px project rule |
+| Button `lg` | 48px | ✅ |
+
+This is an internal contradiction in the source document, not a token error: Playbook §7.1
+sets `md` (40px) as the **default** button size, and Playbook §11 mandates targets ≥ 44×44. As
+written, the default button violates the project's own accessibility rule. The Playbook already
+hints at the tension — it notes *"use `lg` for primary actions on mobile"* — but that is a
+convention, not a constraint, and conventions are what get skipped under deadline.
+
+**Three ways to resolve it, and it needs a decision, not a preference:**
+
+1. **Raise `md` to 44px** and treat 32px `sm` as desktop-only with enforced spacing. Holds the
+   44px rule everywhere it matters.
+2. **Keep the sizes, drop the rule to the real AA bar (24×24)**, and amend
+   `tokens.accessibility` to say so. Legitimate — 44 is AAA — but it must be written down.
+3. **Keep both and rely on hit-area padding** exceeding the visible box. Playbook §11 already
+   says *"small icons need a click area wider than their visible shape"*, so this is the
+   established pattern. Requires a `hit-area` token so the gate can verify it, otherwise it is
+   an untested promise.
+
+Logged as **G11** in `gaps/gap-register.md`. Not resolved here — it is the design lead's call
+and it interacts with **I17**.
+
+**Focus indicator: 2 pass, 8 not specified.** `button` and `input` declare a 2px ring; the
+other eight interactive components have no focus token yet. Playbook §2.3 calls `focus` the
+most-forgotten state, so the `TODO` count is the point — it goes down as the library is built,
+and it never silently reads as a pass.
 
 ### Resolved — `border-strong` raised to `neutral-500`
 
@@ -138,6 +209,12 @@ maintenance and is where most RTL bugs come from.
 
 ## What is not in here yet
 
+- **Dimensions for 8 of the 10 interactive components.** Only `button` and `input` declare
+  sizes and focus rings. The gate reports the rest as `TODO` — see the count above. Add
+  `height-*`/`hit-area` and `focus-ring-width` as each component is designed, and the `TODO`
+  count falls on its own.
+- **Disabled-state tokens.** Playbook §3.2 names disabled text as a usual contrast failure.
+  There is no disabled token to test yet; add it and a matching gate pair together.
 - **Icon mirroring metadata.** Playbook §4.2 requires every icon to be tagged `mirror` or
   `no-mirror` (next/back arrows mirror; upload arrows, clocks, logos, card marks do not).
   Without the tag a developer decides case by case and gets it wrong. Belongs here once the
@@ -148,6 +225,12 @@ maintenance and is where most RTL bugs come from.
 - **Motion tokens.** Duration and easing, with `prefers-reduced-motion` handling.
 - **Elevation.** Deliberately absent — dark mode raises surfaces with lightness, not shadow, so
   a shared shadow scale would be misleading.
+
+> The gate can only check what the tokens declare. It verifies **colour, declared size, and
+> declared focus thickness** — it cannot verify keyboard tab order, focus visibility against
+> adjacent elements, screen-reader labelling, or whether a 44px hit area is actually applied in
+> the built CSS. Those still need the manual review in Playbook §13. The gate narrows what
+> humans must check; it does not replace them.
 
 ---
 

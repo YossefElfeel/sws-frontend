@@ -16,7 +16,8 @@ Design Playbook §3.2 instructs that every foreground/background pair in the sem
 layer be checked with a real contrast tool before adoption, and predicts that *"light grey
 borders usually fail."* The check had never been run.
 
-Running it (`node tokens/contrast-check.mjs`) failed **4 of 42** pairs. All four were
+Running it (`node tokens/a11y-gate.mjs`, then named `contrast-check.mjs`) failed **4 of 42**
+pairs. All four were
 `border-strong` — the input field border — in **both** themes:
 
 | Theme | Pair | Ratio | Required |
@@ -70,9 +71,10 @@ touched.
   directly, this fix would have been a hunt instead of a one-line edit.
 
 **Follow-on work**
-- The gate covers colour only. `focus-ring` **width** (2px) and touch target size (44×44) are
-  in `tokens.accessibility` but are not automatically verified — they need a separate check or
-  a manual review step.
+- ~~The gate covers colour only. `focus-ring` width and touch target size are declared but not
+  verified.~~ **Done 2026-07-29** — the gate was extended to cover target size and focus
+  indicators and renamed `a11y-gate.mjs`. It immediately surfaced that Playbook §7.1's default
+  button size (40px) violates Playbook §11's own 44px rule; logged as **G11**.
 - Disabled-state contrast is not yet in the pair list. Playbook §3.2 names it as a usual
   failure; there is no disabled token to test yet. Add both when the state is defined.
 

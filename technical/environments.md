@@ -167,7 +167,7 @@ no longer exists.
 - [ ] Arabic RTL verified on changed screens — both directions, both themes
 - [ ] Arabic invoice PDF renders correctly (`C-16` — separate engine, separate failure mode)
 - [ ] Emails render in Gmail, Outlook, and Apple Mail in Arabic
-- [ ] Contrast gate passes (`node tokens/contrast-check.mjs`)
+- [ ] Accessibility gate passes (`node tokens/a11y-gate.mjs`) — zero AA failures
 - [ ] Analytics events fire and cross-domain continuity holds
 - [ ] No console errors on the conversion path
 - [ ] Rollback verified as available
