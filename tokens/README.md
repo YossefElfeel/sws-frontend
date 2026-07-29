@@ -100,39 +100,41 @@ compliant. Either is fine — but decide it rather than drift into it.
 ### Current result — 2026-07-29
 
 ```
-64 checks: 45 pass · 0 fail · 2 warn · 17 not specified      exit 0
+64 checks: 46 pass · 0 fail · 1 warn · 17 not specified      exit 0
 ```
 
 **Contrast: 42 / 42 pass** in both themes, after the `border-strong` fix below.
 
-**Target size: 2 warnings.** Both are the Playbook's own button sizes falling under its own
-44px rule:
+**Target size: 1 warning.** The default button was raised to 44px (ADR-0002); `sm` is still
+under the rule:
 
 | Component | Size | Verdict |
 |---|---|---|
 | Button `sm` | 32px | ⚠️ meets AA (24px), under the 44px project rule |
-| Button `md` — **the default** | 40px | ⚠️ meets AA (24px), under the 44px project rule |
+| Button `md` — **the default** | 40px → **44px** | ✅ raised, ADR-0002 |
 | Button `lg` | 48px | ✅ |
 
-This is an internal contradiction in the source document, not a token error: Playbook §7.1
-sets `md` (40px) as the **default** button size, and Playbook §11 mandates targets ≥ 44×44. As
-written, the default button violates the project's own accessibility rule. The Playbook already
-hints at the tension — it notes *"use `lg` for primary actions on mobile"* — but that is a
-convention, not a constraint, and conventions are what get skipped under deadline.
+The finding was an internal contradiction in the source document, not a token error: Playbook
+§7.1 set `md` (40px) as the **default**, and Playbook §11 mandates targets ≥ 44×44 — so the
+most-used control in the product violated the project's own rule. The Playbook hints at the
+tension (*"use `lg` for primary actions on mobile"*), but that is a convention, and conventions
+get skipped under deadline.
 
-**Three ways to resolve it, and it needs a decision, not a preference:**
+> ⚠️ **Side effect worth knowing:** the size scale is now **32 / 44 / 48** — steps of 12px then
+> 4px. `lg` is only 4px taller than `md`, which is close to imperceptible, so the three-size
+> scale is effectively two sizes and a rounding error. Real design debt, tracked under G11.
+> Fixing it means moving `lg` or dropping to two sizes — a component API change.
 
-1. **Raise `md` to 44px** and treat 32px `sm` as desktop-only with enforced spacing. Holds the
-   44px rule everywhere it matters.
-2. **Keep the sizes, drop the rule to the real AA bar (24×24)**, and amend
-   `tokens.accessibility` to say so. Legitimate — 44 is AAA — but it must be written down.
-3. **Keep both and rely on hit-area padding** exceeding the visible box. Playbook §11 already
-   says *"small icons need a click area wider than their visible shape"*, so this is the
-   established pattern. Requires a `hit-area` token so the gate can verify it, otherwise it is
-   an untested promise.
+**`sm` (32px) is still open.** Three ways to close it:
 
-Logged as **G11** in `gaps/gap-register.md`. Not resolved here — it is the design lead's call
-and it interacts with **I17**.
+1. **Restrict `sm` to desktop-only** with enforced spacing — defensible for dense contexts
+   (table row actions, toolbars) where pointer input dominates and the AA bar of 24×24 is met.
+2. **Give it a `hit-area` token** larger than its visible box. Playbook §11 already endorses
+   this (*"small icons need a click area wider than their visible shape"*) — but the gate needs
+   the token to verify it, otherwise it is an untested promise.
+3. **Raise it**, which collapses the scale further.
+
+Tracked in **G11**. See **ADR-0002** for the reasoning behind the `md` change.
 
 **Focus indicator: 2 pass, 8 not specified.** `button` and `input` declare a 2px ring; the
 other eight interactive components have no focus token yet. Playbook §2.3 calls `focus` the
