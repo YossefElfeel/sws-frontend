@@ -7,6 +7,7 @@ import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { gatewaysFor, formatAmount } from '../lib/catalog';
+import { gatewayDestination } from './Order';
 
 /**
  * Checkout — spec 7.3 and 11.
@@ -46,7 +47,11 @@ export function Checkout() {
           className="checkout"
           onSubmit={(e) => {
             e.preventDefault();
-            navigate('/confirmation');
+            // Every gateway has its own next screen, and they are not the same screen. A card
+            // goes to the card frame and on to the bank's challenge; a transfer goes to the
+            // instructions it cannot complete without. Sending all five to the confirmation
+            // was the version that quietly claimed a bank transfer had already been paid.
+            navigate(gatewayDestination(method));
           }}
         >
           <div className="checkout__main">

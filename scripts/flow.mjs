@@ -87,6 +87,45 @@ ok('wallet gateway hides off EGP', chfGw === 4, `${chfGw} gateways on CHF`);
 const disabled = await p.$eval('.checkout__aside .btn', (e) => e.disabled);
 ok('pay button gated on agreement', disabled === true);
 
+// O-07/O-10/O-11: every gateway has its own next screen, and they are not the same screen.
+// Sending all five to the confirmation was the version that quietly claimed a bank transfer
+// had already been paid. Checked here because this is where the cart still has lines in it —
+// the confirmation empties it.
+// Place Order is gated on a non-empty cart as well as on the agreement, so a line has to be
+// in it before the gateway choice can be exercised at all.
+await p.evaluate(() => (location.hash = '#/configure/ultra'));
+await p.waitForSelector('.checkout__aside .btn');
+await p.click('.checkout__aside .btn');
+await p.waitForTimeout(300);
+
+for (const [gw, expect] of [
+  ['bank', '/order/bank'],
+  ['instapay', '/order/wallet'],
+  ['stripe-card', '/checkout/card'],
+]) {
+  await p.evaluate(() => (location.hash = '#/checkout'));
+  await p.waitForSelector('.methods input[value="stripe-card"]');
+  await p.check(`.methods input[value="${gw}"]`);
+  await p.check('.checkout__aside input[type=checkbox]');
+  // The billing form is required-gated, which is correct and which a click alone will not
+  // get past — the browser silently refuses and focuses the first empty field.
+  await p.evaluate(() => {
+    for (const el of document.querySelectorAll('.checkout__main [required]')) {
+      if (el.value) continue;
+      const set = Object.getOwnPropertyDescriptor(
+        el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype,
+        'value',
+      ).set;
+      set.call(el, el.type === 'email' ? 'a@b.co' : 'x');
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+  await p.click('.checkout__aside button[type=submit]');
+  await p.waitForTimeout(350);
+  const landed = await p.evaluate(() => location.hash);
+  ok(`${gw} goes to its own next screen`, landed.includes(expect), landed);
+}
+
 // ── Spec 9, the client area ──────────────────────────────────────────────────
 
 await p.evaluate(() => (location.hash = '#/account'));
@@ -202,6 +241,37 @@ ok(
   missingFromFooter.length === 0,
   missingFromFooter.join(', ') || `${footHrefs.length} links`,
 );
+
+// O-13 is the biggest conversion-recovery opportunity in the project, and it only works if
+// the order survives the failure.
+await p.evaluate(() => (location.hash = '#/order/failed'));
+await p.waitForSelector('.panel--bad');
+{
+  const kept = await p.$$eval('.notice', (n) => n.length);
+  const ways = await p.$$eval('.methods--stack a.method', (n) => n.length);
+  const retry = await p.$$eval('.checkout__aside a.btn--primary', (n) => n.length);
+  ok('a failed payment keeps the order and offers a way out', kept > 0 && ways > 0 && retry === 1, `${ways} alternative(s)`);
+}
+
+// O-08/O-09 render third-party frames. Faking them would get a screen approved that will
+// never exist, so the slot must stay a marked slot.
+for (const r of ['#/checkout/card', '#/checkout/3ds']) {
+  await p.evaluate((h) => (location.hash = h), r);
+  await p.waitForSelector('.slot');
+  const marked = await p.$$eval('.slot__tag', (n) => n.length);
+  const fakeInputs = await p.$$eval('.slot input', (n) => n.length);
+  ok(`${r} marks the third-party frame rather than faking it`, marked === 1 && fakeInputs === 0);
+}
+
+// A-05: the rules are checked live, and Save stays out of reach until they pass.
+await p.evaluate(() => (location.hash = '#/reset/new'));
+await p.waitForSelector('.rules');
+{
+  const before = await p.$eval('button[type=submit]', (b) => b.disabled);
+  await p.fill('input[autocomplete=new-password]:nth-of-type(1)', 'Sws-Prototype-9');
+  const met = await p.$$eval('.rule.is-met', (n) => n.length);
+  ok('password rules are checked as you type', before === true && met === 3, `${met}/3 met`);
+}
 
 // I14, implemented as the decision log recommends: the second-year price of the free domain
 // on the page, not in the terms. It is the single biggest source of billing complaints.

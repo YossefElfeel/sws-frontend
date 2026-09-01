@@ -438,6 +438,190 @@ export const STRINGS = {
   // ── plan change: C-04 to C-06 ─────────────────────────────────────────────
 
   // ── plan comparison: M-10 ─────────────────────────────────────────────────
+
+  // ── registrant details: O-06 ──────────────────────────────────────────────
+  'reg.title': { ar: 'بيانات مالك الدومين', en: 'Domain registrant' },
+  'reg.lede': {
+    ar: 'الجهة المسجِّلة بتطلب البيانات دي وبتتسجّل باسمك.',
+    en: 'The registry requires these, and they are recorded against your name.',
+  },
+  'reg.who': { ar: 'مين المالك', en: 'Who owns it' },
+  'reg.org': { ar: 'الشركة (اختياري)', en: 'Organisation (optional)' },
+  'reg.where': { ar: 'العنوان', en: 'Address' },
+  'reg.ext': { ar: 'الامتداد', en: 'Extension' },
+  'reg.extra': { ar: 'مطلوب كمان لـ', en: 'Also required for' },
+  'reg.aeNote': {
+    ar: 'سجل الإمارات بيطلب إثبات هوية للمالك قبل التسجيل.',
+    en: 'The UAE registry requires proof of identity before it will register the name.',
+  },
+  'reg.saNote': {
+    ar: 'السجل السعودي بيطلب إثبات هوية أو سجل تجاري للمالك.',
+    en: 'The Saudi registry requires an identity document or a commercial registration.',
+  },
+  'reg.idType': { ar: 'نوع الإثبات', en: 'Document type' },
+  'reg.idPassport': { ar: 'جواز سفر', en: 'Passport' },
+  'reg.idNational': { ar: 'بطاقة رقم قومي', en: 'National ID' },
+  'reg.idTrade': { ar: 'سجل تجاري', en: 'Commercial registration' },
+  'reg.idNumber': { ar: 'رقم الإثبات', en: 'Document number' },
+  'reg.why': { ar: 'ليه بنسأل', en: 'Why we ask' },
+  'reg.whyBody': {
+    ar: 'البيانات دي بتروح للجهة المسجِّلة مش لينا، وبتحدد مين صاحب الدومين قانونًا.',
+    en: 'These go to the registry rather than to us, and they decide who legally owns the name.',
+  },
+
+  // ── card entry: O-08 ──────────────────────────────────────────────────────
+  'card.title': { ar: 'بيانات الكارت', en: 'Card details' },
+  'card.details': { ar: 'الكارت', en: 'Your card' },
+  'card.slotTag': { ar: 'حقول Stripe', en: 'Stripe fields' },
+  'card.slotLabel': { ar: 'مكان حقول الكارت', en: 'Where the card fields render' },
+  'card.slotNote': {
+    ar: 'الحقول دي بتترسم جوه إطار Stripe، فمش بنرسمها هنا. اللي حوليها بس هو بتاعنا.',
+    en: 'These render inside Stripe’s own frame, so we do not draw them. Only what surrounds them is ours.',
+  },
+  'card.save': { ar: 'احفظ الكارت', en: 'Save this card' },
+  'card.saveNote': { ar: 'عشان التجديد يتم لوحده.', en: 'So renewals can pay themselves.' },
+  'card.secure': {
+    ar: 'رقم الكارت بيروح لـ Stripe مباشرة وما بيعدّيش علينا.',
+    en: 'The card number goes straight to Stripe and never passes through us.',
+  },
+  'card.pay': { ar: 'ادفع', en: 'Pay' },
+
+  // ── 3-D Secure: O-09 ──────────────────────────────────────────────────────
+  'tds.title': { ar: 'تأكيد من البنك', en: 'Bank confirmation' },
+  'tds.goTitle': { ar: 'بنحوّلك لبنكك', en: 'Taking you to your bank' },
+  'tds.goBody': {
+    ar: 'البنك هيسألك تأكيد. الصفحة دي بتاعته إحنا ما بنشوفهاش.',
+    en: 'Your bank will ask you to confirm. That page is theirs, and we never see it.',
+  },
+  'tds.slotTag': { ar: 'صفحة البنك', en: 'Your bank’s page' },
+  'tds.slotLabel': { ar: 'مكان صفحة البنك', en: 'Where the bank’s page appears' },
+  'tds.slotNote': {
+    ar: 'شكلها بيختلف من بنك للتاني، وما بنقدرش نغيّره.',
+    en: 'It looks different at every bank, and we cannot change it.',
+  },
+  'tds.go': { ar: 'كمّل عند البنك', en: 'Continue at the bank' },
+  'tds.cancel': { ar: 'إلغاء', en: 'Cancel' },
+  'tds.dontClose': {
+    ar: 'ما تقفلش الصفحة دي لحد ما ترجع.',
+    en: 'Leave this page open until you come back.',
+  },
+  'tds.backTitle': { ar: 'البنك أكّد', en: 'Your bank confirmed' },
+  'tds.backBody': { ar: 'فاضل نسجّل الطلب.', en: 'All that is left is recording the order.' },
+  'tds.finish': { ar: 'خلّص الطلب', en: 'Finish the order' },
+
+  // ── transfer instructions: O-10 and O-11 ──────────────────────────────────
+  'bank.title': { ar: 'تحويل بنكي', en: 'Bank transfer' },
+  'bank.lede': {
+    ar: 'حوّل المبلغ وسيب الباقي علينا.',
+    en: 'Send the amount and leave the rest to us.',
+  },
+  'wal.title': { ar: 'إنستاباي أو محفظة', en: 'InstaPay or wallet' },
+  'wal.lede': {
+    ar: 'ابعت المبلغ من تطبيقك، وارفعلنا صورة الإيصال.',
+    en: 'Send from your app, then upload the receipt.',
+  },
+  'bank.reference': { ar: 'رقم المرجع', en: 'Payment reference' },
+  'bank.refWarn': {
+    ar: 'من غير الرقم ده التحويل ما بيتربطش بطلبك.',
+    en: 'Without this, the transfer cannot be matched to your order.',
+  },
+  'bank.sendTo': { ar: 'ابعت لـ', en: 'Send to' },
+  'bank.beneficiary': { ar: 'اسم المستفيد', en: 'Beneficiary' },
+  'bank.iban': { ar: 'الآيبان', en: 'IBAN' },
+  'bank.swift': { ar: 'السويفت', en: 'SWIFT' },
+  'bank.name': { ar: 'البنك', en: 'Bank' },
+  'wal.name': { ar: 'الاسم', en: 'Name' },
+  'wal.number': { ar: 'الرقم', en: 'Number' },
+  'wal.instapay': { ar: 'عنوان إنستاباي', en: 'InstaPay address' },
+  'bank.tellUs': { ar: 'قوللنا إنك حوّلت', en: 'Tell us you have sent it' },
+  'bank.tellUsBody': {
+    ar: 'ارفع الإيصال وهنأكّد أسرع بكتير.',
+    en: 'Upload the receipt and we confirm far sooner.',
+  },
+  'bank.receipt': { ar: 'صورة الإيصال', en: 'Receipt' },
+  'bank.confirm': { ar: 'أكّدت التحويل', en: 'I have sent it' },
+  'bank.gotIt': { ar: 'وصلنا', en: 'Received' },
+  'bank.gotItBody': {
+    ar: 'هنراجع التحويل ونفعّل الخدمة أول ما يظهر عندنا.',
+    en: 'We will check the transfer and start the service as soon as it lands.',
+  },
+  'bank.whenTitle': { ar: 'بيحصل إيه', en: 'What happens' },
+  'bank.w1': { ar: 'الطلب اتسجّل باسمك.', en: 'The order is recorded in your name.' },
+  'bank.w2': { ar: 'التحويل بياخد من يوم لتلاتة.', en: 'A transfer takes one to three days.' },
+  'wal.w2': { ar: 'التحويل بيوصل عادةً في نفس اليوم.', en: 'A wallet transfer usually lands the same day.' },
+  'bank.w3': { ar: 'الخدمة بتشتغل أول ما نأكّد.', en: 'The service starts the moment we confirm.' },
+  'bank.hold': {
+    ar: 'الأسعار محجوزة لك 7 أيام.',
+    en: 'Your prices are held for seven days.',
+  },
+
+  // ── payment failure: O-13 ─────────────────────────────────────────────────
+  'pf.title': { ar: 'الدفع ما تمّش', en: 'The payment did not go through' },
+  'pf.kept': { ar: 'طلبك زي ما هو', en: 'Your order is untouched' },
+  'pf.keptBody': { ar: 'لسه في السلة، عدد البنود:', en: 'Still in your cart, items:' },
+  'pf.tryAnother': { ar: 'جرّب طريقة تانية', en: 'Try another way' },
+  'pf.unchanged': { ar: 'المبلغ ما اتغيّرش.', en: 'The amount has not changed.' },
+  'pf.retry': { ar: 'جرّب الكارت تاني', en: 'Try the card again' },
+
+  // ── pending order: O-14 ───────────────────────────────────────────────────
+  'pend.title': { ar: 'الطلب تحت المراجعة', en: 'Order under review' },
+  'pend.heading': { ar: 'طلبك موقوف مؤقتًا للمراجعة', en: 'Your order is held for a quick check' },
+  'pend.body': {
+    ar: 'ده فحص أوتوماتيكي بيحصل لبعض الطلبات. مش معناه إن في مشكلة في الدفع.',
+    en: 'This is an automated check that runs on some orders. It does not mean anything went wrong with the payment.',
+  },
+  'pend.whatNow': { ar: 'اللي بيحصل دلوقتي', en: 'What is happening' },
+  'pend.s1': { ar: 'الدفع اتم بنجاح.', en: 'The payment went through.' },
+  'pend.s2': { ar: 'فريقنا بيراجع الطلب — عادةً أقل من ساعتين.', en: 'Our team is reviewing it — usually under two hours.' },
+  'pend.s3': { ar: 'هنبعتلك إيميل أول ما تتفعّل.', en: 'We email you the moment it is live.' },
+  'pend.money': { ar: 'وفلوسك', en: 'And your money' },
+  'pend.moneyBody': {
+    ar: 'المبلغ اتخصم واتسجّل على حسابك. لو ما وافقناش على الطلب، بيترد بالكامل.',
+    en: 'The amount has been taken and recorded against your account. If the order is not approved, it is refunded in full.',
+  },
+  'pend.ask': { ar: 'اسأل عن الطلب', en: 'Ask about this order' },
+
+  // ── set a new password: A-05 ──────────────────────────────────────────────
+  'pw.title': { ar: 'كلمة مرور جديدة', en: 'Set a new password' },
+  'pw.lede': { ar: 'اختار واحدة تفتكرها.', en: 'Pick one you will remember.' },
+  'pw.len': { ar: '10 حروف على الأقل', en: 'At least 10 characters' },
+  'pw.case': { ar: 'حرف كبير وحرف صغير', en: 'An upper and a lower case letter' },
+  'pw.num': { ar: 'رقم واحد على الأقل', en: 'At least one number' },
+  'pw.again': { ar: 'اكتبها تاني', en: 'Type it again' },
+  'pw.mismatch': { ar: 'الاتنين مش زي بعض.', en: 'These two do not match.' },
+  'pw.save': { ar: 'احفظ كلمة المرور', en: 'Save the password' },
+  'pw.doneTitle': { ar: 'اتغيّرت', en: 'Password changed' },
+  'pw.doneLede': { ar: 'تقدر تدخل بيها دلوقتي.', en: 'You can sign in with it now.' },
+  'pw.doneNote': {
+    ar: 'قفلنا كل الجلسات التانية على حسابك.',
+    en: 'We signed out every other session on your account.',
+  },
+
+  // ── email verification: A-06 ──────────────────────────────────────────────
+  'ver.title': { ar: 'أكّد إيميلك', en: 'Confirm your email' },
+  'ver.lede': { ar: 'بعتنالك لينك على:', en: 'We sent a link to:' },
+  'ver.resend': { ar: 'ابعت اللينك تاني', en: 'Send the link again' },
+  'ver.resent': { ar: 'اتبعت', en: 'Sent' },
+  'ver.wrong': { ar: 'الإيميل غلط؟', en: 'Wrong address?' },
+  'ver.spam': {
+    ar: 'لو ما وصلش في دقيقتين، بص في السبام.',
+    en: 'If it has not arrived in two minutes, check your spam folder.',
+  },
+  'ver.doneTitle': { ar: 'الإيميل اتأكّد', en: 'Email confirmed' },
+  'ver.doneLede': { ar: 'حسابك جاهز.', en: 'Your account is ready.' },
+  'ver.doneNote': { ar: 'كل حاجة مفتوحة دلوقتي.', en: 'Everything is available now.' },
+  'ver.go': { ar: 'روح لحسابك', en: 'Go to your account' },
+
+  // ── session expiry: A-07 ──────────────────────────────────────────────────
+  'exp.title': { ar: 'الجلسة انتهت', en: 'Session expired' },
+  'exp.heading': { ar: 'سجّلنا خروجك للأمان', en: 'We signed you out for safety' },
+  'exp.body': {
+    ar: 'عدّى وقت من غير نشاط. ادخل تاني وكمّل من نفس المكان.',
+    en: 'There was a stretch with no activity. Sign in again and carry on where you were.',
+  },
+  'exp.kept': { ar: 'سلتك محفوظة، عدد البنود:', en: 'Your cart is saved, items:' },
+  'exp.home': { ar: 'الرئيسية', en: 'Home' },
+
   'cmp.title': { ar: 'قارن الباقات', en: 'Compare plans' },
   'cmp.lede': {
     ar: 'الفروق الحقيقية بين الأربع باقات، من غير اللي بيتشابه فيهم.',

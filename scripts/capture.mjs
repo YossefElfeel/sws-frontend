@@ -88,6 +88,18 @@ const ROUTES = [
   { name: 'contact', path: '#/contact' },
   { name: 'learn', path: '#/learn' },
   { name: 'learn-post', path: '#/learn/move-a-site' },
+  { name: 'registrant', path: '#/checkout/registrant' },
+  { name: 'card-entry', path: '#/checkout/card' },
+  { name: '3ds-go', path: '#/checkout/3ds' },
+  { name: '3ds-back', path: '#/checkout/3ds?state=return' },
+  { name: 'bank-transfer', path: '#/order/bank' },
+  { name: 'wallet-transfer', path: '#/order/wallet' },
+  { name: 'payment-failed-order', path: '#/order/failed' },
+  { name: 'order-pending', path: '#/order/pending' },
+  { name: 'set-password', path: '#/reset/new' },
+  { name: 'verify-email', path: '#/verify' },
+  { name: 'verify-done', path: '#/verify?state=done' },
+  { name: 'session-expired', path: '#/expired' },
 
   { name: 'legal', path: '#/legal/privacy' },
 ];

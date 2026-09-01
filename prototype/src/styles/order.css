@@ -541,3 +541,239 @@
 .actions--split {
   justify-content: flex-start;
 }
+
+/* ═══ ordering: card entry, 3DS, transfers, failure, pending ══════════════════ */
+
+/* ── a slot for something we do not draw ───────────────────────────────────── */
+/*
+ * Stripe's card fields and the bank's 3-D Secure page render inside frames we neither own nor
+ * style. Drawing convincing fakes of them is how a reviewer ends up approving a screen that
+ * will never exist, so the area is marked as somebody else's and left empty.
+ */
+
+.slot {
+  display: grid;
+  place-content: center;
+  gap: var(--sws-space-8);
+  min-block-size: 8rem;
+  margin-block-start: var(--sws-space-16);
+  padding: var(--sws-space-24);
+  text-align: center;
+  border: 2px dashed var(--sws-border-strong);
+  border-radius: var(--sws-radius-md);
+  background: var(--sws-surface-sunken);
+}
+
+.slot--tall {
+  min-block-size: 14rem;
+}
+
+.slot__tag {
+  font-size: var(--sws-font-size-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sws-text-secondary);
+}
+
+:root[lang='ar'] .slot__tag {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.slot__note {
+  max-width: 26rem;
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  line-height: var(--sws-line-height-body-sm);
+}
+
+/* ── a single-message stage ────────────────────────────────────────────────── */
+
+.stage {
+  display: grid;
+  justify-items: center;
+  gap: var(--sws-space-12);
+  max-width: 34rem;
+  margin-inline: auto;
+  padding: var(--sws-space-48) var(--sws-space-24);
+  text-align: center;
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.stage--flush {
+  margin-inline: 0;
+  max-width: none;
+}
+
+.stage__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 64px;
+  block-size: 64px;
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-primary);
+  border-radius: var(--sws-radius-pill);
+}
+
+.stage__mark--ok {
+  background: var(--sws-banner-success-bg);
+  color: var(--sws-status-success);
+}
+
+.stage__mark--wait {
+  background: var(--sws-banner-warning-bg);
+  color: var(--sws-status-warning);
+}
+
+.stage__title {
+  font-size: var(--sws-font-size-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.stage__body {
+  max-width: 28rem;
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.stage__kept {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  padding: var(--sws-space-8) var(--sws-space-16);
+  background: var(--sws-banner-success-bg);
+  border-radius: var(--sws-radius-pill);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-status-success);
+}
+
+.stage .acts {
+  inline-size: 100%;
+  max-width: 20rem;
+}
+
+/* ── the payment reference — O-10 and O-11 ─────────────────────────────────── */
+/* A transfer that arrives without this becomes a support ticket, so it is the largest thing
+   on the screen and it is copyable. */
+
+.ref {
+  display: grid;
+  justify-items: center;
+  gap: var(--sws-space-8);
+  text-align: center;
+}
+
+.ref__label {
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  color: var(--sws-text-secondary);
+}
+
+.ref__code {
+  font-size: var(--sws-font-size-h2);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.ref__warn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-status-danger);
+}
+
+.ref__warn svg {
+  flex: none;
+}
+
+/* ── a panel carrying bad news — O-13 ──────────────────────────────────────── */
+
+.panel--bad {
+  border: var(--sws-rule-hair) solid var(--sws-status-danger);
+  background: var(--sws-banner-danger-bg);
+}
+
+.panel--bad .card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  color: var(--sws-status-danger);
+}
+
+/* A gateway offered as a way out of a failure is a link, and reads like the rest of them. */
+a.method {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-12);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.method svg {
+  flex: none;
+  color: var(--sws-action-primary);
+}
+
+/* ── the extra-fields fieldset — O-06 ──────────────────────────────────────── */
+/* A mandatory field nobody expected needs to look like an addition, not a default. */
+
+.fieldset--extra {
+  border-color: var(--sws-action-primary);
+  background: var(--sws-action-subtle-bg);
+}
+
+/* ── password rules — A-05 ─────────────────────────────────────────────────── */
+/* What is still missing, rather than a bar that says "weak" and leaves you guessing. */
+
+.rules {
+  display: grid;
+  gap: var(--sws-space-4);
+  margin-block-start: calc(var(--sws-space-8) * -1);
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.rule svg {
+  flex: none;
+  color: var(--sws-border-strong);
+}
+
+.rule.is-met {
+  color: var(--sws-status-success);
+}
+
+.rule.is-met svg {
+  color: var(--sws-status-success);
+}
+
+.hint--bad {
+  color: var(--sws-status-danger);
+}
+
+.auth__sent {
+  margin-block-end: var(--sws-space-24);
+  padding: var(--sws-space-12) var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-sm);
+  text-align: center;
+  font-weight: 600;
+}
+
+.methods--stack {
+  display: grid;
+  gap: var(--sws-space-8);
+}

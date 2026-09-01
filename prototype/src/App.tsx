@@ -24,7 +24,24 @@ import {
   Learn,
   LearnPost,
 } from './screens/Company';
-import { Login, Register, ResetPassword, TwoFactor } from './screens/Auth';
+import {
+  Login,
+  Register,
+  ResetPassword,
+  TwoFactor,
+  SetPassword,
+  VerifyEmail,
+} from './screens/Auth';
+import {
+  Registrant,
+  CardEntry,
+  ThreeDSecure,
+  BankTransfer,
+  WalletTransfer,
+  PaymentFailure,
+  PendingOrder,
+  SessionExpired,
+} from './screens/Order';
 
 import { Dashboard } from './screens/account/Dashboard';
 import { Services, ServiceDetail } from './screens/account/Services';
@@ -93,6 +110,13 @@ export function App() {
               <Route path="/domain/:lineId" element={<DomainStep />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout/registrant" element={<Registrant />} />
+              <Route path="/checkout/card" element={<CardEntry />} />
+              <Route path="/checkout/3ds" element={<ThreeDSecure />} />
+              <Route path="/order/bank" element={<BankTransfer />} />
+              <Route path="/order/wallet" element={<WalletTransfer />} />
+              <Route path="/order/failed" element={<PaymentFailure />} />
+              <Route path="/order/pending" element={<PendingOrder />} />
               <Route path="/confirmation" element={<Confirmation />} />
 
               {/* Auth — spec 5.3 and 8 */}
@@ -100,6 +124,9 @@ export function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/reset" element={<ResetPassword />} />
               <Route path="/2fa" element={<TwoFactor />} />
+              <Route path="/reset/new" element={<SetPassword />} />
+              <Route path="/verify" element={<VerifyEmail />} />
+              <Route path="/expired" element={<SessionExpired />} />
 
               {/* Client area — spec 5.4 and 9 */}
               <Route path="/account" element={<Dashboard />} />
