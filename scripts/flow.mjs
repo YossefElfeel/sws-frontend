@@ -188,6 +188,62 @@ const contactHref = await p.$$eval('.colophon__links a', (n) =>
 );
 ok('footer Contact reaches a ticket', Boolean(contactHref), contactHref ?? 'still /account');
 
+// C-05: the whole point of the proration screen is that the total can be checked against the
+// lines above it. If they ever stop adding up, the screen is worse than useless.
+await p.evaluate(() => (location.hash = '#/account/services/svc-8841/upgrade/review?to=unlimited'));
+await p.waitForSelector('.sum');
+{
+  const nums = await p.$$eval('.sum__row dd', (n) =>
+    n.map((d) => d.textContent.replace(/[^0-9.\-−]/g, '').replace('−', '-')),
+  );
+  // rows: days, credit, charge, total
+  const credit = Math.abs(parseFloat(nums[1]));
+  const charge = Math.abs(parseFloat(nums[2]));
+  const total = parseFloat(nums[3]);
+  ok(
+    'proration total equals charge minus credit',
+    Math.abs(charge - credit - total) < 0.02,
+    `${charge} − ${credit} = ${total}`,
+  );
+}
+
+// C-07: cancelling is gated on the acknowledgement that is on the same screen as the warning.
+await p.evaluate(() => (location.hash = '#/account/services/svc-8841/cancel'));
+await p.waitForSelector('.switch-row input');
+{
+  const before = await p.$eval('.acts .btn', (b) => b.disabled);
+  await p.click('.switch-row input');
+  const after = await p.$eval('.acts .btn', (b) => b.disabled);
+  ok('cancelling waits for the acknowledgement', before === true && after === false);
+}
+
+// C-36: the bell opens what it counts, rather than a different list.
+await p.evaluate(() => (location.hash = '#/account'));
+await p.waitForSelector('.app__bellwrap button');
+{
+  const count = await p.$eval('.app__dot', (e) => Number(e.textContent.trim()));
+  await p.click('.app__bellwrap button');
+  await p.waitForSelector('.notifs');
+  const unread = await p.$$eval('.notifs__item.is-unread', (n) => n.length);
+  ok('the bell opens what it counts', count === unread, `badge ${count}, unread ${unread}`);
+  await p.keyboard.press('Escape');
+  const closed = (await p.$$('.notifs')).length === 0;
+  ok('and closes on Escape', closed);
+}
+
+// C-35: a settings grid you have to scroll sideways to reach is the wrong answer on a phone.
+await p.setViewportSize({ width: 390, height: 844 });
+await p.evaluate(() => (location.hash = '#/account/notifications'));
+await p.waitForSelector('.prefs');
+{
+  const shape = await p.evaluate(() => ({
+    display: getComputedStyle(document.querySelector('.prefs')).display,
+    over: document.documentElement.scrollWidth > window.innerWidth + 1,
+  }));
+  ok('preferences stack rather than scroll on a phone', shape.display === 'block' && !shape.over);
+}
+await p.setViewportSize({ width: 1440, height: 900 });
+
 // Logical properties handle layout, but an arrow is a drawing: "onward" has to point the way
 // the reader travels, so it mirrors in Arabic and only it does.
 {

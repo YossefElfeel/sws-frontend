@@ -35,7 +35,7 @@ export const SERVICES: Service[] = [
     product: 'Ultra',
     domain: 'atelier-kamal.com',
     status: 'active',
-    nextDue: '2026-10-14',
+    nextDue: '2026-09-14',
     cycle: 'monthly',
     amountUsdMinor: 1000,
     since: '2026-07-14',
@@ -395,4 +395,194 @@ export const ACCOUNT = {
 export const PAYMENT_METHODS_SAVED = [
   { id: 'pm1', kind: 'Visa', last4: '4242', expiry: '09/29', primary: true },
   { id: 'pm2', kind: 'Mastercard', last4: '8117', expiry: '02/28', primary: false },
+];
+
+/* ── transactions — spec 9.4, C-20 ──────────────────────────────────────────── */
+
+export type TxnKind = 'payment' | 'refund' | 'credit';
+
+export interface Txn {
+  id: string;
+  at: string;
+  kind: TxnKind;
+  /** Which invoice it settled, when it settled one. */
+  invoice?: string;
+  gateway: string;
+  reference: string;
+  /** Signed: money in is positive, money out of the account is negative. */
+  amountUsdMinor: number;
+}
+
+export const TRANSACTIONS: Txn[] = [
+  {
+    id: 'txn-5512',
+    at: '2026-08-01',
+    kind: 'payment',
+    invoice: 'INV-20260801-4310',
+    gateway: 'stripe-card',
+    reference: 'ch_3PkQ2LB8xY',
+    amountUsdMinor: 1367,
+  },
+  {
+    id: 'txn-5390',
+    at: '2026-07-01',
+    kind: 'payment',
+    invoice: 'INV-20260701-4188',
+    gateway: 'stripe-card',
+    reference: 'ch_3PbW9AC1nR',
+    amountUsdMinor: 1140,
+  },
+  {
+    id: 'txn-5301',
+    at: '2026-06-14',
+    kind: 'refund',
+    invoice: 'INV-20260601-4062',
+    gateway: 'stripe-card',
+    reference: 're_3PYt4KD7pM',
+    amountUsdMinor: -900,
+  },
+  {
+    id: 'txn-5288',
+    at: '2026-06-01',
+    kind: 'payment',
+    invoice: 'INV-20260601-4062',
+    gateway: 'instapay',
+    reference: 'IPN-772140',
+    amountUsdMinor: 6270,
+  },
+  {
+    id: 'txn-5150',
+    at: '2026-05-03',
+    kind: 'credit',
+    gateway: 'bank',
+    reference: 'TRF-99013',
+    amountUsdMinor: 2000,
+  },
+];
+
+/* ── a failed charge — spec 9.4, C-21 ───────────────────────────────────────── */
+
+/**
+ * What the gateway said, kept separate from what we tell the customer. "Card declined" is the
+ * only thing an issuer will say; the useful part is what to do next, which depends on why.
+ */
+export const FAILED_PAYMENT = {
+  invoiceId: 'inv-4417',
+  invoiceNumber: 'INV-20260901-4417',
+  at: '2026-09-01',
+  gateway: 'stripe-card',
+  last4: '4242',
+  /** Maps to a fail.* string, so the advice differs by cause. */
+  reason: 'insufficient_funds' as 'insufficient_funds' | 'expired_card' | 'declined' | 'network',
+  attempt: 1,
+  maxAttempts: 3,
+  nextAttempt: '2026-09-04',
+  suspendsOn: '2026-09-15',
+};
+
+/* ── notifications — spec 9.1, C-35 and C-36 ────────────────────────────────── */
+
+export type NotifKind = 'billing' | 'service' | 'ticket' | 'news';
+
+export interface Notif {
+  id: string;
+  kind: NotifKind;
+  titleKey: string;
+  at: string;
+  to: string;
+  read: boolean;
+}
+
+export const NOTIFICATIONS: Notif[] = [
+  {
+    id: 'n-9',
+    kind: 'billing',
+    titleKey: 'notif.invoiceDue',
+    at: '2026-09-01',
+    to: '/account/invoices/inv-4417',
+    read: false,
+  },
+  {
+    id: 'n-8',
+    kind: 'ticket',
+    titleKey: 'notif.ticketReplied',
+    at: '2026-08-31',
+    to: '/account/tickets/tkt-7741',
+    read: false,
+  },
+  {
+    id: 'n-7',
+    kind: 'service',
+    titleKey: 'notif.renewalSoon',
+    at: '2026-08-30',
+    to: '/account/services/svc-6120',
+    read: true,
+  },
+  {
+    id: 'n-6',
+    kind: 'news',
+    titleKey: 'notif.maintenance',
+    at: '2026-08-28',
+    to: '/account/announcements',
+    read: true,
+  },
+];
+
+/** Spec 9.7: each channel is a separate consent, so each is a separate switch. */
+export interface NotifPref {
+  id: NotifKind;
+  labelKey: string;
+  noteKey: string;
+  email: boolean;
+  sms: boolean;
+  inApp: boolean;
+  /** Billing notices are not optional — you cannot turn off being told you owe money. */
+  required?: boolean;
+}
+
+export const NOTIF_PREFS: NotifPref[] = [
+  {
+    id: 'billing',
+    labelKey: 'notif.pref.billing',
+    noteKey: 'notif.pref.billingNote',
+    email: true,
+    sms: true,
+    inApp: true,
+    required: true,
+  },
+  {
+    id: 'service',
+    labelKey: 'notif.pref.service',
+    noteKey: 'notif.pref.serviceNote',
+    email: true,
+    sms: false,
+    inApp: true,
+  },
+  {
+    id: 'ticket',
+    labelKey: 'notif.pref.ticket',
+    noteKey: 'notif.pref.ticketNote',
+    email: true,
+    sms: false,
+    inApp: true,
+  },
+  {
+    id: 'news',
+    labelKey: 'notif.pref.news',
+    noteKey: 'notif.pref.newsNote',
+    email: false,
+    sms: false,
+    inApp: true,
+  },
+];
+
+/* ── cancellation — spec 9.2, C-07 ──────────────────────────────────────────── */
+
+export const CANCEL_REASONS = [
+  'cancel.reason.price',
+  'cancel.reason.moving',
+  'cancel.reason.unused',
+  'cancel.reason.support',
+  'cancel.reason.technical',
+  'cancel.reason.other',
 ];

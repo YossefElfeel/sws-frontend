@@ -69,6 +69,15 @@ const ROUTES = [
   { name: 'acc-affiliates', path: '#/account/affiliates' },
   { name: 'acc-contacts', path: '#/account/contacts' },
   { name: 'acc-security', path: '#/account/security' },
+  { name: 'acc-upgrade', path: '#/account/services/svc-8841/upgrade' },
+  { name: 'acc-upgrade-review', path: '#/account/services/svc-8841/upgrade/review?to=unlimited' },
+  { name: 'acc-upgrade-done', path: '#/account/services/svc-8841/upgrade/done?to=unlimited' },
+  { name: 'acc-cancel', path: '#/account/services/svc-8841/cancel' },
+  { name: 'acc-renew', path: '#/account/renew/svc-8841' },
+  { name: 'acc-transactions', path: '#/account/transactions' },
+  { name: 'acc-payment-failed', path: '#/account/payment-failed' },
+  { name: 'acc-withdraw', path: '#/account/affiliates/withdraw' },
+  { name: 'acc-notifications', path: '#/account/notifications' },
 
   { name: 'legal', path: '#/legal/privacy' },
 ];

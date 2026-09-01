@@ -52,7 +52,9 @@ export function MyDomains() {
                   </td>
                   <td className="num">
                     <span className="row-actions">
-                      <Button size="sm">{t('dom.renew')}</Button>
+                      <Link className="btn btn--sm btn--primary" to={`/account/renew/${d.id}`}>
+                        {t('dom.renew')}
+                      </Link>
                       <Link className="btn btn--sm btn--secondary" to={`/account/domains/${d.id}`}>
                         {t('svc.manage')}
                         <IconArrow size={14} />
@@ -102,7 +104,11 @@ export function DomainManage() {
         { label: t('acc.domains'), to: '/account/domains' },
         { label: dom.name },
       ]}
-      actions={<Button size="md">{t('dom.renew')}</Button>}
+      actions={
+        <Link className="btn btn--md btn--primary" to={`/account/renew/${dom.id}`}>
+          {t('dom.renew')}
+        </Link>
+      }
     >
       <div className="with-side">
         <div className="dash__main">

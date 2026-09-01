@@ -28,6 +28,19 @@ import {
   KbArticle,
 } from './screens/account/Support';
 import { Announcements, Affiliates, Security, Contacts } from './screens/account/Profile';
+import {
+  UpgradePlan,
+  UpgradeProration,
+  UpgradeResult,
+  CancelService,
+} from './screens/account/Upgrade';
+import {
+  Renew,
+  Transactions,
+  PaymentFailed,
+  AffiliateWithdraw,
+} from './screens/account/Money';
+import { NotificationPrefs } from './screens/account/Notifications';
 
 /** A route change is a new page, so it starts at the top of that page. */
 function ScrollToTop() {
@@ -72,11 +85,18 @@ export function App() {
               <Route path="/account" element={<Dashboard />} />
               <Route path="/account/services" element={<Services />} />
               <Route path="/account/services/:id" element={<ServiceDetail />} />
+              <Route path="/account/services/:id/upgrade" element={<UpgradePlan />} />
+              <Route path="/account/services/:id/upgrade/review" element={<UpgradeProration />} />
+              <Route path="/account/services/:id/upgrade/done" element={<UpgradeResult />} />
+              <Route path="/account/services/:id/cancel" element={<CancelService />} />
               <Route path="/account/domains" element={<MyDomains />} />
               <Route path="/account/domains/:id" element={<DomainManage />} />
               <Route path="/account/invoices" element={<Invoices />} />
               <Route path="/account/invoices/:id" element={<InvoiceDetail />} />
+              <Route path="/account/renew/:id" element={<Renew />} />
               <Route path="/account/funds" element={<AddFunds />} />
+              <Route path="/account/transactions" element={<Transactions />} />
+              <Route path="/account/payment-failed" element={<PaymentFailed />} />
               <Route path="/account/payment-methods" element={<PaymentMethods />} />
               <Route path="/account/tickets" element={<Tickets />} />
               <Route path="/account/tickets/new" element={<TicketNew />} />
@@ -85,6 +105,8 @@ export function App() {
               <Route path="/account/knowledgebase/:slug" element={<KbArticle />} />
               <Route path="/account/announcements" element={<Announcements />} />
               <Route path="/account/affiliates" element={<Affiliates />} />
+              <Route path="/account/affiliates/withdraw" element={<AffiliateWithdraw />} />
+              <Route path="/account/notifications" element={<NotificationPrefs />} />
               <Route path="/account/contacts" element={<Contacts />} />
               <Route path="/account/security" element={<Security />} />
 

@@ -221,9 +221,9 @@ export function ServiceDetail() {
               <h2 className="card__heading">{t('svc.manage')}</h2>
             </header>
             <div className="acts">
-              <Button size="md" variant="secondary">
+              <Link className="btn btn--md btn--secondary" to={`/account/services/${svc.id}/upgrade`}>
                 {t('svc.upgrade')}
-              </Button>
+              </Link>
               <Link className="btn btn--md btn--secondary" to="/account/tickets/new">
                 <IconSupport size={15} />
                 {t('svc.support')}
@@ -231,9 +231,9 @@ export function ServiceDetail() {
               {/* Cancellation is a request, not a button that ends the service instantly —
                   and it is set apart so it is never the one you meant to hit. */}
               <div className="acts__sep">
-                <Button size="md" variant="danger">
+                <Link className="btn btn--md btn--danger" to={`/account/services/${svc.id}/cancel`}>
                   {t('svc.cancel')}
-                </Button>
+                </Link>
               </div>
             </div>
           </section>

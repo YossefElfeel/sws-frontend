@@ -44,11 +44,11 @@ A-07,انتهاء الجلسة,Session Expiry,auth,full,P2,low,warning-before-ex
 C-01,لوحة القيادة,Dashboard,client-area,full,P0,high,empty-new-customer;single-service;forty-services;overdue-invoice;suspended-service,5,3,,built,GetClientsProducts,,"Reference screenshot shows four zero counters — worst possible first screen. New customers need a path, not counters"
 C-02,قائمة خدماتي,My Services List,client-area,limited,P0,high,empty;list;sort;filter-by-status;search;pagination;active;suspended;cancelled;provisioning,10,4,,built,GetClientsProducts,,"Designed for Nada persona — 40 services, find one in under 20 seconds. Table fails at 360px; use stacked cards"
 C-03,تفاصيل خدمة,Service Detail,client-area,limited,P0,high,active;suspended;cancelled;server-details;resource-usage;sso-button,6,4,,built,GetClientsProducts;CreateSsoToken,,
-C-04,الترقية: اختيار الباقة,Upgrade — Plan Selection,client-area,limited,P1,medium,higher-plans;current-plan-disabled;difference-comparison,3,4,,not-started,UpgradeProduct,,NEW in v1.1. Spec covered the entire upgrade flow in one line
-C-05,الترقية: حساب الفرق,Upgrade — Proration,client-area,limited,P1,medium,proration-breakdown;effective-date,2,4,,not-started,UpgradeProduct,,NEW in v1.1
-C-06,الترقية: تأكيد ونتيجة,Upgrade — Confirm & Result,client-area,limited,P1,low,immediate-success;awaiting-payment;failure,3,4,,not-started,ModuleChangePackage,,NEW in v1.1
-C-07,الإلغاء,Cancellation,client-area,full,P1,medium,timing-choice;cancellation-reason;retention-offer;final-confirmation;undo,5,4,,not-started,AddCancelRequest,,NEW in v1.1. AddCancelRequest was missing from the spec's API table
-C-08,التجديد اليدوي,Manual Renewal,client-area,limited,P1,medium,expiring-soon;expired;multi-renew,3,4,,not-started,,,NEW in v1.1
+C-04,الترقية: اختيار الباقة,Upgrade — Plan Selection,client-area,limited,P1,medium,higher-plans;current-plan-disabled;difference-comparison,3,4,,built,UpgradeProduct,,NEW in v1.1. Spec covered the entire upgrade flow in one line
+C-05,الترقية: حساب الفرق,Upgrade — Proration,client-area,limited,P1,medium,proration-breakdown;effective-date,2,4,,built,UpgradeProduct,,NEW in v1.1
+C-06,الترقية: تأكيد ونتيجة,Upgrade — Confirm & Result,client-area,limited,P1,low,immediate-success;awaiting-payment;failure,3,4,,built,ModuleChangePackage,,NEW in v1.1
+C-07,الإلغاء,Cancellation,client-area,full,P1,medium,timing-choice;cancellation-reason;retention-offer;final-confirmation;undo,5,4,,built,AddCancelRequest,,NEW in v1.1. AddCancelRequest was missing from the spec's API table
+C-08,التجديد اليدوي,Manual Renewal,client-area,limited,P1,medium,expiring-soon;expired;multi-renew,3,4,,built,,,NEW in v1.1
 C-09,قائمة دوماييناتي,My Domains List,client-area,limited,P0,medium,empty;list;expiring-soon;expired;redemption-period;sort-filter,6,4,,built,GetClientsDomains,,
 C-10,إدارة دومين,Domain Management,client-area,limited,P0,medium,overview;auto-renew;registrar-lock;whois-privacy,4,4,,built,GetClientsDomains,,
 C-11,خوادم الأسماء,Nameservers,client-area,closed,P1,low,default;custom;validation;error,4,4,,folded,DomainUpdateNameservers,,"Registrar module output. Styling possible, restructuring not"
@@ -60,8 +60,8 @@ C-16,فاتورة PDF,Invoice PDF,client-area,closed,P1,high,tcpdf-template,1,5,
 C-17,دفع فاتورة,Pay Invoice,client-area,limited,P0,medium,gateway-selection;use-credit;use-saved-card;failure,4,5,,not-started,CapturePayment,B1,Use CapturePayment — AddInvoicePayment is an admin action and is wrong in the customer flow
 C-18,إضافة رصيد,Add Funds,client-area,limited,P1,low,amount-entry;min-max-limits;confirmation,3,5,,built,GetCredits;AddCredit,,Both actions missing from the spec's API table
 C-19,طرق الدفع المحفوظة,Saved Payment Methods,client-area,limited,P1,medium,empty;saved-cards;add;delete;set-default;expired-card,6,5,,built,GetPayMethods;AddPayMethod;UpdatePayMethod;DeletePayMethod,,"GetPayMethods is NOT GetPaymentMethods. The spec conflated them — this is the customer's saved cards, not the system's gateway list"
-C-20,سجل المعاملات,Transaction History,client-area,limited,P2,low,table;filter;export,3,5,,not-started,GetTransactions,,NEW in v1.1. Missing from the spec's API table
-C-21,استرداد الدفع الفاشل,Dunning / Failed Payment Recovery,client-area,full,P0,medium,warning-banner-3-levels;update-card-page;countdown-to-suspension;suspended-service,4,5,,not-started,,,NEW in v1.1 and entirely absent from the spec. Highest financial impact in the project — typically recovers 3-7% of lost revenue. Needs 5 emails + 3 banner states
+C-20,سجل المعاملات,Transaction History,client-area,limited,P2,low,table;filter;export,3,5,,built,GetTransactions,,NEW in v1.1. Missing from the spec's API table
+C-21,استرداد الدفع الفاشل,Dunning / Failed Payment Recovery,client-area,full,P0,medium,warning-banner-3-levels;update-card-page;countdown-to-suspension;suspended-service,4,5,,built,,,NEW in v1.1 and entirely absent from the spec. Highest financial impact in the project — typically recovers 3-7% of lost revenue. Needs 5 emails + 3 banner states
 C-22,قائمة التذاكر,Ticket List,client-area,limited,P0,medium,empty;open;awaiting-reply;closed;filter-by-department-and-priority,5,6,,built,GetTickets,,
 C-23,فتح تذكرة,Open Ticket,client-area,limited,P0,high,department-selection;empty-form;live-kb-suggestions;no-suggestions;attachment-uploading;attachment-rejected-type;attachment-too-large,7,6,,built,OpenTicket,,"Add a 'related service' field — missing from the spec and it saves a full round of support questions. KB suggestions after 4 characters, max 3 articles"
 C-24,محادثة تذكرة,Ticket Thread,client-area,limited,P0,medium,timeline;customer-reply;staff-reply;attachments;closed;reopened,6,6,,built,GetTicket;AddTicketReply,,"Customer reply needs AddTicketReply — the spec listed UpdateTicket, which is an admin action"
@@ -70,13 +70,13 @@ C-26,مقال معرفي,Knowledgebase Article,client-area,limited,P1,low,conten
 C-27,نتائج بحث المعرفة,Knowledgebase Search Results,client-area,limited,P1,low,results;no-results-with-ticket-suggestion,2,6,,folded,GetKBArticles,,NEW in v1.1
 C-28,الإعلانات,Announcements,client-area,limited,P2,low,list;single;empty,3,6,,built,GetAnnouncements,,
 C-29,الأفلييت — لوحة,Affiliate Dashboard,client-area,limited,P2,medium,not-activated;activated;statistics;referral-link;marketing-materials,5,6,,built,AffiliateActivate;GetAffiliates,,
-C-30,الأفلييت — طلب سحب,Affiliate Withdrawal,client-area,limited,P2,low,form;minimum-not-met;processing;history,4,6,,not-started,GetAffiliates,,
+C-30,الأفلييت — طلب سحب,Affiliate Withdrawal,client-area,limited,P2,low,form;minimum-not-met;processing;history,4,6,,built,GetAffiliates,,
 C-31,بيانات الحساب,Account Details,client-area,limited,P0,medium,view-edit;email-change-requires-confirmation;country-change-affects-tax,3,6,,folded,GetClientsDetails;UpdateClient,I12,
 C-32,الأمان و2FA,Security & 2FA,client-area,limited,P1,medium,enable-with-qr;backup-codes;disable;change-password,4,6,,built,,,
 C-33,جهات الاتصال الفرعية,Sub-accounts / Contacts,client-area,limited,P1,medium,empty;list;add;permissions-matrix;delete,5,6,,built,,,Required by the Nada persona — agency managing many client accounts
 C-34,سجل النشاط الأمني,Security Activity Log,client-area,limited,P2,low,table;filter-by-device-location-time,2,6,,folded,,,
-C-35,تفضيلات الإشعارات,Notification Preferences,client-area,full,P2,low,channel-x-type-matrix,1,6,,not-started,,,NEW in v1.1
-C-36,الإشعارات داخل التطبيق,In-app Notifications,client-area,full,P2,medium,dropdown;empty;unread;view-all-page,4,6,,not-started,,,NEW in v1.1
+C-35,تفضيلات الإشعارات,Notification Preferences,client-area,full,P2,low,channel-x-type-matrix,1,6,,built,,,NEW in v1.1
+C-36,الإشعارات داخل التطبيق,In-app Notifications,client-area,full,P2,medium,dropdown;empty;unread;view-all-page,4,6,,folded,,,NEW in v1.1
 S-01,صفحات الأخطاء,Error Pages (404/500/maintenance/forbidden),system,full,P1,low,404;500;maintenance;forbidden,4,7,,not-started,,,"One template, four pages, with intelligent exit paths. /en/hosting currently returns a bare 404"
 S-02,قوالب البريد الإلكتروني,Email Templates,system,closed,P1,very-high,~50-templates,50,7,,not-started,,,"LARGEST FORGOTTEN ITEM. Template count was never multiplied by language — see gaps/gap-register.md G4. Build one unified template in phase 1, not 50 separate ones in the final 3 weeks"
 S-03,شاشة الانتقال إلى cPanel,cPanel SSO Transition,system,closed,P1,low,transition-screen,1,7,,not-started,CreateSsoToken,,cPanel itself is entirely outside our control. Design only the screen that prepares the user for a different interface

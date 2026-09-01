@@ -37,15 +37,20 @@ export function Invoices() {
     <AccountLayout
       title={t('acc.invoices')}
       actions={
-        <Link className="btn btn--md btn--secondary" to="/account/funds">
-          <IconWallet size={15} />
-          {t('acc.funds')}
-        </Link>
+        <>
+          <Link className="btn btn--md btn--secondary" to="/account/transactions">
+            {t('txn.title')}
+          </Link>
+          <Link className="btn btn--md btn--secondary" to="/account/funds">
+            <IconWallet size={15} />
+            {t('acc.funds')}
+          </Link>
+        </>
       }
     >
       {/* What is owed belongs above the list of everything ever billed, not inside it. */}
       {owing.length > 0 && (
-        <section className="card card--urgent" style={{ marginBlockEnd: 'var(--sws-space-16)' }}>
+        <section className="card card--urgent u-mb-16">
           <div className="due">
             <p className="due__amount serial">
               {formatAmount(convert(owed, currency), locale)} {currency}
@@ -330,7 +335,7 @@ export function AddFunds() {
                 <dd className="serial">{money(amount)}</dd>
               </div>
             </dl>
-            <div className="acts" style={{ marginBlockStart: 'var(--sws-space-16)' }}>
+            <div className="acts u-mt-16">
               <Button size="md" disabled={amount < 500}>
                 {t('funds.add')}
               </Button>
@@ -368,7 +373,7 @@ export function PaymentMethods() {
                 <span className="method-row__num serial">
                   <bdi>•••• {m.last4}</bdi>
                 </span>
-                <span className="method-row__exp serial" style={{ display: 'block' }}>
+                <span className="method-row__exp serial u-block">
                   <bdi>{m.expiry}</bdi>
                 </span>
               </span>

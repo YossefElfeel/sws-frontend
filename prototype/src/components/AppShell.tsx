@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
   IconGauge,
@@ -25,7 +25,7 @@ import {
 import { useLocale, type Locale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { CURRENCIES, type Currency } from '../lib/catalog';
-import { ACCOUNT, INVOICES, TICKETS } from '../lib/account';
+import { ACCOUNT, INVOICES, TICKETS, NOTIFICATIONS } from '../lib/account';
 
 /**
  * The client-area application shell — spec 5.4 and 9.
@@ -115,7 +115,25 @@ export function AppShell({
   const { theme, toggleTheme, currency, setCurrency } = usePrefs();
   const groups = useGroups();
   const [open, setOpen] = useState(false);
+  const [bell, setBell] = useState(false);
+  const bellRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
+
+  // A panel that opens on a bell has to close on the next thing you do, or it follows you
+  // around the app. Escape and any click outside it both count.
+  useEffect(() => {
+    if (!bell) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setBell(false);
+    const onDown = (e: MouseEvent) => {
+      if (!bellRef.current?.contains(e.target as Node)) setBell(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [bell]);
 
   const name = bi(ACCOUNT.name);
   const initials = name
@@ -132,9 +150,7 @@ export function AppShell({
     .sort((a, b) => b.to.length - a.to.length)
     .map((s) => t(s.key as never))[0];
 
-  const alerts =
-    INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue').length +
-    TICKETS.filter((x) => x.status === 'answered').length;
+  const unread = NOTIFICATIONS.filter((n) => !n.read);
 
   return (
     <div className={`app${open ? ' app--open' : ''}`}>
@@ -281,19 +297,66 @@ export function AppShell({
               {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
             </button>
 
-            <NavLink
-              className="app__icon-btn"
-              to="/account/announcements"
-              aria-label={t('app.notifications')}
-              title={t('app.notifications')}
-            >
-              <IconBell size={18} />
-              {alerts > 0 && (
-                <span className="app__dot serial" aria-hidden="true">
-                  {alerts}
-                </span>
+            {/* C-36: the bell opens what it counts. Sending it to the announcements page
+                instead — which is a different list — was the old behaviour and it meant the
+                count and the destination never agreed. */}
+            <div className="app__bellwrap" ref={bellRef}>
+              <button
+                type="button"
+                className="app__icon-btn"
+                onClick={() => setBell((v) => !v)}
+                aria-label={t('app.notifications')}
+                title={t('app.notifications')}
+                aria-expanded={bell}
+                aria-haspopup="true"
+              >
+                <IconBell size={18} />
+                {unread.length > 0 && (
+                  <span className="app__dot serial" aria-hidden="true">
+                    {unread.length}
+                  </span>
+                )}
+              </button>
+
+              {bell && (
+                <div className="notifs" role="dialog" aria-label={t('app.notifications')}>
+                  <div className="notifs__head">
+                    <h2 className="notifs__title">{t('app.notifications')}</h2>
+                    <Link
+                      className="card__more"
+                      to="/account/notifications"
+                      onClick={() => setBell(false)}
+                    >
+                      {t('notif.settings')}
+                    </Link>
+                  </div>
+
+                  {NOTIFICATIONS.length > 0 ? (
+                    <ul className="notifs__list">
+                      {NOTIFICATIONS.map((n) => (
+                        <li key={n.id}>
+                          <Link
+                            className={`notifs__item${n.read ? '' : ' is-unread'}`}
+                            to={n.to}
+                            onClick={() => setBell(false)}
+                          >
+                            <span className="notifs__dot" aria-hidden="true" />
+                            <span className="notifs__text">
+                              <span className="notifs__label">{t(n.titleKey as never)}</span>
+                              <span className="notifs__at serial">
+                                <bdi>{n.at}</bdi>
+                              </span>
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="notifs__empty">{t('notif.none')}</p>
+                  )}
+                </div>
               )}
-            </NavLink>
+            </div>
 
             <Link className="app__exit" to="/">
               <IconExternal size={15} />

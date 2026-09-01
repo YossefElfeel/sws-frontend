@@ -1528,3 +1528,536 @@
 .app__main .data tbody tr:last-child td {
   border-block-end: 0;
 }
+
+/* ═══ plan change, renewal, dunning, notifications ════════════════════════════ */
+
+/* ── spacing helpers, so a screen never reaches for an inline style ─────────── */
+
+.u-mt-16 {
+  margin-block-start: var(--sws-space-16);
+}
+
+.u-mb-16 {
+  margin-block-end: var(--sws-space-16);
+}
+
+.muted {
+  color: var(--sws-text-secondary);
+}
+
+/* ── plan picker — C-04 ────────────────────────────────────────────────────── */
+
+.plan-grid {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.pick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sws-space-12);
+  block-size: 100%;
+  padding: var(--sws-space-24);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+}
+
+/* The plan you are already on is stated, not offered: same card, no accent, no button. */
+.pick--current {
+  background: var(--sws-surface-sunken);
+  border-style: dashed;
+}
+
+.pick__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+.pick__name {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pick__price {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sws-space-4);
+  flex-wrap: wrap;
+  font-size: var(--sws-font-size-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pick__cycle {
+  font-size: var(--sws-font-size-caption);
+  font-weight: 500;
+  color: var(--sws-text-secondary);
+  letter-spacing: 0;
+}
+
+.pick__specs {
+  display: grid;
+  gap: var(--sws-space-8);
+  flex: 1 1 auto;
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.pick__specs li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sws-space-8);
+}
+
+.pick__specs svg {
+  flex: none;
+  color: var(--sws-status-success);
+}
+
+.pick .btn {
+  width: 100%;
+}
+
+/* ── the swap, from → to — C-05 ────────────────────────────────────────────── */
+
+.swap {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+}
+
+.swap > svg {
+  flex: none;
+  color: var(--sws-border-strong);
+}
+
+.swap__side {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 9rem;
+  padding: var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-md);
+}
+
+/* The destination is the one being decided, so it is the one that carries the accent. */
+.swap__side--to {
+  background: var(--sws-action-subtle-bg);
+}
+
+.swap__label {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.swap__plan {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+}
+
+.swap__price {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── the arithmetic — C-05 ─────────────────────────────────────────────────── */
+/* Laid out as a sum so the total can be checked against the lines above it. */
+
+.sum {
+  display: grid;
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.sum__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  padding-block: var(--sws-space-12);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.sum__row dt {
+  color: var(--sws-text-secondary);
+}
+
+.sum__row dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.sum__row--total {
+  border-block-end: 0;
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-strong);
+  margin-block-start: -1px;
+  padding-block-end: 0;
+  font-size: var(--sws-font-size-body);
+}
+
+.sum__row--total dt {
+  color: var(--sws-text-primary);
+  font-weight: 700;
+}
+
+.sum__row--total dd {
+  font-weight: 700;
+}
+
+/* ── term picker — C-08 ────────────────────────────────────────────────────── */
+
+.terms {
+  display: grid;
+  gap: var(--sws-space-8);
+}
+
+.term {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-12) var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-md);
+  cursor: pointer;
+  transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.term:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.term.is-selected {
+  border-color: var(--sws-action-primary);
+  background: var(--sws-action-subtle-bg);
+}
+
+.term__name {
+  flex: 1 1 auto;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+}
+
+.term__price {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── the dunning schedule — C-21 ───────────────────────────────────────────── */
+/*
+ * A schedule, not a threat. Three dated steps with the consequence last, so the shape of it is
+ * legible before any of the words are read.
+ */
+
+.steps {
+  display: grid;
+  gap: 0;
+}
+
+.steps__item {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sws-space-16);
+  padding: var(--sws-space-12) 0 var(--sws-space-12) 0;
+  padding-inline-start: var(--sws-space-24);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+/* The rail and its dot: one line down the column, one mark per step. */
+.steps__item::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 5px;
+  inline-size: var(--sws-rule-hair);
+  background: var(--sws-border-subtle);
+}
+
+.steps__item:first-child::before {
+  inset-block-start: 50%;
+}
+
+.steps__item:last-child::before {
+  inset-block-end: 50%;
+}
+
+.steps__item::after {
+  content: '';
+  position: absolute;
+  inset-block-start: calc(50% - 5px);
+  inset-inline-start: 0;
+  inline-size: 11px;
+  block-size: 11px;
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-surface-raised);
+  border: 2px solid var(--sws-border-strong);
+}
+
+.steps__item--done::after {
+  background: var(--sws-border-strong);
+}
+
+.steps__item--bad::after {
+  border-color: var(--sws-status-danger);
+}
+
+.steps__item--bad .steps__what {
+  color: var(--sws-status-danger);
+  font-weight: 600;
+}
+
+.steps__when {
+  flex: none;
+  inline-size: 6.5rem;
+  color: var(--sws-text-secondary);
+}
+
+.steps__what {
+  flex: 1 1 auto;
+}
+
+/* ── the notifications panel — C-36 ────────────────────────────────────────── */
+
+.app__bellwrap {
+  position: relative;
+  display: flex;
+}
+
+.notifs {
+  position: absolute;
+  inset-block-start: calc(100% + 6px);
+  inset-inline-end: 0;
+  z-index: 50;
+  inline-size: min(22rem, calc(100vw - var(--sws-space-32)));
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-shadow-lift);
+  overflow: hidden;
+}
+
+.notifs__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-12);
+  padding: var(--sws-space-12) var(--sws-space-16);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.notifs__title {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+}
+
+.notifs__list {
+  max-block-size: 60vh;
+  overflow-y: auto;
+}
+
+.notifs__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sws-space-8);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-12) var(--sws-space-16);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  color: inherit;
+  text-decoration: none;
+}
+
+.notifs__list li:last-child .notifs__item {
+  border-block-end: 0;
+}
+
+.notifs__item:hover {
+  background: var(--sws-surface-sunken);
+}
+
+/* Unread is a dot and a weight, not a colour on its own. */
+.notifs__dot {
+  inline-size: 7px;
+  block-size: 7px;
+  margin-block-start: 6px;
+  flex: none;
+  border-radius: var(--sws-radius-pill);
+  background: transparent;
+}
+
+.notifs__item.is-unread .notifs__dot {
+  background: var(--sws-action-primary);
+}
+
+.notifs__item.is-unread .notifs__label {
+  font-weight: 700;
+}
+
+.notifs__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.notifs__label {
+  font-size: var(--sws-font-size-body-sm);
+  line-height: 1.35;
+}
+
+.notifs__at {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.notifs__empty {
+  padding: var(--sws-space-24) var(--sws-space-16);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  text-align: center;
+}
+
+/* ── the preference grid — C-35 ────────────────────────────────────────────── */
+
+.prefs__ch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+}
+
+/* The checkbox is 18px but the cell it answers to is the full target. */
+.tick {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  cursor: pointer;
+}
+
+.tick input:disabled {
+  cursor: not-allowed;
+}
+
+/* ── odds and ends ─────────────────────────────────────────────────────────── */
+
+/* A list of what is lost is not a list of what is confirmed, so it does not take ticks. */
+.checklist--warn li::before {
+  content: '—';
+  flex: none;
+  color: var(--sws-status-danger);
+}
+
+.method__note {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-caption);
+  font-weight: 400;
+  color: var(--sws-text-secondary);
+}
+
+/* Money leaving the account reads as leaving, by sign and by weight. */
+.data td.is-out {
+  color: var(--sws-status-danger);
+}
+
+/* ── the preference grid's shape ───────────────────────────────────────────── */
+/* The channels are three narrow equal columns; the subject takes what is left, so the ticks
+   line up under their headings however long the Arabic label runs. */
+
+.prefs th:not(:first-child),
+.prefs td:not(:first-child) {
+  inline-size: 6rem;
+  text-align: center;
+}
+
+.prefs th:first-child {
+  inline-size: auto;
+}
+
+.prefs .prefs__ch {
+  justify-content: center;
+}
+
+.u-block {
+  display: block;
+}
+
+/*
+ * A flush card clips so the table's corners follow the card's radius — but when the card *is*
+ * the scroll container, clipping wins over scrolling and the table escapes the viewport
+ * instead of scrolling inside it. Latent on every account table; only the widest one showed it.
+ */
+.card--flush.table-scroll {
+  overflow-x: auto;
+}
+
+/*
+ * The preference grid stops being a grid on a phone.
+ *
+ * Scrolling sideways to reach the SMS toggle is the wrong answer on a settings screen — the
+ * whole point is seeing which channels are on. Below 700px each subject becomes a block and
+ * its three channels become a labelled row, so nothing moves out of reach.
+ */
+@media (max-width: 699px) {
+  /* The 32rem floor is what makes a real table scroll instead of compressing. This one has
+     stopped being a table, so the floor would only push it past the viewport. */
+  .table-scroll .prefs {
+    min-width: 0;
+  }
+
+  .prefs,
+  .prefs tbody,
+  .prefs tr,
+  .prefs td {
+    display: block;
+    inline-size: auto;
+  }
+
+  .prefs thead {
+    display: none;
+  }
+
+  .prefs tr {
+    padding: var(--sws-space-16);
+    border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  }
+
+  .prefs tbody tr:last-child {
+    border-block-end: 0;
+  }
+
+  .prefs td {
+    padding: 0;
+    border: 0;
+    text-align: start;
+  }
+
+  .prefs td:first-child {
+    margin-block-end: var(--sws-space-8);
+  }
+
+  /* The heading each tick answers to is carried on the cell, since thead is gone. */
+  .prefs td:not(:first-child) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sws-space-12);
+    min-block-size: var(--sws-touch-target-min);
+    inline-size: auto;
+  }
+
+  .prefs td:not(:first-child)::before {
+    content: attr(data-ch);
+    font-size: var(--sws-font-size-body-sm);
+    color: var(--sws-text-secondary);
+  }
+}

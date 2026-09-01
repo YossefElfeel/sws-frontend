@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { IconCopy, IconPlus, IconCheck, IconKey } from '../../components/icons';
@@ -92,9 +93,9 @@ export function Affiliates() {
       </ul>
 
       <div className="actions actions--split">
-        <Button size="md" disabled={AFFILIATE.balanceUsdMinor === 0}>
+        <Link className="btn btn--md btn--primary" to="/account/affiliates/withdraw">
           {t('aff.withdraw')}
-        </Button>
+        </Link>
       </div>
     </AccountLayout>
   );
