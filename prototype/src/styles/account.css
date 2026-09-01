@@ -26,8 +26,15 @@
 .with-rail__body {
   min-width: 0;
   display: grid;
+  /* Items may shrink below their content, which is what lets a horizontal scroller inside one
+     of them actually scroll instead of stretching the page. */
+  justify-items: stretch;
   gap: var(--sws-space-24);
   align-content: start;
+}
+
+.with-rail__body > * {
+  min-width: 0;
 }
 
 .rail {
@@ -126,9 +133,16 @@
     display: none;
   }
 
-  /* A second group in the same rail continues the same strip rather than starting a new one. */
-  .rail__list + .rail__list {
+  /*
+   * Two strips stacked with no space between them put a category chip one pixel from an action
+   * chip — close enough that a thumb aimed at one lands on the other. They are separate strips,
+   * so they are separated.
+   */
+  /* A general sibling, not adjacent: the two strips have a heading between them, hidden at
+     this width, so `+` never matched and the strips sat flush against each other. */
+  .rail__list ~ .rail__list {
     padding-block-start: 0;
+    margin-block-start: var(--sws-space-8);
   }
 
   .rail__link {

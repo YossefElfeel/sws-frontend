@@ -70,12 +70,37 @@ import {
 } from './screens/account/Money';
 import { NotificationPrefs } from './screens/account/Notifications';
 
-/** A route change is a new page, so it starts at the top of that page. */
-function ScrollToTop() {
+/**
+ * A route change is a new page, so it starts at the top of that page — and any horizontal
+ * strip on it starts showing what is currently selected.
+ *
+ * The second half matters because a strip of chips wider than the screen opens at its start,
+ * and the selected chip is often not there: the plan comparison defaults to annual, which is
+ * fourth of six, so it opened with the active pill off-screen and nothing to say a choice had
+ * been made. scrollLeft is set directly rather than through scrollIntoView, which would also
+ * move the page.
+ */
+function OnRouteChange() {
   const { pathname } = useLocation();
+
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    const id = window.setTimeout(() => {
+      for (const strip of document.querySelectorAll<HTMLElement>('.filters, .rail__list')) {
+        if (strip.scrollWidth <= strip.clientWidth) continue;
+        const active = strip.querySelector<HTMLElement>('.is-active, .active');
+        if (!active) continue;
+        const stripBox = strip.getBoundingClientRect();
+        const box = active.getBoundingClientRect();
+        if (box.left >= stripBox.left && box.right <= stripBox.right) continue;
+        strip.scrollLeft += box.left - stripBox.left - (stripBox.width - box.width) / 2;
+      }
+    }, 60);
+
+    return () => window.clearTimeout(id);
   }, [pathname]);
+
   return null;
 }
 
@@ -85,7 +110,7 @@ export function App() {
       <PrefsProvider>
         <CartProvider>
           <HashRouter>
-            <ScrollToTop />
+            <OnRouteChange />
             <Routes>
               {/* Marketing — spec 5.1 */}
               <Route path="/" element={<Home />} />

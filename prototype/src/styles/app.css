@@ -2122,3 +2122,68 @@
   font-size: var(--sws-font-size-caption);
   inline-size: 52px;
 }
+
+/* ── filters become a scrolling strip on a phone ───────────────────────────── */
+/*
+ * Same pattern as the category rail, and for the same reason. Five invoice filters wrap to two
+ * rows on a 390px screen, which leaves one pill alone on a line with a gap beside it and makes
+ * the row read as two groups when it is one. As a strip it keeps a single line, every option
+ * one swipe away, and no option hidden behind a "more".
+ *
+ * The container's own chrome comes off here: a rounded well that scrolls its contents past its
+ * own padding looks broken. Each pill carries its own ground instead, exactly as the rail's
+ * chips do.
+ */
+@media (max-width: 899px) {
+  .bar {
+    display: block;
+    /* A grid item's implicit min-width is auto, which sizes it to its content — so the strip
+       inside it would widen the page rather than scroll. This is the same fix .with-rail
+       needed for the category rail. */
+    min-width: 0;
+  }
+
+  .bar .filters {
+    margin-block-end: var(--sws-space-8);
+  }
+
+  .filters {
+    flex-wrap: nowrap;
+    min-width: 0;
+    gap: var(--sws-space-8);
+    padding: 0;
+    background: none;
+    border: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .app__main .filters {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filters__btn,
+  .app__main .filters__btn {
+    flex: none;
+    scroll-snap-align: start;
+    white-space: nowrap;
+    background: var(--sws-card-bg);
+    border-radius: var(--sws-radius-pill);
+    box-shadow: var(--sws-shadow-sm);
+  }
+
+  /* The chosen one is solid rather than tinted, so it is findable mid-scroll. */
+  .filters__btn.is-active,
+  .app__main .filters__btn.is-active {
+    background: var(--sws-action-primary);
+    color: var(--sws-text-on-action);
+    box-shadow: none;
+  }
+}
