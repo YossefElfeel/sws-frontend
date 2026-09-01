@@ -436,6 +436,284 @@ export const STRINGS = {
   // navigation, and none of the marketing chrome a signed-in person has already passed.
 
   // ── plan change: C-04 to C-06 ─────────────────────────────────────────────
+
+  // ── plan comparison: M-10 ─────────────────────────────────────────────────
+  'cmp.title': { ar: 'قارن الباقات', en: 'Compare plans' },
+  'cmp.lede': {
+    ar: 'الفروق الحقيقية بين الأربع باقات، من غير اللي بيتشابه فيهم.',
+    en: 'The real differences between the four plans, without the parts they share.',
+  },
+  'cmp.feature': { ar: 'الميزة', en: 'Feature' },
+  'cmp.sites': { ar: 'عدد المواقع', en: 'Websites' },
+  'cmp.storage': { ar: 'المساحة', en: 'Storage' },
+  'cmp.bandwidth': { ar: 'نقل البيانات', en: 'Bandwidth' },
+  'cmp.subdomains': { ar: 'نطاقات فرعية', en: 'Subdomains' },
+  'cmp.mailboxes': { ar: 'صناديق بريد', en: 'Mailboxes' },
+  'cmp.freeDomain': { ar: 'دومين مجاني أول سنة', en: 'Free domain, first year' },
+  'cmp.fairUse': { ar: 'يعني إيه «بلا حدود»', en: 'What "Unlimited" means' },
+  'cmp.fairUseBody': {
+    ar: 'بلا حدود معناها استخدام عادي لموقع عادي، مش موارد بلا نهاية. التفاصيل في',
+    en: 'Unlimited means normal use for a normal site, not infinite resources. The detail is in the',
+  },
+
+  // ── TLD pricing: M-12 ─────────────────────────────────────────────────────
+  'tld.title': { ar: 'أسعار الدومينات', en: 'Domain pricing' },
+  'tld.lede': {
+    ar: 'سعر التسجيل والنقل والتجديد لكل امتداد.',
+    en: 'Registration, transfer and renewal for every extension.',
+  },
+  'tld.ext': { ar: 'الامتداد', en: 'Extension' },
+  'tld.register': { ar: 'تسجيل', en: 'Register' },
+  'tld.transfer': { ar: 'نقل', en: 'Transfer' },
+  'tld.renew': { ar: 'تجديد', en: 'Renew' },
+  'tld.popular': { ar: 'شائع', en: 'Popular' },
+  'tld.jump': { ar: 'أعلى من التسجيل', en: 'higher than year one' },
+  'tld.check': { ar: 'شوف متاح', en: 'Check' },
+  'tld.none': { ar: 'مفيش امتداد بالاسم ده', en: 'No extension matches' },
+  'tld.noneNote': { ar: 'جرّب حروف أقل.', en: 'Try fewer letters.' },
+  'tld.vatNote': {
+    ar: 'الأسعار من غير ضريبة القيمة المضافة، وبتتحسب على العملة اللي مختارها.',
+    en: 'Prices exclude VAT and are shown in the currency you have selected.',
+  },
+  'rail.pricing': { ar: 'أسعار الدومينات', en: 'Domain pricing' },
+
+  // ── product detail: M-14 ──────────────────────────────────────────────────
+  'prod.lede': { ar: 'كل حاجة عن الباقة دي.', en: 'Everything about this plan.' },
+  'prod.whatYouGet': { ar: 'بتاخد إيه', en: 'What you get' },
+  'prod.freeDomain': { ar: 'الدومين المجاني', en: 'The free domain' },
+  'prod.year1': { ar: 'السنة الأولى', en: 'First year' },
+  'prod.year2': { ar: 'كل سنة بعد كده', en: 'Every year after' },
+  'prod.perYear': { ar: 'سنة', en: 'year' },
+  'prod.freeDomainNote': {
+    ar: 'بنكتب سعر التجديد هنا عشان ما يبقاش مفاجأة بعد سنة.',
+    en: 'We state the renewal price here so it is not a surprise twelve months from now.',
+  },
+
+  // ── network status: M-16 ──────────────────────────────────────────────────
+  'status.title': { ar: 'حالة الشبكة', en: 'Network status' },
+  'status.lede': {
+    ar: 'كل نظام وحالته دلوقتي، والأعطال اللي حصلت قبل كده.',
+    en: 'Every system as it stands now, and what has gone wrong before.',
+  },
+  'status.checked': { ar: 'بيتحدّث كل دقيقة.', en: 'Refreshed every minute.' },
+  'status.systems': { ar: 'الأنظمة', en: 'Systems' },
+  'status.history': { ar: 'الأعطال السابقة', en: 'Past incidents' },
+  'status.minutes': { ar: 'دقيقة', en: 'minutes' },
+  'status.all.operational': { ar: 'كل حاجة شغالة', en: 'All systems operational' },
+  'status.all.degraded': { ar: 'في نظام بيتعب', en: 'One system is degraded' },
+  'status.all.maintenance': { ar: 'في صيانة شغالة دلوقتي', en: 'Maintenance in progress' },
+  'status.all.down': { ar: 'في نظام واقف', en: 'A system is down' },
+  'status.state.operational': { ar: 'شغال', en: 'Operational' },
+  'status.state.degraded': { ar: 'بطيء', en: 'Degraded' },
+  'status.state.maintenance': { ar: 'صيانة', en: 'Maintenance' },
+  'status.state.down': { ar: 'واقف', en: 'Down' },
+  'status.sys.web': { ar: 'استضافة المواقع', en: 'Web hosting' },
+  'status.sys.mail': { ar: 'البريد', en: 'Email' },
+  'status.sys.dns': { ar: 'الـ DNS', en: 'DNS' },
+  'status.sys.panel': { ar: 'لوحة التحكم', en: 'Control panel' },
+  'status.sys.billing': { ar: 'الفوترة والدفع', en: 'Billing and payments' },
+  'status.sys.api': { ar: 'الـ API', en: 'API' },
+  'status.inc3': { ar: 'صيانة مجدولة على لوحة التحكم', en: 'Scheduled control-panel maintenance' },
+  'status.inc3b': {
+    ar: 'ترقية تخزين على zrh-web07. المواقع والبريد ما اتأثروش.',
+    en: 'A storage upgrade on zrh-web07. Sites and mail are unaffected.',
+  },
+  'status.inc2': { ar: 'الـ API كان بطيء', en: 'API responses were slow' },
+  'status.inc2b': {
+    ar: 'ضغط على قاعدة البيانات خلّى الردود تتأخر. اتظبط بزيادة الاتصالات.',
+    en: 'Database contention delayed responses. Resolved by raising the connection pool.',
+  },
+  'status.inc1': { ar: 'انقطاع قصير في الـ DNS', en: 'Brief DNS outage' },
+  'status.inc1b': {
+    ar: 'خطأ في إعداد اتنشر على واحد من السيرفرات وترجع تاني في 12 دقيقة.',
+    en: 'A configuration error reached one resolver and was rolled back in twelve minutes.',
+  },
+  'status.sub': { ar: 'عايز تعرف أول بأول', en: 'Want to be told' },
+  'status.subBody': {
+    ar: 'شغّل إشعارات الخدمات وهنبعتلك أول ما حاجة تحصل.',
+    en: 'Turn on service notifications and we will write the moment something happens.',
+  },
+
+  // ── about: M-17 ───────────────────────────────────────────────────────────
+  'ab.title': { ar: 'مين إحنا', en: 'About us' },
+  'ab.lede': {
+    ar: 'بنية تحتية سويسرية بدعم وأسعار مصرية.',
+    en: 'Swiss infrastructure with Egyptian support and pricing.',
+  },
+  'ab.p1': {
+    ar: 'سوميون بتشغّل مواقع وبريد شركات صغيرة ومتوسطة على سيرفرات في سويسرا، وبتدعمها بفريق في مصر بيتكلم عربي ومصري وبيفهم البنوك والمحافظ اللي بتدفع بيها.',
+    en: 'Somion runs the websites and mail of small and mid-sized businesses on servers in Switzerland, supported by a team in Egypt that speaks your language and understands the banks and wallets you actually pay with.',
+  },
+  'ab.p2': {
+    ar: 'الجمع ده مقصود: القوانين والبنية اللي في سويسرا، والقرب والسعر اللي في مصر. مش بنحاول نبقى أرخص واحد، بنحاول نبقى الأوضح.',
+    en: 'The combination is the point: Swiss law and Swiss infrastructure, Egyptian proximity and Egyptian pricing. We are not trying to be the cheapest. We are trying to be the clearest.',
+  },
+  'ab.where': { ar: 'السيرفرات فين', en: 'Where the servers are' },
+  'ab.whereBody': {
+    ar: 'زيورخ، سويسرا. بياناتك خاضعة للقانون السويسري.',
+    en: 'Zürich, Switzerland. Your data sits under Swiss law.',
+  },
+  'ab.who': { ar: 'مين اللي بيرد', en: 'Who answers' },
+  'ab.whoBody': {
+    ar: 'فريق في القاهرة، بالعربي وبالإنجليزي، على نفس التوقيت بتاعك.',
+    en: 'A team in Cairo, in Arabic and English, in your own working hours.',
+  },
+  'ab.how': { ar: 'بتدفع إزاي', en: 'How you pay' },
+  'ab.howBody': {
+    ar: 'بالجنيه أو الفرنك أو الدولار، بالكارت أو إنستاباي أو المحفظة أو التحويل.',
+    en: 'In EGP, CHF or USD — by card, InstaPay, wallet or bank transfer.',
+  },
+  'ab.honest': { ar: 'حاجة إحنا مش بنقولها', en: 'Something we do not claim' },
+  'ab.honestBody': {
+    ar: 'مش هتلاقي هنا نسبة تشغيل ولا عدد عملاء ولا شهادات. الأرقام دي بتتقال لما تبقى متراجعة وموثّقة، مش عشان تملا مساحة في الصفحة.',
+    en: 'You will not find an uptime percentage, a customer count or a badge wall on this page. Those get stated once they have been audited, not because a layout has room for them.',
+  },
+
+  // ── data centres: M-19 ────────────────────────────────────────────────────
+  'dc.title': { ar: 'مراكز البيانات', en: 'Data centres' },
+  'dc.lede': {
+    ar: 'فين بالظبط بيشتغل موقعك.',
+    en: 'Where your site actually runs.',
+  },
+  'dc.ch': { ar: 'سويسرا', en: 'Switzerland' },
+  'dc.eg': { ar: 'مصر', en: 'Egypt' },
+  'dc.primary': { ar: 'الأساسي', en: 'Primary' },
+  'dc.power': { ar: 'الكهرباء', en: 'Power' },
+  'dc.powerBody': {
+    ar: 'تغذية مزدوجة ومولدات احتياطي في الموقع.',
+    en: 'Dual feeds, with generators on site.',
+  },
+  'dc.network': { ar: 'الشبكة', en: 'Network' },
+  'dc.networkBody': {
+    ar: 'أكتر من مزوّد، والمرور بيتحوّل تلقائيًا لو واحد وقع.',
+    en: 'More than one carrier, with traffic rerouted automatically if one drops.',
+  },
+  'dc.law': { ar: 'القانون', en: 'Jurisdiction' },
+  'dc.lawBody': {
+    ar: 'البيانات المستضافة في زيورخ خاضعة لقانون حماية البيانات السويسري.',
+    en: 'Data hosted in Zürich sits under Swiss data-protection law.',
+  },
+  'dc.backup': { ar: 'النسخ الاحتياطي', en: 'Backups' },
+  'dc.backupBody': {
+    ar: 'نسخة يومية، محفوظة في مبنى تاني.',
+    en: 'Taken daily, and kept in a separate building.',
+  },
+  'dc.pending': { ar: 'اللي لسه ما اتأكدش', en: 'Not yet stated' },
+  'dc.pendingBody': {
+    ar: 'تصنيف المبنى والشهادات هيتكتبوا هنا بعد ما نراجع الوثايق. مش هنكتب رقم قبل ما نشوف ورقته.',
+    en: 'Facility tier and certifications will be listed here once the paperwork has been reviewed. We are not printing a number before we have seen the certificate behind it.',
+  },
+
+  // ── contact: M-18 ─────────────────────────────────────────────────────────
+  'ct.title': { ar: 'كلّمنا', en: 'Contact us' },
+  'ct.lede': { ar: 'أسرع طريقة أول، والفورم بعدها.', en: 'The fastest routes first, the form after.' },
+  'ct.ticket': { ar: 'افتح تذكرة', en: 'Open a ticket' },
+  'ct.ticketBody': { ar: 'أسرع حاجة لو عندك حساب.', en: 'The quickest route if you have an account.' },
+  'ct.kb': { ar: 'قاعدة المعرفة', en: 'Knowledgebase' },
+  'ct.kbBody': { ar: 'أغلب الأسئلة لها إجابة مكتوبة.', en: 'Most questions already have a written answer.' },
+  'ct.status': { ar: 'حالة الشبكة', en: 'Network status' },
+  'ct.statusBody': { ar: 'لو حاسس إن في حاجة واقفة، ابدأ من هنا.', en: 'If something feels down, start here.' },
+  'ct.orWrite': { ar: 'أو اكتبلنا', en: 'Or write to us' },
+  'ct.subject': { ar: 'الموضوع', en: 'Subject' },
+  'ct.subj.sales': { ar: 'استفسار قبل الشراء', en: 'Before I buy' },
+  'ct.subj.billing': { ar: 'فوترة', en: 'Billing' },
+  'ct.subj.technical': { ar: 'مشكلة تقنية', en: 'Technical' },
+  'ct.subj.migration': { ar: 'نقل موقع', en: 'Moving a site' },
+  'ct.subj.other': { ar: 'حاجة تانية', en: 'Something else' },
+  'ct.privacyNote': {
+    ar: 'بنستخدم بياناتك للرد بس.',
+    en: 'We use what you write here only to reply.',
+  },
+  'ct.doneTitle': { ar: 'وصلتنا', en: 'We have it' },
+  'ct.doneNote': { ar: 'هنرد في خلال يوم عمل.', en: 'We will reply within one working day.' },
+
+  // ── migration: M-15 ───────────────────────────────────────────────────────
+  'mig.title': { ar: 'انقل موقعك لينا', en: 'Move your site to us' },
+  'mig.lede': {
+    ar: 'قوللنا الموقع عند مين دلوقتي وإحنا بننقله.',
+    en: 'Tell us where the site lives now and we move it.',
+  },
+  'mig.currentHost': { ar: 'الاستضافة الحالية', en: 'Current host' },
+  'mig.panel': { ar: 'لوحة التحكم عندهم', en: 'Their control panel' },
+  'mig.size': { ar: 'حجم الموقع تقريبًا', en: 'Roughly how big' },
+  'mig.sizeHint': { ar: 'مثلاً 4 جيجا', en: 'e.g. 4 GB' },
+  'mig.notes': { ar: 'أي حاجة نعرفها', en: 'Anything we should know' },
+  'mig.send': { ar: 'ابعت الطلب', en: 'Send the request' },
+  'mig.how': { ar: 'بيحصل إزاي', en: 'How it goes' },
+  'mig.s1': { ar: 'بتبعتلنا الطلب.', en: 'You send the request.' },
+  'mig.s2': { ar: 'بناخد نسخة ونجهّزها عندنا.', en: 'We copy the site and stage it here.' },
+  'mig.s3': { ar: 'بتغيّر الـ DNS وقت ما يناسبك.', en: 'You switch DNS whenever it suits you.' },
+  'mig.downtime': {
+    ar: 'الموقع القديم بيفضل شغال طول الوقت. التحويل بيحصل لما تقرر إنت.',
+    en: 'The old site keeps serving the whole time. The switch happens when you decide.',
+  },
+  'mig.doneTitle': { ar: 'الطلب وصل', en: 'Request received' },
+  'mig.doneNote': {
+    ar: 'هنراجعه ونرد عليك بخطة النقل في خلال يوم عمل.',
+    en: 'We will review it and come back with a migration plan within one working day.',
+  },
+
+  // ── learning centre: M-21 ─────────────────────────────────────────────────
+  'blog.title': { ar: 'مركز التعلّم', en: 'Learning centre' },
+  'blog.lede': {
+    ar: 'شروحات قصيرة للحاجات اللي بتوقّف الناس.',
+    en: 'Short guides to the things that actually hold people up.',
+  },
+  'blog.topics': { ar: 'المواضيع', en: 'Topics' },
+  'blog.min': { ar: 'دقيقة قراية', en: 'min read' },
+  'blog.more': { ar: 'اقرا كمان', en: 'Read next' },
+  'blog.cat.start': { ar: 'البداية', en: 'Getting started' },
+  'blog.cat.domains': { ar: 'الدومينات', en: 'Domains' },
+  'blog.cat.email': { ar: 'البريد', en: 'Email' },
+  'blog.cat.wordpress': { ar: 'ووردبريس', en: 'WordPress' },
+  'blog.p5': { ar: 'تختار باقة إزاي من غير ما تدفع زيادة', en: 'Choosing a plan without overpaying' },
+  'blog.p5l': {
+    ar: 'أغلب المواقع الصغيرة محتاجة أقل بكتير مما بتفتكر.',
+    en: 'Most small sites need far less than they think.',
+  },
+  'blog.p5b': {
+    ar: 'ابدأ من عدد المواقع، بعدين المساحة، وسيب نقل البيانات آخر حاجة — هو أقل رقم بيتعدّى فعلاً. لو زوّارك أقل من عشرة آلاف في الشهر، أصغر باقة غالبًا كفاية، والترقية بتاخد دقيقة وبتتحسب بالأيام الفاضلة مش بشهر كامل.',
+    en: 'Start from how many sites, then storage, and leave bandwidth last — it is the number least often exceeded. Under ten thousand visits a month the smallest plan is usually enough, and upgrading takes a minute and is charged for the days remaining rather than a whole month.',
+  },
+  'blog.p4': { ar: 'تنقل موقع من غير ما ينزل', en: 'Moving a site without taking it down' },
+  'blog.p4l': {
+    ar: 'الترتيب الصح بيخلّي وقت التوقف صفر.',
+    en: 'Done in the right order, the downtime is zero.',
+  },
+  'blog.p4b': {
+    ar: 'انسخ الموقع الأول وجهّزه على السيرفر الجديد وجرّبه بالـ IP. سيب الاستضافة القديمة شغالة. آخر خطوة بس هي تغيير الـ DNS، وساعتها الزوار بيتحوّلوا بالتدريج من غير ما حد يشوف صفحة فاضية.',
+    en: 'Copy the site first, stage it on the new server and test it by IP. Leave the old host running. Only the last step changes DNS, and visitors then move across gradually without anyone meeting an empty page.',
+  },
+  'blog.p3': { ar: 'تختار دومين تقدر تعيش بيه', en: 'Picking a domain you can live with' },
+  'blog.p3l': {
+    ar: 'السعر الأول مش هو السعر.',
+    en: 'The first-year price is not the price.',
+  },
+  'blog.p3b': {
+    ar: 'امتدادات كتير بتتباع بجنيهات في السنة الأولى وبتتجدد بأضعافها. بص على عمود التجديد قبل ما تسجّل، واختار اسم تقدر تنطقه في تليفون من غير ما تتهجّاه.',
+    en: 'Plenty of extensions sell for pennies in the first year and renew for many times that. Read the renewal column before you register, and pick a name you can say down a phone without spelling it.',
+  },
+  'blog.p2': { ar: 'بريد بيوصل فعلاً', en: 'Email that actually arrives' },
+  'blog.p2l': {
+    ar: 'ثلاث سجلات بيفرقوا بين الوصول والسبام.',
+    en: 'Three records decide between the inbox and the spam folder.',
+  },
+  'blog.p2b': {
+    ar: 'SPF بيقول مين مسموح له يبعت باسمك، وDKIM بيوقّع الرسالة، وDMARC بيقول للمستقبِل يعمل إيه لما حاجة ما تتطابقش. من غير التلاتة، رسايلك هتتصنّف سبام مهما كان السيرفر كويس.',
+    en: 'SPF says who may send as you, DKIM signs the message, and DMARC tells the receiver what to do when something does not match. Without all three, your mail gets filed as spam no matter how good the server is.',
+  },
+  'blog.p1': { ar: 'ووردبريس أسرع من غير إضافات', en: 'A faster WordPress without plugins' },
+  'blog.p1l': {
+    ar: 'أكبر مكسب في السرعة مش من إضافة.',
+    en: 'The biggest speed win does not come from a plugin.',
+  },
+  'blog.p1b': {
+    ar: 'صوّر الصور بمقاسها الحقيقي، شغّل الكاش على مستوى السيرفر مش الإضافة، واقفل اللي مش مستخدم. تلاتة كده بيعملوا أكتر من أي إضافة تسريع، وما بيضفوش حاجة تقع بعد كده.',
+    en: 'Serve images at the size they are displayed, cache at the server rather than in a plugin, and switch off what you are not using. Those three do more than any speed plugin, and add nothing that can break later.',
+  },
+
+  'footer.company': { ar: 'الشركة', en: 'Company' },
+
   'up.title': { ar: 'ترقية أو تخفيض', en: 'Change plan' },
   'up.current': { ar: 'باقتك الحالية', en: 'Your plan' },
   'up.onThis': { ar: 'أنت عليها', en: 'Current plan' },

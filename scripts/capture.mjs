@@ -78,6 +78,16 @@ const ROUTES = [
   { name: 'acc-payment-failed', path: '#/account/payment-failed' },
   { name: 'acc-withdraw', path: '#/account/affiliates/withdraw' },
   { name: 'acc-notifications', path: '#/account/notifications' },
+  { name: 'compare', path: '#/compare' },
+  { name: 'product', path: '#/product/ultra' },
+  { name: 'tld-pricing', path: '#/domains/pricing' },
+  { name: 'migrate', path: '#/migrate' },
+  { name: 'status', path: '#/status' },
+  { name: 'about', path: '#/about' },
+  { name: 'data-centres', path: '#/data-centres' },
+  { name: 'contact', path: '#/contact' },
+  { name: 'learn', path: '#/learn' },
+  { name: 'learn-post', path: '#/learn/move-a-site' },
 
   { name: 'legal', path: '#/legal/privacy' },
 ];

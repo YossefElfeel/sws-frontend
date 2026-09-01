@@ -569,3 +569,453 @@
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-body-sm);
 }
+
+/* ═══ marketing: comparison, status, company, learning ════════════════════════ */
+
+/* ── comparison table — M-10 ───────────────────────────────────────────────── */
+
+.compare th[scope='row'] {
+  background: none;
+  font-weight: 500;
+  color: var(--sws-text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--sws-font-size-body-sm);
+  white-space: nowrap;
+}
+
+.compare__plan {
+  display: block;
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--sws-text-primary);
+}
+
+.compare__price {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  color: var(--sws-text-secondary);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* "Unlimited" is a word, not a number, so it does not wear the figure face. */
+.bool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 1.5rem;
+}
+
+.unl {
+  font-weight: 600;
+  color: var(--sws-action-quiet);
+}
+
+/* ── the status headline — M-16 ────────────────────────────────────────────── */
+/* One line answering the question the page was opened to ask, before any table. */
+
+.headline {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  padding: var(--sws-space-24);
+  border-radius: var(--sws-radius-xl);
+  margin-block-end: var(--sws-space-32);
+}
+
+.headline--ok {
+  background: var(--sws-banner-success-bg);
+  color: var(--sws-status-success);
+}
+
+.headline--due {
+  background: var(--sws-banner-danger-bg);
+  color: var(--sws-status-danger);
+}
+
+.headline--warn {
+  background: var(--sws-banner-warning-bg);
+  color: var(--sws-status-warning);
+}
+
+/* Maintenance is planned, so it is informational rather than a warning. */
+.headline--taken {
+  background: var(--sws-banner-info-bg);
+  color: var(--sws-status-info);
+}
+
+.tag--warn {
+  background: var(--sws-banner-warning-bg);
+  color: var(--sws-status-warning);
+}
+
+.headline svg {
+  flex: none;
+}
+
+.headline__title {
+  font-size: var(--sws-font-size-h3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.headline__note {
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── the systems list ──────────────────────────────────────────────────────── */
+
+.sys {
+  display: grid;
+  gap: 0;
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  overflow: hidden;
+}
+
+.sys__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-16) var(--sws-space-24);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.sys__row:last-child {
+  border-block-end: 0;
+}
+
+.sys__dot {
+  inline-size: 9px;
+  block-size: 9px;
+  flex: none;
+  border-radius: var(--sws-radius-pill);
+}
+
+.sys__dot--operational {
+  background: var(--sws-status-success);
+}
+
+.sys__dot--degraded {
+  background: var(--sws-status-warning);
+}
+
+.sys__dot--maintenance {
+  background: var(--sws-action-primary);
+}
+
+.sys__dot--down {
+  background: var(--sws-status-danger);
+}
+
+.sys__name {
+  flex: 1 1 auto;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+}
+
+/* ── incidents ─────────────────────────────────────────────────────────────── */
+
+.incidents {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+.incident {
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.incident__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+  margin-block-end: var(--sws-space-8);
+  font-size: var(--sws-font-size-caption);
+}
+
+.incident__at,
+.incident__len {
+  color: var(--sws-text-secondary);
+}
+
+.incident__title {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+}
+
+.incident__body {
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── stands: three things a company page says — M-17 and M-19 ─────────────── */
+
+.stands {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  margin-block-start: var(--sws-space-32);
+}
+
+.stand {
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.stand__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  margin-block-end: var(--sws-space-16);
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-primary);
+  border-radius: var(--sws-radius-md);
+}
+
+.stand__title {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.stand__body {
+  margin-block-start: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── data-centre sites — M-19 ──────────────────────────────────────────────── */
+
+.sites {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.site {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+/* The code is what customers actually meet, in their own server hostname. */
+.site__code {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  flex: none;
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-md);
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.site--primary .site__code {
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-quiet);
+}
+
+.site__where {
+  display: grid;
+  flex: 1 1 auto;
+}
+
+.site__city {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+}
+
+.site__country {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── contact channels — M-18 ───────────────────────────────────────────────── */
+
+.channels {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  margin-block-end: var(--sws-space-32);
+}
+
+.channel {
+  display: grid;
+  gap: var(--sws-space-4);
+  block-size: 100%;
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    box-shadow var(--sws-duration-base) var(--sws-ease-standard),
+    transform var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.channel:hover {
+  box-shadow: var(--sws-shadow-lift);
+  transform: translateY(-2px);
+}
+
+.channel__title {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+}
+
+.channel__body {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.channel svg {
+  color: var(--sws-action-primary);
+}
+
+/* ── posts — M-21 ──────────────────────────────────────────────────────────── */
+
+.posts {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+}
+
+.post {
+  display: grid;
+  gap: var(--sws-space-8);
+  align-content: start;
+  block-size: 100%;
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    box-shadow var(--sws-duration-base) var(--sws-ease-standard),
+    transform var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.post:hover {
+  box-shadow: var(--sws-shadow-lift);
+  transform: translateY(-2px);
+}
+
+.post__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/* Date and read-time sit either side of a hairline, so the meta row reads as one line of
+   provenance rather than three loose fragments. */
+.post__at,
+.post__len {
+  color: var(--sws-text-secondary);
+}
+
+.post__len::before {
+  content: '';
+  display: inline-block;
+  inline-size: 3px;
+  block-size: 3px;
+  margin-inline-end: var(--sws-space-8);
+  vertical-align: middle;
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-border-strong);
+}
+
+.post__title {
+  font-size: var(--sws-font-size-body-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.post__lede {
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.prose .lede {
+  font-size: var(--sws-font-size-body);
+  font-weight: 500;
+  color: var(--sws-text-secondary);
+}
+
+.prose .post__meta {
+  margin-block-end: var(--sws-space-16);
+}
+
+/* ── the footer, once it has more than five links ──────────────────────────── */
+
+.colophon__cols {
+  display: grid;
+  gap: var(--sws-space-32);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  padding-block: var(--sws-space-48) var(--sws-space-32);
+}
+
+.colophon__col {
+  display: grid;
+  gap: var(--sws-space-8);
+  align-content: start;
+}
+
+.colophon__head {
+  margin-block-end: var(--sws-space-4);
+  font-size: var(--sws-font-size-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sws-text-secondary);
+}
+
+:root[lang='ar'] .colophon__head {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.colophon__col a {
+  min-block-size: var(--sws-touch-target-min);
+  display: flex;
+  align-items: center;
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  text-decoration: none;
+}
+
+.colophon__col a:hover {
+  color: var(--sws-action-quiet);
+  text-decoration: underline;
+}

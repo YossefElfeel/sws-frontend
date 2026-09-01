@@ -15,10 +15,13 @@ import { FAMILIES } from '../lib/products';
 export function HostingLayout({
   title,
   lede,
+  crumbs,
   children,
 }: {
   title: string;
   lede?: string;
+  /** A trail, for the pages that sit under a category rather than beside one. */
+  crumbs?: { label: string; to?: string }[];
   children: ReactNode;
 }) {
   const { t } = useLocale();
@@ -26,6 +29,20 @@ export function HostingLayout({
   return (
     <Layout>
       <section className="page-head shell">
+        {crumbs && crumbs.length > 0 && (
+          <nav className="crumbs" aria-label={t('a11y.breadcrumb')}>
+            {crumbs.map((c, i) => (
+              <span key={`${c.label}-${i}`}>
+                {c.to ? <Link to={c.to}>{c.label}</Link> : <span>{c.label}</span>}
+                {i < crumbs.length - 1 && (
+                  <span className="crumbs__sep" aria-hidden="true">
+                    /
+                  </span>
+                )}
+              </span>
+            ))}
+          </nav>
+        )}
         <h1 className="page-title">{title}</h1>
         {lede && <p className="section__lede measure">{lede}</p>}
       </section>
@@ -47,9 +64,9 @@ export function HostingLayout({
             <p className="rail__head">{t('rail.actions')}</p>
             <ul className="rail__list">
               <li>
-                <Link className="rail__link" to="/account/domains">
+                <Link className="rail__link" to="/domains/pricing">
                   <IconArrow size={15} />
-                  {t('rail.renew')}
+                  {t('rail.pricing')}
                 </Link>
               </li>
               <li>

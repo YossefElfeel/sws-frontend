@@ -110,15 +110,58 @@ export function Layout({ children }: { children: ReactNode }) {
       </main>
 
       <footer className="colophon">
-        <div className="shell colophon__inner">
-          <p className="colophon__rights">{t('footer.rights')}</p>
-          <nav className="colophon__links" aria-label={t('footer.terms')}>
-            <Link to="/legal/privacy">{t('footer.privacy')}</Link>
-            <Link to="/legal/terms">{t('footer.terms')}</Link>
-            <Link to="/legal/sla">{t('footer.sla')}</Link>
-            <Link to="/legal/refund">{t('footer.refund')}</Link>
-            <Link to="/account/tickets/new">{t('footer.contact')}</Link>
-          </nav>
+        <div className="shell">
+          <div className="colophon__cols">
+            <nav className="colophon__col" aria-labelledby="f-prod">
+              <p className="colophon__head" id="f-prod">
+                {t('nav.hosting')}
+              </p>
+              <Link to="/hosting/shared">{t('fam.shared')}</Link>
+              <Link to="/hosting/wordpress">{t('fam.wordpress')}</Link>
+              <Link to="/hosting/vps">{t('fam.vps')}</Link>
+              <Link to="/compare">{t('cmp.title')}</Link>
+            </nav>
+
+            <nav className="colophon__col" aria-labelledby="f-dom">
+              <p className="colophon__head" id="f-dom">
+                {t('nav.domains')}
+              </p>
+              <Link to="/domains">{t('rail.register')}</Link>
+              <Link to="/domains/pricing">{t('tld.title')}</Link>
+              <Link to="/transfer">{t('rail.transfer')}</Link>
+              <Link to="/migrate">{t('mig.title')}</Link>
+            </nav>
+
+            <nav className="colophon__col" aria-labelledby="f-co">
+              <p className="colophon__head" id="f-co">
+                {t('footer.company')}
+              </p>
+              <Link to="/about">{t('ab.title')}</Link>
+              <Link to="/data-centres">{t('dc.title')}</Link>
+              <Link to="/status">{t('status.title')}</Link>
+              <Link to="/learn">{t('blog.title')}</Link>
+            </nav>
+
+            <nav className="colophon__col" aria-labelledby="f-help">
+              <p className="colophon__head" id="f-help">
+                {t('nav.support')}
+              </p>
+              <Link to="/contact">{t('ct.title')}</Link>
+              <Link to="/account/knowledgebase">{t('acc.kb')}</Link>
+              <Link to="/account/tickets/new">{t('tkt.open')}</Link>
+              <Link to="/account">{t('nav.login')}</Link>
+            </nav>
+          </div>
+
+          <div className="colophon__inner">
+            <p className="colophon__rights">{t('footer.rights')}</p>
+            <nav className="colophon__links" aria-label={t('footer.terms')}>
+              <Link to="/legal/privacy">{t('footer.privacy')}</Link>
+              <Link to="/legal/terms">{t('footer.terms')}</Link>
+              <Link to="/legal/sla">{t('footer.sla')}</Link>
+              <Link to="/legal/refund">{t('footer.refund')}</Link>
+            </nav>
+          </div>
         </div>
       </footer>
     </div>

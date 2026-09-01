@@ -14,6 +14,16 @@ import { Cart } from './screens/Cart';
 import { Checkout } from './screens/Checkout';
 import { Confirmation } from './screens/Confirmation';
 import { Legal } from './screens/Legal';
+import { Compare, TldPricing, ProductDetail } from './screens/Compare';
+import {
+  Status,
+  About,
+  DataCentres,
+  Contact,
+  Migration,
+  Learn,
+  LearnPost,
+} from './screens/Company';
 import { Login, Register, ResetPassword, TwoFactor } from './screens/Auth';
 
 import { Dashboard } from './screens/account/Dashboard';
@@ -65,8 +75,18 @@ export function App() {
               <Route path="/hosting/:family" element={<Family />} />
               <Route path="/ssl" element={<Family />} />
               <Route path="/builder" element={<Family />} />
+              <Route path="/compare" element={<Compare />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/domains" element={<Domains />} />
+              <Route path="/domains/pricing" element={<TldPricing />} />
               <Route path="/transfer" element={<Transfer />} />
+              <Route path="/migrate" element={<Migration />} />
+              <Route path="/status" element={<Status />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/data-centres" element={<DataCentres />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/learn" element={<Learn />} />
+              <Route path="/learn/:slug" element={<LearnPost />} />
 
               {/* Ordering — spec 5.2 and 7 */}
               <Route path="/configure/:planId" element={<Configure />} />

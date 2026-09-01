@@ -183,10 +183,65 @@ const supportHref = await p.$$eval('.masthead__nav a', (n) =>
 );
 ok('marketing Support reaches the help centre', Boolean(supportHref), supportHref ?? 'still /account');
 
-const contactHref = await p.$$eval('.colophon__links a', (n) =>
-  n.map((a) => a.getAttribute('href')).find((h) => h && h.includes('tickets')),
+// The footer is the only route to eleven of these pages, so it is checked as a route table
+// rather than as decoration.
+const footHrefs = await p.$$eval('.colophon a', (n) => n.map((a) => a.getAttribute('href') ?? ''));
+const wanted = [
+  '/contact',
+  '/about',
+  '/status',
+  '/data-centres',
+  '/learn',
+  '/compare',
+  '/domains/pricing',
+  '/migrate',
+];
+const missingFromFooter = wanted.filter((w) => !footHrefs.some((h) => h.endsWith(w)));
+ok(
+  'the footer reaches every company page',
+  missingFromFooter.length === 0,
+  missingFromFooter.join(', ') || `${footHrefs.length} links`,
 );
-ok('footer Contact reaches a ticket', Boolean(contactHref), contactHref ?? 'still /account');
+
+// I14, implemented as the decision log recommends: the second-year price of the free domain
+// on the page, not in the terms. It is the single biggest source of billing complaints.
+await p.evaluate(() => (location.hash = '#/product/pro'));
+await p.waitForSelector('.kv');
+{
+  const cards = await p.$$eval('.panel--pad h2', (n) => n.map((h) => h.textContent.trim()));
+  const y2 = await p.$$eval('.kv dd', (n) => n.map((d) => d.textContent.trim()));
+  // The second-year figure sits in the last kv of the free-domain card.
+  const priced = y2.some((v) => /\d[\d.,]*\s*\/?\s*\S*$/.test(v) && /\d/.test(v));
+  ok('the free domain states its renewal price', cards.length >= 2 && priced, y2.slice(-1)[0] ?? 'none');
+}
+
+// I13: "Unlimited" is a fair-use word. A superlative on a spec sheet with nothing qualifying
+// it is the version that generates the complaint.
+await p.evaluate(() => (location.hash = '#/compare'));
+await p.waitForSelector('.compare');
+{
+  const hasUnl = (await p.$$eval('.unl', (n) => n.length)) > 0;
+  const qualified = (await p.$$eval('.notice', (n) => n.length)) > 0;
+  ok('"Unlimited" is qualified where it is claimed', !hasUnl || qualified);
+}
+
+// PRODUCT.md: no verified proof metrics exist. The company pages are where an invented
+// uptime figure or certification would land, so they are checked for one.
+for (const r of ['#/about', '#/data-centres', '#/status']) {
+  await p.evaluate((h) => (location.hash = h), r);
+  await p.waitForSelector('main h1');
+  await p.waitForTimeout(150);
+  const txt = await p.$eval('main', (m) => m.textContent ?? '');
+  // 99.9%, ISO 27001, Tier III, "10,000 customers" — the shapes a fabricated proof takes.
+  const claims = [
+    /9\d(\.\d+)?\s*%/,
+    /ISO\s*\d{4,}/i,
+    /Tier\s*(I{1,3}V?|[1-4])/i,
+    /\d{1,3}[,،]?\d{3}\+?\s*(customers|عميل|عملاء)/i,
+  ];
+  const hit = claims.find((c) => c.test(txt));
+  ok(`no invented proof on ${r}`, !hit, hit ? txt.match(hit)[0] : 'clean');
+}
 
 // C-05: the whole point of the proration screen is that the total can be checked against the
 // lines above it. If they ever stop adding up, the screen is worse than useless.
