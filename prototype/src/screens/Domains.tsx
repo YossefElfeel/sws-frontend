@@ -3,8 +3,8 @@ import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import { IconCheck, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
-import { useCart } from '../lib/cart';
-import { TLDS, formatAmount } from '../lib/catalog';
+import { usePrefs } from '../lib/prefs';
+import { TLDS, convert, formatAmount } from '../lib/catalog';
 
 /**
  * Domain search.
@@ -15,7 +15,7 @@ import { TLDS, formatAmount } from '../lib/catalog';
  */
 export function Domains() {
   const { t, locale } = useLocale();
-  const { currency } = useCart();
+  const { currency } = usePrefs();
   const [query, setQuery] = useState('');
   const [searched, setSearched] = useState('');
 
@@ -102,10 +102,10 @@ export function Domains() {
                       )}
                     </td>
                     <td className="num">
-                      {formatAmount(row.register[currency], locale)} {currency}
+                      {formatAmount(convert(row.registerUsdMinor, currency), locale)} {currency}
                     </td>
                     <td className="num">
-                      {formatAmount(row.renew[currency], locale)} {currency}
+                      {formatAmount(convert(row.renewUsdMinor, currency), locale)} {currency}
                     </td>
                     <td className="num">
                       <Button size="sm" variant="secondary" disabled={free === false}>

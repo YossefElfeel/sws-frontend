@@ -39,3 +39,6 @@ scratch/
 
 # Prototype build output
 dist-prototype/
+
+.vercel
+.env*

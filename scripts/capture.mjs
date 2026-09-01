@@ -22,6 +22,7 @@ const VIEWPORTS = [
 
 const ROUTES = [
   { name: 'home', path: '#/' },
+  { name: 'configure', path: '#/configure/ultra' },
   { name: 'domains', path: '#/domains' },
   { name: 'cart', path: '#/cart' },
   { name: 'checkout', path: '#/checkout' },
@@ -37,13 +38,19 @@ let failed = false;
 
 /** Order two plans, so the cart-dependent routes have real lines on them. */
 async function fillCart(page) {
-  for (const i of [1, 2]) {
-    await page.goto(`${BASE}#/`, { waitUntil: 'networkidle' });
-    // networkidle resolves before React paints, so wait on the rendered content itself.
-    await page.waitForSelector('.plan .btn', { state: 'visible' });
-    await page.locator('.plan').nth(i).locator('.btn').click();
-    await page.waitForTimeout(450);
-  }
+  // Walk the real ordering flow rather than injecting state, so the cart holds a line that
+  // actually went through configure and the domain step.
+  await page.goto(`${BASE}#/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.plan .btn', { state: 'visible' });
+  await page.locator('.plan--featured .btn').click();
+  await page.waitForSelector('.cycles');
+  await page.locator('.checkout__aside .btn').click();
+  await page.waitForSelector('.choices');
+  await page.fill('#dom', 'kamalatelier');
+  await page.locator('.domain-strip__form .btn').click();
+  await page.waitForTimeout(250);
+  await page.locator('.step-foot .btn').click();
+  await page.waitForTimeout(350);
 }
 
 for (const vp of VIEWPORTS) {
@@ -91,14 +98,21 @@ for (const vp of VIEWPORTS) {
   // The English rendering is the same layout read the other way, not a mirror of it.
   if (vp.name === 'desktop') {
     await page.goto(`${BASE}#/`, { waitUntil: 'networkidle' });
-    await page.selectOption('.masthead__locale select', 'en');
+    await page.selectOption('.masthead__select:nth-of-type(1) select', 'en');
     await page.waitForTimeout(250);
     await page.screenshot({ path: join(OUT, 'home-desktop-en.png'), fullPage: true });
 
     await page.goto(`${BASE}#/checkout`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(250);
     await page.screenshot({ path: join(OUT, 'checkout-desktop-en.png'), fullPage: true });
-    console.log('home-en, checkout-en  1440px  captured');
+
+    // Spec 4.3 requires dark mode, so it is evidenced rather than assumed.
+    await page.goto(`${BASE}#/`, { waitUntil: 'networkidle' });
+    await page.locator('.masthead__icon-btn').click();
+    await page.waitForTimeout(250);
+    await page.screenshot({ path: join(OUT, 'home-desktop-dark.png'), fullPage: true });
+    await page.locator('.masthead__icon-btn').click();
+    console.log('home-en, checkout-en, home-dark  1440px  captured');
   }
 
   if (errors.length) {

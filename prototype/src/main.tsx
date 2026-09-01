@@ -12,6 +12,7 @@ import '@fontsource/rubik/arabic-700.css';
 import './styles/world.css';
 import './styles/components.css';
 import './styles/screens.css';
+import './styles/order.css';
 import { App } from './App';
 
 createRoot(document.getElementById('root')!).render(

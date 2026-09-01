@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { IconCheck } from '../components/icons';
 import { useLocale } from '../lib/locale';
+import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { formatAmount, statementSerial } from '../lib/catalog';
 
@@ -15,7 +16,8 @@ import { formatAmount, statementSerial } from '../lib/catalog';
  */
 export function Confirmation() {
   const { t, locale } = useLocale();
-  const { lines, currency, cycle, total } = useCart();
+  const { currency } = usePrefs();
+  const { lines, total, lineTotal } = useCart();
   const serial = useMemo(() => statementSerial(new Date()), []);
 
   return (
@@ -46,14 +48,14 @@ export function Confirmation() {
             </thead>
             <tbody>
               {lines.map((line) => (
-                <tr key={line.serial}>
+                <tr key={line.id}>
                   <td>
                     <span className="lead">{line.plan.name}</span>
-                    <span className="data__sub serial" dir="ltr">{line.serial}</span>
+                    <span className="data__sub serial" dir="ltr">{line.domain?.name ?? line.id}</span>
                   </td>
-                  <td>{t(cycle === 'monthly' ? 'cycle.monthly' : 'cycle.annually')}</td>
+                  <td>{t(`cycle.${line.cycle}` as never)}</td>
                   <td className="num">
-                    {formatAmount(line.plan.price[currency][cycle], locale)} {currency}
+                    {formatAmount(lineTotal(line), locale)} {currency}
                   </td>
                   <td>
                     <span className="tag tag--ok">

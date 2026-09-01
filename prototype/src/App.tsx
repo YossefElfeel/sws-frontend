@@ -1,9 +1,12 @@
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { LocaleProvider } from './lib/locale';
+import { PrefsProvider } from './lib/prefs';
 import { CartProvider } from './lib/cart';
 import { Home } from './screens/Home';
 import { Domains } from './screens/Domains';
+import { Configure } from './screens/Configure';
+import { DomainStep } from './screens/DomainStep';
 import { Cart } from './screens/Cart';
 import { Checkout } from './screens/Checkout';
 import { Confirmation } from './screens/Confirmation';
@@ -22,13 +25,16 @@ function ScrollToTop() {
 export function App() {
   return (
     <LocaleProvider>
-      <CartProvider>
+      <PrefsProvider>
+        <CartProvider>
         <HashRouter>
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/hosting" element={<Home />} />
             <Route path="/domains" element={<Domains />} />
+            <Route path="/configure/:planId" element={<Configure />} />
+            <Route path="/domain/:lineId" element={<DomainStep />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/confirmation" element={<Confirmation />} />
@@ -37,7 +43,8 @@ export function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </HashRouter>
-      </CartProvider>
+        </CartProvider>
+      </PrefsProvider>
     </LocaleProvider>
   );
 }

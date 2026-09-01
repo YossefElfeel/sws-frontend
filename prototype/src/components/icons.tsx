@@ -133,3 +133,47 @@ export function IconSpark({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+export function IconSun({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="4.2" />
+      <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4" />
+    </svg>
+  );
+}
+
+export function IconMoon({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M20 13.4A8.2 8.2 0 0 1 10.6 4a8.5 8.5 0 1 0 9.4 9.4Z" />
+    </svg>
+  );
+}
+
+export function IconCoin({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M14.5 9.2a3 3 0 0 0-2.5-1.2c-1.5 0-2.6.9-2.6 2s1 1.7 2.6 2 2.6.9 2.6 2-1.1 2-2.6 2a3 3 0 0 1-2.5-1.2M12 6.4v11.2" />
+    </svg>
+  );
+}
+
+export function IconTrash({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 6.5h16M9.5 6.5V4.8A1.3 1.3 0 0 1 10.8 3.5h2.4a1.3 1.3 0 0 1 1.3 1.3v1.7" />
+      <path d="M6.5 6.5 7.4 19a1.6 1.6 0 0 0 1.6 1.5h6a1.6 1.6 0 0 0 1.6-1.5l.9-12.5" />
+      <path d="M10.5 10.5v6M13.5 10.5v6" />
+    </svg>
+  );
+}
+
+export function IconArrow({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4.5 12h15M13.5 6l6 6-6 6" />
+    </svg>
+  );
+}

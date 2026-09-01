@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
-import { PlanCards, CycleSwitch } from '../components/PlanCards';
+import { PlanCards } from '../components/PlanCards';
 import { Button } from '../components/Button';
 import { IconSpark, IconShield, IconSupport, IconServer, IconGauge } from '../components/icons';
 import { useLocale } from '../lib/locale';
-import { useCart } from '../lib/cart';
-import { PLANS } from '../lib/catalog';
 
 /**
  * Homepage.
@@ -19,15 +16,7 @@ import { PLANS } from '../lib/catalog';
  */
 export function Home() {
   const { t } = useLocale();
-  const { add } = useCart();
   const navigate = useNavigate();
-  const [ordered, setOrdered] = useState<Set<string>>(new Set());
-
-  function order(planId: string) {
-    setOrdered((prev) => new Set(prev).add(planId));
-    add(planId, `SWS-${Date.now().toString().slice(-8)}-${planId.slice(0, 3).toUpperCase()}`);
-    window.setTimeout(() => navigate('/cart'), 260);
-  }
 
   const features = [
     { icon: <IconServer size={26} />, title: t('feat.infra.title'), body: t('feat.infra.body') },
@@ -91,10 +80,9 @@ export function Home() {
             </h2>
             <p className="section__lede measure">{t('hosting.lede')}</p>
           </div>
-          <CycleSwitch />
         </div>
 
-        <PlanCards plans={PLANS} featured="business" onOrder={order} ordered={ordered} />
+        <PlanCards />
       </section>
     </Layout>
   );

@@ -2,7 +2,7 @@ import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import { IconCheck, IconInfo } from '../components/icons';
 import { useLocale } from '../lib/locale';
-import { useCart } from '../lib/cart';
+import { usePrefs } from '../lib/prefs';
 import { formatAmount } from '../lib/catalog';
 
 /**
@@ -28,7 +28,7 @@ const INVOICES = [
 
 export function Account() {
   const { t, locale } = useLocale();
-  const { currency } = useCart();
+  const { currency } = usePrefs();
 
   return (
     <Layout>

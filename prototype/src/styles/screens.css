@@ -373,6 +373,7 @@
   display: grid;
   gap: var(--sws-space-32);
   align-items: start;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -389,6 +390,7 @@
 
 .checkout__main,
 .checkout__aside {
+  min-width: 0;
   padding: var(--sws-space-32);
   background: var(--sws-card-bg);
   border-radius: var(--sws-radius-xl);

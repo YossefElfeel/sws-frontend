@@ -1,141 +1,109 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
-import { IconCheck, IconServer, IconMail, IconGauge } from './icons';
 import { useLocale } from '../lib/locale';
-import { useCart } from '../lib/cart';
-import { formatAmount, type Plan } from '../lib/catalog';
+import { usePrefs } from '../lib/prefs';
+import { PLANS, planPrice, formatAmount, type Plan } from '../lib/catalog';
 
 /**
- * Pricing cards.
+ * Plan cards, following spec 6.2: name, price and cycle, the main feature list, a separator,
+ * an "Additional Features" sub-list, and an Order Now button — with the Featured badge on the
+ * plan the spec marks (Ultra).
  *
- * One card carries the recommended flag. The renewal figure sits on the card itself rather
- * than in the terms — a first-year price with the real price hidden below the fold is the
- * single most common way a hosting invoice surprises someone, and it is the thing this
- * product is trying not to do.
+ * Ordering opens Configure rather than dropping straight into the cart, because the spec's
+ * flow is product → configure → domain → cart → checkout, and the add-ons and billing cycle
+ * are chosen at the configure step.
  */
-export function PlanCards({
-  plans,
-  featured,
-  onOrder,
-  ordered,
-}: {
-  plans: Plan[];
-  featured?: string;
-  onOrder: (planId: string) => void;
-  ordered: Set<string>;
-}) {
+export function PlanCards({ plans = PLANS }: { plans?: Plan[] }) {
   const { t, locale } = useLocale();
-  const { currency, cycle } = useCart();
+  const { currency } = usePrefs();
+  const navigate = useNavigate();
+
+  const amount = (n: number | 'unlimited', unitKey: string) =>
+    n === 'unlimited' ? (
+      <>
+        {t('plan.unlimited')} {t(unitKey as never)}
+      </>
+    ) : (
+      <>
+        <span className="serial">{n}</span> {t(unitKey as never)}
+      </>
+    );
 
   return (
     <ul className="plans">
-      {plans.map((plan) => {
-        const isFeatured = plan.id === featured;
-        const isOrdered = ordered.has(plan.id);
+      {plans.map((plan) => (
+        <li key={plan.id} className={`plan${plan.featured ? ' plan--featured' : ''}`}>
+          {plan.featured && <span className="plan__flag">{t('plan.featured')}</span>}
 
-        // Arabic agreement: singular at 1, dual at 2, plural at 3–10. English collapses all
-        // of that to one plural, which is how a single key ends up reading as translated.
-        const sites =
-          plan.sites === 'unmetered'
-            ? t('res.unmetered')
-            : plan.sites === 1
-              ? t('res.site')
-              : plan.sites === 2
-                ? t('res.sites.dual')
-                : `${plan.sites} ${t('res.sites.plural')}`;
+          <h3 className="plan__name">{plan.name}</h3>
 
-        return (
-          <li key={plan.id} className={`plan${isFeatured ? ' plan--featured' : ''}`}>
-            {isFeatured && <span className="plan__flag">{t('plan.recommended')}</span>}
+          <p className="plan__price">
+            <span className="plan__amount serial">
+              {formatAmount(planPrice(plan, 'monthly', currency), locale)}
+            </span>
+            <span className="plan__currency">{currency}</span>
+          </p>
+          <p className="plan__cycle">{t('cycle.monthly')}</p>
 
-            <h3 className="plan__name">{plan.name}</h3>
-
-            <p className="plan__price">
-              <span className="plan__amount serial">
-                {formatAmount(plan.price[currency][cycle], locale)}
-              </span>
-              <span className="plan__currency">{currency}</span>
-              <span className="plan__cycle">
-                / {t(cycle === 'monthly' ? 'cycle.perMonth' : 'cycle.perYear')}
-              </span>
-            </p>
-
-            {/* Renewal on the card, not in the terms. */}
-            <p className="plan__renewal">{t('plan.renewalSame')}</p>
-
-            <ul className="plan__specs">
-              <li>
-                <IconServer size={17} />
-                {sites}
-              </li>
-              <li>
-                <IconGauge size={17} />
-                <span className="serial">{plan.storageGb} GB</span> {t('res.storage')}
-              </li>
-              <li>
-                <IconGauge size={17} />
-                {plan.bandwidthTb === 'unmetered' ? (
-                  t('res.unmetered')
-                ) : (
-                  <>
-                    <span className="serial">{plan.bandwidthTb} {t('res.tb')}</span>{' '}
-                    {t('res.bandwidth')}
-                  </>
-                )}
-              </li>
-              <li>
-                <IconMail size={17} />
-                {plan.mailboxes === 'unmetered' ? (
-                  t('res.unmetered')
-                ) : (
-                  <>
-                    <span className="serial">{plan.mailboxes}</span> {t('res.mail')}
-                  </>
-                )}
-              </li>
-              {plan.freeDomain && (
-                <li className="plan__perk">
-                  <IconCheck size={17} />
-                  {t('res.freedomain')}
-                </li>
+          <ul className="plan__specs">
+            <li>
+              {plan.sites === 'unlimited'
+                ? `${t('plan.unlimited')} ${t('plan.websites')}`
+                : plan.sites === 1
+                  ? t('plan.website')
+                  : plan.sites === 2
+                    ? t('plan.websitesDual')
+                    : `${plan.sites} ${t('plan.websites')}`}
+            </li>
+            <li>
+              {plan.storageGb === 'unlimited' ? (
+                <>
+                  {t('plan.unlimited')} {t('plan.storage')}
+                </>
+              ) : (
+                <>
+                  <span className="serial">{plan.storageGb} GB</span> {t('plan.storage')}
+                </>
               )}
-            </ul>
+            </li>
+            <li>
+              {plan.bandwidthGb === 'unlimited' ? (
+                <>
+                  {t('plan.unlimited')} {t('plan.bandwidth')}
+                </>
+              ) : (
+                <>
+                  <span className="serial">{plan.bandwidthGb} GB</span> {t('plan.bandwidth')}
+                </>
+              )}
+            </li>
+            <li>{amount(plan.subdomains, 'plan.subdomains')}</li>
+            <li>{amount(plan.mailboxes, 'plan.email')}</li>
+            {plan.freeDomainFirstYear && (
+              <li className="plan__perk">{t('plan.freeDomain')}</li>
+            )}
+          </ul>
 
-            <Button
-              size="lg"
-              variant={isFeatured ? 'primary' : 'secondary'}
-              disabled={isOrdered}
-              onClick={() => onOrder(plan.id)}
-              aria-label={`${isOrdered ? t('action.ordered') : t('action.order')} — ${plan.name}`}
-            >
-              {isOrdered && <IconCheck size={17} />}
-              {isOrdered ? t('action.ordered') : t('action.order')}
-            </Button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+          {/* Spec 6.2: a separator, then the additional features beneath it. */}
+          <p className="plan__divider">
+            <span>{t('plan.additional')}</span>
+          </p>
 
-/** Billing-cycle switch. */
-export function CycleSwitch() {
-  const { t } = useLocale();
-  const { cycle, setCycle } = useCart();
+          <ul className="plan__extras">
+            {plan.additional.map((f) => (
+              <li key={f}>{f}</li>
+            ))}
+          </ul>
 
-  return (
-    <div className="cycle" role="group" aria-label={t('col.term')}>
-      {(['monthly', 'annually'] as const).map((c) => (
-        <button
-          key={c}
-          type="button"
-          className={`cycle__option${cycle === c ? ' is-active' : ''}`}
-          aria-pressed={cycle === c}
-          onClick={() => setCycle(c)}
-        >
-          {t(c === 'monthly' ? 'cycle.monthly' : 'cycle.annually')}
-        </button>
+          <Button
+            size="lg"
+            variant={plan.featured ? 'primary' : 'secondary'}
+            onClick={() => navigate(`/configure/${plan.id}`)}
+          >
+            {t('plan.orderNow')}
+          </Button>
+        </li>
       ))}
-      <span className="cycle__save">{t('cycle.save')}</span>
-    </div>
+    </ul>
   );
 }

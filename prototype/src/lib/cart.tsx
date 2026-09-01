@@ -6,72 +6,107 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { PLANS, type Currency, type Cycle, type Plan } from './catalog';
+import {
+  PLANS,
+  ADDONS,
+  TAX_RATE,
+  convert,
+  planPrice,
+  type Cycle,
+  type Plan,
+} from './catalog';
+import { usePrefs } from './prefs';
 
+/** A configured line: the plan, its cycle, its add-on choices and any linked domain. */
 export interface CartLine {
-  /** The counterfoil number. The statement keeps one; the order carries the other. */
-  serial: string;
+  id: string;
   plan: Plan;
   cycle: Cycle;
-  domain?: string;
+  /** addon group id -> option id */
+  addons: Record<string, string>;
+  domain?: { name: string; action: 'register' | 'transfer' | 'own' | 'cart'; years: number };
 }
 
 interface CartValue {
   lines: CartLine[];
-  currency: Currency;
-  cycle: Cycle;
-  setCurrency: (c: Currency) => void;
-  setCycle: (c: Cycle) => void;
-  add: (planId: string, serial: string, domain?: string) => void;
-  remove: (serial: string) => void;
+  promo: string | null;
+  add: (line: Omit<CartLine, 'id'>) => string;
+  update: (id: string, patch: Partial<Omit<CartLine, 'id'>>) => void;
+  remove: (id: string) => void;
   clear: () => void;
+  applyPromo: (code: string) => boolean;
+  /** All figures in the active currency, as minor units. */
   subtotal: number;
-  vat: number;
+  discount: number;
+  tax: number;
   total: number;
+  lineTotal: (line: CartLine) => number;
 }
 
 const CartContext = createContext<CartValue | null>(null);
 
-/** Egyptian VAT on hosting services. Shown as its own line, never folded into the price. */
-const VAT_RATE = 0.14;
+/** The one code the spec's promo field is demonstrated with. */
+const PROMOS: Record<string, number> = { SWS10: 0.1 };
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { currency } = usePrefs();
   const [lines, setLines] = useState<CartLine[]>([]);
-  const [currency, setCurrency] = useState<Currency>('EGP');
-  const [cycle, setCycle] = useState<Cycle>('monthly');
+  const [promo, setPromo] = useState<string | null>(null);
 
-  const add = useCallback(
-    (planId: string, serial: string, domain?: string) => {
-      const plan = PLANS.find((p) => p.id === planId);
-      if (!plan) return;
-      setLines((prev) =>
-        prev.some((l) => l.plan.id === planId) ? prev : [...prev, { serial, plan, cycle, domain }],
-      );
-    },
-    [cycle],
-  );
+  const add = useCallback((line: Omit<CartLine, 'id'>) => {
+    const id = `${line.plan.id}-${Math.random().toString(36).slice(2, 8)}`;
+    setLines((prev) => [...prev, { ...line, id }]);
+    return id;
+  }, []);
 
-  const remove = useCallback((serial: string) => {
-    setLines((prev) => prev.filter((l) => l.serial !== serial));
+  const update = useCallback((id: string, patch: Partial<Omit<CartLine, 'id'>>) => {
+    setLines((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    setLines((prev) => prev.filter((l) => l.id !== id));
   }, []);
 
   const value = useMemo<CartValue>(() => {
-    const subtotal = lines.reduce((sum, l) => sum + l.plan.price[currency][cycle], 0);
-    const vat = Math.round(subtotal * VAT_RATE);
+    /** A line is its plan for the cycle, plus every chosen add-on priced over the same term. */
+    const lineTotal = (line: CartLine) => {
+      let sum = planPrice(line.plan, line.cycle, currency);
+      for (const group of ADDONS) {
+        const chosen = group.options.find((o) => o.id === line.addons[group.id]);
+        if (!chosen || chosen.priceUsdMinor === 0) continue;
+        sum += convert(chosen.priceUsdMinor, currency);
+      }
+      return sum;
+    };
+
+    const subtotal = lines.reduce((s, l) => s + lineTotal(l), 0);
+    const discount = promo ? Math.round(subtotal * (PROMOS[promo] ?? 0)) : 0;
+    const taxable = subtotal - discount;
+    const tax = Math.round(taxable * TAX_RATE);
+
     return {
       lines,
-      currency,
-      cycle,
-      setCurrency,
-      setCycle,
+      promo,
       add,
+      update,
       remove,
-      clear: () => setLines([]),
+      clear: () => {
+        setLines([]);
+        setPromo(null);
+      },
+      applyPromo: (code: string) => {
+        const key = code.trim().toUpperCase();
+        if (!(key in PROMOS)) return false;
+        setPromo(key);
+        return true;
+      },
       subtotal,
-      vat,
-      total: subtotal + vat,
+      discount,
+      tax,
+      total: taxable + tax,
+      lineTotal,
     };
-  }, [lines, currency, cycle, add, remove]);
+  }, [lines, promo, currency, add, update, remove]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
@@ -81,3 +116,10 @@ export function useCart(): CartValue {
   if (!ctx) throw new Error('useCart must be used inside CartProvider');
   return ctx;
 }
+
+/** Default add-on selection: the first option of every group, which the spec shows as None. */
+export function defaultAddons(): Record<string, string> {
+  return Object.fromEntries(ADDONS.map((g) => [g.id, g.options[0].id]));
+}
+
+export { PLANS };
