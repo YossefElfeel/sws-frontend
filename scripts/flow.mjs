@@ -5,7 +5,7 @@
  */
 import { chromium } from 'playwright';
 
-const BASE = 'http://localhost:5173/';
+const BASE = process.argv[2] ?? 'http://localhost:5173/';
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'light' });
 const p = await ctx.newPage();
