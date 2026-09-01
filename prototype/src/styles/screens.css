@@ -1,0 +1,551 @@
+/*
+ * SWS — screens.
+ *
+ * Pricing, domains, cart, checkout, and the account area. Marketing surfaces use cards, the
+ * way the production site does; anything that is genuinely a list of figures over time —
+ * invoices, services, domain pricing — uses a table, because a table is what lets a column of
+ * numbers be compared.
+ */
+
+/* ── pricing cards ─────────────────────────────────────────────────────────── */
+
+.plans {
+  display: grid;
+  gap: var(--sws-space-24);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  align-items: start;
+}
+
+.plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sws-space-12);
+  padding: var(--sws-space-32);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  transition:
+    box-shadow var(--sws-duration-base) var(--sws-ease-standard),
+    transform var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.plan:hover {
+  box-shadow: var(--sws-shadow-lift);
+  transform: translateY(-3px);
+}
+
+.plan--featured {
+  box-shadow:
+    inset 0 0 0 var(--sws-rule-base) var(--sws-action-primary),
+    var(--sws-shadow-lift);
+}
+
+.plan__flag {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: var(--sws-space-32);
+  transform: translateY(-50%);
+  padding: var(--sws-space-4) var(--sws-space-12);
+  background: var(--sws-action-primary);
+  color: var(--sws-text-on-action);
+  border-radius: var(--sws-radius-pill);
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plan__name {
+  font-size: var(--sws-font-size-h3);
+  font-weight: 600;
+  color: var(--sws-text-secondary);
+}
+
+.plan__price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--sws-space-4);
+}
+
+.plan__amount {
+  font-size: var(--sws-font-size-h1);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--sws-text-primary);
+}
+
+.plan__currency {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  color: var(--sws-text-secondary);
+}
+
+.plan__cycle {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* Renewal on the card, never in the terms. */
+.plan__renewal {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-status-success);
+  font-weight: 500;
+}
+
+.plan__specs {
+  display: grid;
+  gap: var(--sws-space-8);
+  margin-block: var(--sws-space-8) var(--sws-space-16);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.plan__specs li {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+}
+
+.plan__specs svg {
+  flex: none;
+  color: var(--sws-action-primary);
+}
+
+.plan__perk {
+  color: var(--sws-status-success);
+  font-weight: 500;
+}
+
+.plan__perk svg {
+  color: var(--sws-status-success);
+}
+
+.plan .btn {
+  margin-block-start: auto;
+  width: 100%;
+}
+
+/* ── cycle switch ──────────────────────────────────────────────────────────── */
+
+.cycle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  padding: var(--sws-space-4);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-pill);
+}
+
+.cycle__option {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-24);
+  background: transparent;
+  border: 0;
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.cycle__option.is-active {
+  background: var(--sws-surface-raised);
+  color: var(--sws-action-quiet);
+  box-shadow: var(--sws-shadow-sm);
+}
+
+.cycle__save {
+  padding-inline: var(--sws-space-12);
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  color: var(--sws-status-success);
+  white-space: nowrap;
+}
+
+/* ── data tables ───────────────────────────────────────────────────────────── */
+/*
+ * Where the content genuinely is a column of figures, it stays a table: an amount column that
+ * shares one decimal point is the comparison the reader came to make.
+ */
+
+.panel {
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  overflow: hidden;
+}
+
+.data {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.data th {
+  padding: var(--sws-space-16) var(--sws-space-24);
+  background: var(--sws-table-header-bg);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: start;
+  white-space: nowrap;
+}
+
+:root[lang='ar'] .data th {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.data td {
+  padding: var(--sws-space-16) var(--sws-space-24);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  vertical-align: middle;
+}
+
+.data tbody tr:hover {
+  background: var(--sws-table-row-hover);
+}
+
+.data .num {
+  text-align: end;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.data .lead {
+  font-weight: 600;
+  color: var(--sws-text-primary);
+}
+
+.data__sub {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* ── tags ──────────────────────────────────────────────────────────────────── */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  padding: 3px var(--sws-space-12);
+  border-radius: var(--sws-radius-pill);
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag--ok {
+  background: var(--sws-banner-success-bg);
+  color: var(--sws-status-success);
+}
+
+.tag--due {
+  background: var(--sws-banner-danger-bg);
+  color: var(--sws-status-danger);
+}
+
+.tag--taken {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-secondary);
+}
+
+/* ── fields ────────────────────────────────────────────────────────────────── */
+
+.field {
+  inline-size: 100%;
+  min-block-size: var(--sws-input-height-md);
+  padding-inline: var(--sws-space-16);
+  background: var(--sws-input-bg);
+  border: var(--sws-rule-hair) solid var(--sws-input-border);
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-primary);
+  font-size: var(--sws-font-size-body);
+  transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.field::placeholder {
+  color: var(--sws-input-placeholder);
+}
+
+.field:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sws-space-8);
+}
+
+.field-grid {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.fieldset {
+  margin: 0 0 var(--sws-space-32);
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend {
+  margin-block-end: var(--sws-space-16);
+  padding: 0;
+  font-size: var(--sws-font-size-h3);
+  font-weight: 600;
+}
+
+/* ── domain search ─────────────────────────────────────────────────────────── */
+
+.domain-search {
+  display: flex;
+  gap: var(--sws-space-8);
+  margin-block: var(--sws-space-24);
+  max-width: 36rem;
+}
+
+.domain-search__input {
+  flex: 1 1 auto;
+  min-block-size: var(--sws-button-height-lg);
+}
+
+/* ── payment methods ───────────────────────────────────────────────────────── */
+
+.methods {
+  display: grid;
+  gap: var(--sws-space-12);
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.method {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  min-block-size: 56px;
+  padding-inline: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-md);
+  cursor: pointer;
+  transition:
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    background-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.method:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.method.is-selected {
+  border-color: var(--sws-action-primary);
+  background: var(--sws-action-subtle-bg);
+  box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-action-primary);
+}
+
+.method__label {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+}
+
+/* ── checkout ──────────────────────────────────────────────────────────────── */
+
+.checkout {
+  display: grid;
+  gap: var(--sws-space-32);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .checkout {
+    grid-template-columns: 1fr minmax(20rem, 23rem);
+  }
+
+  /* The figure stays in view while the form is filled in. */
+  .checkout__aside {
+    position: sticky;
+    inset-block-start: 96px;
+  }
+}
+
+.checkout__main,
+.checkout__aside {
+  padding: var(--sws-space-32);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.summary {
+  margin-block-end: var(--sws-space-16);
+}
+
+.summary__line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  padding-block: var(--sws-space-12);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+/* ── totals ────────────────────────────────────────────────────────────────── */
+/* VAT is its own line. A total that appears from nowhere is what this product refuses. */
+
+.totals {
+  margin: 0;
+}
+
+.totals__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sws-space-24);
+  padding-block: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.totals__row dt {
+  color: var(--sws-text-secondary);
+}
+
+.totals__row dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.totals__row--grand {
+  margin-block-start: var(--sws-space-8);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  font-size: var(--sws-font-size-h3);
+}
+
+.totals__row--grand dt {
+  color: var(--sws-text-primary);
+  font-weight: 600;
+}
+
+.totals + .btn,
+.totals + .actions {
+  margin-block-start: var(--sws-space-24);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sws-space-12);
+  margin-block-start: var(--sws-space-24);
+}
+
+.checkout__aside .btn {
+  width: 100%;
+  margin-block-start: var(--sws-space-24);
+}
+
+/* ── cart summary panel ────────────────────────────────────────────────────── */
+
+.cart-total {
+  max-width: 26rem;
+  margin-inline-start: auto;
+  margin-block-start: var(--sws-space-24);
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+/* ── empty state ───────────────────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sws-space-24);
+  padding: var(--sws-space-64) var(--sws-space-32);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  text-align: center;
+}
+
+.empty__line {
+  font-size: var(--sws-font-size-h3);
+  color: var(--sws-text-secondary);
+}
+
+/* ── notice ────────────────────────────────────────────────────────────────── */
+
+.notice {
+  display: flex;
+  gap: var(--sws-space-12);
+  padding: var(--sws-space-24);
+  background: var(--sws-banner-info-bg);
+  border-radius: var(--sws-radius-lg);
+  color: var(--sws-text-primary);
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+}
+
+.notice svg {
+  flex: none;
+  color: var(--sws-status-info);
+}
+
+.pending-lines {
+  display: grid;
+  gap: var(--sws-space-24);
+  margin-block-start: var(--sws-space-32);
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.pending-lines span {
+  padding-block-end: var(--sws-space-8);
+  border-block-end: var(--sws-rule-base) solid var(--sws-border-subtle);
+  color: var(--sws-text-secondary);
+}
+
+/* ── confirmation ──────────────────────────────────────────────────────────── */
+
+.confirm-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 64px;
+  block-size: 64px;
+  margin-block-end: var(--sws-space-24);
+  background: var(--sws-banner-success-bg);
+  color: var(--sws-status-success);
+  border-radius: var(--sws-radius-pill);
+}
+
+.confirm-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-24);
+  padding: var(--sws-space-8) var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-sm);
+  font-size: var(--sws-font-size-body-sm);
+}

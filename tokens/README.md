@@ -29,10 +29,10 @@ inside the project?) is still open. Treat these as a working baseline.
 ## The three layers
 
 ```
-primitive          purple-500: #5B2E91        raw values, named by what they are
+primitive          indigo-500: #4E4FEB        raw values, named by what they are
     │
     ▼
-semantic           action-primary  →  { light: purple-500, dark: purple-300 }
+semantic           action-primary  →  { light: indigo-500, dark: indigo-300 }
     │                                  ↑ dark mode happens HERE and only here
     ▼
 component          button-primary-bg  →  action-primary
@@ -211,7 +211,7 @@ up as a reviewable diff, and `--check` makes drift a build failure rather than a
 
 ### Three choices worth knowing about
 
-**1. Primitives are not exported.** There is no `--sws-purple-500` in the output. The rule that
+**1. Primitives are not exported.** There is no `--sws-indigo-500` in the output. The rule that
 components must not reference primitives is not documented and hoped for — it is unbreakable,
 because the variable a developer would need simply does not exist in CSS. The rule is enforced
 at the API boundary rather than in review.
@@ -283,12 +283,15 @@ separate `rtl.css`, costs 30–40% ongoing maintenance and is where most RTL bug
 
 ## What is not in here yet
 
-- **Dimensions for 8 of the 10 interactive components.** Only `button` and `input` declare
-  sizes and focus rings. The gate reports the rest as `TODO` — see the count above. Add
-  `height-*`/`hit-area` and `focus-ring-width` as each component is designed, and the `TODO`
-  count falls on its own.
-- **Disabled-state tokens.** Playbook §3.2 names disabled text as a usual contrast failure.
-  There is no disabled token to test yet; add it and a matching gate pair together.
+- ~~**Dimensions for 8 of the 10 interactive components.**~~ **Closed 2026-09-01.** All ten
+  declare a size or a `hit-area` and a focus ring. The `TODO` count is 0; see ADR-0004.
+- ~~**Disabled-state tokens.**~~ **Closed 2026-09-01.** `text-disabled`, `border-disabled`,
+  and `surface-disabled` exist in both themes, with gate pairs. WCAG exempts disabled
+  controls from 1.4.3, so they are held to the 3:1 non-text bar as an internal rule — and
+  `neutral-400` failed it at 2.66:1, which is why `neutral-450` exists.
+- ~~**Motion tokens.**~~ **Closed 2026-09-01.** Four durations and three easings. The build
+  emits a `prefers-reduced-motion` block that zeroes the duration tokens at source, so a
+  component that forgot its own media query still honours the setting.
 - **Icon mirroring metadata.** Playbook §4.2 requires every icon to be tagged `mirror` or
   `no-mirror` (next/back arrows mirror; upload arrows, clocks, logos, card marks do not).
   Without the tag a developer decides case by case and gets it wrong. Belongs here once the
@@ -296,9 +299,12 @@ separate `rtl.css`, costs 30–40% ongoing maintenance and is where most RTL bug
 - **The Arabic font choice.** Playbook §7.3 recommends IBM Plex Sans Arabic. Not recorded as a
   token until confirmed, and it interacts with the < 150KB subset budget in
   `technical/url-and-seo-map.md`.
-- **Motion tokens.** Duration and easing, with `prefers-reduced-motion` handling.
-- **Elevation.** Deliberately absent — dark mode raises surfaces with lightness, not shadow, so
-  a shared shadow scale would be misleading.
+- **Icon mirroring metadata** and **the Arabic font choice** are the two remaining items
+  below. The typeface question closed on 2026-09-01: the palette and face are now taken from
+  the running production site (Rubik, indigo #4E4FEB), so only icon mirroring is open.
+- **Elevation** is deliberately not a general scale — dark mode raises surfaces with lightness,
+  not shadow. The `shadow` group is narrow on purpose: a sheet, a stub, and a press highlight,
+  each named for the one object it belongs to rather than a t-shirt-sized ramp.
 
 > The gate can only check what the tokens declare. It verifies **colour, declared size, and
 > declared focus thickness** — it cannot verify keyboard tab order, focus visibility against

@@ -212,7 +212,6 @@ function themeBlock(theme, indent = '  ') {
   return body;
 }
 
-const stamp = tokens.$description ? '' : '';
 out('/*');
 out(' * SWS design tokens — GENERATED FILE, DO NOT EDIT.');
 out(' *');
@@ -259,9 +258,39 @@ for (const [name, spec] of Object.entries(tokens.typography?.scale ?? {})) {
   out(`  ${PREFIX}font-weight-${name}: ${spec.weight};`);
 }
 
+section('type families — Latin and Arabic are set separately; neither is the other\'s fallback');
+for (const [name, spec] of groupTokens(tokens.typography?.families ?? {})) {
+  const stack = [spec.$value, spec.fallback].filter(Boolean).join(', ');
+  out(`  ${PREFIX}font-family-${name}: ${stack};`);
+}
+
+section('rule weights — the ledger is built from ruled lines, so these are structural');
+for (const [name, token] of groupTokens(tokens.rule ?? {})) {
+  out(`  ${PREFIX}rule-${name}: ${token.$value};`);
+}
+
+section('shadow — offset plus soft blur; never a zero-offset halo');
+for (const [name, token] of groupTokens(tokens.shadow ?? {})) {
+  out(`  ${PREFIX}shadow-${name}: ${token.$value};`);
+}
+
+section('radius — documents do not have rounded corners');
+for (const [name, token] of groupTokens(tokens.radius ?? {})) {
+  out(`  ${PREFIX}radius-${name}: ${token.$value};`);
+}
+
+section('motion — every duration collapses to 0 under prefers-reduced-motion, below');
+for (const [name, token] of groupTokens(tokens.motion?.duration ?? {})) {
+  out(`  ${PREFIX}duration-${name}: ${token.$value};`);
+}
+for (const [name, token] of groupTokens(tokens.motion?.easing ?? {})) {
+  out(`  ${PREFIX}ease-${name}: ${token.$value};`);
+}
+
 section('accessibility — enforced by tokens/a11y-gate.mjs');
-out(`  ${PREFIX}focus-ring-width: ${tokens.accessibility['focus-ring-width-px']}px;`);
-out(`  ${PREFIX}touch-target-min: ${tokens.accessibility['touch-target-min-px']}px;`);
+const a11y = tokens.accessibility ?? {};
+out(`  ${PREFIX}focus-ring-width: ${a11y['focus-ring-width-px'] ?? 2}px;`);
+out(`  ${PREFIX}touch-target-min: ${a11y['touch-target-min-px'] ?? 44}px;`);
 out('}');
 
 // ── dark theme ───────────────────────────────────────────────────────────────
@@ -279,6 +308,23 @@ out('   win over the OS preference in both directions. */');
 out(':root[data-theme="dark"] {');
 out(themeBlock('dark').join('\n'));
 out('}');
+
+// ── reduced motion ───────────────────────────────────────────────────────────
+//
+// Zeroing the duration tokens at the source means every consumer honours the preference,
+// including any that forgot to write its own media query.
+
+const durations = groupTokens(tokens.motion?.duration ?? {});
+if (durations.length) {
+  out();
+  out('/* Motion is a preference, not a decoration. Zeroing the tokens themselves means a');
+  out('   component that forgot its own media query still honours the setting. */');
+  out('@media (prefers-reduced-motion: reduce) {');
+  out('  :root {');
+  for (const [name] of durations) out(`    ${PREFIX}duration-${name}: 0ms;`);
+  out('  }');
+  out('}');
+}
 
 // ── responsive typography ────────────────────────────────────────────────────
 

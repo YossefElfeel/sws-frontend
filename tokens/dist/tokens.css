@@ -17,46 +17,117 @@
 :root {
 
   /* ── semantic — light theme ────────────────────────────────────────────── */
-  --sws-surface-base: #F8F7FA;
+  --sws-surface-page: #F8F9FC;
+  --sws-surface-base: #FFFFFF;
   --sws-surface-raised: #FFFFFF;
-  --sws-surface-sunken: #F1EFF5;
-  --sws-text-primary: #16131C;
-  --sws-text-secondary: #5C5568;
+  --sws-surface-sunken: #F1F3F9;
+  --sws-text-primary: #020617;
+  --sws-text-secondary: #4B5563;
+  --sws-text-disabled: #6B7280;
   --sws-text-on-action: #FFFFFF;
-  --sws-border-subtle: #E4E1EB;
-  --sws-border-strong: #7B7389;
-  --sws-action-primary: #5B2E91;
-  --sws-action-primary-hover: #4A2578;
-  --sws-action-subtle-bg: #F4F0FA;
-  --sws-focus-ring: #8459C4;
-  --sws-status-success: #1B6E3C;
-  --sws-status-danger: #B3261E;
-  --sws-status-warning: #8A5A00;
-  --sws-status-info: #1A4F8A;
-  --sws-banner-danger-bg: rgba(179, 38, 30, 0.12);
-  --sws-banner-danger-border: rgba(179, 38, 30, 0.4);
+  --sws-border-subtle: #E5E7EB;
+  --sws-border-strong: #6B7280;
+  --sws-border-disabled: #CBD1DC;
+  --sws-surface-disabled: #F1F3F9;
+  --sws-action-primary: #4E4FEB;
+  --sws-action-primary-hover: #3B3CD4;
+  --sws-action-subtle-bg: #EEEEFE;
+  --sws-action-quiet: #2F30A8;
+  --sws-focus-ring: #3B3CD4;
+  --sws-status-success: #146132;
+  --sws-status-danger: #B3181B;
+  --sws-status-warning: #8A4308;
+  --sws-status-info: #1D4ED8;
+  --sws-banner-danger-bg: rgba(179, 24, 27, 0.1);
+  --sws-banner-danger-border: rgba(179, 24, 27, 0.35);
+  --sws-banner-success-bg: rgba(20, 97, 50, 0.1);
+  --sws-banner-success-border: rgba(20, 97, 50, 0.35);
+  --sws-banner-warning-bg: rgba(138, 67, 8, 0.1);
+  --sws-banner-warning-border: rgba(138, 67, 8, 0.35);
+  --sws-banner-info-bg: rgba(29, 78, 216, 0.1);
+  --sws-banner-info-border: rgba(29, 78, 216, 0.35);
 
   /* ── component — resolves through the semantic layer, so themes follow automatically ── */
   --sws-button-primary-bg: var(--sws-action-primary);
   --sws-button-primary-bg-hover: var(--sws-action-primary-hover);
   --sws-button-primary-text: var(--sws-text-on-action);
-  --sws-button-secondary-border: var(--sws-border-strong);
-  --sws-button-height-sm: 32px;
+  --sws-button-secondary-border: var(--sws-action-primary);
+  --sws-button-secondary-text: var(--sws-action-quiet);
+  --sws-button-disabled-bg: var(--sws-surface-disabled);
+  --sws-button-disabled-text: var(--sws-text-disabled);
+  --sws-button-height-sm: 36px;
   --sws-button-height-md: 44px;
-  --sws-button-height-lg: 48px;
+  --sws-button-height-lg: 52px;
+  --sws-button-hit-area: 44px;
   --sws-button-focus-ring-width: 2px;
-  --sws-input-bg: var(--sws-surface-sunken);
+  --sws-input-bg: var(--sws-surface-raised);
   --sws-input-border: var(--sws-border-strong);
   --sws-input-border-focus: var(--sws-focus-ring);
   --sws-input-border-error: var(--sws-status-danger);
   --sws-input-placeholder: var(--sws-text-secondary);
+  --sws-input-disabled-bg: var(--sws-surface-disabled);
+  --sws-input-disabled-border: var(--sws-border-disabled);
+  --sws-input-disabled-text: var(--sws-text-disabled);
+  --sws-input-height-md: 48px;
   --sws-input-focus-ring-width: 2px;
+  --sws-select-bg: var(--sws-surface-raised);
+  --sws-select-border: var(--sws-border-strong);
+  --sws-select-disabled-text: var(--sws-text-disabled);
+  --sws-select-height-md: 48px;
+  --sws-select-focus-ring-width: 2px;
+  --sws-checkbox-border: var(--sws-border-strong);
+  --sws-checkbox-checked-bg: var(--sws-action-primary);
+  --sws-checkbox-checked-mark: var(--sws-text-on-action);
+  --sws-checkbox-disabled-border: var(--sws-border-disabled);
+  --sws-checkbox-size: 20px;
+  --sws-checkbox-hit-area: 44px;
+  --sws-checkbox-focus-ring-width: 2px;
+  --sws-radio-border: var(--sws-border-strong);
+  --sws-radio-checked-bg: var(--sws-action-primary);
+  --sws-radio-disabled-border: var(--sws-border-disabled);
+  --sws-radio-size: 20px;
+  --sws-radio-hit-area: 44px;
+  --sws-radio-focus-ring-width: 2px;
+  --sws-switch-track-off: var(--sws-border-strong);
+  --sws-switch-track-on: var(--sws-action-primary);
+  --sws-switch-knob: var(--sws-surface-raised);
+  --sws-switch-disabled-track: var(--sws-border-disabled);
+  --sws-switch-height-md: 24px;
+  --sws-switch-hit-area: 44px;
+  --sws-switch-focus-ring-width: 2px;
+  --sws-link-text: var(--sws-action-quiet);
+  --sws-link-text-hover: var(--sws-action-primary);
+  --sws-link-visited: var(--sws-action-quiet);
+  --sws-link-hit-area: 44px;
+  --sws-link-focus-ring-width: 2px;
+  --sws-tab-text: var(--sws-text-secondary);
+  --sws-tab-text-active: var(--sws-action-quiet);
+  --sws-tab-rule-active: var(--sws-action-primary);
+  --sws-tab-disabled-text: var(--sws-text-disabled);
+  --sws-tab-height-md: 44px;
+  --sws-tab-focus-ring-width: 2px;
+  --sws-pagination-item-text: var(--sws-text-primary);
+  --sws-pagination-item-active-bg: var(--sws-action-primary);
+  --sws-pagination-item-active-text: var(--sws-text-on-action);
+  --sws-pagination-item-disabled-text: var(--sws-text-disabled);
+  --sws-pagination-item-size: 44px;
+  --sws-pagination-item-focus-ring-width: 2px;
+  --sws-file-uploader-border: var(--sws-border-strong);
+  --sws-file-uploader-bg: var(--sws-surface-sunken);
+  --sws-file-uploader-disabled-text: var(--sws-text-disabled);
+  --sws-file-uploader-height-md: 48px;
+  --sws-file-uploader-focus-ring-width: 2px;
   --sws-card-bg: var(--sws-surface-raised);
   --sws-card-border: var(--sws-border-subtle);
+  --sws-card-tile-bg: var(--sws-action-subtle-bg);
+  --sws-card-tile-ink: var(--sws-action-primary);
   --sws-table-header-bg: var(--sws-surface-sunken);
-  --sws-table-row-hover: var(--sws-action-subtle-bg);
+  --sws-table-row-hover: var(--sws-surface-sunken);
   --sws-table-border: var(--sws-border-subtle);
   --sws-banner-danger-icon: var(--sws-status-danger);
+  --sws-banner-success-icon: var(--sws-status-success);
+  --sws-banner-warning-icon: var(--sws-status-warning);
+  --sws-banner-info-icon: var(--sws-status-info);
 
   /* ── spacing — base-4 scale. No value outside this scale. ──────────────── */
   --sws-space-4: 4px;
@@ -70,33 +141,69 @@
   --sws-space-96: 96px;
 
   /* ── typography — mobile-first base; desktop overrides in the media query below ── */
-  --sws-font-size-display: 32px;
-  --sws-line-height-display: 1.35;
-  --sws-font-weight-display: 800;
-  --sws-font-size-h1: 26px;
-  --sws-line-height-h1: 1.4;
+  --sws-font-size-hero: 36px;
+  --sws-line-height-hero: 1.12;
+  --sws-font-weight-hero: 700;
+  --sws-font-size-display: 30px;
+  --sws-line-height-display: 1.2;
+  --sws-font-weight-display: 700;
+  --sws-font-size-h1: 27px;
+  --sws-line-height-h1: 1.25;
   --sws-font-weight-h1: 700;
-  --sws-font-size-h2: 21px;
-  --sws-line-height-h2: 1.45;
+  --sws-font-size-h2: 24px;
+  --sws-line-height-h2: 1.3;
   --sws-font-weight-h2: 700;
-  --sws-font-size-h3: 19px;
-  --sws-line-height-h3: 1.5;
+  --sws-font-size-h3: 20px;
+  --sws-line-height-h3: 1.4;
   --sws-font-weight-h3: 600;
-  --sws-font-size-body-lg: 17px;
-  --sws-line-height-body-lg: 1.8;
+  --sws-font-size-body-lg: 18px;
+  --sws-line-height-body-lg: 1.65;
   --sws-font-weight-body-lg: 400;
-  --sws-font-size-body: 15px;
-  --sws-line-height-body: 1.8;
+  --sws-font-size-body: 16px;
+  --sws-line-height-body: 1.7;
   --sws-font-weight-body: 400;
-  --sws-font-size-body-sm: 13.5px;
-  --sws-line-height-body-sm: 1.7;
+  --sws-font-size-body-sm: 14px;
+  --sws-line-height-body-sm: 1.6;
   --sws-font-weight-body-sm: 400;
-  --sws-font-size-caption: 12px;
-  --sws-line-height-caption: 1.6;
-  --sws-font-weight-caption: 400;
-  --sws-font-size-mono: 13.5px;
-  --sws-line-height-mono: 1.6;
-  --sws-font-weight-mono: 400;
+  --sws-font-size-caption: 12.5px;
+  --sws-line-height-caption: 1.5;
+  --sws-font-weight-caption: 500;
+  --sws-font-size-mono: 14px;
+  --sws-line-height-mono: 1.5;
+  --sws-font-weight-mono: 500;
+
+  /* ── type families — Latin and Arabic are set separately; neither is the other's fallback ── */
+  --sws-font-family-latin: Rubik;
+  --sws-font-family-arabic: Rubik;
+  --sws-font-family-stack: Rubik, system-ui, -apple-system, sans-serif;
+
+  /* ── rule weights — the ledger is built from ruled lines, so these are structural ── */
+  --sws-rule-hair: 1px;
+  --sws-rule-base: 2px;
+  --sws-rule-heavy: 3px;
+
+  /* ── shadow — offset plus soft blur; never a zero-offset halo ──────────── */
+  --sws-shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.06);
+  --sws-shadow-card: 0 4px 20px -4px rgba(2, 6, 23, 0.08), 0 1px 3px rgba(2, 6, 23, 0.04);
+  --sws-shadow-lift: 0 14px 40px -12px rgba(2, 6, 23, 0.16), 0 2px 8px rgba(2, 6, 23, 0.05);
+  --sws-shadow-cta: 0 8px 24px -8px rgba(78, 79, 235, 0.55);
+
+  /* ── radius — documents do not have rounded corners ────────────────────── */
+  --sws-radius-none: 0px;
+  --sws-radius-sm: 8px;
+  --sws-radius-md: 12px;
+  --sws-radius-lg: 16px;
+  --sws-radius-xl: 24px;
+  --sws-radius-pill: 9999px;
+
+  /* ── motion — every duration collapses to 0 under prefers-reduced-motion, below ── */
+  --sws-duration-fast: 140ms;
+  --sws-duration-base: 220ms;
+  --sws-duration-slow: 340ms;
+  --sws-duration-tear: 420ms;
+  --sws-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --sws-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --sws-ease-stamp: cubic-bezier(0.2, 0, 0, 1);
 
   /* ── accessibility — enforced by tokens/a11y-gate.mjs ──────────────────── */
   --sws-focus-ring-width: 2px;
@@ -106,56 +213,90 @@
 /* Dark by OS preference — unless the user has explicitly chosen light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --sws-surface-base: #16131C;
-    --sws-surface-raised: #201D28;
-    --sws-surface-sunken: #0E0C12;
-    --sws-text-primary: #F8F7FA;
-    --sws-text-secondary: #A29BB2;
-    --sws-text-on-action: #16131C;
-    --sws-border-subtle: #2A2633;
-    --sws-border-strong: #7B7389;
-    --sws-action-primary: #A98BD9;
-    --sws-action-primary-hover: #CFBDEB;
-    --sws-action-subtle-bg: #2A1444;
-    --sws-focus-ring: #A98BD9;
+    --sws-surface-page: #020617;
+    --sws-surface-base: #0B1220;
+    --sws-surface-raised: #141C2E;
+    --sws-surface-sunken: #020617;
+    --sws-text-primary: #F8F9FC;
+    --sws-text-secondary: #9CA3AF;
+    --sws-text-disabled: #6B7280;
+    --sws-text-on-action: #020617;
+    --sws-border-subtle: #1E293B;
+    --sws-border-strong: #6B7280;
+    --sws-border-disabled: #334155;
+    --sws-surface-disabled: #141C2E;
+    --sws-action-primary: #9B9BF4;
+    --sws-action-primary-hover: #C2C2F9;
+    --sws-action-subtle-bg: #1B1C5C;
+    --sws-action-quiet: #C2C2F9;
+    --sws-focus-ring: #9B9BF4;
     --sws-status-success: #4ADE80;
     --sws-status-danger: #F87171;
     --sws-status-warning: #FBBF24;
-    --sws-status-info: #60A5FA;
-    --sws-banner-danger-bg: rgba(248, 113, 113, 0.12);
-    --sws-banner-danger-border: rgba(248, 113, 113, 0.4);
+    --sws-status-info: #93C5FD;
+    --sws-banner-danger-bg: rgba(248, 113, 113, 0.1);
+    --sws-banner-danger-border: rgba(248, 113, 113, 0.35);
+    --sws-banner-success-bg: rgba(74, 222, 128, 0.1);
+    --sws-banner-success-border: rgba(74, 222, 128, 0.35);
+    --sws-banner-warning-bg: rgba(251, 191, 36, 0.1);
+    --sws-banner-warning-border: rgba(251, 191, 36, 0.35);
+    --sws-banner-info-bg: rgba(147, 197, 253, 0.1);
+    --sws-banner-info-border: rgba(147, 197, 253, 0.35);
   }
 }
 
 /* Dark by explicit choice. Spec 4.3 requires the toggle to persist, so the attribute must
    win over the OS preference in both directions. */
 :root[data-theme="dark"] {
-  --sws-surface-base: #16131C;
-  --sws-surface-raised: #201D28;
-  --sws-surface-sunken: #0E0C12;
-  --sws-text-primary: #F8F7FA;
-  --sws-text-secondary: #A29BB2;
-  --sws-text-on-action: #16131C;
-  --sws-border-subtle: #2A2633;
-  --sws-border-strong: #7B7389;
-  --sws-action-primary: #A98BD9;
-  --sws-action-primary-hover: #CFBDEB;
-  --sws-action-subtle-bg: #2A1444;
-  --sws-focus-ring: #A98BD9;
+  --sws-surface-page: #020617;
+  --sws-surface-base: #0B1220;
+  --sws-surface-raised: #141C2E;
+  --sws-surface-sunken: #020617;
+  --sws-text-primary: #F8F9FC;
+  --sws-text-secondary: #9CA3AF;
+  --sws-text-disabled: #6B7280;
+  --sws-text-on-action: #020617;
+  --sws-border-subtle: #1E293B;
+  --sws-border-strong: #6B7280;
+  --sws-border-disabled: #334155;
+  --sws-surface-disabled: #141C2E;
+  --sws-action-primary: #9B9BF4;
+  --sws-action-primary-hover: #C2C2F9;
+  --sws-action-subtle-bg: #1B1C5C;
+  --sws-action-quiet: #C2C2F9;
+  --sws-focus-ring: #9B9BF4;
   --sws-status-success: #4ADE80;
   --sws-status-danger: #F87171;
   --sws-status-warning: #FBBF24;
-  --sws-status-info: #60A5FA;
-  --sws-banner-danger-bg: rgba(248, 113, 113, 0.12);
-  --sws-banner-danger-border: rgba(248, 113, 113, 0.4);
+  --sws-status-info: #93C5FD;
+  --sws-banner-danger-bg: rgba(248, 113, 113, 0.1);
+  --sws-banner-danger-border: rgba(248, 113, 113, 0.35);
+  --sws-banner-success-bg: rgba(74, 222, 128, 0.1);
+  --sws-banner-success-border: rgba(74, 222, 128, 0.35);
+  --sws-banner-warning-bg: rgba(251, 191, 36, 0.1);
+  --sws-banner-warning-border: rgba(251, 191, 36, 0.35);
+  --sws-banner-info-bg: rgba(147, 197, 253, 0.1);
+  --sws-banner-info-border: rgba(147, 197, 253, 0.35);
+}
+
+/* Motion is a preference, not a decoration. Zeroing the tokens themselves means a
+   component that forgot its own media query still honours the setting. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sws-duration-fast: 0ms;
+    --sws-duration-base: 0ms;
+    --sws-duration-slow: 0ms;
+    --sws-duration-tear: 0ms;
+  }
 }
 
 /* Desktop type sizes. Mobile-first: the base values above are the small ones. */
 @media (min-width: 768px) {
   :root {
+    --sws-font-size-hero: 60px;
     --sws-font-size-display: 40px;
-    --sws-font-size-h1: 32px;
-    --sws-font-size-h2: 24px;
+    --sws-font-size-h1: 34px;
+    --sws-font-size-h2: 30px;
   }
 }
 

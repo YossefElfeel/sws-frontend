@@ -1,0 +1,18 @@
+<!doctype html>
+<!--
+  data-theme="light" is deliberate and load-bearing. The token file carries both themes and
+  the build fails if either is incomplete, but this review prototype ships light only, so the
+  OS dark preference must not decide what management is shown. Removing this attribute hands
+  the page's theme to whoever opens it.
+-->
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SWS — استضافة سويسرية بدعم مصري</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

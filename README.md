@@ -2,10 +2,14 @@
 
 Working repo for the **Somion Web Services** redesign (marketing site + WHMCS client area).
 
-This repo does not contain the product. It contains the things that must exist **before**
-design or development starts — the decisions that are still open, the inventory of what has
-to be built, the gaps nobody has assigned, and the four technical designs the planning
-documents call for but never specify.
+This repo began as the things that must exist **before** design or development starts — the
+open decisions, the inventory of what has to be built, the gaps nobody had assigned, and the
+four technical designs the planning documents call for but never specify.
+
+Since 2026-09-01 it also contains **a design-review prototype** under `prototype/`: a Vite +
+React + TypeScript build of the redesign, for management approval and as a working tool for
+the design team. It is not the production stack, and it is not the product — see
+`PRODUCT.md`.
 
 ---
 
@@ -37,9 +41,23 @@ decisions/          The 27 open questions blocking work, as a trackable log. (AR
 inventory/          All 74 screens as filterable data. (EN headers, bilingual names)
 gaps/               The 8 gaps the v1.1 plans do not cover. (AR)
 technical/          The four technical designs the plans require but never specify. (EN)
-tokens/             Design tokens as machine-readable data + an automated contrast gate. (EN)
+tokens/             Design tokens as machine-readable data + an automated WCAG gate. (EN)
 actions/            Fixes that are live on production right now and do not wait for Phase 0. (AR)
+prototype/          The design-review prototype. Vite + React + TS. (EN)
+scripts/            capture.mjs and interact.mjs — screenshot and behaviour verification.
+.impeccable/        Design-direction record: the surface brief and its direction contract.
 ```
+
+## Running it
+
+```bash
+npm install
+npm run dev      # the prototype at http://localhost:5173
+npm run gate     # token drift + accessibility, the same two checks CI runs
+```
+
+`npm run gate` is the one to run before any commit that touches `tokens/`. It fails if
+`dist/tokens.css` has drifted from `tokens.json`, and again on any WCAG 2.2 AA failure.
 
 **Language split:** Arabic for management- and design-facing artifacts (decision log, gap
 register, action list). English for anything code, tooling, or developers touch (inventory
@@ -81,6 +99,16 @@ unspecified. Read in this order — each depends on the one before it.
 ---
 
 ## Status
+
+**2026-09-01** — Ten decisions closed (B3, B4, B5, B7, B7a, I17, I18, C21, C22, P25), which
+unblocked 13 of the 30 blocked rows in `inventory/screens.csv`. Gap G11 closed. The
+accessibility gate went from 64 checks with 17 unverified to **70 checks, all passing**. The
+first surface (`M-01` Homepage) is built.
+
+Still open and deliberately not invented: the owner of the ~1200 price fields (B5), the WHMCS
+version (B6), the Egyptian payment provider (B1), the homepage numeric claims (B7c), and the
+`$2.50` vs `250.00 EGP` conflict (B7d). The prototype marks each of these on the screen
+rather than designing past them.
 
 Phase 0 kit built 2026-07-29. Live-site claims in the v1.1 audit were re-verified the same
 day and all were still true — see `actions/this-week.md` for the evidence.

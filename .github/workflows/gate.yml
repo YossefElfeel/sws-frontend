@@ -1,0 +1,30 @@
+name: gate
+
+# technical/environments.md instructs that `node tokens/build.mjs --check` runs in CI for
+# each deployable. Until this existed the gate ran only when somebody remembered, which is
+# not a gate. Both checks are cheap and dependency-free.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  tokens:
+    name: design tokens and accessibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Fails if dist/tokens.css has drifted from tokens.json — the two consumers must never
+      # ship different design systems.
+      - name: tokens are in sync
+        run: node tokens/build.mjs --check
+
+      # Exits 1 on any WCAG 2.2 AA failure. AAA shortfalls warn, matching decision I17.
+      - name: accessibility gate
+        run: node tokens/a11y-gate.mjs

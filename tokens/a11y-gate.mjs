@@ -136,6 +136,9 @@ const record = (group, verdict, label, detail, sc) =>
 
 /** [foreground, background, minimum, label, SC] */
 const PAIRS = [
+  ['text-primary',   'surface-page',   AA_NORMAL,   'Primary text on the page ground',   '1.4.3 AA'],
+  ['text-secondary', 'surface-page',   AA_NORMAL,   'Secondary text on the page ground', '1.4.3 AA'],
+  ['action-quiet',   'surface-raised', AA_NORMAL,   'Indigo link text on a card',        '1.4.3 AA'],
   ['text-primary',   'surface-base',   AA_NORMAL,   'Primary text on page background',   '1.4.3 AA'],
   ['text-primary',   'surface-raised', AA_NORMAL,   'Primary text on cards',             '1.4.3 AA'],
   ['text-primary',   'surface-sunken', AA_NORMAL,   'Primary text in inputs',            '1.4.3 AA'],
@@ -153,9 +156,17 @@ const PAIRS = [
   ['status-success', 'surface-raised', AA_NORMAL,   'Success text on cards',             '1.4.3 AA'],
   ['status-warning', 'surface-raised', AA_NORMAL,   'Warning text on cards',             '1.4.3 AA'],
   ['status-info',    'surface-raised', AA_NORMAL,   'Info text on cards',                '1.4.3 AA'],
+  // WCAG 1.4.3 exempts disabled controls. Held to the 3:1 non-text bar anyway as an internal
+  // rule: a control nobody can read is a control nobody can find, and the Playbook names
+  // disabled text as a usual failure. Scored at AA_NON_TEXT, not AA_NORMAL, so the rule is
+  // honest about being stricter than the standard rather than pretending the standard says it.
+  ['text-disabled',  'surface-base',   AA_NON_TEXT, 'Disabled text on page background',  '1.4.3 AA (exempt)'],
+  ['text-disabled',  'surface-disabled', AA_NON_TEXT, 'Disabled text on disabled control', '1.4.3 AA (exempt)'],
 ];
 
-const BANNER_ALPHA = 0.12;
+/** Read from the token that actually ships, so the gate cannot drift from the product. */
+const bannerAlpha = (severity) =>
+  component('banner', `${severity}-bg`)?.$extensions?.['sws.alpha'] ?? 0.12;
 const BANNER_SEVERITIES = ['danger', 'success', 'warning', 'info'];
 
 for (const theme of ['light', 'dark']) {
@@ -172,13 +183,26 @@ for (const theme of ['light', 'dark']) {
   }
 
   for (const severity of BANNER_SEVERITIES) {
+    // Presence first. Until 2026-09-01 this loop scored all eight banner checks green by
+    // compositing from the SEMANTIC status colours, while component.banner declared only
+    // `danger` — so dist/tokens.css shipped one severity of four and the gate reported a
+    // clean pass. A colour is only verified if the token that carries it actually exists.
+    const missing = ['bg', 'border', 'icon']
+      .filter((part) => !component('banner', `${severity}-${part}`));
+    if (missing.length) {
+      record('contrast', FAIL, `${theme}  ${severity} banner`,
+        `component.banner is missing ${missing.map((m) => `${severity}-${m}`).join(', ')} — ` +
+        'the colour composites safely but no token ships it', '1.4.3 AA');
+      continue;
+    }
     try {
       const status = semantic(theme, `status-${severity}`);
       const surface = semantic(theme, 'surface-raised');
-      const bg = flatten(status, surface, BANNER_ALPHA);
+      const alpha = bannerAlpha(severity);
+      const bg = flatten(status, surface, alpha);
       const ratio = contrast(status, bg);
       record('contrast', ratio >= AA_NORMAL ? PASS : FAIL,
-        `${theme}  ${severity} text on ${severity} banner (${BANNER_ALPHA * 100}% tint)`,
+        `${theme}  ${severity} text on ${severity} banner (${Math.round(alpha * 100)}% tint)`,
         `${ratio.toFixed(2)}:1  (min ${AA_NORMAL})  ${status} on ${bg}`, '1.4.3 AA');
     } catch (err) {
       record('contrast', FAIL, `${theme}  ${severity} banner`, err.message, '1.4.3 AA');
@@ -193,27 +217,60 @@ for (const theme of ['light', 'dark']) {
 // component must never look like a compliant one.
 
 const TARGET_CHECKS = [
-  ['button', 'height-sm', 'Button sm'],
-  ['button', 'height-md', 'Button md (default)'],
-  ['button', 'height-lg', 'Button lg'],
+  ['button',          'height-sm', 'Button sm'],
+  ['button',          'height-md', 'Button md (default)'],
+  ['button',          'height-lg', 'Button lg'],
+  ['input',           'height-md', 'Input'],
+  ['select',          'height-md', 'Select'],
+  ['checkbox',        'size',      'Checkbox'],
+  ['radio',           'size',      'Radio'],
+  ['switch',          'height-md', 'Switch'],
+  ['tab',             'height-md', 'Tab'],
+  ['pagination-item', 'size',      'Pagination item'],
+  ['file-uploader',   'height-md', 'File uploader'],
+  ['link',            null,        'Link (standalone)'],
 ];
 
+/** The declared pointer target, when a component extends past its visible box. */
+function hitArea(comp) {
+  const declared = component(comp, 'hit-area');
+  if (!declared) return null;
+  try { return px(resolve(declared.$value)); } catch { return null; }
+}
+
 for (const [comp, token, label] of TARGET_CHECKS) {
-  const declared = component(comp, token);
-  if (!declared) {
+  const hit = hitArea(comp);
+  const declared = token ? component(comp, token) : null;
+
+  if (!declared && hit === null) {
     record('target', TODO, label, 'no dimension declared', '2.5.8 AA / 2.5.5 AAA');
     continue;
   }
+
+  // A component may be smaller than the rule if it declares a hit area that is not.
+  // Playbook 11 already endorses the pattern for small icons; declaring it as a token is
+  // what lets this gate verify it instead of trusting it (ADR-0004).
+  if (!declared) {
+    record('target', hit >= TARGET_AAA ? PASS : hit >= TARGET_AA ? WARN : FAIL, label,
+      `${hit}px hit area, no visible box of its own`, '2.5.5 AAA');
+    continue;
+  }
+
   try {
     const size = px(resolve(declared.$value));
-    if (size < TARGET_AA) {
+    const effective = Math.max(size, hit ?? 0);
+    const via = hit !== null && hit > size ? ` via ${hit}px hit area` : '';
+
+    if (effective < TARGET_AA) {
       record('target', FAIL, label,
-        `${size}px — below the AA minimum of ${TARGET_AA}px`, '2.5.8 AA');
-    } else if (size < TARGET_AAA) {
+        `${effective}px — below the AA minimum of ${TARGET_AA}px`, '2.5.8 AA');
+    } else if (effective < TARGET_AAA) {
       record('target', WARN, label,
-        `${size}px — meets AA (${TARGET_AA}px), below project rule (${TARGET_AAA}px)`, '2.5.5 AAA');
+        `${effective}px — meets AA (${TARGET_AA}px), below project rule (${TARGET_AAA}px)`,
+        '2.5.5 AAA');
     } else {
-      record('target', PASS, label, `${size}px (>= ${TARGET_AAA}px)`, '2.5.5 AAA');
+      record('target', PASS, label,
+        `${size}px visible${via} (>= ${TARGET_AAA}px)`, '2.5.5 AAA');
     }
   } catch (err) {
     record('target', FAIL, label, err.message, '2.5.8 AA');
