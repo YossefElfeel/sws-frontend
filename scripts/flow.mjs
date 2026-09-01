@@ -188,6 +188,25 @@ const contactHref = await p.$$eval('.colophon__links a', (n) =>
 );
 ok('footer Contact reaches a ticket', Boolean(contactHref), contactHref ?? 'still /account');
 
+// An icon in a button is a flex item, and a flex item shrinks. In a narrow table cell they
+// were collapsing to zero width while keeping their height — a sliver where an arrow should
+// be, on every account table at once, and invisible to a screenshot at review scale.
+{
+  const squashed = [];
+  for (const r of ['#/account', '#/account/services', '#/account/invoices', '#/account/knowledgebase', '#/cart', '#/hosting/shared']) {
+    await p.evaluate((hash) => { location.hash = hash; }, r);
+    await p.waitForTimeout(250);
+    const found = await p.evaluate(() =>
+      [...document.querySelectorAll('svg')]
+        .map((el) => ({ el, b: el.getBoundingClientRect() }))
+        .filter(({ b }) => b.height > 0 && b.width < b.height * 0.6)
+        .map(({ el, b }) => `${String(el.parentElement.className).slice(0, 24)} ${Math.round(b.width)}x${Math.round(b.height)}`),
+    );
+    squashed.push(...found.map((f) => `${r} ${f}`));
+  }
+  ok('no icon is crushed by its flex parent', squashed.length === 0, squashed.slice(0, 3).join(' · ') || 'all keep their width');
+}
+
 // ADR-0004 is a token the a11y gate checks in the abstract. This checks it on the rendered
 // page, at the width where controls actually get small — the only place it can fail.
 //

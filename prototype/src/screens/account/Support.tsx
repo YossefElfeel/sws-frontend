@@ -358,17 +358,30 @@ export function Knowledgebase() {
         </Button>
       </form>
 
-      <ul className="card card--flush kb-list">
-        {rows.map((a) => (
-          <li key={a.id}>
-            <Link className="kb-item" to={`/account/knowledgebase/${a.slug}`}>
-              <span className="kb-item__cat eyebrow">{t(`kb.cat.${a.category}` as never)}</span>
-              <span className="kb-item__title">{t(a.titleKey as never)}</span>
-              <IconArrow size={16} />
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {rows.length > 0 ? (
+        <ul className="card card--flush kb-list">
+          {rows.map((a) => (
+            <li key={a.id}>
+              <Link className="kb-item" to={`/account/knowledgebase/${a.slug}`}>
+                <span className="kb-item__cat eyebrow">{t(`kb.cat.${a.category}` as never)}</span>
+                <span className="kb-item__title">{t(a.titleKey as never)}</span>
+                <IconArrow size={16} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        /* A search with no answer is where a ticket gets opened, so that is what it offers. */
+        <div className="card empty">
+          <IconBook size={28} />
+          <p className="empty__title">{t('empty.kb')}</p>
+          <p className="empty__note">{t('empty.kbNote')}</p>
+          <Link className="btn btn--md btn--secondary" to="/account/tickets/new">
+            <IconPlus size={15} />
+            {t('tkt.open')}
+          </Link>
+        </div>
+      )}
     </AccountLayout>
   );
 }

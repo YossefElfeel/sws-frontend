@@ -208,6 +208,16 @@
     transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
+/*
+ * An icon in a button is a flex item, and a flex item shrinks. In a narrow cell — the "Manage"
+ * and "View" buttons in every account table, the search button beside a flexible field — the
+ * icon was being crushed to zero width while keeping its height, leaving a one-pixel sliver
+ * where an arrow should be. Icons carry their own size and never give it up.
+ */
+.btn svg {
+  flex: none;
+}
+
 .masthead__login:hover {
   background: var(--sws-action-primary-hover);
   transform: translateY(-1px);

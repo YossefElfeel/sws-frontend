@@ -462,6 +462,11 @@ export const STRINGS = {
     ar: 'سجّل دومين جديد أو انقل واحد عندك دلوقتي.',
     en: 'Register a new domain, or transfer one you already own.',
   },
+  'empty.kb': { ar: 'مفيش مقالات مطابقة', en: 'No articles match' },
+  'empty.kbNote': {
+    ar: 'جرّب كلمة تانية، أو افتح تذكرة وهنرد عليك.',
+    en: 'Try another word, or open a ticket and we will answer.',
+  },
   'empty.methods': { ar: 'مفيش طرق دفع محفوظة', en: 'No saved payment methods' },
 
   'dash.needsYou': { ar: 'محتاج منك حاجة', en: 'Needs you' },

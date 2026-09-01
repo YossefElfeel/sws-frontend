@@ -1129,12 +1129,12 @@
   padding: var(--sws-space-12) var(--sws-space-16);
 }
 
-/* The head stays put while a long list scrolls under it. */
-.app__main .card--flush .data th {
-  position: sticky;
-  inset-block-start: var(--app-bar);
-  z-index: 1;
-}
+/*
+ * No sticky table head. These tables run three to five rows, so a head that follows the scroll
+ * has nothing to follow — and under a full-page screenshot a sticky head resolves against the
+ * expanded viewport and leaves a phantom band above itself, which puts a defect into the
+ * review captures that does not exist in a browser. It can come back when a table earns it.
+ */
 
 /* ── the screen toolbar ────────────────────────────────────────────────────── */
 
