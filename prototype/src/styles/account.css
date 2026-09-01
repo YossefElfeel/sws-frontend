@@ -1,0 +1,926 @@
+/*
+ * SWS — client area and the remaining marketing surfaces.
+ *
+ * Covers spec 6.2 (category rail), 6.3 (VPS table, builder preview), 8 (auth) and 9 (every
+ * client-area section). Layout uses logical properties throughout, so the rail sits on the
+ * correct side in both directions without a mirrored rule.
+ */
+
+/* ── rail layout ───────────────────────────────────────────────────────────── */
+
+.with-rail {
+  display: grid;
+  /* minmax(0, 1fr), not the implicit auto: an auto track sizes to its content, so the mobile
+     rail's horizontal scroller would widen the page instead of scrolling inside it. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sws-space-32);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .with-rail {
+    grid-template-columns: minmax(13rem, 15rem) minmax(0, 1fr);
+  }
+}
+
+.with-rail__body {
+  min-width: 0;
+  display: grid;
+  gap: var(--sws-space-24);
+  align-content: start;
+}
+
+.rail {
+  min-width: 0;
+  position: sticky;
+  inset-block-start: 96px;
+  padding: var(--sws-space-16);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.rail__head {
+  padding: var(--sws-space-8) var(--sws-space-12);
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sws-text-secondary);
+}
+
+:root[lang='ar'] .rail__head {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.rail__list {
+  display: grid;
+  gap: 2px;
+  margin-block-end: var(--sws-space-8);
+}
+
+.rail__link {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  min-height: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.rail__link svg {
+  flex: none;
+}
+
+.rail__link:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-primary);
+}
+
+.rail__link.active {
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-quiet);
+  font-weight: 600;
+}
+
+/*
+ * On a phone the rail becomes a horizontal strip of chips. Left as a column it is a 12-item
+ * list every visitor scrolls past before reaching what they opened the page for — on all
+ * eighteen client-area routes. As a strip it costs one row and keeps every section one tap
+ * away, which a disclosure would not.
+ */
+@media (max-width: 899px) {
+  .rail {
+    position: static;
+    padding: var(--sws-space-12) 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .rail__head {
+    display: none;
+  }
+
+  .rail__list {
+    display: flex;
+    gap: var(--sws-space-8);
+    overflow-x: auto;
+    margin-block-end: 0;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .rail__list > li {
+    display: contents;
+  }
+
+  .rail__list::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* A second group in the same rail continues the same strip rather than starting a new one. */
+  .rail__list + .rail__list {
+    padding-block-start: 0;
+  }
+
+  .rail__link {
+    flex: none;
+    scroll-snap-align: start;
+    background: var(--sws-card-bg);
+    border-radius: var(--sws-radius-pill);
+    box-shadow: var(--sws-shadow-sm);
+    white-space: nowrap;
+  }
+
+  .rail__link.active {
+    background: var(--sws-action-primary);
+    color: var(--sws-text-on-action);
+  }
+}
+
+/* ── panels, splits, stacks ────────────────────────────────────────────────── */
+
+.panel--pad {
+  padding: var(--sws-space-24);
+}
+
+.split {
+  display: grid;
+  gap: var(--sws-space-24);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.with-side {
+  display: grid;
+  gap: var(--sws-space-24);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .with-side {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  }
+}
+
+.stack {
+  display: grid;
+  gap: var(--sws-space-12);
+  margin-block-start: var(--sws-space-16);
+}
+
+.kv {
+  display: grid;
+  gap: var(--sws-space-8);
+  margin-block: var(--sws-space-16);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.kv > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  padding-block: var(--sws-space-4);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.kv dt {
+  color: var(--sws-text-secondary);
+}
+
+.kv dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: end;
+}
+
+/* ── tiles ─────────────────────────────────────────────────────────────────── */
+
+.tiles {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.tile {
+  display: grid;
+  gap: var(--sws-space-4);
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    box-shadow var(--sws-duration-base) var(--sws-ease-standard),
+    transform var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+a.tile:hover {
+  box-shadow: var(--sws-shadow-lift);
+  transform: translateY(-2px);
+}
+
+/* A tile that reports rather than navigates: no lift, no pointer, no promise of a click. */
+.tile--static {
+  cursor: default;
+}
+
+.tile__icon {
+  color: var(--sws-action-primary);
+}
+
+.tile__n {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sws-space-4);
+  font-size: var(--sws-font-size-h1);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* The currency rides beside the figure at label size, so a four-tile row keeps one height. */
+.tile__unit {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--sws-text-secondary);
+}
+
+.tile__label {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── meters ────────────────────────────────────────────────────────────────── */
+/* Used-of-total, because what someone needs before buying more is how much is left. */
+
+.meter {
+  margin-block: var(--sws-space-16);
+}
+
+.meter__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  margin-block-end: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.meter__track {
+  display: block;
+  block-size: 8px;
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-pill);
+  overflow: hidden;
+}
+
+.meter__fill {
+  display: block;
+  block-size: 100%;
+  background: var(--sws-action-primary);
+  border-radius: var(--sws-radius-pill);
+}
+
+/* ── filters and toolbars ──────────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: var(--sws-space-4);
+  flex-wrap: wrap;
+  padding: var(--sws-space-4);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-pill);
+}
+
+.filters__btn {
+  min-height: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-16);
+  background: transparent;
+  border: 0;
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filters__btn.is-active {
+  background: var(--sws-surface-raised);
+  color: var(--sws-action-quiet);
+  box-shadow: var(--sws-shadow-sm);
+}
+
+.row-actions {
+  display: inline-flex;
+  gap: var(--sws-space-8);
+}
+
+/* ── breadcrumbs ───────────────────────────────────────────────────────────── */
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-4);
+  margin-block-end: var(--sws-space-12);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.crumbs a {
+  color: var(--sws-action-quiet);
+}
+
+.crumbs__sep {
+  margin-inline: var(--sws-space-4);
+  color: var(--sws-border-strong);
+}
+
+/* ── switches ──────────────────────────────────────────────────────────────── */
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-12) var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-md);
+  cursor: pointer;
+}
+
+.switch-row__label {
+  display: block;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+}
+
+.switch-row__note {
+  display: block;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * A real toggle, not the platform checkbox, built on the switch tokens the design system
+ * already declares. The knob travels toward the end of the line, so in Arabic "on" moves
+ * left — the same gesture read the other way. State is carried by knob position as well as
+ * by colour, which is what makes it readable without colour.
+ *
+ * The 44px hit area (ADR-0004) comes from the enclosing label, which is the whole row: the
+ * visible track is 24px, but nothing on this row is smaller than the row itself to hit.
+ */
+.switch-row input[type='checkbox'] {
+  --knob: calc(var(--sws-switch-height-md) - 6px);
+
+  appearance: none;
+  flex: none;
+  inline-size: calc(var(--sws-switch-height-md) * 2 - 4px);
+  block-size: var(--sws-switch-height-md);
+  margin: 0;
+  padding: 3px;
+  background: var(--sws-switch-track-off);
+  border: 0;
+  border-radius: var(--sws-radius-pill);
+  cursor: pointer;
+  transition: background-color var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.switch-row input[type='checkbox']::before {
+  content: '';
+  display: block;
+  inline-size: var(--knob);
+  block-size: var(--knob);
+  background: var(--sws-switch-knob);
+  border-radius: var(--sws-radius-pill);
+  box-shadow: var(--sws-shadow-sm);
+  transition: transform var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.switch-row input[type='checkbox']:checked {
+  background: var(--sws-switch-track-on);
+}
+
+.switch-row input[type='checkbox']:checked::before {
+  transform: translateX(calc(var(--knob) * var(--sws-flip, 1)));
+}
+
+:root[dir='rtl'] .switch-row input[type='checkbox'] {
+  --sws-flip: -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-row input[type='checkbox'],
+  .switch-row input[type='checkbox']::before {
+    transition: none;
+  }
+}
+
+/* ── ticket thread ─────────────────────────────────────────────────────────── */
+
+.thread {
+  display: grid;
+  gap: var(--sws-space-16);
+  margin-block-end: var(--sws-space-24);
+}
+
+.msg {
+  max-width: 42rem;
+  padding: var(--sws-space-16) var(--sws-space-24);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-shadow-card);
+}
+
+/* The two sides are told apart by side and ground, not by colour alone. */
+.msg--client {
+  margin-inline-end: auto;
+  background: var(--sws-card-bg);
+}
+
+.msg--staff {
+  margin-inline-start: auto;
+  background: var(--sws-action-subtle-bg);
+}
+
+.msg__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  margin-block-end: var(--sws-space-8);
+  font-size: var(--sws-font-size-caption);
+}
+
+.msg__author {
+  font-weight: 700;
+}
+
+.msg__at {
+  color: var(--sws-text-secondary);
+}
+
+.msg__body {
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+}
+
+/* ── editor ────────────────────────────────────────────────────────────────── */
+
+.editor {
+  border: var(--sws-rule-hair) solid var(--sws-border-strong);
+  border-radius: var(--sws-radius-sm);
+  overflow: hidden;
+}
+
+.editor__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: var(--sws-space-4);
+  background: var(--sws-surface-sunken);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.editor__tool {
+  min-inline-size: var(--sws-touch-target-min);
+  min-block-size: var(--sws-touch-target-min);
+  background: transparent;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editor__tool:hover {
+  background: var(--sws-surface-raised);
+  color: var(--sws-action-quiet);
+}
+
+.editor__area {
+  border: 0;
+  border-radius: 0;
+  resize: vertical;
+}
+
+.editor__count {
+  padding: var(--sws-space-8) var(--sws-space-12);
+  background: var(--sws-surface-sunken);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/* Suggested articles ride alongside the reply box until the page runs out. */
+.kb-side {
+  position: sticky;
+  inset-block-start: 96px;
+}
+
+@media (max-width: 1023px) {
+  .kb-side {
+    position: static;
+  }
+}
+
+.kb-side__list {
+  display: grid;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-12);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.kb-side__list a {
+  color: var(--sws-action-quiet);
+}
+
+/* ── knowledgebase ─────────────────────────────────────────────────────────── */
+
+.kb-list {
+  display: grid;
+  gap: var(--sws-space-8);
+}
+
+.kb-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  padding: var(--sws-space-16) var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-shadow-card);
+  color: inherit;
+  text-decoration: none;
+}
+
+.kb-item:hover {
+  box-shadow: var(--sws-shadow-lift);
+}
+
+.kb-item__cat {
+  flex: none;
+  min-inline-size: 8rem;
+}
+
+.kb-item__title {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+.kb-item svg {
+  flex: none;
+  color: var(--sws-action-primary);
+}
+
+.prose {
+  font-size: var(--sws-font-size-body);
+  line-height: var(--sws-line-height-body);
+}
+
+.vote {
+  margin-block-start: var(--sws-space-16);
+}
+
+/* ── news ──────────────────────────────────────────────────────────────────── */
+
+.news {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+/* On the dashboard the announcements already sit inside a panel, so the item carries only a
+   rule between entries. The full announcements page adds --panel to give each one its own card. */
+.news__item + .news__item {
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.news__item--panel {
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.news__item--panel + .news__item--panel {
+  padding-block-start: var(--sws-space-24);
+  border-block-start: 0;
+}
+
+.news__date {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/* ── list cards (payment methods, contacts) ────────────────────────────────── */
+
+.cards-list {
+  display: grid;
+  gap: var(--sws-space-12);
+}
+
+.pm {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  padding: var(--sws-space-16) var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-shadow-card);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.pm__brand {
+  font-weight: 700;
+  min-inline-size: 9rem;
+}
+
+.pm__num {
+  color: var(--sws-text-secondary);
+}
+
+.pm__exp {
+  color: var(--sws-text-secondary);
+  margin-inline-end: auto;
+}
+
+.perm-list {
+  display: inline-flex;
+  gap: var(--sws-space-4);
+  flex-wrap: wrap;
+  margin-inline-end: auto;
+}
+
+.copy-row {
+  display: flex;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+  margin-block-start: var(--sws-space-12);
+}
+
+.copy-row .field {
+  flex: 1 1 18rem;
+}
+
+.balance {
+  margin-block: var(--sws-space-12);
+  font-size: var(--sws-font-size-h1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.checklist {
+  display: grid;
+  gap: var(--sws-space-12);
+  margin-block-start: var(--sws-space-16);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sws-space-8);
+}
+
+.checklist svg {
+  flex: none;
+  color: var(--sws-status-success);
+}
+
+.notice--due {
+  background: var(--sws-banner-danger-bg);
+  margin-block: var(--sws-space-24);
+  align-items: center;
+}
+
+.notice--due svg {
+  color: var(--sws-status-danger);
+}
+
+/* The amount and the action read as one line: text at the start, the button at the far end.
+   Stacking them left two-thirds of a full-width banner empty. */
+.notice--due > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
+.notice--spaced {
+  margin-block-start: var(--sws-space-24);
+}
+
+
+.data--flush {
+  margin-block: var(--sws-space-16);
+}
+
+/* An invoice is a document before it is a screen, so it holds a printable measure. */
+.invoice {
+  max-width: 52rem;
+}
+
+.invoice__head {
+  margin-block-end: var(--sws-space-16);
+  padding-block-end: var(--sws-space-16);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/* An invoice reads label-at-one-edge, value-at-the-other. Letting the list run the full width
+   is what makes it scan as a document rather than as a stack of form rows. */
+.invoice__head .kv {
+  margin-block: 0;
+}
+
+/* ── auth ──────────────────────────────────────────────────────────────────── */
+
+.auth {
+  display: grid;
+  justify-items: center;
+}
+
+.auth__card {
+  inline-size: 100%;
+  max-width: 34rem;
+  padding: var(--sws-space-32);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.auth__title {
+  font-size: var(--sws-font-size-h2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.auth__lede {
+  margin-block: var(--sws-space-8) var(--sws-space-24);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.auth__form {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+.auth__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.auth__row a {
+  color: var(--sws-action-quiet);
+}
+
+.auth__or {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  margin-block: var(--sws-space-24);
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.auth__or::before,
+.auth__or::after {
+  content: '';
+  flex: 1 1 auto;
+  block-size: var(--sws-rule-hair);
+  background: var(--sws-border-subtle);
+}
+
+.auth__foot {
+  margin-block-start: var(--sws-space-24);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.auth__foot a {
+  color: var(--sws-action-quiet);
+  font-weight: 600;
+}
+
+.auth .btn {
+  width: 100%;
+}
+
+.code-field {
+  font-size: var(--sws-font-size-h2);
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+/* ── website builder preview ───────────────────────────────────────────────── */
+
+.builder {
+  display: grid;
+  gap: var(--sws-space-24);
+  /* The tier cards sit under the preview, so the preview needs to end before they start. */
+  margin-block-end: var(--sws-space-48);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .builder {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+}
+
+.builder__frame {
+  padding: var(--sws-space-12);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.builder__bar {
+  display: flex;
+  gap: 6px;
+  padding-block-end: var(--sws-space-12);
+}
+
+.builder__bar i {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-border-subtle);
+}
+
+.builder__canvas {
+  display: grid;
+  gap: var(--sws-space-8);
+  padding: var(--sws-space-12);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-lg);
+}
+
+.builder__block {
+  display: block;
+  block-size: 42px;
+  background: var(--sws-border-subtle);
+  border-radius: var(--sws-radius-sm);
+}
+
+.builder__block--hero {
+  block-size: 108px;
+  background: var(--sws-action-subtle-bg);
+}
+
+.builder__block--wide {
+  block-size: 64px;
+}
+
+.builder__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sws-space-8);
+}
+
+.builder__side {
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.builder__side .btn {
+  margin-block-start: var(--sws-space-16);
+}
+
+.os-choice {
+  margin-block-start: var(--sws-space-24);
+}

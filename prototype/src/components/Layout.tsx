@@ -51,7 +51,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="masthead__tools">
             <label className="masthead__select">
               <IconGlobe />
-              <span className="u-visually-hidden">Language</span>
+              <span className="u-visually-hidden">{t('a11y.language')}</span>
               <select value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
                 <option value="ar">العربية</option>
                 <option value="en">English</option>

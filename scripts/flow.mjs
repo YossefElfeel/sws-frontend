@@ -1,7 +1,8 @@
 /**
  * End-to-end check of the ordering flow the spec defines in section 7:
  * plan -> configure -> domain -> cart -> checkout -> confirmation.
- * Also verifies the spec's currency and dark-mode requirements (4.2, 4.3).
+ * Also verifies the spec's currency and dark-mode requirements (4.2, 4.3),
+ * and the client-area behaviours of section 9.
  */
 import { chromium } from 'playwright';
 
@@ -85,6 +86,77 @@ ok('wallet gateway hides off EGP', chfGw === 4, `${chfGw} gateways on CHF`);
 // Spec 7.3 agreement gate
 const disabled = await p.$eval('.checkout__aside .btn', (e) => e.disabled);
 ok('pay button gated on agreement', disabled === true);
+
+// ── Spec 9, the client area ──────────────────────────────────────────────────
+
+await p.evaluate(() => (location.hash = '#/account'));
+await p.waitForSelector('.rail__link');
+const sections = await p.$$eval('.rail__link', (n) => n.length);
+ok('rail reaches every section', sections === 12, `${sections} sections`);
+ok('dashboard shows the four counts', (await p.$$eval('.tiles .tile', (n) => n.length)) === 4);
+
+// 9.2 services, filtered by status
+await p.evaluate(() => (location.hash = '#/account/services'));
+await p.waitForSelector('.data tbody tr');
+const allSvc = await p.$$eval('.data tbody tr', (n) => n.length);
+await p.click('.filters__btn:nth-child(2)');
+await p.waitForTimeout(120);
+const someSvc = await p.$$eval('.data tbody tr', (n) => n.length);
+ok('services filter by status', someSvc < allSvc, `${allSvc} -> ${someSvc}`);
+
+// 9.3 DNS records on a managed domain
+await p.evaluate(() => (location.hash = '#/account/domains/dom-1'));
+await p.waitForSelector('.data tbody tr');
+const dns = await p.$$eval('.data tbody tr', (n) => n.length);
+ok('DNS records listed', dns >= 5, `${dns} records`);
+
+// 9.4 invoices, filtered by status
+await p.evaluate(() => (location.hash = '#/account/invoices'));
+await p.waitForSelector('.data tbody tr');
+const allInv = await p.$$eval('.data tbody tr', (n) => n.length);
+await p.click('.filters__btn:nth-child(2)');
+await p.waitForTimeout(120);
+const someInv = await p.$$eval('.data tbody tr', (n) => n.length);
+ok('invoices filter by status', someInv < allInv, `${allInv} -> ${someInv}`);
+
+// 9.5.3 a thread has two distinguishable sides
+await p.evaluate(() => (location.hash = '#/account/tickets/tkt-7741'));
+await p.waitForSelector('.msg');
+const client = await p.$$eval('.msg--client', (n) => n.length);
+const staff = await p.$$eval('.msg--staff', (n) => n.length);
+ok('ticket thread separates the two sides', client > 0 && staff > 0, `${client} client / ${staff} staff`);
+
+// The bilingual fixtures are the point of section 9 in Arabic: switching language has to
+// change the customer's own words, not only the chrome around them.
+const bodyAr = await p.$eval('.msg__body', (e) => e.textContent.trim());
+await p.selectOption('.masthead__select:nth-of-type(1) select', 'en');
+await p.waitForTimeout(150);
+const bodyEn = await p.$eval('.msg__body', (e) => e.textContent.trim());
+ok('ticket text follows the language', bodyAr !== bodyEn, `${bodyAr.slice(0, 18)}… -> ${bodyEn.slice(0, 18)}…`);
+await p.selectOption('.masthead__select:nth-of-type(1) select', 'ar');
+
+// 9.5.4 knowledgebase search narrows the list
+await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
+await p.waitForSelector('.kb-item');
+const allKb = await p.$$eval('.kb-item', (n) => n.length);
+await p.fill('#kbq', 'cPanel');
+await p.waitForTimeout(150);
+const someKb = await p.$$eval('.kb-item', (n) => n.length);
+ok('knowledgebase search narrows', someKb < allKb, `${allKb} -> ${someKb}`);
+
+// 9.7 two-factor is a real control, not a label
+await p.evaluate(() => (location.hash = '#/account/security'));
+await p.waitForSelector('.switch-row input');
+const twofaBefore = await p.$eval('.switch-row input', (e) => e.checked);
+await p.click('.switch-row input');
+const twofaAfter = await p.$eval('.switch-row input', (e) => e.checked);
+ok('two-factor toggles', twofaBefore !== twofaAfter, `${twofaBefore} -> ${twofaAfter}`);
+
+// ADR-0003: Latin numerals everywhere, including inside Arabic copy.
+await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
+await p.waitForSelector('.invoice');
+const easternDigits = await p.$eval('main', (e) => (e.textContent.match(/[٠-٩۰-۹]/g) ?? []).length);
+ok('ADR-0003 Latin numerals', easternDigits === 0, `${easternDigits} eastern digit(s)`);
 
 console.log(errs.length ? `\n${errs.length} console error(s):\n  ${errs.slice(0, 4).join('\n  ')}` : '\nclean console');
 await b.close();

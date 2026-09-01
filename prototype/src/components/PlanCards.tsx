@@ -3,6 +3,7 @@ import { Button } from './Button';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { PLANS, planPrice, formatAmount, type Plan } from '../lib/catalog';
+import { specText } from '../lib/specs';
 
 /**
  * Plan cards, following spec 6.2: name, price and cycle, the main feature list, a separator,
@@ -91,7 +92,7 @@ export function PlanCards({ plans = PLANS }: { plans?: Plan[] }) {
 
           <ul className="plan__extras">
             {plan.additional.map((f) => (
-              <li key={f}>{f}</li>
+              <li key={f}>{specText(f, locale)}</li>
             ))}
           </ul>
 

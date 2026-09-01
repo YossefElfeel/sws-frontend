@@ -13,6 +13,7 @@ import './styles/world.css';
 import './styles/components.css';
 import './styles/screens.css';
 import './styles/order.css';
+import './styles/account.css';
 import { App } from './App';
 
 createRoot(document.getElementById('root')!).render(

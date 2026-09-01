@@ -224,6 +224,13 @@
   white-space: nowrap;
 }
 
+/* A cell that is itself a serial holds one atomic token — a date, an IP, a reference. Left to
+   wrap it breaks at the hyphen and reads as two numbers. Serials nested inside a cell (a domain
+   under a product name) are not covered, because those are meant to wrap. */
+.data td.serial {
+  white-space: nowrap;
+}
+
 .data .lead {
   font-weight: 600;
   color: var(--sws-text-primary);
@@ -238,6 +245,15 @@
 
 .table-scroll {
   overflow-x: auto;
+}
+
+/*
+ * Without a floor the wrapper never scrolls — the table just compresses until a domain breaks
+ * mid-word and reads as two names. The floor makes the columns keep their shape and lets the
+ * card scroll instead, which is the one thing this wrapper existed to do.
+ */
+.table-scroll .data {
+  min-width: 32rem;
 }
 
 /* ── tags ──────────────────────────────────────────────────────────────────── */
@@ -299,7 +315,9 @@
 .field-grid {
   display: grid;
   gap: var(--sws-space-16);
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  /* 12rem, not 15: at 15 a pair needs 30rem plus the gap, which is a hair more than the auth
+     card offers, so first/last name collapsed to one column on the widest screen there is. */
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
 .fieldset {

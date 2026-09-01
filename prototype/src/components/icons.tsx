@@ -177,3 +177,74 @@ export function IconArrow({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+export function IconInvoice({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M6 2.8h9.5L19 6.3V21l-2.2-1.3-2.1 1.3-2.2-1.3-2.1 1.3L8.1 19.7 6 21V2.8Z" />
+      <path d="M9.3 8.5h6M9.3 12h6M9.3 15.5h3.5" />
+    </svg>
+  );
+}
+
+export function IconBook({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 4.5A1.7 1.7 0 0 1 5.7 3H19v15.5H5.7A1.7 1.7 0 0 0 4 20.2V4.5Z" />
+      <path d="M4 18.4A1.6 1.6 0 0 0 5.6 21H19" />
+    </svg>
+  );
+}
+
+export function IconMegaphone({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 10v3.5a1.5 1.5 0 0 0 1.5 1.5H7l9.5 4.5V5L7 9.5H5.5A1.5 1.5 0 0 0 4 11Z" />
+      <path d="M19.5 9.5a3.2 3.2 0 0 1 0 5M7 15v4.5" />
+    </svg>
+  );
+}
+
+export function IconUsers({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="9.5" cy="8" r="3.3" />
+      <path d="M3.5 20a6 6 0 0 1 12 0M16.5 5.2a3.3 3.3 0 0 1 0 6M17.5 20a6 6 0 0 0-2.2-4.6" />
+    </svg>
+  );
+}
+
+export function IconKey({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="8" cy="15.5" r="4" />
+      <path d="m10.9 12.6 8.1-8.1M16.5 7l2.2 2.2M14 9.5l2.2 2.2" />
+    </svg>
+  );
+}
+
+export function IconExternal({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M13.5 4.5H19.5V10.5M19.5 4.5 11 13" />
+      <path d="M18 14.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5" />
+    </svg>
+  );
+}
+
+export function IconCopy({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="8.5" y="8.5" width="12" height="12" rx="2.2" />
+      <path d="M15.5 8.5V5.7A2.2 2.2 0 0 0 13.3 3.5H5.7A2.2 2.2 0 0 0 3.5 5.7v7.6a2.2 2.2 0 0 0 2.2 2.2h2.8" />
+    </svg>
+  );
+}
+
+export function IconPlus({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
