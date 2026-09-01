@@ -62,9 +62,7 @@ export function Account() {
                 <tr key={s.serial}>
                   <td>
                     <span className="lead">{s.plan}</span>
-                    <span className="data__sub serial" dir="ltr">
-                      {s.domain} · {s.serial}
-                    </span>
+                    <span className="data__sub serial"><bdi>{s.domain} · {s.serial}</bdi></span>
                   </td>
                   {/*
                     Days running, as a plain count. An uptime percentage would be a claim
@@ -114,13 +112,9 @@ export function Account() {
               {INVOICES.map((inv) => (
                 <tr key={inv.no}>
                   <td>
-                    <span className="lead serial" dir="ltr">
-                      {inv.no}
-                    </span>
+                    <span className="lead serial"><bdi>{inv.no}</bdi></span>
                   </td>
-                  <td className="serial" dir="ltr">
-                    {inv.date}
-                  </td>
+                  <td className="serial"><bdi>{inv.date}</bdi></td>
                   <td className="num">
                     {formatAmount(inv.amount, locale)} {currency}
                   </td>

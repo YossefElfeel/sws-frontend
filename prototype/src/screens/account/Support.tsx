@@ -68,7 +68,7 @@ export function Tickets() {
                 <tr key={x.id}>
                   <td>
                     <span className="lead">{bi(x.subject)}</span>
-                    <span className="data__sub serial" dir="ltr">{x.ref}</span>
+                    <span className="data__sub serial"><bdi>{x.ref}</bdi></span>
                   </td>
                   <td>{t(`dept.${x.department}` as never)}</td>
                   <td>
@@ -76,7 +76,7 @@ export function Tickets() {
                       {t(`prio.${x.priority}` as never)}
                     </span>
                   </td>
-                  <td className="serial" dir="ltr">{x.updated}</td>
+                  <td className="serial"><bdi>{x.updated}</bdi></td>
                   <td>
                     <span className={`tag tag--${x.status === 'closed' ? 'taken' : 'ok'}`}>
                       {t(`tkt.${x.status}` as never)}
@@ -301,8 +301,8 @@ export function TicketThread() {
           <article className={`msg msg--${m.from}`} key={m.id}>
             <header className="msg__head">
               <span className="msg__author">{bi(m.author)}</span>
-              <span className="msg__at serial" dir="ltr">
-                {m.at}
+              <span className="msg__at serial">
+                <bdi>{m.at}</bdi>
               </span>
             </header>
             <p className="msg__body" dir="auto">

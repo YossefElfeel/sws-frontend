@@ -91,9 +91,7 @@ export function Domains() {
                 return (
                   <tr key={row.tld}>
                     <td>
-                      <span className="lead serial" dir="ltr">
-                        {stem ? `${stem}${row.tld}` : row.tld}
-                      </span>
+                      <span className="lead serial"><bdi>{stem ? `${stem}${row.tld}` : row.tld}</bdi></span>
                       {free !== undefined && (
                         <span className={`tag${free ? ' tag--ok' : ' tag--taken'}`}>
                           {free && <IconCheck size={13} />}

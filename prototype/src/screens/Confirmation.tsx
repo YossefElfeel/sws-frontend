@@ -30,9 +30,7 @@ export function Confirmation() {
           {t('confirm.title')}
         </h1>
         <p className="section__lede measure">{t('confirm.lede')}</p>
-        <p className="confirm-ref serial" dir="ltr">
-          {serial}
-        </p>
+        <p className="confirm-ref serial"><bdi>{serial}</bdi></p>
       </section>
 
       <section className="section shell">
@@ -51,7 +49,7 @@ export function Confirmation() {
                 <tr key={line.id}>
                   <td>
                     <span className="lead">{line.plan.name}</span>
-                    <span className="data__sub serial" dir="ltr">{line.domain?.name ?? line.id}</span>
+                    <span className="data__sub serial"><bdi>{line.domain?.name ?? line.id}</bdi></span>
                   </td>
                   <td>{t(`cycle.${line.cycle}` as never)}</td>
                   <td className="num">

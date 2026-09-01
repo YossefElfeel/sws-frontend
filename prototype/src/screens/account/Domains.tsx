@@ -27,10 +27,10 @@ export function MyDomains() {
             {DOMAINS.map((d) => (
               <tr key={d.id}>
                 <td>
-                  <span className="lead serial" dir="ltr">{d.name}</span>
+                  <span className="lead serial"><bdi>{d.name}</bdi></span>
                 </td>
-                <td className="serial" dir="ltr">{d.registered}</td>
-                <td className="serial" dir="ltr">{d.expires}</td>
+                <td className="serial"><bdi>{d.registered}</bdi></td>
+                <td className="serial"><bdi>{d.expires}</bdi></td>
                 <td>
                   <span className={`tag tag--${d.status === 'active' ? 'ok' : 'due'}`}>
                     {t(`dom.${d.status}` as never)}
@@ -148,8 +148,8 @@ export function DomainManage() {
             {DNS_RECORDS.map((r) => (
               <tr key={r.id}>
                 <td><span className="lead serial">{r.type}</span></td>
-                <td className="serial" dir="ltr">{r.host}</td>
-                <td className="serial" dir="ltr">{r.value}</td>
+                <td className="serial"><bdi>{r.host}</bdi></td>
+                <td className="serial"><bdi>{r.value}</bdi></td>
                 <td className="num">{r.ttl}</td>
                 <td className="num">
                   <Button size="sm" variant="quiet" aria-label={`${t('action.remove')} ${r.type} ${r.host}`}>

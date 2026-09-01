@@ -153,8 +153,8 @@ export function DomainStep() {
             .concat(TLDS.filter((x) => !x.featured && !extras.includes(x.tld)).slice(0, 3))
             .map((row) => (
               <li className="tld" key={row.tld}>
-                <span className="tld__name serial" dir="ltr">
-                  {stem ? `${stem}${row.tld}` : row.tld}
+                <span className="tld__name serial">
+                  <bdi>{stem ? `${stem}${row.tld}` : row.tld}</bdi>
                 </span>
                 <span className="tld__price serial">
                   {formatAmount(convert(row.registerUsdMinor, currency), locale)} {currency}

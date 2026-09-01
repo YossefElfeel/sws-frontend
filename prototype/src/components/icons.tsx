@@ -248,3 +248,68 @@ export function IconPlus({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+/* ── client-area chrome ─────────────────────────────────────────────────────── */
+
+export function IconBell({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M18 8.6a6 6 0 1 0-12 0c0 5.3-2 6.9-2 6.9h16s-2-1.6-2-6.9" />
+      <path d="M13.7 19.4a2 2 0 0 1-3.4 0" />
+    </svg>
+  );
+}
+
+export function IconMenu({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  );
+}
+
+export function IconClose({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+export function IconSignOut({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M14.5 20H6.2A2.2 2.2 0 0 1 4 17.8V6.2A2.2 2.2 0 0 1 6.2 4h8.3" />
+      <path d="M16.5 15.5 20 12l-3.5-3.5M20 12H9.5" />
+    </svg>
+  );
+}
+
+/** A renewal is a date on a calendar before it is a row in a table. */
+export function IconCalendar({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="3.5" y="5.5" width="17" height="15" rx="2.2" />
+      <path d="M3.5 10h17M8 3.5v4M16 3.5v4" />
+    </svg>
+  );
+}
+
+export function IconWallet({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3.5 8.2A2.2 2.2 0 0 1 5.7 6h11.1A2.2 2.2 0 0 1 19 8.2" />
+      <rect x="3.5" y="8.2" width="17" height="11.8" rx="2.2" />
+      <path d="M20.5 12.5h-3.3a1.8 1.8 0 0 0 0 3.6h3.3" />
+    </svg>
+  );
+}
+
+export function IconAlert({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.8v4.6M12 16.1h.01" />
+    </svg>
+  );
+}

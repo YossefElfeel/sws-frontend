@@ -60,9 +60,9 @@ export function Invoices() {
             <tbody>
               {rows.map((inv) => (
                 <tr key={inv.id}>
-                  <td><span className="lead serial" dir="ltr">{inv.number}</span></td>
-                  <td className="serial" dir="ltr">{inv.date}</td>
-                  <td className="serial" dir="ltr">{inv.due}</td>
+                  <td><span className="lead serial"><bdi>{inv.number}</bdi></span></td>
+                  <td className="serial"><bdi>{inv.date}</bdi></td>
+                  <td className="serial"><bdi>{inv.due}</bdi></td>
                   <td className="num">
                     {formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}
                   </td>
@@ -129,8 +129,8 @@ export function InvoiceDetail() {
       <div className="panel panel--pad invoice">
         <div className="invoice__head">
           <dl className="kv">
-            <div><dt>{t('account.date')}</dt><dd className="serial" dir="ltr">{inv.date}</dd></div>
-            <div><dt>{t('inv.due')}</dt><dd className="serial" dir="ltr">{inv.due}</dd></div>
+            <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
+            <div><dt>{t('inv.due')}</dt><dd className="serial"><bdi>{inv.due}</bdi></dd></div>
             <div><dt>{t('account.status')}</dt><dd><span className={`tag tag--${inv.status === 'paid' ? 'ok' : 'due'}`}>{t(`inv.${inv.status}` as never)}</span></dd></div>
             {method && <div><dt>{t('checkout.method')}</dt><dd>{t(method.labelKey as never)}</dd></div>}
           </dl>
@@ -256,11 +256,11 @@ export function PaymentMethods() {
         {PAYMENT_METHODS_SAVED.map((m) => (
           <li className="pm" key={m.id}>
             <span className="pm__brand">{m.kind}</span>
-            <span className="pm__num serial" dir="ltr">
-              •••• {m.last4}
+            <span className="pm__num serial">
+              <bdi>•••• {m.last4}</bdi>
             </span>
-            <span className="pm__exp serial" dir="ltr">
-              {m.expiry}
+            <span className="pm__exp serial">
+              <bdi>{m.expiry}</bdi>
             </span>
             {m.primary ? (
               <span className="tag tag--ok">

@@ -58,8 +58,8 @@ export function Cart() {
                         <td>
                           <span className="lead">{line.plan.name}</span>
                           {line.domain?.name && (
-                            <span className="data__sub serial" dir="ltr">
-                              {line.domain.name}
+                            <span className="data__sub serial">
+                              <bdi>{line.domain.name}</bdi>
                             </span>
                           )}
                         </td>

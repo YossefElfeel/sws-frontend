@@ -16,8 +16,8 @@ export function Announcements() {
       <ul className="news">
         {ANNOUNCEMENTS.map((n) => (
           <li className="news__item news__item--panel" key={n.id}>
-            <p className="news__date serial" dir="ltr">
-              {n.date}
+            <p className="news__date serial">
+              <bdi>{n.date}</bdi>
             </p>
             <h2 className="card__title">{t(n.titleKey as never)}</h2>
             <p className="card__body">{t(n.bodyKey as never)}</p>
@@ -178,8 +178,8 @@ export function Security() {
           <tbody>
             {LOGIN_LOG.map((l) => (
               <tr key={l.id}>
-                <td className="serial" dir="ltr">{l.at}</td>
-                <td className="serial" dir="ltr">{l.ip}</td>
+                <td className="serial"><bdi>{l.at}</bdi></td>
+                <td className="serial"><bdi>{l.ip}</bdi></td>
                 <td>{bi(l.where)}</td>
                 <td>
                   <span className={`tag tag--${l.ok ? 'ok' : 'due'}`}>
@@ -205,8 +205,8 @@ export function Contacts() {
         {CONTACTS.map((c) => (
           <li className="pm" key={c.id}>
             <span className="pm__brand">{bi(c.name)}</span>
-            <span className="pm__num serial" dir="ltr">
-              {c.email}
+            <span className="pm__num serial">
+              <bdi>{c.email}</bdi>
             </span>
             <span className="perm-list">
               {c.permissions.map((p) => (

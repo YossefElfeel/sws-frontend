@@ -54,10 +54,10 @@ export function Services() {
               <tr key={s.id}>
                 <td>
                   <span className="lead">{s.product}</span>
-                  <span className="data__sub serial" dir="ltr">{s.domain}</span>
+                  <span className="data__sub serial"><bdi>{s.domain}</bdi></span>
                 </td>
                 <td>{t(`cycle.${s.cycle}` as never)}</td>
-                <td className="serial" dir="ltr">{s.nextDue}</td>
+                <td className="serial"><bdi>{s.nextDue}</bdi></td>
                 <td className="num">
                   {formatAmount(convert(s.amountUsdMinor, currency), locale)} {currency}
                 </td>
@@ -115,9 +115,9 @@ export function ServiceDetail() {
         <div className="panel panel--pad">
           <h2 className="card__title">{t('svc.server')}</h2>
           <dl className="kv">
-            <div><dt>{t('svc.hostname')}</dt><dd className="serial" dir="ltr">{svc.server}</dd></div>
-            <div><dt>{t('svc.ip')}</dt><dd className="serial" dir="ltr">{svc.ip}</dd></div>
-            <div><dt>{t('account.since')}</dt><dd className="serial" dir="ltr">{svc.since}</dd></div>
+            <div><dt>{t('svc.hostname')}</dt><dd className="serial"><bdi>{svc.server}</bdi></dd></div>
+            <div><dt>{t('svc.ip')}</dt><dd className="serial"><bdi>{svc.ip}</bdi></dd></div>
+            <div><dt>{t('account.since')}</dt><dd className="serial"><bdi>{svc.since}</bdi></dd></div>
             <div><dt>{t('account.status')}</dt><dd><span className="tag tag--ok">{t(`status.${svc.status}` as never)}</span></dd></div>
           </dl>
 
@@ -153,7 +153,7 @@ export function ServiceDetail() {
           <dl className="kv">
             <div><dt>{t('col.term')}</dt><dd>{t(`cycle.${svc.cycle}` as never)}</dd></div>
             <div><dt>{t('col.amount')}</dt><dd className="serial">{formatAmount(convert(svc.amountUsdMinor, currency), locale)} {currency}</dd></div>
-            <div><dt>{t('account.nextdue')}</dt><dd className="serial" dir="ltr">{svc.nextDue}</dd></div>
+            <div><dt>{t('account.nextdue')}</dt><dd className="serial"><bdi>{svc.nextDue}</bdi></dd></div>
           </dl>
 
           <div className="stack">

@@ -90,10 +90,24 @@ ok('pay button gated on agreement', disabled === true);
 // ── Spec 9, the client area ──────────────────────────────────────────────────
 
 await p.evaluate(() => (location.hash = '#/account'));
-await p.waitForSelector('.rail__link');
-const sections = await p.$$eval('.rail__link', (n) => n.length);
-ok('rail reaches every section', sections === 12, `${sections} sections`);
-ok('dashboard shows the four counts', (await p.$$eval('.tiles .tile', (n) => n.length)) === 4);
+await p.waitForSelector('.app__link');
+const sections = await p.$$eval('.app__link', (n) => n.length);
+ok('sidebar reaches every section', sections === 12, `${sections} sections`);
+ok('dashboard shows the four counts', (await p.$$eval('.stat-row .stat', (n) => n.length)) === 4);
+
+// The client area is an application, not another page of the site: none of the marketing
+// chrome a signed-in person has already passed should be on the screen.
+const marketing = await p.$$eval(
+  '.masthead, .colophon, .masthead__login, .masthead__cart',
+  (n) => n.length,
+);
+ok('no marketing chrome inside the app', marketing === 0, `${marketing} element(s)`);
+ok('the signed-in account is named', (await p.$$eval('.app__user-name', (n) => n.length)) === 1);
+
+// 9.1 the dashboard leads with what is owed, and the amount is a link to paying it.
+const owes = await p.$$eval('.card--urgent .due__amount', (n) => n.map((x) => x.textContent.trim()));
+ok('dashboard leads with what is owed', owes.length === 1, owes[0] ?? 'none');
+ok('renewals are scheduled nearest first', (await p.$$eval('.sched__when', (n) => n.length)) > 0);
 
 // 9.2 services, filtered by status
 await p.evaluate(() => (location.hash = '#/account/services'));
@@ -129,11 +143,11 @@ ok('ticket thread separates the two sides', client > 0 && staff > 0, `${client} 
 // The bilingual fixtures are the point of section 9 in Arabic: switching language has to
 // change the customer's own words, not only the chrome around them.
 const bodyAr = await p.$eval('.msg__body', (e) => e.textContent.trim());
-await p.selectOption('.masthead__select:nth-of-type(1) select', 'en');
+await p.selectOption('.app__select:nth-of-type(1) select', 'en');
 await p.waitForTimeout(150);
 const bodyEn = await p.$eval('.msg__body', (e) => e.textContent.trim());
 ok('ticket text follows the language', bodyAr !== bodyEn, `${bodyAr.slice(0, 18)}… -> ${bodyEn.slice(0, 18)}…`);
-await p.selectOption('.masthead__select:nth-of-type(1) select', 'ar');
+await p.selectOption('.app__select:nth-of-type(1) select', 'ar');
 
 // 9.5.4 knowledgebase search narrows the list
 await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
@@ -151,6 +165,75 @@ const twofaBefore = await p.$eval('.switch-row input', (e) => e.checked);
 await p.click('.switch-row input');
 const twofaAfter = await p.$eval('.switch-row input', (e) => e.checked);
 ok('two-factor toggles', twofaBefore !== twofaAfter, `${twofaBefore} -> ${twofaAfter}`);
+
+// ADR-0004 is a token the a11y gate checks in the abstract. This checks it on the rendered
+// page, at the width where controls actually get small — the only place it can fail.
+//
+// The effective target is measured by hit-testing, not by getBoundingClientRect: a control
+// may legitimately extend its target with an absolutely-positioned pseudo-element, which a
+// box measurement cannot see and a fingertip can. What matters is whether the point is
+// clickable and resolves to this control.
+for (const w of [390, 1440]) {
+  await p.setViewportSize({ width: w, height: 900 });
+  await p.evaluate(() => (location.hash = '#/account'));
+  await p.waitForSelector('.app__bar');
+  await p.waitForTimeout(200);
+
+  const small = await p.evaluate(() => {
+    const MIN = 44;
+    const owns = (el, node) => {
+      for (let n = node; n; n = n.parentElement) if (n === el) return true;
+      return false;
+    };
+    /**
+     * How far past an edge the target still answers to the pointer. Probing outward from the
+     * edges rather than from the centre keeps the arithmetic exact: a plain 44px box measures
+     * 44, not 43, because the centre pixel is never counted twice or lost.
+     */
+    const reach = (el, x, y, dx, dy) => {
+      for (let d = 1; d <= MIN; d++) {
+        const hit = document.elementFromPoint(x + dx * d, y + dy * d);
+        if (!hit || !owns(el, hit)) return d - 1;
+      }
+      return MIN;
+    };
+
+    const sel = 'a, button, select, input:not([type=hidden]), [role=button]';
+    return [...document.querySelectorAll(sel)]
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) return false;
+        if (getComputedStyle(el).visibility === 'hidden') return false;
+        if (r.top < 0 || r.bottom > window.innerHeight) return false; // off-screen, not measurable
+        if (r.right < 0 || r.left > window.innerWidth) return false; // off-canvas drawer
+        // Nothing over it at its own centre, or it is not the thing being measured.
+        const at = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        if (!at) return false;
+        for (let n = at; ; n = n.parentElement) {
+          if (n === el) return true;
+          if (!n) return false;
+        }
+        // A link inside running text is text, not a control; the rule is about controls.
+        return !el.closest('p, .app__crumbs, .prose, .colophon');
+      })
+      .map((el) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const h = r.height + reach(el, cx, r.top + 0.5, 0, -1) + reach(el, cx, r.bottom - 0.5, 0, 1);
+        const wdt = r.width + reach(el, r.left + 0.5, cy, -1, 0) + reach(el, r.right - 0.5, cy, 1, 0);
+        return { w: Math.round(wdt), h: Math.round(h), what: String(el.className || el.tagName).slice(0, 30) };
+      })
+      .filter((b) => b.w < MIN || b.h < MIN);
+  });
+
+  ok(
+    `every control clears 44px at ${w}`,
+    small.length === 0,
+    small.length ? small.slice(0, 3).map((b) => `${b.what} ${b.w}x${b.h}`).join(' · ') : 'all clear',
+  );
+}
+await p.setViewportSize({ width: 1440, height: 900 });
 
 // ADR-0003: Latin numerals everywhere, including inside Arabic copy.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));

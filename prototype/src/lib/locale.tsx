@@ -430,6 +430,47 @@ export const STRINGS = {
   'acc.security': { ar: 'الحساب والأمان', en: 'Account & Security' },
   'acc.portalHome': { ar: 'الرئيسية', en: 'Portal Home' },
 
+
+  // ── client area chrome ────────────────────────────────────────────────────
+  // The client area is an application, not another page of the site: its own shell, its own
+  // navigation, and none of the marketing chrome a signed-in person has already passed.
+  'app.workspace': { ar: 'حسابك', en: 'Your account' },
+  'app.backToSite': { ar: 'رجوع للموقع', en: 'Back to site' },
+  'app.signOut': { ar: 'تسجيل الخروج', en: 'Sign out' },
+  'app.notifications': { ar: 'الإشعارات', en: 'Notifications' },
+  'app.menu': { ar: 'القائمة', en: 'Menu' },
+  'app.closeMenu': { ar: 'إغلاق القائمة', en: 'Close menu' },
+  'app.grp.overview': { ar: 'نظرة عامة', en: 'Overview' },
+  'app.grp.billing': { ar: 'الفوترة', en: 'Billing' },
+  'app.grp.support': { ar: 'الدعم', en: 'Support' },
+  'app.grp.account': { ar: 'الحساب', en: 'Account' },
+
+  // ── dashboard ─────────────────────────────────────────────────────────────
+  'dash.needsYou': { ar: 'محتاج منك حاجة', en: 'Needs you' },
+  'dash.allClear': { ar: 'مفيش حاجة مطلوبة منك', en: 'Nothing needs you' },
+  'dash.allClearNote': {
+    ar: 'كل الفواتير مدفوعة وكل الخدمات شغالة.',
+    en: 'Every invoice is paid and every service is running.',
+  },
+  'dash.dueOn': { ar: 'مستحقة يوم', en: 'Due' },
+  'dash.overdueBy': { ar: 'متأخرة', en: 'Overdue' },
+  'dash.daysShort': { ar: 'يوم', en: 'days' },
+  'dash.credit': { ar: 'رصيدك', en: 'Account credit' },
+  'dash.creditNote': {
+    ar: 'بيتخصم تلقائيًا من أول فاتورة جاية.',
+    en: 'Applied automatically to your next invoice.',
+  },
+  'dash.renewals': { ar: 'تجديدات قادمة', en: 'Upcoming renewals' },
+  'dash.noRenewals': { ar: 'مفيش تجديدات في الـ 60 يوم الجاية.', en: 'No renewals in the next 60 days.' },
+  'dash.inDays': { ar: 'خلال', en: 'in' },
+  'dash.today': { ar: 'النهارده', en: 'today' },
+  'dash.tomorrow': { ar: 'بكرة', en: 'tomorrow' },
+  'dash.activity': { ar: 'آخر النشاط', en: 'Recent activity' },
+  'dash.quick': { ar: 'إجراءات سريعة', en: 'Quick actions' },
+  'dash.viewAll': { ar: 'عرض الكل', en: 'View all' },
+  'dash.noTickets': { ar: 'مفيش تذاكر مفتوحة.', en: 'No open tickets.' },
+  'dash.of': { ar: 'من', en: 'of' },
+
   'dash.hello': { ar: 'أهلًا', en: 'Hello' },
   'dash.lede': { ar: 'دي نظرة سريعة على حسابك.', en: 'A quick look at your account.' },
   'dash.unpaid': { ar: 'فواتير غير مدفوعة', en: 'Unpaid invoices' },

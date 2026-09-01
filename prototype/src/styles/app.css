@@ -1,0 +1,1096 @@
+/*
+ * SWS — the client-area application shell.
+ *
+ * Everything here is furniture for a signed-in workspace: a standing navigation column, a bar
+ * that names the current place, and a denser body than the marketing pages carry. It shares
+ * the marketing type scale and accent — the same product, a different room.
+ *
+ * The document scrolls; the sidebar is sticky at full height. That reads as an application
+ * while keeping every screen linkable and capturable end to end.
+ */
+
+.app {
+  --app-side: 17rem;
+  --app-bar: 60px;
+
+  min-block-size: 100vh;
+  background: var(--sws-surface-sunken);
+}
+
+@media (min-width: 1024px) {
+  .app {
+    display: grid;
+    grid-template-columns: var(--app-side) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* ── the navigation column ─────────────────────────────────────────────────── */
+
+.app__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sws-space-8);
+  background: var(--sws-surface-raised);
+  border-inline-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+@media (min-width: 1024px) {
+  .app__side {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100vh;
+    overflow-y: auto;
+  }
+}
+
+/* Under 1024 it is a drawer. Off-canvas rather than collapsed, because a workspace nav of
+   twelve links has nowhere useful to collapse to. */
+@media (max-width: 1023px) {
+  .app__side {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: min(var(--app-side), 84vw);
+    z-index: 60;
+    transform: translateX(calc(-105% * var(--sws-flip, 1)));
+    transition: transform var(--sws-duration-base) var(--sws-ease-standard);
+    box-shadow: var(--sws-shadow-lift);
+  }
+
+  :root[dir='rtl'] .app__side {
+    --sws-flip: -1;
+  }
+
+  .app--open .app__side {
+    transform: none;
+  }
+}
+
+@media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+  .app__side {
+    transition: none;
+  }
+}
+
+.app__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  padding: 0;
+  border: 0;
+  background: rgb(2 6 23 / 0.45);
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .app__scrim {
+    display: none;
+  }
+}
+
+/* ── brand ─────────────────────────────────────────────────────────────────── */
+
+.app__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  min-block-size: var(--app-bar);
+  padding-inline: var(--sws-space-16);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.app__brand-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-width: 0;
+  min-block-size: var(--sws-touch-target-min);
+  color: inherit;
+  text-decoration: none;
+}
+
+.app__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 30px;
+  block-size: 30px;
+  flex: none;
+  background: var(--sws-action-primary);
+  color: var(--sws-text-on-action);
+  border-radius: var(--sws-radius-sm);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.app__brand-text {
+  display: grid;
+  min-width: 0;
+}
+
+.app__brand-name {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.app__brand-sub {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+  line-height: 1.3;
+}
+
+.app__side-close {
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  flex: none;
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .app__side-close {
+    display: none;
+  }
+}
+
+/* ── nav ───────────────────────────────────────────────────────────────────── */
+
+.app__nav {
+  flex: 1 1 auto;
+  padding: var(--sws-space-16) var(--sws-space-12);
+  overflow-y: auto;
+}
+
+.app__group + .app__group {
+  margin-block-start: var(--sws-space-24);
+}
+
+.app__group-label {
+  padding: 0 var(--sws-space-12) var(--sws-space-8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sws-text-secondary);
+}
+
+:root[lang='ar'] .app__group-label {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: var(--sws-font-size-caption);
+}
+
+.app__group ul {
+  display: grid;
+  gap: 2px;
+}
+
+.app__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  /* A real 44px row rather than a 38px row with an invisible expander: on a list this dense
+     the expanders of adjacent rows overlap, and the one painted last wins the shared strip —
+     so the trick gives back most of what it claims. ADR-0004 by construction. */
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.app__link-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--sws-text-secondary);
+}
+
+.app__link-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app__link:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-primary);
+}
+
+.app__link.active {
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-quiet);
+  font-weight: 600;
+}
+
+.app__link.active .app__link-icon {
+  color: var(--sws-action-primary);
+}
+
+/* A count in the nav is the reason to open that section, so it reads before the label does. */
+.app__link-badge {
+  display: grid;
+  place-items: center;
+  min-inline-size: 20px;
+  block-size: 20px;
+  padding-inline: 6px;
+  flex: none;
+  background: var(--sws-status-danger);
+  color: var(--sws-text-on-action);
+  border-radius: var(--sws-radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ── the account block ─────────────────────────────────────────────────────── */
+
+.app__user {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  padding: var(--sws-space-12) var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.app__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  flex: none;
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-quiet);
+  border-radius: var(--sws-radius-pill);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+}
+
+.app__user-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.app__user-name,
+.app__user-mail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app__user-name {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.app__user-mail {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+  line-height: 1.3;
+}
+
+.app__signout {
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  flex: none;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+}
+
+.app__signout:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-status-danger);
+}
+
+/* ── the bar ───────────────────────────────────────────────────────────────── */
+
+.app__body {
+  min-width: 0;
+}
+
+.app__bar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  min-block-size: var(--app-bar);
+  padding-inline: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+@media (min-width: 1024px) {
+  .app__bar {
+    padding-inline: var(--sws-space-32);
+  }
+}
+
+.app__menu {
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  flex: none;
+  margin-inline-start: calc(var(--sws-space-12) * -1);
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-primary);
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .app__menu {
+    display: none;
+  }
+}
+
+.app__where {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app__where-title {
+  display: block;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app__crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.app__crumbs > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app__crumbs a {
+  color: var(--sws-text-secondary);
+  text-decoration: none;
+}
+
+.app__crumbs a:hover {
+  color: var(--sws-action-quiet);
+  text-decoration: underline;
+}
+
+.app__crumbs > span:last-child {
+  color: var(--sws-text-primary);
+  font-weight: 600;
+}
+
+.app__crumbs-sep {
+  margin-inline: var(--sws-space-4);
+  color: var(--sws-border-strong);
+}
+
+/* ── bar tools ─────────────────────────────────────────────────────────────── */
+
+.app__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  flex: none;
+}
+
+.app__select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: 34px;
+  padding-inline: var(--sws-space-8);
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.app__select:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-primary);
+}
+
+.app__select select {
+  appearance: none;
+  min-inline-size: var(--sws-touch-target-min);
+  min-block-size: var(--sws-touch-target-min);
+  padding: 0;
+  padding-inline-end: var(--sws-space-4);
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app__select select:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .app__select--currency {
+    display: none;
+  }
+}
+
+.app__icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  flex: none;
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+}
+
+.app__icon-btn:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-primary);
+}
+
+/* Sits on the bell's corner in either direction. */
+.app__dot {
+  position: absolute;
+  inset-block-start: 6px;
+  inset-inline-end: 6px;
+  display: grid;
+  place-items: center;
+  min-inline-size: 16px;
+  block-size: 16px;
+  padding-inline: 4px;
+  background: var(--sws-status-danger);
+  color: var(--sws-text-on-action);
+  border-radius: var(--sws-radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.app__exit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  margin-inline-start: var(--sws-space-4);
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app__exit:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-action-quiet);
+}
+
+@media (max-width: 899px) {
+  .app__exit-label {
+    display: none;
+  }
+
+  .app__exit {
+    padding-inline: 0;
+    inline-size: var(--sws-touch-target-min);
+    justify-content: center;
+  }
+}
+
+/* ── the body ──────────────────────────────────────────────────────────────── */
+
+.app__main {
+  padding: var(--sws-space-24) var(--sws-space-16) var(--sws-space-48);
+}
+
+@media (min-width: 1024px) {
+  .app__main {
+    padding: var(--sws-space-32) var(--sws-space-32) var(--sws-space-48);
+  }
+}
+
+.app__main:focus {
+  outline: none;
+}
+
+.app__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  margin-block-end: var(--sws-space-24);
+}
+
+/*
+ * An application title is a label for the screen, not a headline for a page. The marketing h1
+ * runs to display size; here it stays close to the body so the data below it is the loudest
+ * thing on screen.
+ */
+.app__title {
+  font-size: var(--sws-font-size-h3);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.app__lede {
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.app__head-actions {
+  display: flex;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+/* The account screens were written against the marketing rail; inside the shell the rail is
+   the sidebar, so the old two-column wrapper is a plain column. */
+.app__main .with-rail {
+  display: block;
+}
+
+.app__main .rail {
+  display: none;
+}
+
+/* ═══ dashboard ═══════════════════════════════════════════════════════════════ */
+
+/* ── the stat row ──────────────────────────────────────────────────────────── */
+
+.stat-row {
+  display: grid;
+  gap: var(--sws-space-12);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  margin-block-end: var(--sws-space-24);
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0 var(--sws-space-8);
+  padding: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-md);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.stat:hover {
+  border-color: var(--sws-action-primary);
+  box-shadow: var(--sws-shadow-sm);
+}
+
+.stat__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  grid-row: span 2;
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-primary);
+  border-radius: var(--sws-radius-sm);
+}
+
+.stat__n {
+  font-size: var(--sws-font-size-h3);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.stat__label {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.stat__note {
+  grid-column: 2;
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-status-success);
+}
+
+/*
+ * A stat that is also a debt is marked as one — ground, border and figure together, never
+ * colour alone. It is the loudest number in the row because it is the only one that is owed.
+ */
+.stat--alert {
+  border-color: var(--sws-status-danger);
+  background: var(--sws-banner-danger-bg);
+}
+
+.stat--alert .stat__icon {
+  background: var(--sws-surface-raised);
+  color: var(--sws-status-danger);
+}
+
+.stat--alert .stat__n {
+  color: var(--sws-status-danger);
+}
+
+/* ── the two-column body ───────────────────────────────────────────────────── */
+
+.dash {
+  display: grid;
+  gap: var(--sws-space-16);
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .dash {
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+}
+
+.dash__main,
+.dash__side {
+  display: grid;
+  gap: var(--sws-space-16);
+  align-content: start;
+  min-width: 0;
+}
+
+/* ── cards ─────────────────────────────────────────────────────────────────── */
+
+.card {
+  padding: var(--sws-space-24);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+}
+
+.card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-12);
+  margin-block-end: var(--sws-space-16);
+}
+
+.card__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.card__heading svg {
+  color: var(--sws-text-secondary);
+}
+
+.card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  color: var(--sws-action-quiet);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.card__more:hover {
+  text-decoration: underline;
+}
+
+/*
+ * A "view all" beside a heading is a control, so it carries a control's target. The negative
+ * block margin keeps the card head at its heading's height: the reach grows, the row does not.
+ * Nothing is stacked above or below it, so nothing can take the extra strip back.
+ */
+.card__more {
+  min-block-size: var(--sws-touch-target-min);
+  margin-block: calc((var(--sws-touch-target-min) - 1.5rem) / -2);
+}
+
+.card--urgent {
+  border-color: var(--sws-status-danger);
+}
+
+.card--urgent .card__heading,
+.card--urgent .card__heading svg {
+  color: var(--sws-status-danger);
+}
+
+/* The other half of the same slot. An account with nothing owed should read as settled, not
+   as an empty box where the alarm goes — so the calm state is stated, not left blank. */
+.card--calm {
+  border-color: var(--sws-status-success);
+  background: var(--sws-banner-success-bg);
+}
+
+/* ── the amount owed ───────────────────────────────────────────────────────── */
+
+.due__amount {
+  font-size: var(--sws-font-size-h1);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.due__note {
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.due__actions {
+  display: flex;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+  margin-block-start: var(--sws-space-16);
+}
+
+.calm {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sws-space-12);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.calm svg {
+  flex: none;
+  color: var(--sws-status-success);
+}
+
+.calm strong {
+  display: block;
+  font-size: var(--sws-font-size-body);
+}
+
+.calm__note {
+  display: block;
+  margin-block-start: 2px;
+  color: var(--sws-text-secondary);
+}
+
+/* ── list rows ─────────────────────────────────────────────────────────────── */
+/* Three fields do not need a table's machinery, and rows survive a narrow column. */
+
+.rows {
+  display: grid;
+  margin: calc(var(--sws-space-8) * -1) calc(var(--sws-space-12) * -1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-8) var(--sws-space-12);
+  border-radius: var(--sws-radius-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.row:hover {
+  background: var(--sws-surface-sunken);
+}
+
+.row__dot {
+  inline-size: 8px;
+  block-size: 8px;
+  flex: none;
+  border-radius: var(--sws-radius-pill);
+}
+
+.row__dot--ok {
+  background: var(--sws-status-success);
+}
+
+.row__dot--wait {
+  background: var(--sws-status-warning);
+}
+
+.row__text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.row__title {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.row__sub {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex: none;
+}
+
+.row__date {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.row__go {
+  flex: none;
+  color: var(--sws-border-strong);
+}
+
+.row:hover .row__go {
+  color: var(--sws-action-primary);
+}
+
+@media (max-width: 599px) {
+  .row__date,
+  .row__go {
+    display: none;
+  }
+}
+
+/* ── the schedule list ─────────────────────────────────────────────────────── */
+
+.sched {
+  display: grid;
+  gap: 2px;
+  margin: calc(var(--sws-space-8) * -1) calc(var(--sws-space-12) * -1);
+}
+
+.sched__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-8) var(--sws-space-12);
+  border-radius: var(--sws-radius-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.sched__item:hover {
+  background: var(--sws-surface-sunken);
+}
+
+/* Fixed width so every label beside them starts on one line, which is what makes the column
+   scan as a schedule rather than as a list of sentences. */
+.sched__when {
+  flex: none;
+  inline-size: 5.5rem;
+  font-size: var(--sws-font-size-caption);
+  font-weight: 600;
+  color: var(--sws-action-quiet);
+}
+
+.sched__what {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sched__label {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sched__sub {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── credit ────────────────────────────────────────────────────────────────── */
+
+.credit {
+  font-size: var(--sws-font-size-h2);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.credit__note {
+  margin-block: var(--sws-space-4) var(--sws-space-16);
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/* ── quick actions ─────────────────────────────────────────────────────────── */
+
+.quick {
+  display: grid;
+  gap: 2px;
+  margin: calc(var(--sws-space-8) * -1) calc(var(--sws-space-12) * -1);
+}
+
+.quick__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.quick__item:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-action-quiet);
+}
+
+.quick__item svg {
+  flex: none;
+}
+
+/* ── the announcement feed ─────────────────────────────────────────────────── */
+
+.feed {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+.feed__item + .feed__item {
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.feed__date {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.feed__title {
+  margin-block: 2px;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+}
+
+.feed__body {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  line-height: var(--sws-line-height-body-sm);
+}
+
+/* ── truncation, where the direction of the clip matters ───────────────────── */
+
+/*
+ * An address is identified by its start. Clipped from the RTL end it becomes "…al@host.com",
+ * which names nobody. Running the box LTR puts the clip on the domain instead — "kamal@ate…"
+ * still says whose account this is. The text stays at the reading edge in both directions.
+ */
+.app__user-mail {
+  direction: ltr;
+}
+
+:root[dir='rtl'] .app__user-mail {
+  text-align: right;
+}
+
+/*
+ * A ticket subject is a sentence, and a sentence ending in a domain cannot be clipped to one
+ * line without eating the domain in half — "…mal.com" names nothing. Two lines is what it
+ * takes to stay readable.
+ */
+.sched__label {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow: hidden;
+}
+
+/*
+ * Under 600 the bar has to hold a place name, four controls and a way out, and the place name
+ * is the one that was losing. The language stays switchable — the select covers its own globe
+ * as an invisible overlay; only the redundant name of the language you are already reading in
+ * comes off the bar.
+ */
+@media (max-width: 599px) {
+  /* The overlay select takes the wrapper's size, so the wrapper is what has to carry the
+     44px target (ADR-0004) once the label is gone. */
+  .app__select {
+    position: relative;
+    inline-size: var(--sws-touch-target-min);
+    min-block-size: var(--sws-touch-target-min);
+    padding-inline: 0;
+    justify-content: center;
+  }
+
+  .app__select select {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: 0;
+    padding: 0;
+    opacity: 0;
+  }
+
+  .app__select > svg:last-child {
+    display: none;
+  }
+}
