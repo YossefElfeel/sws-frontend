@@ -2,7 +2,14 @@ import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconArrow, IconInvoice, IconPlus, IconCheck } from '../../components/icons';
+import {
+  IconArrow,
+  IconInvoice,
+  IconPlus,
+  IconCheck,
+  IconWallet,
+  IconAlert,
+} from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount, gatewaysFor, GATEWAYS } from '../../lib/catalog';
@@ -23,29 +30,67 @@ export function Invoices() {
   const [filter, setFilter] = useState<InvoiceStatus | 'all'>('all');
 
   const rows = INVOICES.filter((i) => filter === 'all' || i.status === filter);
+  const owing = INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
+  const owed = owing.reduce((s, i) => s + i.totalUsdMinor, 0);
 
   return (
-    <AccountLayout title={t('acc.invoices')}>
-      <div className="filters" role="group" aria-label={t('account.status')}>
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            className={`filters__btn${filter === f ? ' is-active' : ''}`}
-            aria-pressed={filter === f}
-            onClick={() => setFilter(f)}
-          >
-            {t(`inv.${f}` as never)}
-          </button>
-        ))}
+    <AccountLayout
+      title={t('acc.invoices')}
+      actions={
+        <Link className="btn btn--md btn--secondary" to="/account/funds">
+          <IconWallet size={15} />
+          {t('acc.funds')}
+        </Link>
+      }
+    >
+      {/* What is owed belongs above the list of everything ever billed, not inside it. */}
+      {owing.length > 0 && (
+        <section className="card card--urgent" style={{ marginBlockEnd: 'var(--sws-space-16)' }}>
+          <div className="due">
+            <p className="due__amount serial">
+              {formatAmount(convert(owed, currency), locale)} {currency}
+            </p>
+            <p className="due__note">
+              <IconAlert size={14} /> {t('dash.dueNote')}
+            </p>
+            <div className="due__actions">
+              <Link className="btn btn--md btn--primary" to={`/account/invoices/${owing[0].id}`}>
+                {t('account.pay')}
+                <IconArrow size={15} />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <div className="bar">
+        <div className="filters" role="group" aria-label={t('account.status')}>
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              className={`filters__btn${filter === f ? ' is-active' : ''}`}
+              aria-pressed={filter === f}
+              onClick={() => setFilter(f)}
+            >
+              {t(`inv.${f}` as never)}
+            </button>
+          ))}
+        </div>
+        <p className="bar__count">
+          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
+          <span className="serial">{INVOICES.length}</span>
+        </p>
       </div>
 
       {rows.length === 0 ? (
-        <div className="empty">
-          <p className="empty__line">{t('inv.none')}</p>
+        <div className="card empty">
+          <IconInvoice size={28} />
+          <p className="empty__title">{t('inv.none')}</p>
+          <p className="empty__note">{t('empty.filter')}</p>
         </div>
       ) : (
-        <div className="panel table-scroll">
+        <div className="card card--flush table-scroll">
           <table className="data">
             <thead>
               <tr>
@@ -87,7 +132,12 @@ export function Invoices() {
   );
 }
 
-/** Single invoice — spec 9.4: line items, payment method, Pay Now, Download PDF. */
+/**
+ * Single invoice — spec 9.4: line items, payment method, Pay Now, Download PDF.
+ *
+ * This one screen keeps a document's measure rather than filling the app's width: an invoice
+ * is a thing you read, print and file, and a full-bleed one reads as a report.
+ */
 export function InvoiceDetail() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
@@ -98,6 +148,7 @@ export function InvoiceDetail() {
 
   const sub = inv.lines.reduce((s, l) => s + l.amountUsdMinor, 0);
   const method = GATEWAYS.find((g) => g.id === inv.method);
+  const unpaid = inv.status !== 'paid' && inv.status !== 'cancelled';
 
   /**
    * The product name and the domain stay as written; only the cycle is a word, so only the
@@ -125,14 +176,35 @@ export function InvoiceDetail() {
         { label: t('acc.invoices'), to: '/account/invoices' },
         { label: inv.number },
       ]}
+      actions={
+        <>
+          <Button size="md" variant="secondary">
+            <IconInvoice size={15} />
+            {t('inv.pdf')}
+          </Button>
+          {unpaid && <Button size="md">{t('account.pay')}</Button>}
+        </>
+      }
     >
-      <div className="panel panel--pad invoice">
+      <div className="card invoice">
         <div className="invoice__head">
           <dl className="kv">
             <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
             <div><dt>{t('inv.due')}</dt><dd className="serial"><bdi>{inv.due}</bdi></dd></div>
-            <div><dt>{t('account.status')}</dt><dd><span className={`tag tag--${inv.status === 'paid' ? 'ok' : 'due'}`}>{t(`inv.${inv.status}` as never)}</span></dd></div>
-            {method && <div><dt>{t('checkout.method')}</dt><dd>{t(method.labelKey as never)}</dd></div>}
+            <div>
+              <dt>{t('account.status')}</dt>
+              <dd>
+                <span className={`tag tag--${inv.status === 'paid' ? 'ok' : 'due'}`}>
+                  {t(`inv.${inv.status}` as never)}
+                </span>
+              </dd>
+            </div>
+            {method && (
+              <div>
+                <dt>{t('checkout.method')}</dt>
+                <dd>{t(method.labelKey as never)}</dd>
+              </div>
+            )}
           </dl>
         </div>
 
@@ -164,17 +236,11 @@ export function InvoiceDetail() {
           </div>
           <div className="totals__row totals__row--grand">
             <dt>{t('cart.total')}</dt>
-            <dd>{formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}</dd>
+            <dd>
+              {formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}
+            </dd>
           </div>
         </dl>
-
-        <div className="actions">
-          <Button size="md" variant="secondary">
-            <IconInvoice size={16} />
-            {t('inv.pdf')}
-          </Button>
-          {inv.status !== 'paid' && <Button size="lg">{t('account.pay')}</Button>}
-        </div>
       </div>
     </AccountLayout>
   );
@@ -187,59 +253,89 @@ export function AddFunds() {
   const [amount, setAmount] = useState(2000);
 
   const presets = [1000, 2000, 5000, 10000];
+  const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
 
   return (
     <AccountLayout title={t('acc.funds')} lede={t('funds.lede')}>
-      <div className="split">
-        <div className="panel panel--pad">
-          <h2 className="card__title">{t('funds.amount')}</h2>
-          <div className="filters">
-            {presets.map((p) => (
-              <button
-                key={p}
-                type="button"
-                className={`filters__btn${amount === p ? ' is-active' : ''}`}
-                aria-pressed={amount === p}
-                onClick={() => setAmount(p)}
-              >
-                {formatAmount(convert(p, currency), locale)} {currency}
-              </button>
-            ))}
-          </div>
+      <div className="with-side">
+        <div className="dash__main">
+          <section className="card">
+            <header className="card__head">
+              <h2 className="card__heading">{t('funds.amount')}</h2>
+            </header>
+            <div className="form">
+              <div className="chips" role="group" aria-label={t('funds.amount')}>
+                {presets.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    className={`chip${amount === p ? ' is-active' : ''}`}
+                    aria-pressed={amount === p}
+                    onClick={() => setAmount(p)}
+                  >
+                    {money(p)}
+                  </button>
+                ))}
+              </div>
 
-          <label className="field-label">
-            <span className="eyebrow">{t('funds.custom')}</span>
-            <input
-              className="field serial"
-              type="number"
-              min={5}
-              dir="ltr"
-              value={(amount / 100).toFixed(2)}
-              onChange={(e) => setAmount(Math.round(Number(e.target.value) * 100))}
-            />
-          </label>
+              <label className="field-label">
+                <span className="eyebrow">{t('funds.custom')}</span>
+                <input
+                  className="field serial"
+                  type="number"
+                  min={5}
+                  dir="ltr"
+                  value={(amount / 100).toFixed(2)}
+                  onChange={(e) => setAmount(Math.round(Number(e.target.value) * 100))}
+                />
+              </label>
+            </div>
+          </section>
 
-          <h2 className="card__title">{t('checkout.method')}</h2>
-          <ul className="methods">
-            {gatewaysFor(currency).map((g, i) => (
-              <li key={g.id}>
-                <label className={`method${i === 0 ? ' is-selected' : ''}`}>
-                  <input type="radio" name="fundsmethod" defaultChecked={i === 0} />
-                  <span className="method__label">{t(g.labelKey as never)}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-
-          <Button size="lg">{t('funds.add')}</Button>
+          <section className="card">
+            <header className="card__head">
+              <h2 className="card__heading">{t('checkout.method')}</h2>
+            </header>
+            <ul className="methods">
+              {gatewaysFor(currency).map((g, i) => (
+                <li key={g.id}>
+                  <label className={`method${i === 0 ? ' is-selected' : ''}`}>
+                    <input type="radio" name="fundsmethod" defaultChecked={i === 0} />
+                    <span className="method__label">{t(g.labelKey as never)}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
 
-        <div className="panel panel--pad">
-          <h2 className="card__title">{t('funds.balance')}</h2>
-          <p className="balance serial">
-            {formatAmount(convert(ACCOUNT.creditUsdMinor, currency), locale)} {currency}
-          </p>
-          <p className="card__body">{t('funds.balanceNote')}</p>
+        <div className="dash__side">
+          <section className="card">
+            <header className="card__head">
+              <h2 className="card__heading">
+                <IconWallet size={17} />
+                {t('funds.balance')}
+              </h2>
+            </header>
+            <p className="figure">
+              <span className="figure__n serial">{money(ACCOUNT.creditUsdMinor)}</span>
+            </p>
+            <p className="credit__note">{t('funds.balanceNote')}</p>
+
+            {/* The amount being added is restated where the button is, so nobody confirms a
+                figure they set four fields ago and can no longer see. */}
+            <dl className="kv">
+              <div>
+                <dt>{t('funds.adding')}</dt>
+                <dd className="serial">{money(amount)}</dd>
+              </div>
+            </dl>
+            <div className="acts" style={{ marginBlockStart: 'var(--sws-space-16)' }}>
+              <Button size="md" disabled={amount < 500}>
+                {t('funds.add')}
+              </Button>
+            </div>
+          </section>
         </div>
       </div>
     </AccountLayout>
@@ -251,40 +347,57 @@ export function PaymentMethods() {
   const { t } = useLocale();
 
   return (
-    <AccountLayout title={t('acc.methods')} lede={t('pm.lede')}>
-      <ul className="cards-list">
-        {PAYMENT_METHODS_SAVED.map((m) => (
-          <li className="pm" key={m.id}>
-            <span className="pm__brand">{m.kind}</span>
-            <span className="pm__num serial">
-              <bdi>•••• {m.last4}</bdi>
-            </span>
-            <span className="pm__exp serial">
-              <bdi>{m.expiry}</bdi>
-            </span>
-            {m.primary ? (
-              <span className="tag tag--ok">
-                <IconCheck size={13} />
-                {t('pm.primary')}
-              </span>
-            ) : (
-              <Button size="sm" variant="secondary">
-                {t('pm.makePrimary')}
-              </Button>
-            )}
-            <Button size="sm" variant="quiet">
-              {t('action.remove')}
-            </Button>
-          </li>
-        ))}
-      </ul>
-
-      <div className="actions actions--split">
+    <AccountLayout
+      title={t('acc.methods')}
+      lede={t('pm.lede')}
+      actions={
         <Button size="md" variant="secondary">
           <IconPlus size={15} />
           {t('pm.add')}
         </Button>
-      </div>
+      }
+    >
+      {PAYMENT_METHODS_SAVED.length > 0 ? (
+        <div className="card card--flush">
+          {PAYMENT_METHODS_SAVED.map((m) => (
+            <div className="method-row" key={m.id}>
+              <span className="method-row__mark" aria-hidden="true">
+                {m.kind.slice(0, 4).toUpperCase()}
+              </span>
+              <span>
+                <span className="method-row__num serial">
+                  <bdi>•••• {m.last4}</bdi>
+                </span>
+                <span className="method-row__exp serial" style={{ display: 'block' }}>
+                  <bdi>{m.expiry}</bdi>
+                </span>
+              </span>
+              <span className="method-row__grow">
+                {m.primary && (
+                  <span className="tag tag--ok">
+                    <IconCheck size={13} />
+                    {t('pm.primary')}
+                  </span>
+                )}
+              </span>
+              {!m.primary && (
+                <Button size="sm" variant="secondary">
+                  {t('pm.makePrimary')}
+                </Button>
+              )}
+              <Button size="sm" variant="danger" aria-label={`${t('action.remove')} ${m.kind} ${m.last4}`}>
+                {t('action.remove')}
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="card empty">
+          <IconInvoice size={28} />
+          <p className="empty__title">{t('empty.methods')}</p>
+          <p className="empty__note">{t('pm.lede')}</p>
+        </div>
+      )}
     </AccountLayout>
   );
 }

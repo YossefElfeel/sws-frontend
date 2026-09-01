@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconArrow, IconPlus, IconSearch, IconBook } from '../../components/icons';
+import { IconArrow, IconPlus, IconSearch, IconBook, IconSupport } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import {
   TICKETS,
@@ -44,14 +44,16 @@ export function Tickets() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="empty">
-          <p className="empty__line">{t('tkt.none')}</p>
+        <div className="card empty">
+          <IconSupport size={28} />
+          <p className="empty__title">{t('tkt.none')}</p>
+          <p className="empty__note">{t('empty.filter')}</p>
           <Link className="btn btn--lg btn--primary" to="/account/tickets/new">
             {t('tkt.open')}
           </Link>
         </div>
       ) : (
-        <div className="panel table-scroll">
+        <div className="card card--flush table-scroll">
           <table className="data">
             <thead>
               <tr>
@@ -128,12 +130,11 @@ export function TicketNew() {
       title={t('tkt.open')}
       crumbs={[
         { label: t('acc.portalHome'), to: '/account' },
-        { label: t('acc.title'), to: '/account' },
         { label: t('acc.tickets'), to: '/account/tickets' },
         { label: t('tkt.submit') },
       ]}
     >
-      <h2 className="section__title section__title--sm">{t('tkt.chooseDept')}</h2>
+      <h2 className="app__section">{t('tkt.chooseDept')}</h2>
       <ul className="choices">
         {DEPARTMENTS.map((d) => (
           <li key={d.id}>
@@ -154,7 +155,7 @@ export function TicketNew() {
 
       <div className="with-side">
         <form
-          className="panel panel--pad"
+          className="card"
           onSubmit={(e) => {
             e.preventDefault();
             navigate('/account/tickets');
@@ -208,7 +209,7 @@ export function TicketNew() {
 
             <div className="editor">
               <div className="editor__bar" role="toolbar" aria-label={t('tkt.format')}>
-                {['B', 'I', 'H', '🔗', '• ', '1.', '</>', '❝'].map((mark, i) => (
+                {['B', 'I', 'H', '🔗', '•', '1.', '</>', '❝'].map((mark, i) => (
                   <button
                     type="button"
                     key={mark}
@@ -216,7 +217,7 @@ export function TicketNew() {
                     aria-label={t(`tkt.tool${i}` as never)}
                     title={t(`tkt.tool${i}` as never)}
                   >
-                    {mark}
+                    <bdi>{mark}</bdi>
                   </button>
                 ))}
               </div>
@@ -255,8 +256,8 @@ export function TicketNew() {
           </div>
         </form>
 
-        <aside className="panel panel--pad kb-side" aria-labelledby="kb-sug">
-          <h2 className="card__title" id="kb-sug">
+        <aside className="card kb-side" aria-labelledby="kb-sug">
+          <h2 className="card__heading" id="kb-sug">
             <IconBook size={17} />
             {t('tkt.suggestions')}
           </h2>
@@ -312,8 +313,8 @@ export function TicketThread() {
         ))}
       </div>
 
-      <div className="panel panel--pad">
-        <h2 className="card__title">{t('tkt.reply')}</h2>
+      <div className="card">
+        <h2 className="card__heading">{t('tkt.reply')}</h2>
         <label className="u-visually-hidden" htmlFor="reply">
           {t('tkt.reply')}
         </label>
@@ -357,7 +358,7 @@ export function Knowledgebase() {
         </Button>
       </form>
 
-      <ul className="kb-list">
+      <ul className="card card--flush kb-list">
         {rows.map((a) => (
           <li key={a.id}>
             <Link className="kb-item" to={`/account/knowledgebase/${a.slug}`}>
@@ -389,13 +390,13 @@ export function KbArticle() {
         { label: t(`kb.cat.${a.category}` as never) },
       ]}
     >
-      <article className="panel panel--pad prose">
+      <article className="card prose">
         <p>{t(a.bodyKey as never)}</p>
       </article>
 
       {/* Spec 9.5.4 asks each article to collect whether it was useful. */}
-      <div className="panel panel--pad vote">
-        <p className="card__title">{t('kb.helpful')}</p>
+      <div className="card vote">
+        <p className="card__heading">{t('kb.helpful')}</p>
         {voted ? (
           <p className="card__body">{t('kb.thanks')}</p>
         ) : (

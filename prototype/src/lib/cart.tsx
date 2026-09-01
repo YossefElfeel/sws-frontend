@@ -13,14 +13,14 @@ import {
   convert,
   planPrice,
   type Cycle,
-  type Plan,
+  type Priced,
 } from './catalog';
 import { usePrefs } from './prefs';
 
 /** A configured line: the plan, its cycle, its add-on choices and any linked domain. */
 export interface CartLine {
   id: string;
-  plan: Plan;
+  plan: Priced;
   cycle: Cycle;
   /** addon group id -> option id */
   addons: Record<string, string>;

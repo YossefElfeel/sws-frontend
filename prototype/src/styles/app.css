@@ -1094,3 +1094,437 @@
     display: none;
   }
 }
+
+/* ═══ the screen kit ══════════════════════════════════════════════════════════ */
+/*
+ * What every client-area screen that is not the dashboard is built from. The marketing
+ * surfaces keep .panel — a lifted card on a plotted ground. In here a card is a bordered
+ * plane on a flat ground, and the density is a third tighter, because these screens are read
+ * to find one row rather than to be persuaded.
+ */
+
+/* ── a card that holds a table edge to edge ────────────────────────────────── */
+
+.card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.app__main .data {
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.app__main .data th {
+  padding: var(--sws-space-12) var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+:root[lang='ar'] .app__main .data th {
+  font-size: var(--sws-font-size-caption);
+}
+
+.app__main .data td {
+  padding: var(--sws-space-12) var(--sws-space-16);
+}
+
+/* The head stays put while a long list scrolls under it. */
+.app__main .card--flush .data th {
+  position: sticky;
+  inset-block-start: var(--app-bar);
+  z-index: 1;
+}
+
+/* ── the screen toolbar ────────────────────────────────────────────────────── */
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+  margin-block-end: var(--sws-space-16);
+}
+
+.bar__count {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.app__main .filters {
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  padding: 3px;
+}
+
+.app__main .filters__btn {
+  min-height: 34px;
+  padding-inline: var(--sws-space-12);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+/* The visible pill is 34px; the reach is the full 44 (ADR-0004). Filters sit in a row, so
+   the expanders grow sideways into the gap where nothing else is claiming the point. */
+.app__main .filters__btn {
+  position: relative;
+}
+
+.app__main .filters__btn::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc((var(--sws-touch-target-min) - 34px) / -2);
+}
+
+.app__main .filters__btn.is-active {
+  background: var(--sws-action-subtle-bg);
+  box-shadow: none;
+}
+
+/* ── an empty result ───────────────────────────────────────────────────────── */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--sws-space-8);
+  padding: var(--sws-space-48) var(--sws-space-24);
+  text-align: center;
+}
+
+.empty svg {
+  color: var(--sws-border-strong);
+}
+
+.empty__title {
+  font-size: var(--sws-font-size-body);
+  font-weight: 600;
+}
+
+.empty__note {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* ── key/value inside an app card ──────────────────────────────────────────── */
+
+.app__main .kv {
+  margin-block: 0;
+  gap: 0;
+}
+
+.app__main .kv > div:last-child {
+  border-block-end: 0;
+  padding-block-end: 0;
+}
+
+.app__main .kv > div {
+  padding-block: var(--sws-space-12);
+}
+
+/* ── meters ────────────────────────────────────────────────────────────────── */
+
+.app__main .meter {
+  margin-block: 0;
+}
+
+.meters {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+/* Approaching the ceiling is the one thing a usage bar exists to warn about. */
+.meter__fill--high {
+  background: var(--sws-status-warning);
+}
+
+.meter__fill--full {
+  background: var(--sws-status-danger);
+}
+
+.meter__left {
+  font-weight: 600;
+  color: var(--sws-text-primary);
+}
+
+/* ── a column of actions, with the destructive one set apart ───────────────── */
+
+.acts {
+  display: grid;
+  gap: var(--sws-space-8);
+}
+
+.acts .btn {
+  width: 100%;
+}
+
+.acts__sep {
+  margin-block-start: var(--sws-space-8);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/* Cancelling a service is not the same kind of act as upgrading one, and should not wear the
+   same button. It stays quiet until you reach for it, then it is unmistakably red. */
+.btn--danger {
+  background: transparent;
+  border: var(--sws-rule-hair) solid transparent;
+  color: var(--sws-status-danger);
+}
+
+.btn--danger:hover {
+  background: var(--sws-banner-danger-bg);
+  border-color: var(--sws-status-danger);
+}
+
+/* ── forms on an app screen ────────────────────────────────────────────────── */
+
+.form {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+.form__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+  margin-block-start: var(--sws-space-8);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.form__note {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/* ── a labelled figure, used for balances and totals ───────────────────────── */
+
+.figure {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sws-space-8);
+}
+
+.figure__n {
+  font-size: var(--sws-font-size-h2);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.figure__unit {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  color: var(--sws-text-secondary);
+}
+
+/* ── inline chips of preset amounts ────────────────────────────────────────── */
+
+.chips {
+  display: flex;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+.chip {
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-primary);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--sws-action-primary);
+  color: var(--sws-action-quiet);
+}
+
+.chip.is-active {
+  background: var(--sws-action-subtle-bg);
+  border-color: var(--sws-action-primary);
+  color: var(--sws-action-quiet);
+}
+
+/* ── a saved payment method ────────────────────────────────────────────────── */
+
+.method-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  padding: var(--sws-space-16);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.method-row:last-child {
+  border-block-end: 0;
+}
+
+.method-row__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 46px;
+  block-size: 32px;
+  flex: none;
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-sm);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.method-row__num {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+}
+
+.method-row__exp {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.method-row__grow {
+  flex: 1 1 auto;
+}
+
+/* ── knowledgebase ─────────────────────────────────────────────────────────── */
+
+.app__main .kb-list {
+  gap: 0;
+}
+
+.app__main .kb-item {
+  padding: var(--sws-space-16);
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.app__main .kb-list li:last-child .kb-item {
+  border-block-end: 0;
+}
+
+.app__main .kb-item:hover {
+  background: var(--sws-surface-sunken);
+  box-shadow: none;
+}
+
+/* ── the ticket thread, in app dress ───────────────────────────────────────── */
+
+.app__main .msg {
+  box-shadow: none;
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.app__main .msg--staff {
+  border-color: transparent;
+}
+
+/* ── prose ─────────────────────────────────────────────────────────────────── */
+
+.app__main .prose p + p {
+  margin-block-start: var(--sws-space-16);
+}
+
+/* ── a heading that names a group of cards ─────────────────────────────────── */
+/* The screen title is in the head; this is the level below it, and it stays quiet so the
+   cards under it read as the content rather than as a subordinate section of a page. */
+
+.app__section {
+  margin-block: var(--sws-space-24) var(--sws-space-12);
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.app__section:first-child {
+  margin-block-start: 0;
+}
+
+/* ── a card head sitting above flush content ───────────────────────────────── */
+
+.card__head--flush {
+  padding: var(--sws-space-24);
+  margin-block-end: 0;
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/* ── the screens that keep a marketing component ───────────────────────────── */
+/*
+ * Choices, methods, fieldsets and the knowledgebase search are shared with the ordering flow,
+ * which is a marketing surface. Inside the app they lose the lift and take the border, so one
+ * screen does not read as two.
+ */
+
+.app__main .fieldset {
+  margin: 0;
+  padding: var(--sws-space-24);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+}
+
+.app__main .fieldset + .fieldset {
+  margin-block-start: var(--sws-space-16);
+}
+
+.app__main .fieldset legend {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+}
+
+.app__main .choice,
+.app__main .method {
+  box-shadow: none;
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.app__main .choice.is-selected,
+.app__main .method.is-selected {
+  border-color: var(--sws-action-primary);
+}
+
+.app__main .domain-search {
+  margin-block-end: var(--sws-space-16);
+}
+
+/* ── the invoice, which is a document before it is a screen ────────────────── */
+
+.app__main .invoice {
+  max-width: 46rem;
+}
+
+.app__main .invoice .data--flush th:first-child,
+.app__main .invoice .data--flush td:first-child {
+  padding-inline-start: 0;
+}
+
+.app__main .invoice .data--flush th:last-child,
+.app__main .invoice .data--flush td:last-child {
+  padding-inline-end: 0;
+}
+
+/* ── the vote at the foot of an article ────────────────────────────────────── */
+
+.app__main .vote {
+  margin-block-start: var(--sws-space-16);
+}
+
+/* ── copy row ──────────────────────────────────────────────────────────────── */
+
+.app__main .copy-row {
+  margin-block-start: 0;
+}
+
+/* ── the account tables never grow taller than they need ───────────────────── */
+
+.app__main .data tbody tr:last-child td {
+  border-block-end: 0;
+}

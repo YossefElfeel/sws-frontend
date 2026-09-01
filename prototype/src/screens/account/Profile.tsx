@@ -19,7 +19,7 @@ export function Announcements() {
             <p className="news__date serial">
               <bdi>{n.date}</bdi>
             </p>
-            <h2 className="card__title">{t(n.titleKey as never)}</h2>
+            <h2 className="card__heading">{t(n.titleKey as never)}</h2>
             <p className="card__body">{t(n.bodyKey as never)}</p>
           </li>
         ))}
@@ -53,8 +53,8 @@ export function Affiliates() {
 
   return (
     <AccountLayout title={t('acc.affiliates')} lede={t('aff.lede')}>
-      <div className="panel panel--pad">
-        <h2 className="card__title">{t('aff.link')}</h2>
+      <div className="card">
+        <h2 className="card__heading">{t('aff.link')}</h2>
         <div className="copy-row">
           <input className="field serial" dir="ltr" readOnly value={AFFILIATE.link} />
           <Button
@@ -108,8 +108,8 @@ export function Security() {
   return (
     <AccountLayout title={t('acc.security')}>
       <div className="split">
-        <div className="panel panel--pad">
-          <h2 className="card__title">{t('sec.details')}</h2>
+        <div className="card">
+          <h2 className="card__heading">{t('sec.details')}</h2>
           <div className="field-grid">
             <label className="field-label">
               <span className="eyebrow">{t('checkout.name')}</span>
@@ -141,8 +141,8 @@ export function Security() {
           </div>
         </div>
 
-        <div className="panel panel--pad">
-          <h2 className="card__title">{t('sec.access')}</h2>
+        <div className="card">
+          <h2 className="card__heading">{t('sec.access')}</h2>
           <div className="stack">
             <label className="field-label">
               <span className="eyebrow">{t('sec.newPassword')}</span>
@@ -164,8 +164,8 @@ export function Security() {
         </div>
       </div>
 
-      <h2 className="section__title section__title--sm">{t('sec.log')}</h2>
-      <div className="panel table-scroll">
+      <h2 className="app__section">{t('sec.log')}</h2>
+      <div className="card card--flush table-scroll">
         <table className="data">
           <thead>
             <tr>

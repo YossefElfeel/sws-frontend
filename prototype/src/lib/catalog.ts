@@ -133,7 +133,18 @@ export const PLANS: Plan[] = [
 ];
 
 /** Price for a plan on a cycle, in the requested currency, as minor units. */
-export function planPrice(plan: Plan, cycle: Cycle, currency: Currency): number {
+/**
+ * The least a thing needs to be to sit in the cart: a name, an identity and a monthly price.
+ * Shared-hosting Plans satisfy it, and so does every other family's Offer — which is what
+ * lets "Order now" mean the same thing on every product page.
+ */
+export interface Priced {
+  id: string;
+  name: string;
+  monthlyUsdMinor: number;
+}
+
+export function planPrice(plan: Priced, cycle: Cycle, currency: Currency): number {
   const { months, save } = CYCLE_META[cycle];
   const gross = plan.monthlyUsdMinor * months;
   const net = Math.round(gross * (1 - save / 100));

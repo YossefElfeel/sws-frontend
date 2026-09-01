@@ -166,6 +166,28 @@ await p.click('.switch-row input');
 const twofaAfter = await p.$eval('.switch-row input', (e) => e.checked);
 ok('two-factor toggles', twofaBefore !== twofaAfter, `${twofaBefore} -> ${twofaAfter}`);
 
+// Wiring. Every one of these resolved to a real route before and still went to the wrong
+// place — the most invisible kind of broken, because the click appears to do nothing.
+await p.setViewportSize({ width: 1440, height: 900 });
+await p.evaluate(() => (location.hash = '#/hosting/wordpress'));
+await p.waitForSelector('.plans .plan');
+await p.click('.plans .plan .btn');
+await p.waitForSelector('.checkout, .empty');
+const inCart = await p.$$eval('.checkout__main tbody tr', (n) => n.length);
+ok('ordering off a non-shared family fills the cart', inCart > 0, `${inCart} line(s)`);
+
+await p.evaluate(() => (location.hash = '#/'));
+await p.waitForSelector('.masthead__nav');
+const supportHref = await p.$$eval('.masthead__nav a', (n) =>
+  n.map((a) => a.getAttribute('href')).find((h) => h && h.includes('knowledgebase')),
+);
+ok('marketing Support reaches the help centre', Boolean(supportHref), supportHref ?? 'still /account');
+
+const contactHref = await p.$$eval('.colophon__links a', (n) =>
+  n.map((a) => a.getAttribute('href')).find((h) => h && h.includes('tickets')),
+);
+ok('footer Contact reaches a ticket', Boolean(contactHref), contactHref ?? 'still /account');
+
 // ADR-0004 is a token the a11y gate checks in the abstract. This checks it on the rendered
 // page, at the width where controls actually get small — the only place it can fail.
 //

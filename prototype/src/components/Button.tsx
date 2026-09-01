@@ -1,7 +1,8 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type Size = 'sm' | 'md' | 'lg';
-type Variant = 'primary' | 'secondary' | 'quiet';
+/** 'danger' is for acts that take something away — cancelling, deleting, closing. */
+type Variant = 'primary' | 'secondary' | 'quiet' | 'danger';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;

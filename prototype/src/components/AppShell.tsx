@@ -282,7 +282,7 @@ export function AppShell({
             </button>
 
             <NavLink
-              className="app__icon-btn app__bell"
+              className="app__icon-btn"
               to="/account/announcements"
               aria-label={t('app.notifications')}
               title={t('app.notifications')}

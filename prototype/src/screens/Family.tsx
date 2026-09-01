@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { IconCheck, IconServer } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
+import { useCart } from '../lib/cart';
 import { convert, formatAmount } from '../lib/catalog';
 import { specText } from '../lib/specs';
 import { FAMILIES, OFFERS, VPS, VPS_OS, type Offer } from '../lib/products';
@@ -51,7 +52,19 @@ export function Family() {
 function OfferCards({ offers }: { offers: Offer[] }) {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const { add } = useCart();
   const navigate = useNavigate();
+
+  /**
+   * These families are single-price products, so ordering puts the line in the cart and takes
+   * you there. Shared hosting keeps its Configure step (spec 7.2) because that is the family
+   * with cycles and add-ons to choose; sending these here to an empty cart, as this button
+   * used to, meant "Order now" visibly did nothing.
+   */
+  const order = (o: Offer) => {
+    add({ plan: o, cycle: 'monthly', addons: {} });
+    navigate('/cart');
+  };
 
   return (
     <ul className="plans">
@@ -98,7 +111,7 @@ function OfferCards({ offers }: { offers: Offer[] }) {
           <Button
             size="lg"
             variant={o.featured ? 'primary' : 'secondary'}
-            onClick={() => navigate('/cart')}
+            onClick={() => order(o)}
           >
             {t('plan.orderNow')}
           </Button>
@@ -112,6 +125,7 @@ function OfferCards({ offers }: { offers: Offer[] }) {
 function VpsTable() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const { add } = useCart();
   const navigate = useNavigate();
 
   return (
@@ -148,7 +162,10 @@ function VpsTable() {
                   <Button
                     size="sm"
                     variant={row.featured ? 'primary' : 'secondary'}
-                    onClick={() => navigate('/cart')}
+                    onClick={() => {
+                      add({ plan: row, cycle: 'monthly', addons: {} });
+                      navigate('/cart');
+                    }}
                   >
                     {t('plan.orderNow')}
                   </Button>
@@ -177,6 +194,7 @@ function VpsTable() {
 /** Spec 6.3: Website Builder leads with a preview, not a price list. */
 function BuilderPreview() {
   const { t } = useLocale();
+  const { add } = useCart();
   const navigate = useNavigate();
 
   return (
@@ -201,7 +219,15 @@ function BuilderPreview() {
       <div className="builder__side">
         <h2 className="card__title">{t('builder.preview')}</h2>
         <p className="card__body">{t('builder.previewNote')}</p>
-        <Button size="lg" onClick={() => navigate('/cart')}>
+        <Button
+          size="lg"
+          onClick={() => {
+            // "Try it free" orders the free tier, not an unspecified something.
+            const free = OFFERS.builder?.find((o) => o.monthlyUsdMinor === 0);
+            if (free) add({ plan: free, cycle: 'monthly', addons: {} });
+            navigate('/cart');
+          }}
+        >
           {t('builder.try')}
         </Button>
       </div>

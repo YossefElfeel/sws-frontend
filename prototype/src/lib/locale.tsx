@@ -446,6 +446,24 @@ export const STRINGS = {
   'app.grp.account': { ar: 'الحساب', en: 'Account' },
 
   // ── dashboard ─────────────────────────────────────────────────────────────
+
+  // ── client-area screens ───────────────────────────────────────────────────
+  'svc.usage': { ar: 'الاستهلاك', en: 'Usage' },
+  'svc.left': { ar: 'متبقّي', en: 'left' },
+  'dom.registration': { ar: 'بيانات التسجيل', en: 'Registration' },
+  'funds.adding': { ar: 'هتضيف', en: 'Adding' },
+
+  // Empty states. Each says what is missing and what to do about it, because an empty screen
+  // that only says "nothing here" leaves someone wondering whether it is broken.
+  'empty.filter': { ar: 'جرّب فلتر تاني أو اعرض الكل.', en: 'Try another filter, or show all.' },
+  'empty.services': { ar: 'مفيش خدمات في الفلتر ده', en: 'No services match this filter' },
+  'empty.domains': { ar: 'لسه مافيش دومينات', en: 'No domains yet' },
+  'empty.domainsNote': {
+    ar: 'سجّل دومين جديد أو انقل واحد عندك دلوقتي.',
+    en: 'Register a new domain, or transfer one you already own.',
+  },
+  'empty.methods': { ar: 'مفيش طرق دفع محفوظة', en: 'No saved payment methods' },
+
   'dash.needsYou': { ar: 'محتاج منك حاجة', en: 'Needs you' },
   'dash.allClear': { ar: 'مفيش حاجة مطلوبة منك', en: 'Nothing needs you' },
   'dash.allClearNote': {

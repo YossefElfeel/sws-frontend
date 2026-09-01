@@ -43,7 +43,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <NavLink className="masthead__link" to="/domains">
               {t('nav.domains')}
             </NavLink>
-            <NavLink className="masthead__link" to="/account">
+            <NavLink className="masthead__link" to="/account/knowledgebase">
               {t('nav.support')}
             </NavLink>
           </nav>
@@ -117,7 +117,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <Link to="/legal/terms">{t('footer.terms')}</Link>
             <Link to="/legal/sla">{t('footer.sla')}</Link>
             <Link to="/legal/refund">{t('footer.refund')}</Link>
-            <Link to="/account">{t('footer.contact')}</Link>
+            <Link to="/account/tickets/new">{t('footer.contact')}</Link>
           </nav>
         </div>
       </footer>
