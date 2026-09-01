@@ -845,3 +845,81 @@ label.consent__row {
   border-radius: var(--sws-radius-pill);
   background: var(--sws-border-strong);
 }
+
+/* ═══ what a phone found ══════════════════════════════════════════════════════ */
+/*
+ * Every rule below fixes something the 390px audit reported and a 1440px screen never shows.
+ * They are grouped by what was wrong rather than by component, because the same fault turned
+ * up in both shells and fixing it in one place would have left the other.
+ */
+
+/* ── text below the readable floor ─────────────────────────────────────────── */
+/*
+ * 10px and 11px are not sizes, they are apologies. The floor is 12px, and the two places that
+ * broke it were a wordmark and a count badge — the badge especially, since it is the number
+ * that decides whether you open that section at all.
+ */
+
+.masthead__sub {
+  font-size: var(--sws-font-size-caption);
+}
+
+.app__mark,
+.masthead__mark {
+  font-size: var(--sws-font-size-caption);
+  letter-spacing: 0;
+}
+
+/* The tile grows with the lettering rather than clipping it. */
+.app__mark {
+  inline-size: 34px;
+  block-size: 34px;
+}
+
+.app__link-badge {
+  min-inline-size: 22px;
+  block-size: 22px;
+  font-size: var(--sws-font-size-caption);
+}
+
+.app__dot {
+  font-size: 11px;
+}
+
+/* ── targets that came up short ────────────────────────────────────────────── */
+
+/* The language select measured 40px wide: narrower than a fingertip in either axis. */
+.masthead__select select {
+  min-inline-size: var(--sws-touch-target-min);
+}
+
+.masthead__cart {
+  min-inline-size: var(--sws-touch-target-min);
+}
+
+/* An agreement is a checkbox you have to be able to hit, not a line of small print. */
+.agree {
+  min-block-size: var(--sws-touch-target-min);
+  align-items: center;
+}
+
+/* A list of article links is navigation, so each entry gets a row rather than a text line. */
+.kb-side__list a {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--sws-touch-target-min);
+}
+
+/* ── controls a thumb cannot separate ──────────────────────────────────────── */
+/*
+ * Four pixels between two 44px targets means the gap is a sixth of the target. The rule is
+ * eight, and both shells were under it — the marketing nav and the app bar's icon row.
+ */
+
+.masthead__nav {
+  gap: var(--sws-space-8);
+}
+
+.app__tools {
+  gap: var(--sws-space-8);
+}

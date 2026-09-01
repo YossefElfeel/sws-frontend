@@ -266,6 +266,18 @@ Design intent that is not enforced is design intent that lasts one sprint.
 | `scripts/capture.mjs` | 76 routes × 2 viewports — overflow, empty main, console errors |
 | `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
 | `scripts/journeys.mjs` | 16 journeys walked by clicking only — a link that goes nowhere stalls the walk |
+| `scripts/mobile.mjs` | 76 routes at 390px — overflow, hit area, crowding, tiny text, covered controls, crushed icons |
+
+`mobile.mjs` walks every route at 390 in Arabic and looks for what a 1440px screen never shows.
+It found the marketing header failing on four counts at once — a 40px language select, a 43px
+cart, nav links four pixels apart, and a 10px tagline — on all 49 marketing routes.
+
+Three of its own findings were the audit being wrong, and each is now documented in it: a
+closed off-canvas drawer is not a covered control, an item scrolled out of a horizontal strip
+is reachable by scrolling, and an input wrapped in a label is tapped through the label. A
+fourth was sub-pixel: `elementFromPoint` resolves to whole pixels, so a genuine 44px target
+whose box begins at 243.0156 measures 43. That one carries a documented 1px tolerance,
+verified against a real button first.
 
 `journeys.mjs` never sets the URL mid-walk. Every other gate asserts screens; this one asserts
 the routes *between* them, which is the only way a dead link fails a test instead of being

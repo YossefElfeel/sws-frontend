@@ -802,7 +802,11 @@ a.tile:hover {
   font-size: var(--sws-font-size-body-sm);
 }
 
+/* A link on its own line is navigation, not prose, so it carries a navigable target. */
 .auth__row a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--sws-touch-target-min);
   color: var(--sws-action-quiet);
 }
 

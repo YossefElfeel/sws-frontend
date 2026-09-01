@@ -495,11 +495,12 @@
   margin-inline-start: auto;
 }
 
+/* Card scheme marks: small, but not below the readable floor. */
 .mark {
   padding: 2px var(--sws-space-8);
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-sm);
-  font-size: 10px;
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--sws-text-secondary);

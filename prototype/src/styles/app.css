@@ -2061,3 +2061,64 @@
     color: var(--sws-text-secondary);
   }
 }
+
+/* ── what the 390px audit found in the app shell ───────────────────────────── */
+/*
+ * These live here rather than in components.css because app.css loads last and was quietly
+ * winning: the same fixes written once in the shared sheet had no effect at all.
+ */
+
+/* 10px and 11px are not sizes, they are apologies. The badge especially — it is the number
+   that decides whether you open that section at all. */
+.app__mark {
+  inline-size: 34px;
+  block-size: 34px;
+  font-size: var(--sws-font-size-caption);
+  letter-spacing: 0;
+}
+
+.app__link-badge {
+  min-inline-size: 22px;
+  block-size: 22px;
+  font-size: var(--sws-font-size-caption);
+}
+
+/* Four pixels between two 44px targets is a gap one sixth the size of the thing it separates. */
+.app__tools {
+  gap: var(--sws-space-8);
+}
+
+/* A filter row is a row of separate decisions, so its pills are separable too. */
+.filters {
+  gap: var(--sws-space-8);
+}
+
+/*
+ * The app's filter pills were 34px with a 44px expander, which works until the row wraps —
+ * and the invoice filters are five pills on a 390px screen, so it wraps. Stacked, each
+ * expander is clipped by the row above it and the target lands at 42.
+ *
+ * Same lesson as the sidebar rows: on anything that stacks, the expander gives back most of
+ * what it claims. The pill is genuinely 44 now, and costs one row of height where it wraps.
+ */
+.filters__btn,
+.app__main .filters__btn {
+  min-block-size: var(--sws-touch-target-min);
+}
+
+.app__main .filters__btn::after {
+  content: none;
+}
+
+/* The bell count is the smallest number on the screen and still has to be read. */
+.app__dot {
+  min-inline-size: 18px;
+  block-size: 18px;
+  font-size: var(--sws-font-size-caption);
+}
+
+/* A card-scheme tile is small; it is not exempt from being legible. */
+.method-row__mark {
+  font-size: var(--sws-font-size-caption);
+  inline-size: 52px;
+}
