@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
-import { Button } from '../../components/Button';
 import { IconArrow, IconExternal, IconServer, IconSupport } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
@@ -134,10 +133,10 @@ export function ServiceDetail() {
         { label: svc.product },
       ]}
       actions={
-        <Button size="md">
+        <Link className="btn btn--md btn--primary" to={`/cpanel?domain=${svc.domain}`}>
           <IconExternal size={15} />
           {t('svc.cpanel')}
-        </Button>
+        </Link>
       }
     >
       <div className="with-side">

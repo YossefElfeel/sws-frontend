@@ -302,6 +302,74 @@ await p.waitForSelector('.compare');
   ok('"Unlimited" is qualified where it is claimed', !hasUnl || qualified);
 }
 
+// "Some buttons don't work" was the report, so the controls that were inert are exercised
+// here rather than only counted by the static audit.
+await p.evaluate(() => (location.hash = '#/account/domains/dom-1'));
+await p.waitForSelector('.form .field-label');
+{
+  const before = await p.$$eval('.form .field-label', (n) => n.length);
+  await p.click('.form__foot .btn--secondary');
+  await p.waitForTimeout(150);
+  const after = await p.$$eval('.form .field-label', (n) => n.length);
+  ok('add-a-nameserver adds one', after === before + 1, `${before} -> ${after}`);
+
+  const rows = await p.$$eval('.data tbody tr', (n) => n.length);
+  await p.click('.data tbody tr:first-child .btn--danger');
+  await p.waitForTimeout(150);
+  const left = await p.$$eval('.data tbody tr', (n) => n.length);
+  ok('deleting a DNS record deletes it', left === rows - 1, `${rows} -> ${left}`);
+
+  await p.click('.form__foot .btn--primary');
+  await p.waitForSelector('.banner--success');
+  ok('saving says that it saved', true);
+}
+
+// A reply that vanishes is worse than no reply box.
+await p.evaluate(() => (location.hash = '#/account/tickets/tkt-7741'));
+await p.waitForSelector('#reply');
+{
+  const before = await p.$$eval('.thread .msg', (n) => n.length);
+  await p.fill('#reply', 'شكرًا، جربت وشغال.');
+  await p.click('.card .actions .btn--lg');
+  await p.waitForTimeout(200);
+  const after = await p.$$eval('.thread .msg', (n) => n.length);
+  ok('a sent reply joins the thread', after === before + 1, `${before} -> ${after}`);
+
+  await p.click('.card .actions .btn--quiet');
+  await p.waitForTimeout(150);
+  const boxGone = (await p.$$('#reply')).length === 0;
+  ok('closing a ticket removes the reply box', boxGone);
+}
+
+// Removing a saved card removes it.
+await p.evaluate(() => (location.hash = '#/account/payment-methods'));
+await p.waitForSelector('.method-row');
+{
+  const before = await p.$$eval('.method-row', (n) => n.length);
+  await p.click('.method-row:last-child .btn--danger');
+  await p.waitForTimeout(150);
+  const after = await p.$$eval('.method-row', (n) => n.length);
+  ok('removing a saved card removes it', after === before - 1, `${before} -> ${after}`);
+}
+
+// The transfer form was a dead end: submit did nothing at all.
+await p.evaluate(() => (location.hash = '#/transfer'));
+await p.waitForSelector('form.panel');
+{
+  await p.fill('form.panel input:nth-of-type(1)', 'example.com');
+  await p.evaluate(() => {
+    for (const el of document.querySelectorAll('form.panel [required]')) {
+      if (el.value) continue;
+      const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+      set.call(el, 'ABC-123');
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+  await p.click('form.panel button[type=submit]');
+  await p.waitForSelector('.stage__title');
+  ok('starting a transfer goes somewhere', true);
+}
+
 // S-01: a mistyped URL used to redirect silently to the homepage, which looks exactly like a
 // working link that went somewhere else.
 await p.evaluate(() => (location.hash = '#/no/such/page'));

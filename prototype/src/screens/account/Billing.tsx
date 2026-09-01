@@ -11,6 +11,7 @@ import {
   IconAlert,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
+import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount, gatewaysFor, GATEWAYS } from '../../lib/catalog';
 import {
@@ -148,6 +149,7 @@ export function InvoiceDetail() {
   const { currency } = usePrefs();
   const { id } = useParams<{ id: string }>();
   const inv = INVOICES.find((i) => i.id === id);
+  const { saved, mark, clear } = useSaved(6000);
 
   if (!inv) return <Navigate to="/account/invoices" replace />;
 
@@ -183,14 +185,24 @@ export function InvoiceDetail() {
       ]}
       actions={
         <>
-          <Button size="md" variant="secondary">
+          {/* C-16 is blocked on I12 and the PDF is generated server-side, so the button
+              reports why rather than doing nothing at all. */}
+          <Button size="md" variant="secondary" onClick={() => mark(t('inv.pdfPending'))}>
             <IconInvoice size={15} />
             {t('inv.pdf')}
           </Button>
-          {unpaid && <Button size="md">{t('account.pay')}</Button>}
+          {unpaid && (
+            <Link className="btn btn--md btn--primary" to="/checkout/card">
+              {t('account.pay')}
+            </Link>
+          )}
         </>
       }
     >
+      <SavedNote saved={saved} onDismiss={clear}>
+        {t('inv.pdfPendingNote')}
+      </SavedNote>
+
       <div className="card invoice">
         <div className="invoice__head">
           <dl className="kv">
@@ -350,21 +362,22 @@ export function AddFunds() {
 /** Payment Methods — spec 5.4 and 11: saved cards for recurring billing. */
 export function PaymentMethods() {
   const { t } = useLocale();
+  const [cards, setCards] = useState(PAYMENT_METHODS_SAVED);
 
   return (
     <AccountLayout
       title={t('acc.methods')}
       lede={t('pm.lede')}
       actions={
-        <Button size="md" variant="secondary">
+        <Link className="btn btn--md btn--secondary" to="/checkout/card">
           <IconPlus size={15} />
           {t('pm.add')}
-        </Button>
+        </Link>
       }
     >
-      {PAYMENT_METHODS_SAVED.length > 0 ? (
+      {cards.length > 0 ? (
         <div className="card card--flush">
-          {PAYMENT_METHODS_SAVED.map((m) => (
+          {cards.map((m) => (
             <div className="method-row" key={m.id}>
               <span className="method-row__mark" aria-hidden="true">
                 {m.kind.slice(0, 4).toUpperCase()}
@@ -386,11 +399,22 @@ export function PaymentMethods() {
                 )}
               </span>
               {!m.primary && (
-                <Button size="sm" variant="secondary">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() =>
+                    setCards((all) => all.map((x) => ({ ...x, primary: x.id === m.id })))
+                  }
+                >
                   {t('pm.makePrimary')}
                 </Button>
               )}
-              <Button size="sm" variant="danger" aria-label={`${t('action.remove')} ${m.kind} ${m.last4}`}>
+              <Button
+                size="sm"
+                variant="danger"
+                aria-label={`${t('action.remove')} ${m.kind} ${m.last4}`}
+                onClick={() => setCards((all) => all.filter((x) => x.id !== m.id))}
+              >
                 {t('action.remove')}
               </Button>
             </div>

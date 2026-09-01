@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react';
 import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconArrow, IconPlus, IconSearch, IconBook, IconSupport } from '../../components/icons';
+import { IconArrow, IconPlus, IconSearch, IconBook, IconSupport, IconCheck } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
+import { useSaved, SavedNote } from '../../lib/saved';
 import {
   TICKETS,
   DEPARTMENTS,
@@ -209,13 +210,27 @@ export function TicketNew() {
 
             <div className="editor">
               <div className="editor__bar" role="toolbar" aria-label={t('tkt.format')}>
-                {['B', 'I', 'H', '🔗', '•', '1.', '</>', '❝'].map((mark, i) => (
+                {/* Each mark inserts the markup it depicts. A toolbar of buttons that do
+                    nothing is the most convincing broken thing on a form. */}
+                {(
+                  [
+                    ['B', '**', '**'],
+                    ['I', '_', '_'],
+                    ['H', '## ', ''],
+                    ['🔗', '[', '](https://)'],
+                    ['•', '- ', ''],
+                    ['1.', '1. ', ''],
+                    ['</>', '`', '`'],
+                    ['❝', '> ', ''],
+                  ] as const
+                ).map(([mark, open, close], i) => (
                   <button
                     type="button"
                     key={mark}
                     className="editor__tool"
                     aria-label={t(`tkt.tool${i}` as never)}
                     title={t(`tkt.tool${i}` as never)}
+                    onClick={() => setBody((v) => `${v}${open}${close}`)}
                   >
                     <bdi>{mark}</bdi>
                   </button>
@@ -286,6 +301,12 @@ export function TicketThread() {
   const { id } = useParams<{ id: string }>();
   const tkt = TICKETS.find((x) => x.id === id);
 
+  // A reply that vanishes is worse than no reply box, so what is sent joins the thread.
+  const [draft, setDraft] = useState('');
+  const [sent, setSent] = useState<typeof TICKETS[number]['messages']>([]);
+  const [closed, setClosed] = useState(false);
+  const { saved, mark, clear } = useSaved();
+
   if (!tkt) return <Navigate to="/account/tickets" replace />;
 
   return (
@@ -297,8 +318,10 @@ export function TicketThread() {
         { label: tkt.ref },
       ]}
     >
+      <SavedNote saved={saved} onDismiss={clear} />
+
       <div className="thread">
-        {tkt.messages.map((m) => (
+        {[...tkt.messages, ...sent].map((m) => (
           <article className={`msg msg--${m.from}`} key={m.id}>
             <header className="msg__head">
               <span className="msg__author">{bi(m.author)}</span>
@@ -313,19 +336,57 @@ export function TicketThread() {
         ))}
       </div>
 
-      <div className="card">
-        <h2 className="card__heading">{t('tkt.reply')}</h2>
-        <label className="u-visually-hidden" htmlFor="reply">
-          {t('tkt.reply')}
-        </label>
-        <textarea id="reply" className="field" rows={5} />
-        <div className="actions">
-          <Button size="md" variant="quiet">
-            {t('tkt.close')}
-          </Button>
-          <Button size="lg">{t('tkt.send')}</Button>
+      {closed ? (
+        /* A closed ticket has no reply box. Leaving one there and refusing the send is worse
+           than not offering it. */
+        <div className="card empty">
+          <IconCheck size={28} />
+          <p className="empty__title">{t('tkt.closedTitle')}</p>
+          <p className="empty__note">{t('tkt.closedNote')}</p>
+          <Link className="btn btn--md btn--secondary" to="/account/tickets/new">
+            {t('tkt.open')}
+          </Link>
         </div>
-      </div>
+      ) : (
+        <div className="card">
+          <h2 className="card__heading">{t('tkt.reply')}</h2>
+          <label className="u-visually-hidden" htmlFor="reply">
+            {t('tkt.reply')}
+          </label>
+          <textarea
+            id="reply"
+            className="field"
+            rows={5}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+          />
+          <div className="actions">
+            <Button size="md" variant="quiet" onClick={() => setClosed(true)}>
+              {t('tkt.close')}
+            </Button>
+            <Button
+              size="lg"
+              disabled={!draft.trim()}
+              onClick={() => {
+                setSent((all) => [
+                  ...all,
+                  {
+                    id: `r-${all.length}`,
+                    from: 'client' as const,
+                    author: { ar: 'كمال عبدالرحمن', en: 'Kamal Abdelrahman' },
+                    at: '2026-09-01 10:24',
+                    body: { ar: draft, en: draft },
+                  },
+                ]);
+                setDraft('');
+                mark(t('tkt.sent'));
+              }}
+            >
+              {t('tkt.send')}
+            </Button>
+          </div>
+        </div>
+      )}
     </AccountLayout>
   );
 }

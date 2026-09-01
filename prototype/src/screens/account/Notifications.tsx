@@ -3,6 +3,7 @@ import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { IconBell, IconMail, IconInfo } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
+import { useSaved, SavedNote } from '../../lib/saved';
 import { NOTIF_PREFS, ACCOUNT, type NotifPref } from '../../lib/account';
 
 /**
@@ -24,6 +25,7 @@ const CHANNELS = [
 export function NotificationPrefs() {
   const { t } = useLocale();
   const [prefs, setPrefs] = useState<NotifPref[]>(NOTIF_PREFS);
+  const { saved, mark, clear } = useSaved();
 
   const toggle = (id: string, channel: 'email' | 'sms' | 'inApp') =>
     setPrefs((rows) =>
@@ -32,6 +34,8 @@ export function NotificationPrefs() {
 
   return (
     <AccountLayout title={t('notif.title')} lede={t('notif.lede')}>
+      <SavedNote saved={saved} onDismiss={clear} />
+
       <div className="card card--flush table-scroll">
         <table className="data prefs">
           <thead>
@@ -98,7 +102,7 @@ export function NotificationPrefs() {
         </dl>
         <p className="form__note">{t('notif.whereNote')}</p>
         <div className="form__foot">
-          <Button size="md">{t('sec.save')}</Button>
+          <Button size="md" onClick={() => mark()}>{t('sec.save')}</Button>
         </div>
       </section>
     </AccountLayout>

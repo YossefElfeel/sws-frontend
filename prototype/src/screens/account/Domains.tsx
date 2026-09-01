@@ -4,6 +4,7 @@ import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { IconArrow, IconPlus, IconTrash, IconGlobe } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
+import { useSaved, SavedNote } from '../../lib/saved';
 import { DOMAINS, DNS_RECORDS } from '../../lib/account';
 
 /** My Domains — spec 9.3: name, expiry, status, quick renew. */
@@ -94,6 +95,12 @@ export function DomainManage() {
   const [privacy, setPrivacy] = useState(dom?.whoisPrivacy ?? false);
   const [lock, setLock] = useState(dom?.registrarLock ?? false);
 
+  // Nameservers and DNS are lists you edit, so they are state rather than a fixture read
+  // straight into inputs — an Add button that adds nothing is the clearest kind of broken.
+  const [ns, setNs] = useState<string[]>(dom?.nameservers ?? []);
+  const [records, setRecords] = useState(DNS_RECORDS);
+  const { saved, mark, clear } = useSaved();
+
   if (!dom) return <Navigate to="/account/domains" replace />;
 
   return (
@@ -110,6 +117,8 @@ export function DomainManage() {
         </Link>
       }
     >
+      <SavedNote saved={saved} onDismiss={clear} />
+
       <div className="with-side">
         <div className="dash__main">
           <section className="card">
@@ -117,17 +126,31 @@ export function DomainManage() {
               <h2 className="card__heading">{t('dom.nameservers')}</h2>
             </header>
             <div className="form">
-              {dom.nameservers.map((ns, i) => (
-                <label className="field-label" key={ns}>
+              {ns.map((host, i) => (
+                <label className="field-label" key={i}>
                   <span className="eyebrow">
                     {t('dom.ns')} {i + 1}
                   </span>
-                  <input className="field serial" dir="ltr" defaultValue={ns} />
+                  <input
+                    className="field serial"
+                    dir="ltr"
+                    value={host}
+                    onChange={(e) =>
+                      setNs((rows) => rows.map((r, j) => (j === i ? e.target.value : r)))
+                    }
+                  />
                 </label>
               ))}
               <div className="form__foot">
-                <Button size="md">{t('sec.save')}</Button>
-                <Button size="md" variant="secondary">
+                <Button size="md" onClick={() => mark()}>
+                  {t('sec.save')}
+                </Button>
+                <Button
+                  size="md"
+                  variant="secondary"
+                  disabled={ns.length >= 5}
+                  onClick={() => setNs((rows) => [...rows, ''])}
+                >
                   <IconPlus size={15} />
                   {t('dom.addNs')}
                 </Button>
@@ -138,7 +161,16 @@ export function DomainManage() {
           <section className="card card--flush">
             <header className="card__head card__head--flush">
               <h2 className="card__heading">{t('dom.dns')}</h2>
-              <Button size="sm" variant="secondary">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() =>
+                  setRecords((rows) => [
+                    ...rows,
+                    { id: `dns-new-${rows.length}`, type: 'A', host: '@', value: '', ttl: 3600 },
+                  ])
+                }
+              >
                 <IconPlus size={14} />
                 {t('dom.addRecord')}
               </Button>
@@ -155,7 +187,7 @@ export function DomainManage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {DNS_RECORDS.map((r) => (
+                  {records.map((r) => (
                     <tr key={r.id}>
                       <td><span className="lead serial">{r.type}</span></td>
                       <td className="serial"><bdi>{r.host}</bdi></td>
@@ -166,6 +198,7 @@ export function DomainManage() {
                           size="sm"
                           variant="danger"
                           aria-label={`${t('action.remove')} ${r.type} ${r.host}`}
+                          onClick={() => setRecords((rows) => rows.filter((x) => x.id !== r.id))}
                         >
                           <IconTrash size={14} />
                         </Button>

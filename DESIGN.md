@@ -264,6 +264,12 @@ Design intent that is not enforced is design intent that lasts one sprint.
 | `tokens/a11y-gate.mjs` | 74 checks — contrast, focus, hit area |
 | `scripts/flow.mjs` | **62 checks** against a running build |
 | `scripts/capture.mjs` | 76 routes × 2 viewports — overflow, empty main, console errors |
+| `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
+
+`deadends.mjs` exists because "some buttons don't work" is the one defect a screenshot never
+shows and a typecheck never catches. It ran once by hand and found twenty-one. Its four
+exceptions are listed with reasons rather than silenced, and an exception that stops matching
+is itself reported — so the list cannot rot into a blanket.
 
 `flow.mjs` covers, among others: every control clears 44px at 390 and 1440 (hit-tested outward
 from the edges, not measured from the box, so a legitimate pseudo-element expander counts); no

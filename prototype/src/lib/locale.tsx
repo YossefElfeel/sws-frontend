@@ -441,6 +441,39 @@ export const STRINGS = {
 
   // ── registrant details: O-06 ──────────────────────────────────────────────
 
+  // ── acting on things: what a control says once it has done something ──────
+  'save.done': { ar: 'اتحفظ', en: 'Saved' },
+  'save.doneNote': {
+    ar: 'التغييرات اتسجّلت على حسابك.',
+    en: 'Your changes have been recorded.',
+  },
+  'sec.pwChanged': { ar: 'كلمة المرور اتغيّرت', en: 'Password changed' },
+  'con.edited': { ar: 'الجهة اتحدّثت', en: 'Contact updated' },
+  'con.none': { ar: 'مفيش جهات اتصال', en: 'No contacts yet' },
+  'tkt.sent': { ar: 'الرد اتبعت', en: 'Reply sent' },
+  'tkt.closedTitle': { ar: 'التذكرة اتقفلت', en: 'This ticket is closed' },
+  'tkt.closedNote': {
+    ar: 'لو لسه محتاج حاجة، افتح تذكرة جديدة وهنربطها بدي.',
+    en: 'If you still need something, open a new ticket and we will link it to this one.',
+  },
+  'transfer.doneTitle': { ar: 'طلب النقل اتسجّل', en: 'Transfer started' },
+  'transfer.doneBody': {
+    ar: 'بعتنا الطلب للجهة المسجِّلة. النقل بياخد من 5 لـ 7 أيام، وهنبعتلك أول ما يخلص.',
+    en: 'We have sent the request to the registry. A transfer takes five to seven days, and we write the moment it completes.',
+  },
+
+  'inv.pdfPending': { ar: 'الـ PDF لسه مش جاهز', en: 'The PDF is not wired up yet' },
+  'inv.pdfPendingNote': {
+    ar: 'بيتولّد من السيرفر، وده مربوط بقرار I12 اللي لسه مفتوح. الفاتورة كاملة قدامك هنا وتقدر تطبعها.',
+    en: 'It is generated server-side, which is waiting on decision I12. The full invoice is on this page and prints as it stands.',
+  },
+  'sso.going': { ar: 'بنفتح cPanel…', en: 'Opening cPanel…' },
+  'sso.slotTag': { ar: 'واجهة cPanel', en: 'cPanel’s own interface' },
+  'sso.slotLabel': { ar: 'مكان واجهة cPanel', en: 'Where cPanel appears' },
+  'sso.slotNote': {
+    ar: 'من هنا ورايح، الشاشة بتاعت cPanel مش بتاعتنا.',
+    en: 'From here on the screen is cPanel’s, not ours.',
+  },
   // ── error pages: S-01 ─────────────────────────────────────────────────────
   'err.404.title': { ar: 'الصفحة دي مش موجودة', en: 'This page does not exist' },
   'err.404.body': {

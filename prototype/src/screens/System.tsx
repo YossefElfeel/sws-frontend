@@ -120,6 +120,7 @@ export function ErrorPage({ kind: fixed }: { kind?: ErrKind }) {
 export function CpanelTransition() {
   const { t } = useLocale();
   const [params] = useSearchParams();
+  const [going, setGoing] = useState(false);
   const domain = params.get('domain') ?? 'atelier-kamal.com';
 
   return (
@@ -143,10 +144,19 @@ export function CpanelTransition() {
             <li>{t('sso.n3')}</li>
           </ul>
 
+          {going ? (
+            /* cPanel is not ours to draw, so the handoff ends at a marked slot rather than at
+               an invented control panel. */
+            <div className="slot slot--tall" role="img" aria-label={t('sso.slotLabel')}>
+              <span className="slot__tag">{t('sso.slotTag')}</span>
+              <p className="slot__note">{t('sso.slotNote')}</p>
+            </div>
+          ) : null}
+
           <div className="acts u-mt-16">
-            <Button size="lg">
+            <Button size="lg" disabled={going} onClick={() => setGoing(true)}>
               <IconExternal size={17} />
-              {t('sso.go')}
+              {t(going ? 'sso.going' : 'sso.go')}
             </Button>
             <Link className="btn btn--md btn--quiet" to="/account/services">
               {t('action.back')}

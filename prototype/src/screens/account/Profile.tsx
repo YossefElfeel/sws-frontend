@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconCopy, IconPlus, IconCheck, IconKey } from '../../components/icons';
+import { IconCopy, IconPlus, IconCheck, IconKey, IconUsers } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
+import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount } from '../../lib/catalog';
 import { ANNOUNCEMENTS, AFFILIATE, ACCOUNT, CONTACTS, LOGIN_LOG } from '../../lib/account';
@@ -105,9 +106,11 @@ export function Affiliates() {
 export function Security() {
   const { t, bi } = useLocale();
   const [twofa, setTwofa] = useState(ACCOUNT.twoFactor);
+  const { saved, mark, clear } = useSaved();
 
   return (
     <AccountLayout title={t('acc.security')}>
+      <SavedNote saved={saved} onDismiss={clear} />
       <div className="split">
         <div className="card">
           <h2 className="card__heading">{t('sec.details')}</h2>
@@ -138,7 +141,7 @@ export function Security() {
             </label>
           </div>
           <div className="actions actions--split">
-            <Button size="md">{t('sec.save')}</Button>
+            <Button size="md" onClick={() => mark()}>{t('sec.save')}</Button>
           </div>
         </div>
 
@@ -149,7 +152,7 @@ export function Security() {
               <span className="eyebrow">{t('sec.newPassword')}</span>
               <input className="field" type="password" autoComplete="new-password" />
             </label>
-            <Button size="md" variant="secondary">
+            <Button size="md" variant="secondary" onClick={() => mark(t('sec.pwChanged'))}>
               <IconKey size={15} />
               {t('sec.changePassword')}
             </Button>
@@ -199,11 +202,16 @@ export function Security() {
 /** Contacts and sub-accounts — spec 9.7: each with specific permissions. */
 export function Contacts() {
   const { t, bi } = useLocale();
+  const [rows, setRows] = useState(CONTACTS);
+  const { saved, mark, clear } = useSaved();
 
   return (
     <AccountLayout title={t('acc.contacts')} lede={t('con.lede')}>
-      <ul className="cards-list">
-        {CONTACTS.map((c) => (
+      <SavedNote saved={saved} onDismiss={clear} />
+
+      {rows.length > 0 ? (
+        <ul className="cards-list">
+          {rows.map((c) => (
           <li className="pm" key={c.id}>
             <span className="pm__brand">{bi(c.name)}</span>
             <span className="pm__num serial">
@@ -216,18 +224,43 @@ export function Contacts() {
                 </span>
               ))}
             </span>
-            <Button size="sm" variant="secondary">
+            <Button size="sm" variant="secondary" onClick={() => mark(t('con.edited'))}>
               {t('con.edit')}
             </Button>
-            <Button size="sm" variant="quiet">
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => setRows((all) => all.filter((x) => x.id !== c.id))}
+            >
               {t('action.remove')}
             </Button>
           </li>
         ))}
       </ul>
+      ) : (
+        <div className="card empty">
+          <IconUsers size={28} />
+          <p className="empty__title">{t('con.none')}</p>
+          <p className="empty__note">{t('con.lede')}</p>
+        </div>
+      )}
 
       <div className="actions actions--split">
-        <Button size="md" variant="secondary">
+        <Button
+          size="md"
+          variant="secondary"
+          onClick={() =>
+            setRows((all) => [
+              ...all,
+              {
+                id: `ct-new-${all.length}`,
+                name: { ar: 'جهة جديدة', en: 'New contact' },
+                email: 'new@atelier-kamal.com',
+                permissions: ['billing'],
+              },
+            ])
+          }
+        >
           <IconPlus size={15} />
           {t('con.add')}
         </Button>
