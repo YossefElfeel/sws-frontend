@@ -14,6 +14,7 @@ import { Cart } from './screens/Cart';
 import { Checkout } from './screens/Checkout';
 import { Confirmation } from './screens/Confirmation';
 import { Legal } from './screens/Legal';
+import { ErrorPage, CpanelTransition, BannerGallery } from './screens/System';
 import { Compare, TldPricing, ProductDetail } from './screens/Compare';
 import {
   Status,
@@ -158,7 +159,18 @@ export function App() {
               <Route path="/account/security" element={<Security />} />
 
               <Route path="/legal/:doc" element={<Legal />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+
+              {/* System — spec 5.5 */}
+              <Route path="/error/:kind" element={<ErrorPage />} />
+              <Route path="/cpanel" element={<CpanelTransition />} />
+              <Route path="/system/banners" element={<BannerGallery />} />
+
+              {/*
+                A mistyped URL used to be redirected silently to the homepage, which looks
+                exactly like a working link that went somewhere else. It is a 404 now, and the
+                404 says what to do next.
+              */}
+              <Route path="*" element={<ErrorPage kind="404" />} />
             </Routes>
           </HashRouter>
         </CartProvider>

@@ -526,3 +526,322 @@
 main:focus {
   outline: none;
 }
+
+/* ═══ system: banners, consent, currency guard, errors ════════════════════════ */
+
+/* ── banners — S-05 ────────────────────────────────────────────────────────── */
+/*
+ * Severity is carried by ground, border and icon together. Around one man in twelve cannot
+ * separate red from green, so a banner that says "danger" only by being red says nothing to
+ * him — the icon and the border are what make the four distinguishable without the colour.
+ */
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sws-space-12);
+  padding: var(--sws-space-16);
+  border-radius: var(--sws-radius-md);
+  border: var(--sws-rule-hair) solid transparent;
+}
+
+.banner__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  block-size: 1.5rem;
+}
+
+.banner__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.banner__title {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+}
+
+.banner__body {
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.banner__action {
+  flex: none;
+  align-self: center;
+}
+
+.banner__close {
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  flex: none;
+  margin: calc(var(--sws-space-12) * -1) calc(var(--sws-space-8) * -1);
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+}
+
+.banner__close:hover {
+  color: var(--sws-text-primary);
+}
+
+.banner--info {
+  background: var(--sws-banner-info-bg);
+  border-color: var(--sws-banner-info-border);
+}
+
+.banner--info .banner__icon {
+  color: var(--sws-banner-info-icon);
+}
+
+.banner--success {
+  background: var(--sws-banner-success-bg);
+  border-color: var(--sws-banner-success-border);
+}
+
+.banner--success .banner__icon {
+  color: var(--sws-banner-success-icon);
+}
+
+.banner--warning {
+  background: var(--sws-banner-warning-bg);
+  border-color: var(--sws-banner-warning-border);
+}
+
+.banner--warning .banner__icon {
+  color: var(--sws-banner-warning-icon);
+}
+
+.banner--danger {
+  background: var(--sws-banner-danger-bg);
+  border-color: var(--sws-banner-danger-border);
+}
+
+.banner--danger .banner__icon {
+  color: var(--sws-banner-danger-icon);
+}
+
+/* ── cookie consent — S-06 ─────────────────────────────────────────────────── */
+
+.consent {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 80;
+  background: var(--sws-surface-raised);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-strong);
+  box-shadow: var(--sws-shadow-lift);
+}
+
+.consent__inner {
+  display: grid;
+  gap: var(--sws-space-16);
+  padding-block: var(--sws-space-24);
+}
+
+@media (min-width: 900px) {
+  .consent__inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .consent__rows {
+    grid-column: 1 / -1;
+  }
+}
+
+.consent__title {
+  font-size: var(--sws-font-size-body);
+  font-weight: 700;
+}
+
+.consent__body {
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.consent__body a {
+  color: var(--sws-action-quiet);
+}
+
+.consent__rows {
+  display: grid;
+  gap: var(--sws-space-8);
+  padding-block: var(--sws-space-8);
+}
+
+.consent__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  min-block-size: var(--sws-touch-target-min);
+  padding: var(--sws-space-8) var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-sm);
+}
+
+label.consent__row {
+  cursor: pointer;
+}
+
+.consent__name {
+  display: block;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+}
+
+.consent__note {
+  display: block;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * Reject and Accept are the same size and the same weight. A greyed-out refusal beside a
+ * bright acceptance is a dark pattern with a legal name: consent obtained that way is not
+ * freely given, which makes it not consent.
+ */
+.consent__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+.consent__acts .btn {
+  flex: 1 1 auto;
+  min-inline-size: 9rem;
+}
+
+.consent__more {
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  background: none;
+  border: 0;
+  color: var(--sws-action-quiet);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ── currency guard — S-04 / I15 ───────────────────────────────────────────── */
+
+.cur {
+  position: relative;
+  display: inline-flex;
+}
+
+.cur__ask {
+  position: absolute;
+  inset-block-start: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 70;
+  inline-size: min(20rem, calc(100vw - var(--sws-space-32)));
+  padding: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-strong);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-shadow-lift);
+  text-align: start;
+}
+
+.cur__title {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+}
+
+/* Two totals side by side is the whole point: seeing that the number changes, before it does. */
+.cur__compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sws-space-8);
+  margin-block: var(--sws-space-12);
+}
+
+.cur__side {
+  display: grid;
+  gap: 2px;
+  padding: var(--sws-space-8);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-sm);
+}
+
+.cur__side--to {
+  background: var(--sws-action-subtle-bg);
+}
+
+.cur__label {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.cur__amount {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+}
+
+.cur__note {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+  line-height: var(--sws-line-height-body-sm);
+}
+
+.cur__acts {
+  display: flex;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-12);
+}
+
+/* ── error pages — S-01 ────────────────────────────────────────────────────── */
+
+/* The code matters to whoever you forward the page to. It is not what you need first. */
+.err__code {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--sws-text-secondary);
+}
+
+/* ── cPanel transition — S-03 ──────────────────────────────────────────────── */
+
+.sso__domain {
+  padding: var(--sws-space-8) var(--sws-space-16);
+  background: var(--sws-surface-sunken);
+  border-radius: var(--sws-radius-sm);
+  font-weight: 600;
+}
+
+.sso__notes {
+  display: grid;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  text-align: start;
+}
+
+.sso__notes li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sws-space-8);
+}
+
+.sso__notes li::before {
+  content: '';
+  flex: none;
+  inline-size: 5px;
+  block-size: 5px;
+  margin-block-start: 0.55em;
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-border-strong);
+}

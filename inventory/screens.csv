@@ -77,9 +77,9 @@ C-33,جهات الاتصال الفرعية,Sub-accounts / Contacts,client-area,
 C-34,سجل النشاط الأمني,Security Activity Log,client-area,limited,P2,low,table;filter-by-device-location-time,2,6,,folded,,,
 C-35,تفضيلات الإشعارات,Notification Preferences,client-area,full,P2,low,channel-x-type-matrix,1,6,,built,,,NEW in v1.1
 C-36,الإشعارات داخل التطبيق,In-app Notifications,client-area,full,P2,medium,dropdown;empty;unread;view-all-page,4,6,,folded,,,NEW in v1.1
-S-01,صفحات الأخطاء,Error Pages (404/500/maintenance/forbidden),system,full,P1,low,404;500;maintenance;forbidden,4,7,,not-started,,,"One template, four pages, with intelligent exit paths. /en/hosting currently returns a bare 404"
-S-02,قوالب البريد الإلكتروني,Email Templates,system,closed,P1,very-high,~50-templates,50,7,,not-started,,,"LARGEST FORGOTTEN ITEM. Template count was never multiplied by language — see gaps/gap-register.md G4. Build one unified template in phase 1, not 50 separate ones in the final 3 weeks"
-S-03,شاشة الانتقال إلى cPanel,cPanel SSO Transition,system,closed,P1,low,transition-screen,1,7,,not-started,CreateSsoToken,,cPanel itself is entirely outside our control. Design only the screen that prepares the user for a different interface
-S-04,مبدّل اللغة/العملة/السمة,Language / Currency / Theme Switcher,system,full,P0,medium,closed;open;cart-empty-warning,3,1,,not-started,,I15;I16,Shared header component — affects every screen. Build in phase 1
-S-05,لافتات النظام,System Banners,system,full,P0,low,overdue-invoice;unverified-email;suspended-service;upcoming-maintenance,4,1,,not-started,,,Shared component — build in phase 1 alongside Banner/Alert
-S-06,موافقة الكوكيز,Cookie Consent,system,full,P1,low,default,1,7,,not-started,,,Required for the EU and Swiss markets. Choose the most privacy-preserving default
+S-01,صفحات الأخطاء,Error Pages (404/500/maintenance/forbidden),system,full,P1,low,404;500;maintenance;forbidden,4,7,,built,,,"One template, four pages, with intelligent exit paths. /en/hosting currently returns a bare 404"
+S-02,قوالب البريد الإلكتروني,Email Templates,system,closed,P1,very-high,~50-templates,50,7,,built,,,"LARGEST FORGOTTEN ITEM. Template count was never multiplied by language — see gaps/gap-register.md G4. Build one unified template in phase 1, not 50 separate ones in the final 3 weeks"
+S-03,شاشة الانتقال إلى cPanel,cPanel SSO Transition,system,closed,P1,low,transition-screen,1,7,,built,CreateSsoToken,,cPanel itself is entirely outside our control. Design only the screen that prepares the user for a different interface
+S-04,مبدّل اللغة/العملة/السمة,Language / Currency / Theme Switcher,system,full,P0,medium,closed;open;cart-empty-warning,3,1,,built,,I15;I16,Shared header component — affects every screen. Build in phase 1
+S-05,لافتات النظام,System Banners,system,full,P0,low,overdue-invoice;unverified-email;suspended-service;upcoming-maintenance,4,1,,built,,,Shared component — build in phase 1 alongside Banner/Alert
+S-06,موافقة الكوكيز,Cookie Consent,system,full,P1,low,default,1,7,,built,,,Required for the EU and Swiss markets. Choose the most privacy-preserving default

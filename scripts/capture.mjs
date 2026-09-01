@@ -100,6 +100,13 @@ const ROUTES = [
   { name: 'verify-email', path: '#/verify' },
   { name: 'verify-done', path: '#/verify?state=done' },
   { name: 'session-expired', path: '#/expired' },
+  { name: 'err-404', path: '#/error/404' },
+  { name: 'err-500', path: '#/error/500' },
+  { name: 'err-403', path: '#/error/403' },
+  { name: 'err-maintenance', path: '#/error/maintenance' },
+  { name: 'cpanel-sso', path: '#/cpanel' },
+  { name: 'sys-banners', path: '#/system/banners' },
+  { name: 'not-found', path: '#/no/such/page' },
 
   { name: 'legal', path: '#/legal/privacy' },
 ];
@@ -165,6 +172,24 @@ for (const vp of VIEWPORTS) {
       // full-page screenshot hides behind a header and a footer.
       empty: (document.querySelector('main')?.textContent ?? '').trim().length < 20,
     }));
+
+    /*
+     * Naming the culprit rather than only flagging the page. Both edges are probed: in RTL an
+     * element that escapes does so past the left, and a right-only check reports nothing at
+     * all while the page scrolls sideways.
+     */
+    if (shape.overflow) {
+      const who = await page.evaluate(() =>
+        [...document.querySelectorAll('*')]
+          .filter((el) => {
+            const r = el.getBoundingClientRect();
+            return r.right > window.innerWidth + 1 || r.left < -1;
+          })
+          .slice(0, 6)
+          .map((el) => `${el.tagName}.${String(el.className).slice(0, 28)} r=${Math.round(el.getBoundingClientRect().right)} w=${Math.round(el.getBoundingClientRect().width)}`),
+      );
+      console.log('   OVERFLOW BY:', who.join(' | '));
+    }
 
     const flags = [
       shape.overflow ? 'HORIZONTAL OVERFLOW' : '',

@@ -440,6 +440,123 @@ export const STRINGS = {
   // ── plan comparison: M-10 ─────────────────────────────────────────────────
 
   // ── registrant details: O-06 ──────────────────────────────────────────────
+
+  // ── error pages: S-01 ─────────────────────────────────────────────────────
+  'err.404.title': { ar: 'الصفحة دي مش موجودة', en: 'This page does not exist' },
+  'err.404.body': {
+    ar: 'يمكن اللينك قديم أو فيه حرف ناقص. جرّب تدوّر من الرئيسية.',
+    en: 'The link may be old, or a letter may be missing. Try searching from the homepage.',
+  },
+  'err.404.act': { ar: 'روح للرئيسية', en: 'Go to the homepage' },
+  'err.500.title': { ar: 'في حاجة وقعت عندنا', en: 'Something broke on our side' },
+  'err.500.body': {
+    ar: 'المشكلة دي مننا مش منك. اتسجّلت عندنا وفريقنا شايفها.',
+    en: 'That one is ours, not yours. It has been logged and our team can see it.',
+  },
+  'err.500.act': { ar: 'جرّب تاني', en: 'Try again' },
+  'err.500.note': {
+    ar: 'لو فضلت تتكرر، شوف حالة الشبكة أو افتح تذكرة.',
+    en: 'If it keeps happening, check network status or open a ticket.',
+  },
+  'err.403.title': { ar: 'مالكش صلاحية هنا', en: 'You cannot open this' },
+  'err.403.body': {
+    ar: 'الصفحة دي بتحتاج حساب أو صلاحية مش موجودة في حسابك الحالي.',
+    en: 'This page needs an account, or a permission your current one does not have.',
+  },
+  'err.403.act': { ar: 'دخول العملاء', en: 'Sign in' },
+  'err.maintenance.title': { ar: 'بنعمل صيانة', en: 'We are doing maintenance' },
+  'err.maintenance.body': {
+    ar: 'الجزء ده واقف مؤقتًا وراجع قريب. مواقعك وبريدك شغالين عادي.',
+    en: 'This part is briefly down and will be back shortly. Your sites and mail are unaffected.',
+  },
+  'err.maintenance.act': { ar: 'شوف حالة الشبكة', en: 'Check network status' },
+
+  // ── cPanel transition: S-03 ───────────────────────────────────────────────
+  'sso.title': { ar: 'بنحوّلك على cPanel', en: 'Taking you to cPanel' },
+  'sso.body': {
+    ar: 'cPanel برنامج تاني بندخّلك عليه من غير ما تكتب باسورد. شكله مختلف عن هنا.',
+    en: 'cPanel is a separate program we sign you into without a password. It looks different from here.',
+  },
+  'sso.n1': { ar: 'الواجهة إنجليزي ومن الشمال لليمين.', en: 'Its interface is English and left-to-right.' },
+  'sso.n2': { ar: 'الشكل والخط مختلفين — ده طبيعي.', en: 'The look and the type are different — that is normal.' },
+  'sso.n3': { ar: 'اقفل التبويب وارجع هنا في أي وقت.', en: 'Close the tab to come back here whenever you like.' },
+  'sso.go': { ar: 'كمّل على cPanel', en: 'Continue to cPanel' },
+
+  // ── banners: S-05 ─────────────────────────────────────────────────────────
+  'sys.banners': { ar: 'لافتات النظام', en: 'System banners' },
+  'sys.bannersLede': {
+    ar: 'أربع درجات، كل واحدة بأرضية وحد وأيقونة — مش باللون لوحده.',
+    en: 'Four severities, each with its own ground, border and icon — never colour alone.',
+  },
+  'sys.dismiss': { ar: 'إخفاء', en: 'Dismiss' },
+  'sys.b.info': { ar: 'معلومة', en: 'Something to know' },
+  'sys.b.infoBody': {
+    ar: 'إنستاباي بقت متاحة كطريقة دفع.',
+    en: 'InstaPay is now available as a payment method.',
+  },
+  'sys.b.success': { ar: 'تمّت', en: 'Done' },
+  'sys.b.successBody': { ar: 'إعداداتك اتحفظت.', en: 'Your settings have been saved.' },
+  'sys.b.warning': { ar: 'خد بالك', en: 'Worth a look' },
+  'sys.b.warningBody': {
+    ar: 'مساحتك قربت تخلص على واحدة من خدماتك.',
+    en: 'One of your services is close to its storage limit.',
+  },
+  'sys.b.danger': { ar: 'محتاج تصرّف', en: 'Needs action' },
+  'sys.b.dangerBody': {
+    ar: 'عندك فاتورة متأخرة، والخدمة بتتوقف لو ما اتدفعتش.',
+    en: 'An invoice is overdue, and the service stops if it stays unpaid.',
+  },
+  'sys.permanent': { ar: 'لافتة ما بتتقفلش', en: 'A banner you cannot close' },
+  'sys.permanentBody': {
+    ar: 'في إخطارات مش من حق الواحد يسكّتها، فالزرار مش بيتعرض أصلاً بدل ما يتعرض ومايشتغلش.',
+    en: 'Some notices are not yours to silence, so the button is simply not offered rather than offered and inert.',
+  },
+  'sys.severityRule': { ar: 'ليه مش باللون بس', en: 'Why not colour alone' },
+  'sys.severityRuleBody': {
+    ar: 'واحد من كل اتناشر راجل ما بيفرّقش الأحمر عن الأخضر. الدرجة بتتقال بالأيقونة والحد والأرضية مع بعض، عشان تفضل مفهومة من غير اللون.',
+    en: 'Around one man in twelve cannot separate red from green. Severity is carried by icon, border and ground together, so it survives without the colour.',
+  },
+  'sys.errors': { ar: 'صفحات الأخطاء', en: 'Error pages' },
+
+  // ── cookie consent: S-06 ──────────────────────────────────────────────────
+  'cc.title': { ar: 'الكوكيز', en: 'Cookies' },
+  'cc.body': {
+    ar: 'بنستخدم اللي لازم عشان الموقع يشتغل. أي حاجة تانية بإذنك.',
+    en: 'We use what the site needs to work. Anything beyond that is up to you.',
+  },
+  'cc.essential': { ar: 'أساسية', en: 'Essential' },
+  'cc.essentialNote': {
+    ar: 'الدخول والسلة واللغة. من غيرها الموقع ما بيشتغلش.',
+    en: 'Sign-in, cart and language. The site does not work without them.',
+  },
+  'cc.always': { ar: 'دايمًا', en: 'Always on' },
+  'cc.analytics': { ar: 'تحليلات', en: 'Analytics' },
+  'cc.analyticsNote': {
+    ar: 'بتساعدنا نعرف الصفحات اللي بتقف مع الناس.',
+    en: 'They tell us which pages people get stuck on.',
+  },
+  'cc.marketing': { ar: 'تسويق', en: 'Marketing' },
+  'cc.marketingNote': {
+    ar: 'إعلانات مبنية على اللي شفته.',
+    en: 'Advertising based on what you have looked at.',
+  },
+  'cc.rejectAll': { ar: 'الأساسية بس', en: 'Essential only' },
+  'cc.acceptAll': { ar: 'اقبل الكل', en: 'Accept all' },
+  'cc.saveChoice': { ar: 'احفظ اختياري', en: 'Save my choice' },
+  'cc.choose': { ar: 'اختار بنفسك', en: 'Choose what to allow' },
+  'cc.less': { ar: 'اخفي التفاصيل', en: 'Hide the detail' },
+
+  // ── currency switch: S-04 and I15 ─────────────────────────────────────────
+  'cur.title': { ar: 'تغيير العملة', en: 'Change currency' },
+  'cur.now': { ar: 'دلوقتي', en: 'Now' },
+  'cur.after': { ar: 'بعد التغيير', en: 'After' },
+  'cur.note': {
+    ar: 'سلتك ما بتتفضّاش — بس الإجمالي هيتحسب بالعملة الجديدة.',
+    en: 'Your cart is not emptied — the total is simply worked out in the new currency.',
+  },
+  'cur.switch': { ar: 'غيّر العملة', en: 'Change it' },
+  'cur.keep': { ar: 'سيبها زي ما هي', en: 'Leave it' },
+
   'reg.title': { ar: 'بيانات مالك الدومين', en: 'Domain registrant' },
   'reg.lede': {
     ar: 'الجهة المسجِّلة بتطلب البيانات دي وبتتسجّل باسمك.',

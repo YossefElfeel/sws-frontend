@@ -36,7 +36,7 @@ ok('dark mode toggles and persists', theme === 'dark' && stored === 'dark', `${t
 await p.click('.masthead__icon-btn');
 
 // Spec 4.2 currency
-await p.selectOption('.masthead__select:nth-of-type(2) select', 'EGP');
+await p.selectOption('.cur select', 'EGP');
 const egp = await p.$eval('.plan .plan__currency', (e) => e.textContent.trim());
 ok('currency switches in place', egp === 'EGP', egp);
 
@@ -78,7 +78,14 @@ await p.evaluate(() => (location.hash = '#/checkout'));
 await p.waitForSelector('.methods');
 const egpGw = await p.$$eval('.method__label', (n) => n.map((x) => x.textContent.trim()));
 ok('five gateways on EGP', egpGw.length === 5, String(egpGw.length));
-await p.selectOption('.masthead__select:nth-of-type(2) select', 'CHF');
+// S-04 / I15: with items in the cart the switch asks before it re-prices, so the flow has to
+// answer it. That the dialog appears at all is the assertion.
+await p.selectOption('.cur select', 'CHF');
+await p.waitForSelector('.cur__ask');
+const bothTotals = await p.$$eval('.cur__amount', (n) => n.map((x) => x.textContent.trim()));
+ok('changing currency with a full cart shows both totals', bothTotals.length === 2, bothTotals.join(' -> '));
+await p.click('.cur__acts .btn--primary');
+await p.waitForTimeout(200);
 await p.waitForTimeout(150);
 const chfGw = await p.$$eval('.method__label', (n) => n.length);
 ok('wallet gateway hides off EGP', chfGw === 4, `${chfGw} gateways on CHF`);
@@ -293,6 +300,72 @@ await p.waitForSelector('.compare');
   const hasUnl = (await p.$$eval('.unl', (n) => n.length)) > 0;
   const qualified = (await p.$$eval('.notice', (n) => n.length)) > 0;
   ok('"Unlimited" is qualified where it is claimed', !hasUnl || qualified);
+}
+
+// S-01: a mistyped URL used to redirect silently to the homepage, which looks exactly like a
+// working link that went somewhere else.
+await p.evaluate(() => (location.hash = '#/no/such/page'));
+await p.waitForSelector('.err__code');
+{
+  const code = await p.$eval('.err__code', (e) => e.textContent.trim());
+  const acts = await p.$$eval('.stage .acts a, .stage .acts button', (n) => n.length);
+  ok('an unknown URL is a 404, not a silent redirect home', code === '404' && acts >= 1, code);
+}
+
+// Each error state ends somewhere different, because the useful next move differs.
+{
+  const dest = [];
+  for (const k of ['404', '500', '403', 'maintenance']) {
+    await p.evaluate((kk) => (location.hash = `#/error/${kk}`), k);
+    await p.waitForSelector('.err__code');
+    dest.push(await p.$eval('.err__code', (e) => e.textContent.trim()));
+  }
+  ok('four error states, four codes', new Set(dest).size === 4, dest.join(' '));
+}
+
+// S-05: severity is carried by ground, border and icon together. Colour alone fails for
+// roughly one man in twelve, and the fourth severity is the one that ships untested.
+await p.evaluate(() => (location.hash = '#/system/banners'));
+await p.waitForSelector('.banner');
+{
+  const shape = await p.evaluate(() =>
+    ['info', 'success', 'warning', 'danger'].map((s) => {
+      const el = document.querySelector(`.banner--${s}`);
+      if (!el) return null;
+      const cs = getComputedStyle(el);
+      return {
+        s,
+        bg: cs.backgroundColor,
+        border: cs.borderTopColor,
+        icon: !!el.querySelector('.banner__icon svg'),
+      };
+    }),
+  );
+  const all = shape.every((x) => x && x.icon && x.bg !== 'rgba(0, 0, 0, 0)' && x.border !== x.bg);
+  const distinct = new Set(shape.map((x) => x?.bg)).size;
+  ok('all four severities differ by more than colour', all && distinct === 4, `${distinct} grounds`);
+}
+
+// S-06: the most privacy-preserving default, and refusing has to be as easy as agreeing.
+await p.evaluate(() => {
+  localStorage.removeItem('sws.consent');
+});
+await p.evaluate(() => (location.hash = '#/'));
+await p.reload({ waitUntil: 'networkidle' });
+await p.waitForSelector('.consent');
+{
+  const weights = await p.$$eval('.consent__acts .btn', (n) =>
+    n.map((b) => getComputedStyle(b).backgroundColor),
+  );
+  const sameWeight = new Set(weights).size === 1;
+  const noDismiss = (await p.$$eval('.consent [aria-label*="ismiss"], .consent__close', (n) => n.length)) === 0;
+  ok('reject is as prominent as accept', sameWeight && weights.length === 2, `${weights.length} buttons`);
+  ok('consent cannot be dismissed without answering', noDismiss);
+
+  await p.click('.consent__more');
+  await p.waitForSelector('.consent__rows');
+  const optIns = await p.$$eval('.consent__rows input[type=checkbox]', (n) => n.map((c) => c.checked));
+  ok('every optional category starts off', optIns.length > 0 && optIns.every((c) => c === false), `${optIns.length} optional`);
 }
 
 // PRODUCT.md: no verified proof metrics exist. The company pages are where an invented

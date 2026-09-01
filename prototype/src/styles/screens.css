@@ -473,6 +473,9 @@
 
 .actions {
   display: flex;
+  /* Three buttons and a 390px screen is not an unusual combination, and without this the
+     third one leaves the viewport entirely rather than moving to a second line. */
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--sws-space-12);
   margin-block-start: var(--sws-space-24);

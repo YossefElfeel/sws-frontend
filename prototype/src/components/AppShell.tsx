@@ -22,9 +22,9 @@ import {
   IconCoin,
   IconGlobe as IconLang,
 } from './icons';
+import { CurrencySelect } from './CurrencySelect';
 import { useLocale, type Locale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
-import { CURRENCIES, type Currency } from '../lib/catalog';
 import { ACCOUNT, INVOICES, TICKETS, NOTIFICATIONS } from '../lib/account';
 
 /**
@@ -112,7 +112,7 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { t, locale, setLocale, bi } = useLocale();
-  const { theme, toggleTheme, currency, setCurrency } = usePrefs();
+  const { theme, toggleTheme } = usePrefs();
   const groups = useGroups();
   const [open, setOpen] = useState(false);
   const [bell, setBell] = useState(false);
@@ -274,17 +274,7 @@ export function AppShell({
               <IconChevron size={13} />
             </label>
 
-            <label className="app__select app__select--currency">
-              <span className="u-visually-hidden">{t('currency.label')}</span>
-              <select value={currency} onChange={(e) => setCurrency(e.target.value as Currency)}>
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <IconChevron size={13} />
-            </label>
+            <CurrencySelect variant="app" />
 
             <button
               type="button"

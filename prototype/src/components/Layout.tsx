@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { IconGlobe, IconChevron, IconCart, IconSun, IconMoon, IconCoin } from './icons';
+import { IconGlobe, IconChevron, IconCart, IconSun, IconMoon } from './icons';
+import { CurrencySelect } from './CurrencySelect';
+import { CookieConsent } from './CookieConsent';
 import { useLocale, type Locale } from '../lib/locale';
 import { useCart } from '../lib/cart';
 import { usePrefs } from '../lib/prefs';
-import { CURRENCIES, type Currency } from '../lib/catalog';
 
 /**
  * The shell every page sits in.
@@ -16,7 +17,7 @@ import { CURRENCIES, type Currency } from '../lib/catalog';
 export function Layout({ children }: { children: ReactNode }) {
   const { t, locale, setLocale } = useLocale();
   const { lines } = useCart();
-  const { theme, toggleTheme, currency, setCurrency } = usePrefs();
+  const { theme, toggleTheme } = usePrefs();
 
   return (
     <div className="page">
@@ -59,22 +60,8 @@ export function Layout({ children }: { children: ReactNode }) {
               <IconChevron size={14} />
             </label>
 
-            {/* Spec 4.2: switches in place, persists, and drives which gateways appear. */}
-            <label className="masthead__select">
-              <IconCoin />
-              <span className="u-visually-hidden">{t('currency.label')}</span>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as Currency)}
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-              <IconChevron size={14} />
-            </label>
+            {/* Spec 4.2, and the open half of I15 — see CurrencySelect. */}
+            <CurrencySelect variant="masthead" />
 
             {/* Spec 4.3. */}
             <button
@@ -164,6 +151,9 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </footer>
+
+      {/* S-06. Rendered last so it sits above the page without a stacking-context fight. */}
+      <CookieConsent />
     </div>
   );
 }
