@@ -1,0 +1,16 @@
+# Nothing here is needed to build the front end, and none of it should travel to a
+# deployment host. The spec PDF in 00-source/ additionally contains a live credential
+# (gap G8), so it stays local regardless.
+00-source/
+decisions/
+gaps/
+technical/
+inventory/
+actions/
+.impeccable/
+scripts/
+.github/
+
+# Docs
+*.md
+!README.md
