@@ -170,9 +170,14 @@ export function IconTrash({ size = 18, className }: IconProps) {
   );
 }
 
+/**
+ * Forward. Drawn pointing right, and mirrored in RTL by the `icon--dir` rule — an arrow that
+ * means "onward" points the way the reader is travelling, so in Arabic it points left. It is
+ * the one class of icon that is not the same picture in both directions.
+ */
 export function IconArrow({ size = 18, className }: IconProps) {
   return (
-    <svg {...base(size)} className={className}>
+    <svg {...base(size)} className={`icon--dir${className ? ` ${className}` : ''}`}>
       <path d="M4.5 12h15M13.5 6l6 6-6 6" />
     </svg>
   );
@@ -278,7 +283,7 @@ export function IconClose({ size = 18, className }: IconProps) {
 
 export function IconSignOut({ size = 18, className }: IconProps) {
   return (
-    <svg {...base(size)} className={className}>
+    <svg {...base(size)} className={`icon--dir${className ? ` ${className}` : ''}`}>
       <path d="M14.5 20H6.2A2.2 2.2 0 0 1 4 17.8V6.2A2.2 2.2 0 0 1 6.2 4h8.3" />
       <path d="M16.5 15.5 20 12l-3.5-3.5M20 12H9.5" />
     </svg>

@@ -188,6 +188,40 @@ const contactHref = await p.$$eval('.colophon__links a', (n) =>
 );
 ok('footer Contact reaches a ticket', Boolean(contactHref), contactHref ?? 'still /account');
 
+// Logical properties handle layout, but an arrow is a drawing: "onward" has to point the way
+// the reader travels, so it mirrors in Arabic and only it does.
+{
+  await p.evaluate(() => (location.hash = '#/account'));
+  await p.waitForSelector('.icon--dir');
+  const rtl = await p.evaluate(() => {
+    const mirrored = (el) => getComputedStyle(el).transform.includes('-1');
+    return {
+      dir: document.documentElement.getAttribute('dir'),
+      dirTotal: document.querySelectorAll('.icon--dir').length,
+      dirMirrored: [...document.querySelectorAll('.icon--dir')].filter(mirrored).length,
+      plainMirrored: [...document.querySelectorAll('svg:not(.icon--dir)')].filter(mirrored).length,
+    };
+  });
+  ok(
+    'forward arrows point the reading way in Arabic',
+    rtl.dir === 'rtl' && rtl.dirTotal > 0 && rtl.dirMirrored === rtl.dirTotal,
+    `${rtl.dirMirrored}/${rtl.dirTotal} mirrored`,
+  );
+  ok('no other icon is mirrored', rtl.plainMirrored === 0, `${rtl.plainMirrored} stray`);
+
+  await p.selectOption('.app__select:nth-of-type(1) select', 'en');
+  await p.waitForTimeout(200);
+  const ltr = await p.evaluate(() => ({
+    dir: document.documentElement.getAttribute('dir'),
+    mirrored: [...document.querySelectorAll('.icon--dir')].filter((el) =>
+      getComputedStyle(el).transform.includes('-1'),
+    ).length,
+  }));
+  ok('and point the other way in English', ltr.dir === 'ltr' && ltr.mirrored === 0, `${ltr.mirrored} mirrored`);
+  await p.selectOption('.app__select:nth-of-type(1) select', 'ar');
+  await p.waitForTimeout(200);
+}
+
 // An icon in a button is a flex item, and a flex item shrinks. In a narrow table cell they
 // were collapsing to zero width while keeping their height — a sliver where an arrow should
 // be, on every account table at once, and invisible to a screenshot at review scale.

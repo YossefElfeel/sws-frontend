@@ -237,3 +237,14 @@ ol {
 .skip-link:focus-visible {
   transform: translateY(0);
 }
+
+/*
+ * Directional icons mirror with the reading direction.
+ *
+ * Logical properties handle layout, but an arrow is a drawing, and a drawing of "onward" has
+ * to point the way the reader travels. Everything else in the set — a globe, a shield, a
+ * wallet — is the same picture in both directions and is left alone.
+ */
+:root[dir='rtl'] .icon--dir {
+  transform: scaleX(-1);
+}
