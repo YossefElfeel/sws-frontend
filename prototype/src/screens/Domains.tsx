@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import { IconCheck, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
+import { useCart } from '../lib/cart';
 import { TLDS, convert, formatAmount } from '../lib/catalog';
 
 /**
@@ -16,6 +18,8 @@ import { TLDS, convert, formatAmount } from '../lib/catalog';
 export function Domains() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const { add } = useCart();
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [searched, setSearched] = useState('');
 
@@ -106,7 +110,29 @@ export function Domains() {
                       {formatAmount(convert(row.renewUsdMinor, currency), locale)} {currency}
                     </td>
                     <td className="num">
-                      <Button size="sm" variant="secondary" disabled={free === false}>
+                      {/*
+                        This was the primary action of the whole domain search and it did
+                        nothing. A domain is a yearly product, so it enters the cart on the
+                        annual cycle at its registration price.
+                      */}
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={free === false || !stem}
+                        onClick={() => {
+                          add({
+                            plan: {
+                              id: `dom-${stem}${row.tld}`,
+                              name: `${stem}${row.tld}`,
+                              monthlyUsdMinor: Math.round(row.registerUsdMinor / 12),
+                            },
+                            cycle: 'annually',
+                            addons: {},
+                            domain: { name: `${stem}${row.tld}`, action: 'register', years: 1 },
+                          });
+                          navigate('/cart');
+                        }}
+                      >
                         {t('action.add')}
                       </Button>
                     </td>

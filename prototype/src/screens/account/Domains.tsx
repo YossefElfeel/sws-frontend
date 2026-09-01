@@ -99,6 +99,7 @@ export function DomainManage() {
   // straight into inputs — an Add button that adds nothing is the clearest kind of broken.
   const [ns, setNs] = useState<string[]>(dom?.nameservers ?? []);
   const [records, setRecords] = useState(DNS_RECORDS);
+  const [epp, setEpp] = useState(false);
   const { saved, mark, clear } = useSaved();
 
   if (!dom) return <Navigate to="/account/domains" replace />;
@@ -258,10 +259,28 @@ export function DomainManage() {
               {/* Transfer out is only possible with the lock off, so the state is explained
                   right here rather than left as a button that silently refuses. */}
               <div className="acts__sep">
-                <Button size="md" variant="danger" disabled={lock}>
+                <Button
+                  size="md"
+                  variant="danger"
+                  disabled={lock}
+                  onClick={() => setEpp(true)}
+                >
                   {t('dom.transferOut')}
                 </Button>
                 {lock && <p className="form__note">{t('dom.lockedNote')}</p>}
+
+                {/* Transferring out means handing the EPP code to the gaining registrar, so
+                    the code is what the button produces. Refusing to show it is how registrars
+                    make leaving hard, and this product is claiming not to do that. */}
+                {epp && !lock && (
+                  <div className="u-mt-16">
+                    <p className="ref__label">{t('dom.epp')}</p>
+                    <p className="ref__code serial">
+                      <bdi>SWS-EPP-4417</bdi>
+                    </p>
+                    <p className="form__note">{t('dom.eppNote')}</p>
+                  </div>
+                )}
               </div>
             </div>
           </section>

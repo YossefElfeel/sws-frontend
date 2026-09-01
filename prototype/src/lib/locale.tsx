@@ -474,6 +474,16 @@ export const STRINGS = {
     ar: 'من هنا ورايح، الشاشة بتاعت cPanel مش بتاعتنا.',
     en: 'From here on the screen is cPanel’s, not ours.',
   },
+  'funds.doneTitle': { ar: 'الرصيد اتشحن', en: 'Balance topped up' },
+  'funds.doneNote': {
+    ar: 'هيتخصم تلقائيًا من أول فاتورة جاية.',
+    en: 'It comes off your next invoice automatically.',
+  },
+  'dom.epp': { ar: 'كود النقل (EPP)', en: 'Transfer code (EPP)' },
+  'dom.eppNote': {
+    ar: 'ادّي الكود ده للشركة اللي ناقل ليها. صالح 5 أيام.',
+    en: 'Give this to the registrar you are moving to. It is valid for five days.',
+  },
   // ── error pages: S-01 ─────────────────────────────────────────────────────
   'err.404.title': { ar: 'الصفحة دي مش موجودة', en: 'This page does not exist' },
   'err.404.body': {

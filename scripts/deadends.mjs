@@ -59,13 +59,36 @@ for (const f of files) {
   const lineOf = (i) => src.slice(0, i).split('\n').length;
 
   // ── 1. controls wired to nothing ───────────────────────────────────────────
-  for (const re of [/<Button\b([^>]*?)>([\s\S]*?)<\/Button>/g, /<button\b([^>]*?)>([\s\S]*?)<\/button>/g]) {
-    for (const m of src.matchAll(re)) {
-      const [, attrs, body] = m;
-      if (/onClick|type="submit"|disabled/.test(attrs)) continue;
+  /*
+   * Attributes are read with a brace-aware scan rather than [^>]*, because an expression can
+   * contain the very character that would end the tag: disabled={ns.length >= 5} truncated the
+   * match right before its own onClick and reported a working button as dead.
+   */
+  for (const tag of ['Button', 'button']) {
+    let i = 0;
+    while ((i = src.indexOf(`<${tag}`, i)) !== -1) {
+      const after = src[i + tag.length + 1];
+      if (after && /[A-Za-z0-9_]/.test(after)) { i += 1; continue; }
+      let j = i + tag.length + 1;
+      let depth = 0;
+      while (j < src.length) {
+        const c = src[j];
+        if (c === '{') depth++;
+        else if (c === '}') depth--;
+        else if (c === '>' && depth === 0) break;
+        j++;
+      }
+      const attrs = src.slice(i + tag.length + 1, j);
+      const selfClosing = src[j - 1] === '/';
+      const close = selfClosing ? j : src.indexOf(`</${tag}>`, j);
+      const body = selfClosing ? '' : src.slice(j + 1, close === -1 ? j + 1 : close);
+      i = j + 1;
+
+      const alwaysOff = /\sdisabled(\s|\/|$|=\{true\})/.test(attrs);
+      if (/onClick|type="submit"/.test(attrs) || alwaysOff) continue;
       if (short === 'components/Button.tsx' && allow('components/Button.tsx:Button')) continue;
       const label = body.match(/t\('([^']+)'\)/)?.[1] ?? body.trim().replace(/\s+/g, ' ').slice(0, 28);
-      findings.push({ kind: 'control', where: `${short}:${lineOf(m.index)}`, what: label });
+      findings.push({ kind: 'control', where: `${short}:${lineOf(i)}`, what: label });
     }
   }
 

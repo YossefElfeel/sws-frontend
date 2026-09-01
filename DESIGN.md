@@ -265,6 +265,12 @@ Design intent that is not enforced is design intent that lasts one sprint.
 | `scripts/flow.mjs` | **62 checks** against a running build |
 | `scripts/capture.mjs` | 76 routes × 2 viewports — overflow, empty main, console errors |
 | `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
+| `scripts/journeys.mjs` | 16 journeys walked by clicking only — a link that goes nowhere stalls the walk |
+
+`journeys.mjs` never sets the URL mid-walk. Every other gate asserts screens; this one asserts
+the routes *between* them, which is the only way a dead link fails a test instead of being
+stepped over. It found the domain search's Add button doing nothing — the primary action of an
+entire journey — after `deadends.mjs` had cleared the file.
 
 `deadends.mjs` exists because "some buttons don't work" is the one defect a screenshot never
 shows and a typecheck never catches. It ran once by hand and found twenty-one. Its four

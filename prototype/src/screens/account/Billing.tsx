@@ -268,9 +268,36 @@ export function AddFunds() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
   const [amount, setAmount] = useState(2000);
+  const [added, setAdded] = useState(false);
 
   const presets = [1000, 2000, 5000, 10000];
   const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
+
+  if (added) {
+    return (
+      <AccountLayout title={t('acc.funds')}>
+        <div className="card card--calm">
+          <p className="calm">
+            <IconCheck size={22} />
+            <span>
+              <strong>{t('funds.doneTitle')}</strong>
+              <span className="calm__note">
+                {money(amount)} — {t('funds.doneNote')}
+              </span>
+            </span>
+          </p>
+        </div>
+        <div className="form__foot">
+          <Link className="btn btn--md btn--primary" to="/account/invoices">
+            {t('acc.invoices')}
+          </Link>
+          <Link className="btn btn--md btn--secondary" to="/account">
+            {t('acc.dashboard')}
+          </Link>
+        </div>
+      </AccountLayout>
+    );
+  }
 
   return (
     <AccountLayout title={t('acc.funds')} lede={t('funds.lede')}>
@@ -348,7 +375,7 @@ export function AddFunds() {
               </div>
             </dl>
             <div className="acts u-mt-16">
-              <Button size="md" disabled={amount < 500}>
+              <Button size="md" disabled={amount < 500} onClick={() => setAdded(true)}>
                 {t('funds.add')}
               </Button>
             </div>
