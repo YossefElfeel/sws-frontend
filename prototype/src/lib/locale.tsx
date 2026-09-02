@@ -42,6 +42,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       }
       return entry[locale];
     };
+    /*
+     * index.html carries the Arabic title so the first paint has one, but it stayed Arabic
+     * after the switch — the browser tab is part of the page, and an English page announcing
+     * itself in Arabic in the tab strip is the one bit of the translation that leaks.
+     */
+    document.title = t('meta.title');
     const bi = (value: Bi) => value[locale];
     return { locale, dir, setLocale, t, bi };
   }, [locale]);
@@ -64,6 +70,11 @@ type StringKey = keyof typeof STRINGS;
  * it says something true instead.
  */
 export const STRINGS = {
+  /* The browser tab. index.html carries the Arabic default so the first paint has a title. */
+  'meta.title': {
+    ar: 'SWS — استضافة سويسرية بدعم مصري',
+    en: 'SWS — Swiss hosting, Egyptian support',
+  },
   'brand.tagline': { ar: 'خدمات الويب', en: 'Web Services' },
 
   'hero.announce': {
@@ -952,7 +963,7 @@ export const STRINGS = {
   'ct.title': { ar: 'كلّمنا', en: 'Contact us' },
   'ct.lede': { ar: 'أسرع طريقة أول، والفورم بعدها.', en: 'The fastest routes first, the form after.' },
   'ct.ticket': { ar: 'افتح تذكرة', en: 'Open a ticket' },
-  'ct.ticketBody': { ar: 'أسرع حاجة لو عندك حساب.', en: 'The quickest route if you have an account.' },
+  'ct.ticketBody': { ar: 'ادخل على حسابك وافتح تذكرة — أسرع طريق للرد.', en: 'Sign in to your account and open a ticket — the quickest route to an answer.' },
   'ct.kb': { ar: 'قاعدة المعرفة', en: 'Knowledgebase' },
   'ct.kbBody': { ar: 'أغلب الأسئلة لها إجابة مكتوبة.', en: 'Most questions already have a written answer.' },
   'ct.status': { ar: 'حالة الشبكة', en: 'Network status' },
@@ -1417,6 +1428,8 @@ export const STRINGS = {
   'tkt.cancel': { ar: 'إلغاء', en: 'Cancel' },
   'tkt.reply': { ar: 'رد', en: 'Reply' },
   'tkt.close': { ar: 'إغلاق التذكرة', en: 'Close ticket' },
+  'tkt.noneFilter': { ar: 'مفيش تذاكر بالفلاتر دي.', en: 'No tickets match these filters.' },
+  'tkt.showAll': { ar: 'اعرض كل التذاكر', en: 'Show all tickets' },
 
   'prio.low': { ar: 'منخفضة', en: 'Low' },
   'prio.medium': { ar: 'متوسطة', en: 'Medium' },
@@ -1432,6 +1445,8 @@ export const STRINGS = {
   'dept.transfer.body': { ar: 'عندك موقع مستضاف في مكان تاني؟ ابعت طلب نقل.', en: 'Hosting a site elsewhere? Submit a transfer request.' },
 
   'kb.search': { ar: 'ابحث في قاعدة المعرفة', en: 'Search the knowledgebase' },
+  'kb.categories': { ar: 'تصنيفات المقالات', en: 'Article categories' },
+  'kb.related': { ar: 'مقالات في نفس التصنيف', en: 'More in this category' },
   'kb.helpful': { ar: 'هل كانت المقالة دي مفيدة؟', en: 'Was this article helpful?' },
   'kb.thanks': { ar: 'شكرًا — رأيك بيساعدنا نحسّن المقالات.', en: 'Thank you — your answer helps us improve these articles.' },
   'kb.yes': { ar: 'نعم', en: 'Yes' },
@@ -1446,6 +1461,10 @@ export const STRINGS = {
   'kb.a2.body': { ar: 'من صفحة الخدمة اضغط «ادخل على cPanel» — الدخول تلقائي من غير كلمة مرور تانية.', en: 'From the service page press "Log in to cPanel" — the sign-in is automatic and needs no second password.' },
   'kb.a3.title': { ar: 'إعداد البريد على الموبايل', en: 'Setting up email on your phone' },
   'kb.a3.body': { ar: 'استخدم IMAP على mail.somion.ch، بورت 993 مع SSL للوارد و465 للصادر.', en: 'Use IMAP on mail.somion.ch, port 993 with SSL for incoming and 465 for outgoing.' },
+  'kb.a5.title': { ar: 'إزاي تنقل دومينك لـ SWS', en: 'How to transfer your domain to SWS' },
+  'kb.a5.body': { ar: 'افتح قفل الدومين عند المُسجِّل الحالي، اطلب كود الـEPP، وبعدين ادخل الكود في صفحة نقل الدومين. النقل بياخد من ٥ لـ٧ أيام وبيضيف سنة على مدة الدومين.', en: 'Unlock the domain at your current registrar, ask it for the EPP code, then enter that code on the domain transfer page. A transfer takes five to seven days and adds a year to the domain.' },
+  'kb.a6.title': { ar: 'إزاي تقرا فاتورتك', en: 'How to read your invoice' },
+  'kb.a6.body': { ar: 'كل بند في الفاتورة بيوضّح الخدمة ودورة الفوترة والمدة اللي بتغطيها. ضريبة القيمة المضافة سطر منفصل، والإجمالي تحتها هو المبلغ اللي هيتخصم فعلًا.', en: 'Each line on an invoice names the service, its billing cycle and the period it covers. VAT is its own line, and the total beneath it is the figure that will actually be charged.' },
   'kb.a4.title': { ar: 'ليه سعر التجديد مختلف أحيانًا', en: 'Why a renewal price can differ' },
   'kb.a4.body': { ar: 'باقات الاستضافة بتتجدد بنفس السعر. الدومينات بس هي اللي سعر تجديدها ممكن يختلف عن سعر التسجيل، والرقمين معروضين جنب بعض في صفحة الدومينات.', en: 'Hosting plans renew at the same price. Only domains can renew at a different figure from registration, and both numbers are shown side by side on the domains page.' },
 
@@ -1470,6 +1489,18 @@ export const STRINGS = {
   'sec.newPassword': { ar: 'كلمة مرور جديدة', en: 'New password' },
   'sec.changePassword': { ar: 'غيّر كلمة المرور', en: 'Change password' },
   'sec.twofaNote': { ar: 'كود إضافي من تطبيق المصادقة عند كل دخول.', en: 'An extra code from your authenticator app at every sign-in.' },
+  'sec.twofaOnNote': { ar: 'مفعّل — هيتطلب منك كود عند كل دخول.', en: 'On — you will be asked for a code at every sign-in.' },
+  'sec.twofaStep1': { ar: '١ — امسح الكود ده من تطبيق المصادقة (Google Authenticator أو أي تطبيق تاني).', en: '1 — Scan this code in your authenticator app (Google Authenticator or any other).' },
+  'sec.twofaStep2': { ar: '٢ — أو أدخل المفتاح ده يدويًا لو مش قادر تمسح الكود.', en: '2 — Or enter this key by hand if you cannot scan the code.' },
+  'sec.twofaStep3': { ar: '٣ — اكتب الكود المكوّن من ٦ أرقام اللي ظهر في التطبيق', en: '3 — Enter the six-digit code your app is showing' },
+  'sec.twofaConfirm': { ar: 'فعّل التحقق بخطوتين', en: 'Turn on two-factor' },
+  'sec.twofaOn': { ar: 'التحقق بخطوتين اتفعّل', en: 'Two-factor is on' },
+  'sec.twofaOff': { ar: 'التحقق بخطوتين اتوقف — حسابك دلوقتي بكلمة المرور بس.', en: 'Two-factor is off — your account is now protected by a password alone.' },
+  'sec.qrLabel': { ar: 'مكان رمز QR الخاص بالتحقق بخطوتين', en: 'Slot for the two-factor QR code' },
+  'sec.qrTag': { ar: 'رمز QR', en: 'QR code' },
+  'sec.qrNote': { ar: 'الرمز بيتولّد في الخادم لكل حساب على حدة، فمش مرسوم هنا.', en: 'The code is minted per account on the server, so it is not drawn here.' },
+  'sec.backup': { ar: 'رموز احتياطية', en: 'Backup codes' },
+  'sec.backupNote': { ar: 'احفظهم في مكان آمن. كل رمز بيشتغل مرة واحدة، ودول طريقك لو ضاع الموبايل.', en: 'Keep these somewhere safe. Each one works once, and they are your way in if you lose your phone.' },
   'sec.log': { ar: 'سجل الدخول', en: 'Login activity' },
   'sec.ip': { ar: 'عنوان IP', en: 'IP address' },
   'sec.where': { ar: 'المكان', en: 'Location' },
@@ -1480,8 +1511,14 @@ export const STRINGS = {
   'con.edit': { ar: 'تعديل', en: 'Edit' },
   'con.add': { ar: 'أضف جهة اتصال', en: 'Add a contact' },
   'perm.invoices': { ar: 'الفواتير', en: 'Invoices' },
+  'perm.invoices.note': { ar: 'يشوف الفواتير ويدفعها.', en: 'Can see invoices and pay them.' },
   'perm.tickets': { ar: 'التذاكر', en: 'Tickets' },
+  'perm.tickets.note': { ar: 'يفتح تذاكر دعم ويرد عليها.', en: 'Can open support tickets and reply to them.' },
   'perm.domains': { ar: 'الدومينات', en: 'Domains' },
+  'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
+  'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
+  'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
+  'con.done': { ar: 'إغلاق', en: 'Done' },
 
   'footer.privacy': { ar: 'سياسة الخصوصية', en: 'Privacy policy' },
   'footer.terms': { ar: 'الشروط والأحكام', en: 'Terms' },

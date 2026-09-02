@@ -236,6 +236,12 @@ export interface TicketMessage {
   author: Bi;
   at: string;
   body: Bi;
+  /**
+   * Spec 9.5.3 asks for files on a reply, not only on the first message. A screenshot is
+   * usually the second thing sent, not the first, so the names travel with the message they
+   * were attached to rather than sitting in a list beside the thread.
+   */
+  attachments?: string[];
 }
 
 export interface Ticket {
@@ -271,6 +277,10 @@ export const TICKETS: Ticket[] = [
           ar: 'الشهادة خلصت امبارح والتجديد التلقائي ما اشتغلش، والموقع بيطلع تحذير للزوار.',
           en: 'The certificate expired yesterday and the auto-renew did not fire. The site is showing a warning to visitors.',
         },
+        // A screenshot is the first thing anyone sends about a browser warning, so the
+        // fixture carries one — the attachment row has to be reviewable without waiting for
+        // someone to attach a file by hand.
+        attachments: ['ssl-warning.png'],
       },
       {
         id: 'm2',
@@ -332,6 +342,14 @@ export const ARTICLES: Article[] = [
   { id: 'a2', slug: 'cpanel-first-login', category: 'getting-started', titleKey: 'kb.a2.title', bodyKey: 'kb.a2.body' },
   { id: 'a3', slug: 'email-on-phone', category: 'email', titleKey: 'kb.a3.title', bodyKey: 'kb.a3.body' },
   { id: 'a4', slug: 'why-renewal-differs', category: 'billing', titleKey: 'kb.a4.title', bodyKey: 'kb.a4.body' },
+  /*
+   * One article per category made the category strip look right and left it doing nothing —
+   * every filter returned the whole of its category, and "more in this category" could never
+   * appear because no article ever had a sibling. Two categories carry a second article so
+   * both behaviours are reviewable rather than merely present in the markup.
+   */
+  { id: 'a5', slug: 'transfer-a-domain', category: 'domains', titleKey: 'kb.a5.title', bodyKey: 'kb.a5.body' },
+  { id: 'a6', slug: 'read-your-invoice', category: 'billing', titleKey: 'kb.a6.title', bodyKey: 'kb.a6.body' },
 ];
 
 export interface Announcement {
@@ -363,8 +381,22 @@ export const LOGIN_LOG = [
   { id: 'l3', at: '2026-08-27 03:11', ip: '45.132.192.7', where: { ar: 'غير معروف', en: 'Unknown' }, ok: false },
 ];
 
-/** Spec 9.7 sub-accounts with specific permissions. */
-export const CONTACTS = [
+/**
+ * Spec 9.7 sub-accounts with specific permissions. The list is the whole vocabulary — a
+ * contact can hold any subset of it and nothing outside it, which is what the editor on the
+ * contacts screen enumerates.
+ */
+export const PERMISSIONS = ['invoices', 'tickets', 'domains'] as const;
+export type Permission = (typeof PERMISSIONS)[number];
+
+export interface Contact {
+  id: string;
+  name: Bi;
+  email: string;
+  permissions: string[];
+}
+
+export const CONTACTS: Contact[] = [
   {
     id: 'c1',
     name: { ar: 'منى عبدالرحمن', en: 'Mona Abdelrahman' },
@@ -390,6 +422,22 @@ export const ACCOUNT = {
   twoFactor: false,
   creditUsdMinor: 0,
 };
+
+/**
+ * Spec 9.7 two-factor enrolment. The real secret is minted per account by the server and
+ * shown once; these stand in for it so the enrolment screen can be reviewed. They live here
+ * rather than inside the screen so that the day they come from an API, one file changes.
+ */
+export const TWOFA_SECRET = 'JBSW Y3DP EHPK 3PXP';
+
+export const BACKUP_CODES = [
+  '4KQ2-90XF',
+  'R7TD-1M8V',
+  'B3NC-64WH',
+  'Z8YL-27JQ',
+  'P5GS-83KD',
+  'M2VR-49TB',
+];
 
 /** Spec 9.4: saved payment methods. */
 export const PAYMENT_METHODS_SAVED = [

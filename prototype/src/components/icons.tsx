@@ -228,6 +228,14 @@ export function IconKey({ size = 18, className }: IconProps) {
   );
 }
 
+export function IconPaperclip({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M19 11.5 12.2 18.3a4.5 4.5 0 0 1-6.4-6.4l7.3-7.3a3 3 0 0 1 4.3 4.3l-7.3 7.3a1.5 1.5 0 0 1-2.2-2.2l6.4-6.4" />
+    </svg>
+  );
+}
+
 export function IconExternal({ size = 18, className }: IconProps) {
   return (
     <svg {...base(size)} className={className}>

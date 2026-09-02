@@ -942,3 +942,156 @@ a.tile:hover {
 .os-choice {
   margin-block-start: var(--sws-space-24);
 }
+
+/* ── ticket filters: department and priority ───────────────────────────────── */
+/*
+ * Spec 9.5.1 asks for three filters, and three pill strips would be eleven pills on one
+ * screen for a list this short. Status stays as pills because it is the one people reach for;
+ * these two are selects, which also survives a department list that grows.
+ */
+.bar__picks {
+  display: flex;
+  align-items: end;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+}
+
+.bar__pick {
+  display: grid;
+  gap: var(--sws-space-4);
+}
+
+.bar__pick .field {
+  min-inline-size: 11rem;
+}
+
+/* The count on a category chip is quieter than its label but still has to be read. */
+.filters__n {
+  margin-inline-start: var(--sws-space-4);
+  opacity: 0.7;
+}
+
+/* ── files on a ticket reply — spec 9.5.3 ──────────────────────────────────── */
+.msg__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-12);
+  padding-block-start: var(--sws-space-12);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  list-style: none;
+}
+
+.msg__files li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  padding: var(--sws-space-4) var(--sws-space-8);
+  border-radius: var(--sws-radius-sm);
+  background: var(--sws-surface-sunken);
+  font-size: var(--sws-font-size-caption);
+}
+
+/* ── two-factor enrolment — spec 9.7 ───────────────────────────────────────── */
+/*
+ * Set apart from the switch that opened it, so it reads as a task that is not finished rather
+ * than as more of the same panel.
+ */
+.enrol {
+  display: grid;
+  gap: var(--sws-space-12);
+  margin-block-start: var(--sws-space-16);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.enrol .slot {
+  margin-block-start: 0;
+}
+
+/* Backup codes are copied by eye, one at a time, so they are set apart and never wrap. */
+.codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--sws-space-8);
+  list-style: none;
+}
+
+.codes li {
+  padding: var(--sws-space-8) var(--sws-space-12);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-sm);
+  background: var(--sws-surface-sunken);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── contact permissions — spec 9.7 ────────────────────────────────────────── */
+.contact {
+  display: grid;
+  gap: 0;
+}
+
+.perm-edit {
+  margin: 0;
+  padding: var(--sws-space-16) var(--sws-space-24) var(--sws-space-24);
+  border: 0;
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  background: var(--sws-surface-sunken);
+  border-end-start-radius: var(--sws-radius-lg);
+  border-end-end-radius: var(--sws-radius-lg);
+}
+
+/* The row above it keeps its own rounding, so the pair reads as one card while open. */
+.contact:has(.perm-edit) .pm {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.perm-edit__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--sws-space-12);
+  margin-block: var(--sws-space-12);
+}
+
+.perm-edit__row {
+  display: flex;
+  align-items: start;
+  gap: var(--sws-space-8);
+  min-block-size: var(--sws-touch-target-min);
+}
+
+.perm-edit__label {
+  display: block;
+  font-weight: 600;
+}
+
+.perm-edit__note {
+  display: block;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * On a phone the two selects wrapped to a row each, which pushed the first ticket below the
+ * fold on a list of two. They are both short choices, so they share the row instead — and the
+ * field's min width has to come off, or the grid track is sized by the content and the pair
+ * widens the page rather than splitting it.
+ */
+@media (max-width: 599px) {
+  .bar__picks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sws-space-8);
+  }
+
+  .bar__pick {
+    min-inline-size: 0;
+  }
+
+  .bar__pick .field {
+    min-inline-size: 0;
+    inline-size: 100%;
+  }
+}

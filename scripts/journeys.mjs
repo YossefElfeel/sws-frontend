@@ -150,7 +150,16 @@ await journey('Transfer a domain in', [
 await journey('Register and verify', [
   ['register', () => start('#/register')],
   ['submit', async () => { await satisfyRequired('.auth__form'); await click(['.auth__form button[type=submit]']); }],
-  ['verify screen', () => p.goto(BASE + '#/verify', { waitUntil: 'networkidle' })],
+  /*
+   * A hash-only goto is a same-document navigation, so networkidle resolves before the router
+   * has swapped the screen — the next step then clicks into the previous one. Waiting for the
+   * screen that was asked for is what makes the step deterministic; the earlier version passed
+   * or failed depending on which route the journey happened to arrive from.
+   */
+  ['verify screen', async () => {
+    await p.goto(BASE + '#/verify', { waitUntil: 'networkidle' });
+    await p.waitForSelector('.auth__form .btn--secondary');
+  }],
   ['resend', () => click(['.auth__form .btn--secondary'])],
 ]);
 
@@ -167,7 +176,13 @@ await journey('Sign in with 2FA', [
 await journey('Reset a password', [
   ['reset request', () => start('#/reset')],
   ['send', async () => { await satisfyRequired('.auth__form'); await click(['.auth__form button[type=submit]']); }],
-  ['set a new one', () => p.goto(BASE + '#/reset/new', { waitUntil: 'networkidle' })],
+  /*
+   * A bare goto here is a same-document hash change from #/reset, so the page kept showing
+   * the "we sent it" state this journey had just produced — which has no password fields, so
+   * Save stayed disabled and the journey timed out against a screen that works fine by hand.
+   * start() reloads, which is what actually lands on the route.
+   */
+  ['set a new one', () => start('#/reset/new')],
   ['type it twice', async () => {
     await p.evaluate(() => {
       const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
@@ -227,7 +242,12 @@ await journey('Open a ticket', [
 await journey('Order by bank transfer', [
   ['configure', () => start('#/configure/ultra')],
   ['add to cart', () => click(['.checkout__aside .btn'])],
-  ['checkout', () => p.goto(BASE + '#/checkout', { waitUntil: 'networkidle' })],
+  /* Same hazard as the verify step. start() is not usable here: it reloads, and the cart this
+     journey has just filled lives in memory. */
+  ['checkout', async () => {
+    await p.goto(BASE + '#/checkout', { waitUntil: 'networkidle' });
+    await p.waitForSelector('.checkout__main');
+  }],
   ['choose bank', async () => {
     await p.check('.methods input[value="bank"]');
     await satisfyRequired('.checkout');
