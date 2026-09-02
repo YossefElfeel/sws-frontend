@@ -230,6 +230,13 @@
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
 }
 
+/* The row sits in a plain block, so whatever follows it would otherwise butt against the
+   bottom edge of the tiles. The space below the row is the same token as the space inside it,
+   which is what makes the grid read as one band rather than as tiles glued to the next card. */
+.tiles:not(:last-child) {
+  margin-block-end: var(--sws-space-16);
+}
+
 .tile {
   display: grid;
   gap: var(--sws-space-4);
