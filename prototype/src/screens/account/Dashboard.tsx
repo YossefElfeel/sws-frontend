@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import {
@@ -66,11 +67,79 @@ export function Dashboard() {
     .sort((a, b) => a.days - b.days)
     .slice(0, 5);
 
-  const stats = [
-    { to: '/account/services', icon: <IconServer size={16} />, n: SERVICES.length, key: 'acc.services', note: `${active} ${t('status.active')}` },
-    { to: '/account/domains', icon: <IconGlobe size={16} />, n: DOMAINS.length, key: 'acc.domains' },
-    { to: '/account/invoices', icon: <IconInvoice size={16} />, n: unpaid.length, key: 'dash.unpaid', alert: unpaid.length > 0 },
-    { to: '/account/tickets', icon: <IconSupport size={16} />, n: openTickets.length, key: 'dash.openTickets' },
+  /*
+   * Every tile carries the same four parts — a category glyph, the count, the label and one
+   * qualifier line — because a count on its own says how many and never says whether it
+   * matters. Three services is fine; three services with one suspended is not, and a tile that
+   * hides the difference is a tile nobody trusts. The shared anatomy is also what makes the
+   * four the same height honestly, rather than by padding three of them out to match a fourth.
+   */
+  const expiring = DOMAINS.filter((d) => d.status !== 'active').length;
+  const answered = openTickets.filter((x) => x.status === 'answered').length;
+
+  /*
+   * A qualifier names the exception, never the healthy remainder. "2 Active" under a count of
+   * three is technically true and says nothing — the reader has to do the subtraction to find
+   * out that one service is pending. So when anything is off, the note reports what is off and
+   * how many, worst status first, and only an account where everything runs gets the green
+   * count back.
+   */
+  const stalled = SERVICES.filter((s) => s.status !== 'active');
+  const worst = (['suspended', 'pending', 'cancelled'] as const).find((k) =>
+    stalled.some((s) => s.status === k),
+  );
+
+  const stats: {
+    to: string;
+    icon: ReactNode;
+    n: number;
+    key: string;
+    note: string;
+    tone: 'ok' | 'warn' | 'bad';
+    alert?: boolean;
+  }[] = [
+    {
+      to: '/account/services',
+      icon: <IconServer size={16} />,
+      n: SERVICES.length,
+      key: 'acc.services',
+      note: worst
+        ? `${stalled.filter((s) => s.status === worst).length} ${t(`status.${worst}` as never)}`
+        : `${active} ${t('status.active')}`,
+      tone: worst ? 'warn' : 'ok',
+    },
+    {
+      to: '/account/domains',
+      icon: <IconGlobe size={16} />,
+      n: DOMAINS.length,
+      key: 'acc.domains',
+      note: expiring > 0 ? `${expiring} ${t('dom.expiring')}` : `${DOMAINS.length} ${t('dom.active')}`,
+      tone: expiring > 0 ? 'warn' : 'ok',
+    },
+    {
+      to: '/account/invoices',
+      icon: <IconInvoice size={16} />,
+      n: unpaid.length,
+      key: 'dash.unpaid',
+      // What is owed, not how many envelopes it arrived in — the amount is what decides
+      // whether this is worth opening now.
+      note: unpaid.length > 0 ? money(dueTotal) : t('dash.settled'),
+      tone: unpaid.length > 0 ? 'bad' : 'ok',
+      alert: unpaid.length > 0,
+    },
+    {
+      to: '/account/tickets',
+      icon: <IconSupport size={16} />,
+      n: openTickets.length,
+      key: 'dash.openTickets',
+      note:
+        openTickets.length === 0
+          ? t('dash.noneOpen')
+          : answered > 0
+            ? `${answered} ${t('tkt.answered')}`
+            : t('dash.awaiting'),
+      tone: openTickets.length === 0 || answered > 0 ? 'ok' : 'warn',
+    },
   ];
 
   const when = (days: number) =>
@@ -87,17 +156,26 @@ export function Dashboard() {
         </Link>
       }
     >
-      {/* Row 1 — the counts, compact enough to read in one pass. */}
+      {/* Row 1 — the counts, one shape repeated four times so the row reads as a single object
+          rather than as four things that happen to be near each other. */}
       <ul className="stat-row">
         {stats.map((s) => (
           <li key={s.to}>
             <Link className={`stat${s.alert ? ' stat--alert' : ''}`} to={s.to}>
-              <span className="stat__icon" aria-hidden="true">
-                {s.icon}
+              <span className="stat__top">
+                <span className="stat__icon" aria-hidden="true">
+                  {s.icon}
+                </span>
+                <IconArrow size={14} className="stat__go" />
               </span>
               <span className="stat__n serial">{s.n}</span>
               <span className="stat__label">{t(s.key as never)}</span>
-              {s.note && <span className="stat__note">{s.note}</span>}
+              {/* The tone is carried by a glyph as well as a colour, so the one tile that is a
+                  debt still reads as one in greyscale or to a red-green eye. */}
+              <span className={`stat__note stat__note--${s.tone} serial`}>
+                {s.tone === 'ok' ? <IconCheck size={13} /> : <IconAlert size={13} />}
+                <span>{s.note}</span>
+              </span>
             </Link>
           </li>
         ))}

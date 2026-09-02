@@ -1320,6 +1320,12 @@ export const STRINGS = {
   'dash.openTickets': { ar: 'تذاكر مفتوحة', en: 'Open tickets' },
   'dash.dueNote': { ar: 'عندك مستحق دلوقتي', en: 'You have an amount due:' },
 
+  // The qualifier under each count on the dashboard tiles. Every one is two or three words: a
+  // caption line in a 170px tile has no room for a sentence, in either language.
+  'dash.settled': { ar: 'كله مدفوع', en: 'All paid' },
+  'dash.awaiting': { ar: 'في انتظار الرد', en: 'Awaiting reply' },
+  'dash.noneOpen': { ar: 'مفيش مفتوح', en: 'None open' },
+
   'status.active': { ar: 'يعمل', en: 'Active' },
   'status.pending': { ar: 'قيد التجهيز', en: 'Pending' },
   'status.suspended': { ar: 'موقوف', en: 'Suspended' },
