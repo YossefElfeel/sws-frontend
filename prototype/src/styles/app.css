@@ -603,18 +603,39 @@
 
 /* ── the stat row ──────────────────────────────────────────────────────────── */
 
+/*
+ * Two across, then four. `auto-fit` used to decide the count from the available width, which
+ * at some widths put three tiles on a line and orphaned the fourth — and a strip that reflows
+ * ragged reads as broken rather than as responsive. Four counts are a set; they break in half
+ * or not at all.
+ */
 .stat-row {
   display: grid;
   gap: var(--sws-space-12);
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-block-end: var(--sws-space-24);
 }
 
-.stat {
+@media (min-width: 768px) {
+  .stat-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/*
+ * Equal height is structural rather than a measured number: the grid row stretches every <li>
+ * to the tallest of the four, and the tile fills its <li>. So a label that takes two lines in
+ * English and one in Arabic grows all four together, and no fixed height has to be revisited
+ * when the copy changes.
+ */
+.stat-row > li {
   display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 0 var(--sws-space-8);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
   padding: var(--sws-space-16);
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
@@ -623,59 +644,141 @@
   text-decoration: none;
   transition:
     border-color var(--sws-duration-fast) var(--sws-ease-standard),
-    box-shadow var(--sws-duration-fast) var(--sws-ease-standard);
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .stat:hover {
   border-color: var(--sws-action-primary);
-  box-shadow: var(--sws-shadow-sm);
+  box-shadow: var(--sws-shadow-card);
+  transform: translateY(-2px);
+}
+
+.stat:active {
+  transform: translateY(0);
+}
+
+/*
+ * The glyph and the arrow share the top line, so the count and its label get the full inner
+ * width. That is what stops "فواتير غير مدفوعة" from wrapping in a tile the width of a phone
+ * half-column, and it puts all four counts on one baseline.
+ */
+.stat__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-8);
+  margin-block-end: var(--sws-space-12);
 }
 
 .stat__icon {
   display: grid;
   place-items: center;
-  inline-size: 28px;
-  block-size: 28px;
-  grid-row: span 2;
+  flex: none;
+  inline-size: 32px;
+  block-size: 32px;
   background: var(--sws-action-subtle-bg);
   color: var(--sws-action-primary);
   border-radius: var(--sws-radius-sm);
 }
 
+/* Quiet at rest and coloured on hover, the same way the service rows below announce that they
+   lead somewhere — a count is a link in every case, and the tile has to say so. */
+.stat__go {
+  flex: none;
+  color: var(--sws-border-strong);
+  transition: color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.stat:hover .stat__go {
+  color: var(--sws-action-primary);
+}
+
 .stat__n {
-  font-size: var(--sws-font-size-h3);
+  font-size: var(--sws-font-size-h2);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .stat__label {
-  font-size: var(--sws-font-size-caption);
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  line-height: 1.3;
   color: var(--sws-text-secondary);
 }
 
+/*
+ * The qualifier is docked to the bottom edge rather than trailing the label, so the four notes
+ * sit on one line whatever happens above them.
+ */
 .stat__note {
-  grid-column: 2;
-  margin-block-start: 2px;
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  min-inline-size: 0;
+  margin-block-start: auto;
+  padding-block-start: var(--sws-space-8);
   font-size: var(--sws-font-size-caption);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--sws-text-secondary);
+}
+
+.stat__note svg {
+  flex: none;
+}
+
+.stat__note span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.stat__note--ok {
   color: var(--sws-status-success);
 }
 
+.stat__note--warn {
+  color: var(--sws-status-warning);
+}
+
+.stat__note--bad {
+  color: var(--sws-status-danger);
+}
+
 /*
- * A stat that is also a debt is marked as one — ground, border and figure together, never
- * colour alone. It is the loudest number in the row because it is the only one that is owed.
+ * A stat that is also a debt is marked four ways — ground, border, figure and the glyph in its
+ * note — so it survives a greyscale print and a red-green eye. The border is the 35% banner
+ * tone rather than the full danger red: at full strength a hairline around a tinted card reads
+ * as a validation error rather than as the one thing worth doing first.
  */
 .stat--alert {
-  border-color: var(--sws-status-danger);
+  border-color: var(--sws-banner-danger-border);
   background: var(--sws-banner-danger-bg);
 }
 
+.stat--alert:hover {
+  border-color: var(--sws-status-danger);
+}
+
+/*
+ * The chip is a tint of the tile's own hue on all four, never a lift out of it. White here
+ * would be the brightest thing in the strip and would take the eye off the figure it is meant
+ * to label; laying the danger ground over itself doubles to roughly 19%, which reads as the
+ * same chip in a different colour. The glyph clears 4.5:1 on the doubled tint in both themes.
+ */
 .stat--alert .stat__icon {
-  background: var(--sws-surface-raised);
+  background: var(--sws-banner-danger-bg);
   color: var(--sws-status-danger);
 }
 
 .stat--alert .stat__n {
+  color: var(--sws-status-danger);
+}
+
+.stat--alert:hover .stat__go {
   color: var(--sws-status-danger);
 }
 
