@@ -54,7 +54,29 @@ export function Affiliates() {
   ];
 
   return (
-    <AccountLayout title={t('acc.affiliates')} lede={t('aff.lede')}>
+    <AccountLayout
+      title={t('acc.affiliates')}
+      lede={t('aff.lede')}
+      actions={
+        <Link className="btn btn--md btn--primary" to="/account/affiliates/withdraw">
+          {t('aff.withdraw')}
+        </Link>
+      }
+    >
+      <ul className="tiles">
+        {stats.map((s) => (
+          <li key={s.key}>
+            <span className="tile tile--static">
+              <span className="tile__n serial">
+                {s.v}
+                {s.unit && <span className="tile__unit">{s.unit}</span>}
+              </span>
+              <span className="tile__label">{t(s.key as never)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
       <div className="card">
         <h2 className="card__heading">{t('aff.link')}</h2>
         <div className="copy-row">
@@ -77,26 +99,6 @@ export function Affiliates() {
             {t(copied ? 'aff.copied' : 'aff.copy')}
           </Button>
         </div>
-      </div>
-
-      <ul className="tiles">
-        {stats.map((s) => (
-          <li key={s.key}>
-            <span className="tile tile--static">
-              <span className="tile__n serial">
-                {s.v}
-                {s.unit && <span className="tile__unit">{s.unit}</span>}
-              </span>
-              <span className="tile__label">{t(s.key as never)}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="actions actions--split">
-        <Link className="btn btn--md btn--primary" to="/account/affiliates/withdraw">
-          {t('aff.withdraw')}
-        </Link>
       </div>
     </AccountLayout>
   );
