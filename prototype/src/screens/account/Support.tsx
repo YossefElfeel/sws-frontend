@@ -1,8 +1,16 @@
-import { useMemo, useState } from 'react';
-import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
+import { useMemo, useRef, useState } from 'react';
+import { Link, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconArrow, IconPlus, IconSearch, IconBook, IconSupport, IconCheck } from '../../components/icons';
+import {
+  IconArrow,
+  IconPlus,
+  IconSearch,
+  IconBook,
+  IconSupport,
+  IconCheck,
+  IconPaperclip,
+} from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import {
@@ -10,17 +18,42 @@ import {
   DEPARTMENTS,
   PRIORITIES,
   ARTICLES,
+  KB_CATEGORIES,
+  SERVICES,
   type TicketStatus,
 } from '../../lib/account';
 
 const STATUSES: (TicketStatus | 'all')[] = ['all', 'open', 'answered', 'closed'];
 
-/** Ticket list — spec 9.5.1: filtered by status, department and priority. */
+/**
+ * Ticket list — spec 9.5.1, which asks for three filters, not one: status, department and
+ * priority.
+ *
+ * Status stays as pills because it is the one people reach for and it matches the services
+ * and invoices lists. Department and priority are selects: as pills the row would carry
+ * eleven options for a list this short, and departments are the thing most likely to grow.
+ * Three filters also means an empty result is easy to reach, so the empty state has to offer
+ * the way back out rather than only offering a new ticket.
+ */
 export function Tickets() {
   const { t, bi } = useLocale();
   const [status, setStatus] = useState<TicketStatus | 'all'>('all');
+  const [dept, setDept] = useState('all');
+  const [priority, setPriority] = useState('all');
 
-  const rows = TICKETS.filter((x) => status === 'all' || x.status === status);
+  const rows = TICKETS.filter(
+    (x) =>
+      (status === 'all' || x.status === status) &&
+      (dept === 'all' || x.department === dept) &&
+      (priority === 'all' || x.priority === priority),
+  );
+
+  const narrowed = status !== 'all' || dept !== 'all' || priority !== 'all';
+  const showAll = () => {
+    setStatus('all');
+    setDept('all');
+    setPriority('all');
+  };
 
   return (
     <AccountLayout title={t('acc.tickets')}>
@@ -44,14 +77,52 @@ export function Tickets() {
         </Link>
       </div>
 
+      <div className="bar">
+        <div className="bar__picks">
+          <label className="bar__pick">
+            <span className="eyebrow">{t('tkt.department')}</span>
+            <select className="field" value={dept} onChange={(e) => setDept(e.target.value)}>
+              <option value="all">{t('inv.all')}</option>
+              {DEPARTMENTS.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {t(d.nameKey as never)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="bar__pick">
+            <span className="eyebrow">{t('tkt.priority')}</span>
+            <select className="field" value={priority} onChange={(e) => setPriority(e.target.value)}>
+              <option value="all">{t('inv.all')}</option>
+              {PRIORITIES.map((p) => (
+                <option key={p} value={p}>
+                  {t(`prio.${p}` as never)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <p className="bar__count">
+          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
+          <span className="serial">{TICKETS.length}</span>
+        </p>
+      </div>
+
       {rows.length === 0 ? (
         <div className="card empty">
           <IconSupport size={28} />
-          <p className="empty__title">{t('tkt.none')}</p>
+          <p className="empty__title">{t(narrowed ? 'tkt.noneFilter' : 'tkt.none')}</p>
           <p className="empty__note">{t('empty.filter')}</p>
-          <Link className="btn btn--lg btn--primary" to="/account/tickets/new">
-            {t('tkt.open')}
-          </Link>
+          <div className="actions actions--split">
+            {narrowed && (
+              <Button size="lg" variant="secondary" onClick={showAll}>
+                {t('tkt.showAll')}
+              </Button>
+            )}
+            <Link className="btn btn--lg btn--primary" to="/account/tickets/new">
+              {t('tkt.open')}
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="card card--flush table-scroll">
@@ -113,8 +184,19 @@ export function Tickets() {
 export function TicketNew() {
   const { t } = useLocale();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  /*
+   * Spec 9.2 asks the service page for a support request "related to this service
+   * specifically". Arriving from that button carries the service, so the subject opens
+   * already naming the plan and the domain instead of asking the customer to retype what the
+   * previous screen already knew. The cursor still lands after the colon, so the sentence is
+   * theirs to finish.
+   */
+  const from = SERVICES.find((s) => s.id === params.get('service'));
+
   const [dept, setDept] = useState('tech');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState(from ? `${from.product} — ${from.domain}: ` : '');
   const [body, setBody] = useState('');
 
   const suggestions = useMemo(() => {
@@ -303,8 +385,12 @@ export function TicketThread() {
 
   // A reply that vanishes is worse than no reply box, so what is sent joins the thread.
   const [draft, setDraft] = useState('');
+  const [files, setFiles] = useState<string[]>([]);
   const [sent, setSent] = useState<typeof TICKETS[number]['messages']>([]);
   const [closed, setClosed] = useState(false);
+  // The file input keeps its own value, so clearing our state is not enough to clear the
+  // control's own "2 files selected" label after the reply has gone.
+  const fileRef = useRef<HTMLInputElement>(null);
   const { saved, mark, clear } = useSaved();
 
   if (!tkt) return <Navigate to="/account/tickets" replace />;
@@ -332,6 +418,16 @@ export function TicketThread() {
             <p className="msg__body" dir="auto">
               {bi(m.body)}
             </p>
+            {m.attachments && m.attachments.length > 0 && (
+              <ul className="msg__files">
+                {m.attachments.map((f) => (
+                  <li key={f}>
+                    <IconPaperclip size={14} />
+                    <bdi className="serial">{f}</bdi>
+                  </li>
+                ))}
+              </ul>
+            )}
           </article>
         ))}
       </div>
@@ -360,6 +456,23 @@ export function TicketThread() {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
           />
+
+          {/* Spec 9.5.3: a reply can carry files too. The names are held in state so the
+              chosen files survive until Send and then travel with the message, rather than
+              sitting in an input that quietly empties. */}
+          <label className="field-label">
+            <span className="eyebrow">{t('tkt.attachments')}</span>
+            <input
+              ref={fileRef}
+              className="field"
+              type="file"
+              multiple
+              accept=".jpg,.gif,.jpeg,.png,.txt,.pdf"
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
+            />
+          </label>
+          <p className="hint">{t('tkt.attachNote')}</p>
+
           <div className="actions">
             <Button size="md" variant="quiet" onClick={() => setClosed(true)}>
               {t('tkt.close')}
@@ -376,9 +489,12 @@ export function TicketThread() {
                     author: { ar: 'كمال عبدالرحمن', en: 'Kamal Abdelrahman' },
                     at: '2026-09-01 10:24',
                     body: { ar: draft, en: draft },
+                    attachments: files.length > 0 ? files : undefined,
                   },
                 ]);
                 setDraft('');
+                setFiles([]);
+                if (fileRef.current) fileRef.current.value = '';
                 mark(t('tkt.sent'));
               }}
             >
@@ -391,14 +507,26 @@ export function TicketThread() {
   );
 }
 
-/** Knowledgebase — spec 9.5.4: categories, search, and a helpfulness vote per article. */
+/**
+ * Knowledgebase — spec 9.5.4: categories, search, and a helpfulness vote per article.
+ *
+ * The category strip and the search box narrow the same list rather than replacing one
+ * another: someone who has picked "Domains" and then types is still inside Domains, which is
+ * what picking a category was for. Each chip carries its own count, so an empty category is
+ * visible before it is opened.
+ */
 export function Knowledgebase() {
   const { t } = useLocale();
   const [q, setQ] = useState('');
+  const [cat, setCat] = useState<string>('all');
 
-  const rows = ARTICLES.filter((a) =>
-    q.trim() ? t(a.titleKey as never).toLowerCase().includes(q.trim().toLowerCase()) : true,
+  const rows = ARTICLES.filter(
+    (a) =>
+      (cat === 'all' || a.category === cat) &&
+      (q.trim() ? t(a.titleKey as never).toLowerCase().includes(q.trim().toLowerCase()) : true),
   );
+
+  const countIn = (c: string) => ARTICLES.filter((a) => a.category === c).length;
 
   return (
     <AccountLayout title={t('acc.kb')}>
@@ -418,6 +546,30 @@ export function Knowledgebase() {
           {t('action.search')}
         </Button>
       </form>
+
+      <div className="bar">
+        <div className="filters" role="group" aria-label={t('kb.categories')}>
+          <button
+            type="button"
+            className={`filters__btn${cat === 'all' ? ' is-active' : ''}`}
+            aria-pressed={cat === 'all'}
+            onClick={() => setCat('all')}
+          >
+            {t('inv.all')} <span className="filters__n serial">{ARTICLES.length}</span>
+          </button>
+          {KB_CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              className={`filters__btn${cat === c ? ' is-active' : ''}`}
+              aria-pressed={cat === c}
+              onClick={() => setCat(c)}
+            >
+              {t(`kb.cat.${c}` as never)} <span className="filters__n serial">{countIn(c)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {rows.length > 0 ? (
         <ul className="card card--flush kb-list">
@@ -455,6 +607,10 @@ export function KbArticle() {
 
   if (!a) return <Navigate to="/account/knowledgebase" replace />;
 
+  // The point of holding a category on an article is to answer the next question as well as
+  // this one, so the siblings are offered here rather than only on the index.
+  const related = ARTICLES.filter((x) => x.category === a.category && x.id !== a.id);
+
   return (
     <AccountLayout
       title={t(a.titleKey as never)}
@@ -484,6 +640,23 @@ export function KbArticle() {
           </div>
         )}
       </div>
+
+      {related.length > 0 && (
+        <>
+          <h2 className="app__section">{t('kb.related')}</h2>
+          <ul className="card card--flush kb-list">
+            {related.map((r) => (
+              <li key={r.id}>
+                <Link className="kb-item" to={`/account/knowledgebase/${r.slug}`}>
+                  <span className="kb-item__cat eyebrow">{t(`kb.cat.${r.category}` as never)}</span>
+                  <span className="kb-item__title">{t(r.titleKey as never)}</span>
+                  <IconArrow size={16} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </AccountLayout>
   );
 }

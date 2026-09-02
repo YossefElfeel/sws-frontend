@@ -60,8 +60,10 @@ export function ErrorPage({ kind: fixed }: { kind?: ErrKind }) {
                   <IconSearch size={17} />
                   {t('err.404.act')}
                 </Link>
-                <Link className="btn btn--md btn--secondary" to="/account/knowledgebase">
-                  {t('acc.kb')}
+                {/* A 404 is reached signed-out at least as often as signed-in, so the exit
+                    is a public page rather than a client-area screen. */}
+                <Link className="btn btn--md btn--secondary" to="/contact">
+                  {t('ct.title')}
                 </Link>
               </>
             )}
@@ -82,7 +84,9 @@ export function ErrorPage({ kind: fixed }: { kind?: ErrKind }) {
                 <Link className="btn btn--lg btn--primary" to="/login">
                   {t('err.403.act')}
                 </Link>
-                <Link className="btn btn--md btn--secondary" to="/account/tickets/new">
+                {/* 403 means the account cannot reach this — sending it to a client-area
+                    form would land on the same wall. */}
+                <Link className="btn btn--md btn--secondary" to="/contact">
                   {t('fail.getHelp')}
                 </Link>
               </>

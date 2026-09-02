@@ -195,6 +195,48 @@ const bodyEn = await p.$eval('.msg__body', (e) => e.textContent.trim());
 ok('ticket text follows the language', bodyAr !== bodyEn, `${bodyAr.slice(0, 18)}… -> ${bodyEn.slice(0, 18)}…`);
 await p.selectOption('.app__select:nth-of-type(1) select', 'ar');
 
+// 9.5.1 asks for three filters — status, department and priority — and the empty state that
+// three filters make reachable has to offer the way back out.
+await p.evaluate(() => (location.hash = '#/account/tickets'));
+await p.waitForSelector('.data tbody tr');
+{
+  const all = await p.$$eval('.data tbody tr', (n) => n.length);
+  await p.selectOption('.bar__pick:nth-of-type(1) select', 'tech');
+  await p.waitForTimeout(150);
+  const byDept = await p.$$eval('.data tbody tr', (n) => n.length);
+  ok('tickets filter by department', byDept < all, `${all} -> ${byDept}`);
+
+  await p.selectOption('.bar__pick:nth-of-type(2) select', 'low');
+  await p.waitForTimeout(150);
+  const none = (await p.$$('.data tbody tr')).length;
+  const reset = await p.$$eval('.empty .btn', (n) => n.length);
+  ok('a filtered-out list offers its way back', none === 0 && reset > 1, `${reset} actions`);
+
+  await p.click('.empty .btn--secondary');
+  await p.waitForTimeout(150);
+  const back = await p.$$eval('.data tbody tr', (n) => n.length);
+  ok('showing all restores every ticket', back === all, `${none} -> ${back}`);
+}
+
+// 9.2 support raised from a service arrives knowing which one.
+await p.evaluate(() => (location.hash = '#/account/services/svc-8841'));
+await p.waitForSelector('.app__main');
+{
+  const href = await p.$$eval('a', (n) =>
+    n.map((a) => a.getAttribute('href') ?? '').find((h) => h.includes('tickets/new?service=')),
+  );
+  await p.evaluate(() => (location.hash = '#/account/tickets/new?service=svc-8841'));
+  await p.waitForSelector('.editor');
+  /*
+   * The email field also contains the domain, so matching on the domain alone passes on the
+   * wrong input. The subject is the one holding the plan name and the domain together.
+   */
+  const seeded = await p.$$eval('input', (n) =>
+    n.map((e) => e.value).find((v) => /^Ultra .* atelier-kamal\.com/.test(v)),
+  );
+  ok('a service raises a ticket that names it', Boolean(href) && Boolean(seeded), seeded ?? 'not seeded');
+}
+
 // 9.5.4 knowledgebase search narrows the list
 await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
 await p.waitForSelector('.kb-item');
@@ -204,13 +246,71 @@ await p.waitForTimeout(150);
 const someKb = await p.$$eval('.kb-item', (n) => n.length);
 ok('knowledgebase search narrows', someKb < allKb, `${allKb} -> ${someKb}`);
 
-// 9.7 two-factor is a real control, not a label
+// 9.5.4 the category strip has to narrow the list, not just decorate it, and it has to keep
+// working alongside the search box rather than replacing it.
+await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
+await p.waitForSelector('.kb-item');
+{
+  // The search check above left a term in the box, and a hash that has not changed does not
+  // remount the screen — so the box is cleared before the category strip is measured.
+  await p.fill('#kbq', '');
+  await p.waitForTimeout(150);
+  const chips = await p.$$('.filters__btn');
+  const total = await p.$$eval('.kb-item', (n) => n.length);
+  await chips[1].click();
+  await p.waitForTimeout(150);
+  const inCat = await p.$$eval('.kb-item', (n) => n.length);
+  ok('knowledgebase categories narrow the list', inCat > 0 && inCat < total, `${total} -> ${inCat}`);
+
+  const counts = await p.$$eval('.filters__n', (n) => n.map((x) => Number(x.textContent)));
+  ok('each category states its count', counts.length > 1 && counts[0] === total, counts.join(' '));
+}
+
+// An article's category is only worth holding if it leads somewhere.
+await p.evaluate(() => (location.hash = '#/account/knowledgebase/point-domain'));
+await p.waitForSelector('.prose');
+const related = await p.$$eval('.kb-list .kb-item', (n) => n.length);
+ok('an article offers its siblings', related > 0, `${related} related`);
+
+// 9.7 two-factor is a real control, not a label — and turning the switch on must not be
+// enough on its own, or the login screen's conditional code field is a promise nothing keeps.
 await p.evaluate(() => (location.hash = '#/account/security'));
 await p.waitForSelector('.switch-row input');
-const twofaBefore = await p.$eval('.switch-row input', (e) => e.checked);
-await p.click('.switch-row input');
-const twofaAfter = await p.$eval('.switch-row input', (e) => e.checked);
-ok('two-factor toggles', twofaBefore !== twofaAfter, `${twofaBefore} -> ${twofaAfter}`);
+{
+  const before = await p.$eval('.switch-row input', (e) => e.checked);
+  await p.click('.switch-row input');
+  await p.waitForTimeout(150);
+  const enrolShown = (await p.$$('.enrol .slot')).length === 1;
+  ok('two-factor asks to enrol rather than just flipping', !before && enrolShown);
+
+  const gated = await p.$$eval('.enrol .actions .btn', (n) => n.some((b) => b.disabled));
+  ok('confirm is refused without a code', gated);
+
+  await p.fill('.enrol input[inputmode=numeric]', '428913');
+  await p.waitForTimeout(100);
+  await p.click('.enrol .actions .btn:not(.btn--quiet)');
+  await p.waitForTimeout(200);
+  const codes = await p.$$eval('.codes li', (n) => n.length);
+  const on = await p.$eval('.switch-row input', (e) => e.checked);
+  ok('a confirmed code turns it on and issues backup codes', on && codes > 0, `${codes} codes`);
+}
+
+// 9.7 "sub-accounts with specific permissions" — the permissions have to be settable.
+await p.evaluate(() => (location.hash = '#/account/contacts'));
+await p.waitForSelector('.perm-list');
+{
+  const before = await p.$$eval('.cards-list > li:first-child .perm-list .tag', (n) => n.length);
+  await p.click('.cards-list > li:first-child .btn--secondary');
+  await p.waitForTimeout(150);
+  const boxes = await p.$$('.perm-edit__row input');
+  ok('a contact opens a permission list', boxes.length > 0, `${boxes.length} permissions`);
+
+  const unchecked = await p.$$eval('.perm-edit__row input', (n) => n.findIndex((b) => !b.checked));
+  await boxes[unchecked].click();
+  await p.waitForTimeout(150);
+  const after = await p.$$eval('.cards-list > li:first-child .perm-list .tag', (n) => n.length);
+  ok('granting one shows it on the contact', after === before + 1, `${before} -> ${after}`);
+}
 
 // Wiring. Every one of these resolved to a real route before and still went to the wrong
 // place — the most invisible kind of broken, because the click appears to do nothing.
@@ -222,12 +322,23 @@ await p.waitForSelector('.checkout, .empty');
 const inCart = await p.$$eval('.checkout__main tbody tr', (n) => n.length);
 ok('ordering off a non-shared family fills the cart', inCart > 0, `${inCart} line(s)`);
 
+/*
+ * This used to assert that marketing "Support" pointed at /account/knowledgebase, which
+ * pinned the defect in place: that screen renders inside the signed-in shell, so the public
+ * nav walked a logged-out visitor into a dashboard carrying someone else's name. The check
+ * now guards the opposite — the public site must not hand out client-area links at all.
+ */
 await p.evaluate(() => (location.hash = '#/'));
 await p.waitForSelector('.masthead__nav');
 const supportHref = await p.$$eval('.masthead__nav a', (n) =>
-  n.map((a) => a.getAttribute('href')).find((h) => h && h.includes('knowledgebase')),
+  n.map((a) => a.getAttribute('href')).find((h) => h && h.includes('/contact')),
 );
-ok('marketing Support reaches the help centre', Boolean(supportHref), supportHref ?? 'still /account');
+ok('marketing Support reaches a public page', Boolean(supportHref), supportHref ?? 'not found');
+
+const publicLeaks = await p.$$eval('.masthead__nav a, .colophon a, main a', (n) =>
+  n.map((a) => a.getAttribute('href') ?? '').filter((h) => h.includes('/account')),
+);
+ok('the public site never links into the client area', publicLeaks.length === 0, publicLeaks.join(' '));
 
 // The footer is the only route to eleven of these pages, so it is checked as a route table
 // rather than as decoration.
@@ -334,6 +445,12 @@ await p.waitForSelector('#reply');
   await p.waitForTimeout(200);
   const after = await p.$$eval('.thread .msg', (n) => n.length);
   ok('a sent reply joins the thread', after === before + 1, `${before} -> ${after}`);
+
+  // Spec 9.5.3 puts files on the reply too, not only on the first message.
+  const replyFiles = (await p.$$('#reply ~ .field-label input[type=file], .card input[type=file]')).length;
+  const shownFiles = await p.$$eval('.msg__files li', (n) => n.length);
+  ok('a reply can carry files, and a message shows them', replyFiles > 0 && shownFiles > 0,
+    `${replyFiles} field, ${shownFiles} shown`);
 
   await p.click('.card .actions .btn--quiet');
   await p.waitForTimeout(150);

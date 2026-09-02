@@ -223,7 +223,12 @@ export function ServiceDetail() {
               <Link className="btn btn--md btn--secondary" to={`/account/services/${svc.id}/upgrade`}>
                 {t('svc.upgrade')}
               </Link>
-              <Link className="btn btn--md btn--secondary" to="/account/tickets/new">
+              {/* Spec 9.2: support "related to this service specifically" — the service
+                  travels with the link so the ticket form opens knowing which one. */}
+              <Link
+                className="btn btn--md btn--secondary"
+                to={`/account/tickets/new?service=${svc.id}`}
+              >
                 <IconSupport size={15} />
                 {t('svc.support')}
               </Link>
