@@ -1250,11 +1250,6 @@
   margin-block-end: var(--sws-space-16);
 }
 
-.bar__count {
-  font-size: var(--sws-font-size-body-sm);
-  color: var(--sws-text-secondary);
-}
-
 .app__main .filters {
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
@@ -1561,9 +1556,10 @@
 
 /* ── the screens that keep a marketing component ───────────────────────────── */
 /*
- * Choices, methods, fieldsets and the knowledgebase search are shared with the ordering flow,
- * which is a marketing surface. Inside the app they lose the lift and take the border, so one
- * screen does not read as two.
+ * Choices, methods and fieldsets are shared with the ordering flow, which is a marketing
+ * surface. Inside the app they lose the lift and take the border, so one screen does not read
+ * as two. The knowledgebase search was on this list until it became a table toolbar like
+ * every other list in the client area.
  */
 
 .app__main .fieldset {
@@ -1592,10 +1588,6 @@
 .app__main .choice.is-selected,
 .app__main .method.is-selected {
   border-color: var(--sws-action-primary);
-}
-
-.app__main .domain-search {
-  margin-block-end: var(--sws-space-16);
 }
 
 /* ── the invoice, which is a document before it is a screen ────────────────── */

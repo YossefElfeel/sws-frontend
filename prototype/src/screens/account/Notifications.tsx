@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { IconBell, IconMail, IconInfo } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { NOTIF_PREFS, ACCOUNT, type NotifPref } from '../../lib/account';
@@ -25,7 +26,17 @@ const CHANNELS = [
 export function NotificationPrefs() {
   const { t } = useLocale();
   const [prefs, setPrefs] = useState<NotifPref[]>(NOTIF_PREFS);
+  const [q, setQ] = useState('');
+  const [channel, setChannel] = useState<'all' | 'email' | 'sms' | 'inApp'>('all');
   const { saved, mark, clear } = useSaved();
+
+  // The channel filter answers the question this grid is opened with — "what is going to reach
+  // my phone?" — by showing only the rows switched on for it.
+  const rows = prefs.filter(
+    (r) =>
+      (channel === 'all' || r[channel]) &&
+      matches(q, t(r.labelKey as never), t(r.noteKey as never)),
+  );
 
   const toggle = (id: string, channel: 'email' | 'sms' | 'inApp') =>
     setPrefs((rows) =>
@@ -35,6 +46,24 @@ export function NotificationPrefs() {
   return (
     <AccountLayout title={t('notif.title')} lede={t('notif.lede')}>
       <SavedNote saved={saved} onDismiss={clear} />
+
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.notifs')}
+        shown={rows.length}
+        total={prefs.length}
+      >
+        <TableFilter
+          label={t('filter.channel')}
+          value={channel}
+          onChange={setChannel}
+          options={[
+            { value: 'all' as const, label: t('filter.allChannels') },
+            ...CHANNELS.map((c) => ({ value: c.id, label: t(c.labelKey as never) })),
+          ]}
+        />
+      </TableToolbar>
 
       <div className="card card--flush table-scroll">
         <table className="data prefs">
@@ -52,7 +81,7 @@ export function NotificationPrefs() {
             </tr>
           </thead>
           <tbody>
-            {prefs.map((r) => (
+            {rows.map((r) => (
               <tr key={r.id}>
                 <td>
                   <span className="lead">{t(r.labelKey as never)}</span>
@@ -80,6 +109,12 @@ export function NotificationPrefs() {
             ))}
           </tbody>
         </table>
+        {rows.length === 0 && (
+          <div className="empty empty--inset">
+            <p className="empty__title">{t(q.trim() ? 'empty.search' : 'empty.notifs')}</p>
+            <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
+          </div>
+        )}
       </div>
 
       <section className="card u-mt-16">
