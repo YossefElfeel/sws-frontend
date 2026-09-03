@@ -159,7 +159,7 @@ ok('renewals are scheduled nearest first', (await p.$$eval('.sched__when', (n) =
 await p.evaluate(() => (location.hash = '#/account/services'));
 await p.waitForSelector('.data tbody tr');
 const allSvc = await p.$$eval('.data tbody tr', (n) => n.length);
-await p.click('.filters__btn:nth-child(2)');
+await p.selectOption('.tfilter__select', 'active');
 await p.waitForTimeout(120);
 const someSvc = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('services filter by status', someSvc < allSvc, `${allSvc} -> ${someSvc}`);
@@ -174,7 +174,7 @@ ok('DNS records listed', dns >= 5, `${dns} records`);
 await p.evaluate(() => (location.hash = '#/account/invoices'));
 await p.waitForSelector('.data tbody tr');
 const allInv = await p.$$eval('.data tbody tr', (n) => n.length);
-await p.click('.filters__btn:nth-child(2)');
+await p.selectOption('.tfilter__select', 'paid');
 await p.waitForTimeout(120);
 const someInv = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('invoices filter by status', someInv < allInv, `${allInv} -> ${someInv}`);
@@ -201,12 +201,12 @@ await p.evaluate(() => (location.hash = '#/account/tickets'));
 await p.waitForSelector('.data tbody tr');
 {
   const all = await p.$$eval('.data tbody tr', (n) => n.length);
-  await p.selectOption('.bar__pick:nth-of-type(1) select', 'tech');
+  await p.selectOption('.tfilter:nth-of-type(2) .tfilter__select', 'tech');
   await p.waitForTimeout(150);
   const byDept = await p.$$eval('.data tbody tr', (n) => n.length);
   ok('tickets filter by department', byDept < all, `${all} -> ${byDept}`);
 
-  await p.selectOption('.bar__pick:nth-of-type(2) select', 'low');
+  await p.selectOption('.tfilter:nth-of-type(3) .tfilter__select', 'low');
   await p.waitForTimeout(150);
   const none = (await p.$$('.data tbody tr')).length;
   const reset = await p.$$eval('.empty .btn', (n) => n.length);
@@ -241,7 +241,7 @@ await p.waitForSelector('.app__main');
 await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
 await p.waitForSelector('.kb-item');
 const allKb = await p.$$eval('.kb-item', (n) => n.length);
-await p.fill('#kbq', 'cPanel');
+await p.fill('.tsearch__input', 'cPanel');
 await p.waitForTimeout(150);
 const someKb = await p.$$eval('.kb-item', (n) => n.length);
 ok('knowledgebase search narrows', someKb < allKb, `${allKb} -> ${someKb}`);
@@ -253,16 +253,20 @@ await p.waitForSelector('.kb-item');
 {
   // The search check above left a term in the box, and a hash that has not changed does not
   // remount the screen — so the box is cleared before the category strip is measured.
-  await p.fill('#kbq', '');
+  await p.fill('.tsearch__input', '');
   await p.waitForTimeout(150);
-  const chips = await p.$$('.filters__btn');
+  const cats = await p.$$eval('.tfilter__select option', (n) => n.map((o) => o.value));
   const total = await p.$$eval('.kb-item', (n) => n.length);
-  await chips[1].click();
+  await p.selectOption('.tfilter__select', cats[1]);
   await p.waitForTimeout(150);
   const inCat = await p.$$eval('.kb-item', (n) => n.length);
   ok('knowledgebase categories narrow the list', inCat > 0 && inCat < total, `${total} -> ${inCat}`);
 
-  const counts = await p.$$eval('.filters__n', (n) => n.map((x) => Number(x.textContent)));
+  // The counts moved onto the options themselves — "Domains (2)" — so the option is both the
+  // name of the category and how much is in it.
+  const counts = await p.$$eval('.tfilter__select option', (n) =>
+    n.map((o) => Number((o.textContent.match(/\((\d+)\)\s*$/) ?? [])[1])),
+  );
   ok('each category states its count', counts.length > 1 && counts[0] === total, counts.join(' '));
 }
 

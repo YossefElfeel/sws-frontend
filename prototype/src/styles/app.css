@@ -1348,34 +1348,6 @@
   margin-block-end: var(--sws-space-16);
 }
 
-.bar__count {
-  font-size: var(--sws-font-size-body-sm);
-  color: var(--sws-text-secondary);
-}
-
-.app__main .filters {
-  background: var(--sws-surface-raised);
-  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  padding: var(--sws-space-4);
-}
-
-/*
- * The pill is genuinely 44px rather than 34px with an invisible expander. The expander works
- * until the row wraps — and the invoice filters are five pills on a 390px screen, so it wraps;
- * stacked, each expander is clipped by the row above it and the target lands at 42. Same lesson
- * as the sidebar rows: on anything that stacks, the trick gives back most of what it claims.
- */
-.app__main .filters__btn {
-  min-block-size: var(--sws-touch-target-min);
-  padding-inline: var(--sws-space-12);
-  font-size: var(--sws-font-size-body-sm);
-}
-
-.app__main .filters__btn.is-active {
-  background: var(--sws-action-subtle-bg);
-  box-shadow: none;
-}
-
 /* ── an empty result ───────────────────────────────────────────────────────── */
 
 .empty {
@@ -1736,9 +1708,10 @@
 
 /* ── the screens that keep a marketing component ───────────────────────────── */
 /*
- * Choices, methods, fieldsets and the knowledgebase search are shared with the ordering flow,
- * which is a marketing surface. Inside the app they lose the lift and take the border, so one
- * screen does not read as two.
+ * Choices, methods and fieldsets are shared with the ordering flow, which is a marketing
+ * surface. Inside the app they lose the lift and take the border, so one screen does not read
+ * as two. The knowledgebase search was on this list until it became a table toolbar like
+ * every other list in the client area.
  */
 
 .app__main .fieldset {
@@ -1780,18 +1753,6 @@
 .app__main .choice.is-selected,
 .app__main .method.is-selected {
   border-color: var(--sws-action-primary);
-}
-
-.app__main .domain-search {
-  margin-block-end: var(--sws-space-16);
-  align-items: center;
-}
-
-/* The marketing search pairs a 52px field with a 52px button. In here the field scale is 48 and
-   the button scale tops out at 44 for a form control, so the pair is set at the app's own two
-   heights and centred, exactly like every other field-plus-button row on these screens. */
-.app__main .domain-search__input {
-  min-block-size: var(--sws-input-height-md);
 }
 
 /*
@@ -2447,18 +2408,11 @@
     scroll-snap-type: x proximity;
   }
 
-  .app__main .filters {
-    background: none;
-    border: 0;
-    padding: 0;
-  }
-
   .filters::-webkit-scrollbar {
     display: none;
   }
 
-  .filters__btn,
-  .app__main .filters__btn {
+  .filters__btn {
     flex: none;
     scroll-snap-align: start;
     white-space: nowrap;
@@ -2468,8 +2422,7 @@
   }
 
   /* The chosen one is solid rather than tinted, so it is findable mid-scroll. */
-  .filters__btn.is-active,
-  .app__main .filters__btn.is-active {
+  .filters__btn.is-active {
     background: var(--sws-action-primary);
     color: var(--sws-text-on-action);
     box-shadow: none;

@@ -1530,6 +1530,40 @@ export const STRINGS = {
   'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
   'con.done': { ar: 'إغلاق', en: 'Done' },
 
+
+  /* Table toolbars — the search field and filter pills above every client-area table. The
+     placeholder is always the plain word; these name the list for a screen reader. */
+  'search.services': { ar: 'ابحث في الخدمات', en: 'Search services' },
+  'search.domains': { ar: 'ابحث في الدومينات', en: 'Search domains' },
+  'search.dns': { ar: 'ابحث في سجلات DNS', en: 'Search DNS records' },
+  'search.invoices': { ar: 'ابحث في الفواتير', en: 'Search invoices' },
+  'search.txns': { ar: 'ابحث في الحركات', en: 'Search transactions' },
+  'search.tickets': { ar: 'ابحث في التذاكر', en: 'Search tickets' },
+  'search.log': { ar: 'ابحث في سجل الدخول', en: 'Search login activity' },
+  'search.notifs': { ar: 'ابحث في التنبيهات', en: 'Search notifications' },
+  'search.contacts': { ar: 'ابحث في جهات الاتصال', en: 'Search contacts' },
+  'search.news': { ar: 'ابحث في الإعلانات', en: 'Search announcements' },
+
+  'filter.allStatuses': { ar: 'كل الحالات', en: 'All statuses' },
+  'filter.allTypes': { ar: 'كل الأنواع', en: 'All types' },
+  'filter.allDepartments': { ar: 'كل الأقسام', en: 'All departments' },
+  'filter.allPriorities': { ar: 'كل الأولويات', en: 'All priorities' },
+  'filter.allCategories': { ar: 'كل التصنيفات', en: 'All categories' },
+  'filter.allChannels': { ar: 'كل القنوات', en: 'All channels' },
+  'filter.allPermissions': { ar: 'كل الصلاحيات', en: 'All permissions' },
+  'filter.allResults': { ar: 'كل المحاولات', en: 'All attempts' },
+  'filter.channel': { ar: 'القناة', en: 'Channel' },
+  'filter.result': { ar: 'نتيجة المحاولة', en: 'Result' },
+  'filter.recordType': { ar: 'نوع السجل', en: 'Record type' },
+
+  'empty.search': { ar: 'مفيش نتايج للبحث ده', en: 'Nothing matches that search' },
+  'empty.searchNote': { ar: 'غيّر كلمة البحث أو ارجع الفلاتر للكل.', en: 'Try different words, or set the filters back to all.' },
+  'empty.dns': { ar: 'مفيش سجل مطابق', en: 'No records match' },
+  'empty.log': { ar: 'مفيش محاولة دخول مطابقة', en: 'No sign-in matches' },
+  'empty.notifs': { ar: 'مفيش تنبيه مطابق', en: 'No notification matches' },
+  'empty.news': { ar: 'مفيش إعلان مطابق', en: 'No announcement matches' },
+  'empty.contactsFilter': { ar: 'مفيش جهة اتصال مطابقة', en: 'No contact matches' },
+
   'footer.privacy': { ar: 'سياسة الخصوصية', en: 'Privacy policy' },
   'footer.terms': { ar: 'الشروط والأحكام', en: 'Terms' },
   'footer.sla': { ar: 'اتفاقية مستوى الخدمة', en: 'Service level agreement' },

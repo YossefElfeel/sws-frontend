@@ -253,6 +253,192 @@
   border-radius: var(--sws-radius-pill);
 }
 
+/* ── the table toolbar: one search field, then the filters ─────────────────── */
+/*
+ * The row above every dashboard table. The field takes whatever the filters leave, because
+ * what gets typed in it is a domain or an invoice serial, and both are long.
+ *
+ * Pills rather than the 8px radius the rest of the forms use: this row sits above a table with
+ * square corners, and the contrast between the two is what tells you the row is a control and
+ * the thing below it is the data.
+ */
+
+.tbar {
+  margin-block-end: var(--sws-space-16);
+}
+
+.tbar__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+}
+
+.tbar__count {
+  margin-block-start: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * A toolbar inside a flush card takes the card's own padding and a rule under it, so the
+ * search reads as belonging to the table beneath rather than floating on it.
+ */
+.tbar--inset {
+  margin-block-end: 0;
+  padding: var(--sws-space-16) var(--sws-space-24);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/* The same for an empty result: inside a card it is a row, not a whole screen. */
+.empty--inset {
+  padding-block: var(--sws-space-32);
+}
+
+/* The field is the only thing in the row that grows; 14rem is about a domain name, which is
+   the shortest it can be and still show what was typed. */
+.tsearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+.tbar__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+}
+
+.tsearch__icon {
+  position: absolute;
+  inset-inline-start: var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
+}
+
+.tsearch__input {
+  inline-size: 100%;
+  min-block-size: var(--sws-input-height-md);
+  /* 16 + 20 + 12: the margin, the icon, and the gap that keeps a descender off it. */
+  padding-inline-start: calc(var(--sws-space-16) + 20px + var(--sws-space-12));
+  padding-inline-end: var(--sws-space-16);
+  background: var(--sws-input-bg);
+  /*
+   * The reference draws this outline as a pale hairline. It cannot be one here: the field's
+   * white fill sits on a #F8F9FC page, so the border is the only thing that says where the
+   * control is, and border-subtle against that page is 1.2:1 against a 3:1 bar (SC 1.4.11).
+   * input-border is the token the system already gives every other field on these screens,
+   * and it clears the bar in both themes — 4.7:1 light, 3.8:1 dark.
+   */
+  border: var(--sws-rule-hair) solid var(--sws-input-border);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-primary);
+  font: inherit;
+  font-size: var(--sws-font-size-body);
+  transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.tsearch__input::placeholder {
+  color: var(--sws-input-placeholder);
+}
+
+.tsearch__input:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.tsearch__input:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Chrome draws its own clear button inside a search input. It is worth keeping — it is the
+   only one-click way back to the full list — but it sits against the pill's edge without a
+   little room of its own. */
+.tsearch__input::-webkit-search-cancel-button {
+  margin-inline-start: var(--sws-space-8);
+}
+
+/*
+ * A filter is a pill with the chosen option written on it. The select is the whole control
+ * rather than a control inside a box: one element to focus, one to click, and no gap where a
+ * click lands on the wrapper and nothing opens.
+ */
+.tfilter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.tfilter__select {
+  appearance: none;
+  min-block-size: var(--sws-input-height-md);
+  /* Room for the chevron on the trailing side, which is the inline end in both directions. */
+  padding-inline: var(--sws-space-16) calc(var(--sws-space-16) + 16px + var(--sws-space-8));
+  background: var(--sws-select-bg);
+  border: var(--sws-rule-hair) solid var(--sws-select-border);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-primary);
+  font: inherit;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.tfilter__select:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.tfilter__select:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+}
+
+.tfilter__chev {
+  position: absolute;
+  inset-inline-end: var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
+}
+
+/*
+ * On a phone the filters go under the field rather than beside it: a select wide enough to
+ * read "All departments" and a field wide enough to type into do not both fit on 360px, and
+ * the field is the one that has to stay usable. Two filters share a row; a third takes its own.
+ */
+@media (max-width: 599px) {
+  .tbar__row {
+    gap: var(--sws-space-8);
+  }
+
+  .tsearch {
+    flex: 1 0 100%;
+  }
+
+  .tbar__filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sws-space-8);
+    inline-size: 100%;
+  }
+
+  .tfilter,
+  .tfilter__select {
+    inline-size: 100%;
+  }
+
+  /* An odd filter out — the third of three — spans the row instead of leaving a gap. */
+  .tfilter:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
 /* ── filters and toolbars ──────────────────────────────────────────────────── */
 
 .toolbar {
@@ -831,34 +1017,6 @@
   margin-block-start: var(--sws-space-24);
 }
 
-/* ── ticket filters: department and priority ───────────────────────────────── */
-/*
- * Spec 9.5.1 asks for three filters, and three pill strips would be eleven pills on one
- * screen for a list this short. Status stays as pills because it is the one people reach for;
- * these two are selects, which also survives a department list that grows.
- */
-.bar__picks {
-  display: flex;
-  align-items: end;
-  gap: var(--sws-space-12);
-  flex-wrap: wrap;
-}
-
-.bar__pick {
-  display: grid;
-  gap: var(--sws-space-4);
-}
-
-.bar__pick .field {
-  min-inline-size: 11rem;
-}
-
-/* The count on a category chip is quieter than its label but still has to be read. */
-.filters__n {
-  margin-inline-start: var(--sws-space-4);
-  opacity: 0.7;
-}
-
 /* ── files on a ticket reply — spec 9.5.3 ──────────────────────────────────── */
 .msg__files {
   display: flex;
@@ -959,27 +1117,4 @@
   display: block;
   font-size: var(--sws-font-size-caption);
   color: var(--sws-text-secondary);
-}
-
-/*
- * On a phone the two selects wrapped to a row each, which pushed the first ticket below the
- * fold on a list of two. They are both short choices, so they share the row instead — and the
- * field's min width has to come off, or the grid track is sized by the content and the pair
- * widens the page rather than splitting it.
- */
-@media (max-width: 599px) {
-  .bar__picks {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sws-space-8);
-  }
-
-  .bar__pick {
-    min-inline-size: 0;
-  }
-
-  .bar__pick .field {
-    min-inline-size: 0;
-    inline-size: 100%;
-  }
 }

@@ -7,7 +7,6 @@ import { Tag, TICKET_TONE, PRIORITY_TONE } from '../../components/Tag';
 import {
   IconArrow,
   IconPlus,
-  IconSearch,
   IconBook,
   IconSupport,
   IconCheck,
@@ -21,6 +20,7 @@ import {
   IconCode,
   IconQuote,
 } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import {
@@ -39,90 +39,91 @@ const STATUSES: (TicketStatus | 'all')[] = ['all', 'open', 'answered', 'closed']
  * Ticket list — spec 9.5.1, which asks for three filters, not one: status, department and
  * priority.
  *
- * Status stays as pills because it is the one people reach for and it matches the services
- * and invoices lists. Department and priority are selects: as pills the row would carry
- * eleven options for a list this short, and departments are the thing most likely to grow.
- * Three filters also means an empty result is easy to reach, so the empty state has to offer
- * the way back out rather than only offering a new ticket.
+ * All three are selects, matching every other list in the client area: they share the row with
+ * a search field, and three pill strips would be eleven pills competing with it for width.
+ * Three filters plus a query means an empty result is easy to reach, so the empty state has to
+ * offer the way back out rather than only offering a new ticket.
  */
 export function Tickets() {
   const { t, bi } = useLocale();
+  const [q, setQ] = useState('');
   const [status, setStatus] = useState<TicketStatus | 'all'>('all');
   const [dept, setDept] = useState('all');
   const [priority, setPriority] = useState('all');
 
+  // Subjects are authored in both languages, so both are searched: someone reading the Arabic
+  // list still remembers the ticket they opened in English.
   const rows = TICKETS.filter(
     (x) =>
       (status === 'all' || x.status === status) &&
       (dept === 'all' || x.department === dept) &&
-      (priority === 'all' || x.priority === priority),
+      (priority === 'all' || x.priority === priority) &&
+      matches(q, x.subject.ar, x.subject.en, x.ref, x.updated),
   );
 
-  const narrowed = status !== 'all' || dept !== 'all' || priority !== 'all';
+  const narrowed = q.trim() !== '' || status !== 'all' || dept !== 'all' || priority !== 'all';
   const showAll = () => {
+    setQ('');
     setStatus('all');
     setDept('all');
     setPriority('all');
   };
 
   return (
-    <AccountLayout title={t('acc.tickets')}>
-      <div className="toolbar">
-        <div className="filters" role="group" aria-label={t('account.status')}>
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              type="button"
-              className={`filters__btn${status === s ? ' is-active' : ''}`}
-              aria-pressed={status === s}
-              onClick={() => setStatus(s)}
-            >
-              {t(`tkt.${s}` as never)}
-            </button>
-          ))}
-        </div>
+    /* Opening a ticket moves up to the header action, where every other list keeps its one
+       primary verb — the toolbar row below is now the search, and only the search. */
+    <AccountLayout
+      title={t('acc.tickets')}
+      actions={
         <Link className="btn btn--md btn--primary" to="/account/tickets/new">
           <IconPlus size={15} />
           {t('tkt.open')}
         </Link>
-      </div>
-
-      <div className="bar">
-        <div className="bar__picks">
-          <label className="bar__pick">
-            <span className="eyebrow">{t('tkt.department')}</span>
-            <select className="field" value={dept} onChange={(e) => setDept(e.target.value)}>
-              <option value="all">{t('inv.all')}</option>
-              {DEPARTMENTS.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {t(d.nameKey as never)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="bar__pick">
-            <span className="eyebrow">{t('tkt.priority')}</span>
-            <select className="field" value={priority} onChange={(e) => setPriority(e.target.value)}>
-              <option value="all">{t('inv.all')}</option>
-              {PRIORITIES.map((p) => (
-                <option key={p} value={p}>
-                  {t(`prio.${p}` as never)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <p className="bar__count">
-          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{TICKETS.length}</span>
-        </p>
-      </div>
+      }
+    >
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.tickets')}
+        shown={rows.length}
+        total={TICKETS.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={status}
+          onChange={setStatus}
+          options={STATUSES.map((s) => ({
+            value: s,
+            label: t(s === 'all' ? 'filter.allStatuses' : (`tkt.${s}` as never)),
+          }))}
+        />
+        <TableFilter
+          label={t('tkt.department')}
+          value={dept}
+          onChange={setDept}
+          options={[
+            { value: 'all', label: t('filter.allDepartments') },
+            ...DEPARTMENTS.map((d) => ({ value: d.id, label: t(d.nameKey as never) })),
+          ]}
+        />
+        <TableFilter
+          label={t('tkt.priority')}
+          value={priority}
+          onChange={setPriority}
+          options={[
+            { value: 'all', label: t('filter.allPriorities') },
+            ...PRIORITIES.map((p) => ({ value: p, label: t(`prio.${p}` as never) })),
+          ]}
+        />
+      </TableToolbar>
 
       {rows.length === 0 ? (
         <div className="card empty">
           <IconSupport size={28} />
-          <p className="empty__title">{t(narrowed ? 'tkt.noneFilter' : 'tkt.none')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
+          <p className="empty__title">
+            {t(q.trim() ? 'empty.search' : narrowed ? 'tkt.noneFilter' : 'tkt.none')}
+          </p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
           <div className="actions actions--split">
             {narrowed && (
               <Button size="lg" variant="secondary" onClick={showAll}>
@@ -522,66 +523,52 @@ export function TicketThread() {
 /**
  * Knowledgebase — spec 9.5.4: categories, search, and a helpfulness vote per article.
  *
- * The category strip and the search box narrow the same list rather than replacing one
+ * The category filter and the search box narrow the same list rather than replacing one
  * another: someone who has picked "Domains" and then types is still inside Domains, which is
- * what picking a category was for. Each chip carries its own count, so an empty category is
+ * what picking a category was for. Each option carries its own count, so an empty category is
  * visible before it is opened.
+ *
+ * The search here was the one field in the client area that already existed, with a submit
+ * button beside it. The button went with the strip: nothing was ever submitted — the list
+ * narrows on every keystroke — so it was a button whose only job was to look like search.
  */
 export function Knowledgebase() {
   const { t } = useLocale();
   const [q, setQ] = useState('');
   const [cat, setCat] = useState<string>('all');
 
+  // The body is searched as well as the title: what people remember of an article is a phrase
+  // out of it — a port number, a nameserver — not the sentence it was titled with.
   const rows = ARTICLES.filter(
     (a) =>
       (cat === 'all' || a.category === cat) &&
-      (q.trim() ? t(a.titleKey as never).toLowerCase().includes(q.trim().toLowerCase()) : true),
+      matches(q, t(a.titleKey as never), t(a.bodyKey as never)),
   );
 
   const countIn = (c: string) => ARTICLES.filter((a) => a.category === c).length;
 
   return (
     <AccountLayout title={t('acc.kb')}>
-      <form className="domain-search" onSubmit={(e) => e.preventDefault()}>
-        <label className="u-visually-hidden" htmlFor="kbq">
-          {t('action.search')}
-        </label>
-        <input
-          id="kbq"
-          className="field domain-search__input"
-          placeholder={t('kb.search')}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('kb.search')}
+        shown={rows.length}
+        total={ARTICLES.length}
+      >
+        <TableFilter
+          label={t('kb.categories')}
+          value={cat}
+          onChange={setCat}
+          options={[
+            { value: 'all', label: `${t('filter.allCategories')} (${ARTICLES.length})` },
+            ...KB_CATEGORIES.map((c) => ({
+              value: c,
+              label: `${t(`kb.cat.${c}` as never)} (${countIn(c)})`,
+            })),
+          ]}
         />
-        <Button size="md" type="submit">
-          <IconSearch size={17} />
-          {t('action.search')}
-        </Button>
-      </form>
-
-      <div className="bar">
-        <div className="filters" role="group" aria-label={t('kb.categories')}>
-          <button
-            type="button"
-            className={`filters__btn${cat === 'all' ? ' is-active' : ''}`}
-            aria-pressed={cat === 'all'}
-            onClick={() => setCat('all')}
-          >
-            {t('inv.all')} <span className="filters__n serial">{ARTICLES.length}</span>
-          </button>
-          {KB_CATEGORIES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              className={`filters__btn${cat === c ? ' is-active' : ''}`}
-              aria-pressed={cat === c}
-              onClick={() => setCat(c)}
-            >
-              {t(`kb.cat.${c}` as never)} <span className="filters__n serial">{countIn(c)}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      </TableToolbar>
 
       {rows.length > 0 ? (
         <ul className="card card--flush kb-list">
