@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
+import { Tag, INVOICE_TONE } from '../../components/Tag';
 import {
   IconArrow,
   IconInvoice,
@@ -59,14 +61,22 @@ export function Invoices() {
     >
       {/* What is owed belongs above the list of everything ever billed, not inside it. */}
       {owing.length > 0 && (
-        <section className="card card--urgent u-mb-16">
+        <Card
+          tone="urgent"
+          heading={t('dash.needsYou')}
+          icon={<IconAlert size={17} />}
+          className="u-mb-16"
+        >
           <div className="due">
-            <p className="due__amount serial">
-              {formatAmount(convert(owed, currency), locale)} {currency}
-            </p>
-            <p className="due__note">
-              <IconAlert size={14} /> {t('dash.dueNote')}
-            </p>
+            <div className="due__text">
+              <p className="due__amount serial">
+                {formatAmount(convert(owed, currency), locale)} {currency}
+              </p>
+              <p className="due__note">
+                <IconAlert size={14} />
+                <span>{t('dash.dueNote')}</span>
+              </p>
+            </div>
             <div className="due__actions">
               <Link className="btn btn--md btn--primary" to={`/account/invoices/${owing[0].id}`}>
                 {t('account.pay')}
@@ -74,7 +84,7 @@ export function Invoices() {
               </Link>
             </div>
           </div>
-        </section>
+        </Card>
       )}
 
       <TableToolbar
@@ -124,9 +134,7 @@ export function Invoices() {
                     {formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}
                   </td>
                   <td>
-                    <span className={`tag tag--${inv.status === 'paid' ? 'ok' : inv.status === 'cancelled' ? 'taken' : 'due'}`}>
-                      {t(`inv.${inv.status}` as never)}
-                    </span>
+                    <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
                   </td>
                   <td className="num">
                     <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
@@ -217,9 +225,7 @@ export function InvoiceDetail() {
             <div>
               <dt>{t('account.status')}</dt>
               <dd>
-                <span className={`tag tag--${inv.status === 'paid' ? 'ok' : 'due'}`}>
-                  {t(`inv.${inv.status}` as never)}
-                </span>
+                <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
               </dd>
             </div>
             {method && (
@@ -425,10 +431,10 @@ export function PaymentMethods() {
               </span>
               <span className="method-row__grow">
                 {m.primary && (
-                  <span className="tag tag--ok">
+                  <Tag tone="ok">
                     <IconCheck size={13} />
                     {t('pm.primary')}
-                  </span>
+                  </Tag>
                 )}
               </span>
               {!m.primary && (

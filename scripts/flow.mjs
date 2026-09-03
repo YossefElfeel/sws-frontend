@@ -159,7 +159,7 @@ ok('renewals are scheduled nearest first', (await p.$$eval('.sched__when', (n) =
 await p.evaluate(() => (location.hash = '#/account/services'));
 await p.waitForSelector('.data tbody tr');
 const allSvc = await p.$$eval('.data tbody tr', (n) => n.length);
-await p.click('.filters__btn:nth-child(2)');
+await p.selectOption('.tfilter__select', 'active');
 await p.waitForTimeout(120);
 const someSvc = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('services filter by status', someSvc < allSvc, `${allSvc} -> ${someSvc}`);
@@ -174,7 +174,7 @@ ok('DNS records listed', dns >= 5, `${dns} records`);
 await p.evaluate(() => (location.hash = '#/account/invoices'));
 await p.waitForSelector('.data tbody tr');
 const allInv = await p.$$eval('.data tbody tr', (n) => n.length);
-await p.click('.filters__btn:nth-child(2)');
+await p.selectOption('.tfilter__select', 'paid');
 await p.waitForTimeout(120);
 const someInv = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('invoices filter by status', someInv < allInv, `${allInv} -> ${someInv}`);
@@ -201,12 +201,12 @@ await p.evaluate(() => (location.hash = '#/account/tickets'));
 await p.waitForSelector('.data tbody tr');
 {
   const all = await p.$$eval('.data tbody tr', (n) => n.length);
-  await p.selectOption('.bar__pick:nth-of-type(1) select', 'tech');
+  await p.selectOption('.tfilter:nth-of-type(2) .tfilter__select', 'tech');
   await p.waitForTimeout(150);
   const byDept = await p.$$eval('.data tbody tr', (n) => n.length);
   ok('tickets filter by department', byDept < all, `${all} -> ${byDept}`);
 
-  await p.selectOption('.bar__pick:nth-of-type(2) select', 'low');
+  await p.selectOption('.tfilter:nth-of-type(3) .tfilter__select', 'low');
   await p.waitForTimeout(150);
   const none = (await p.$$('.data tbody tr')).length;
   const reset = await p.$$eval('.empty .btn', (n) => n.length);
@@ -241,7 +241,7 @@ await p.waitForSelector('.app__main');
 await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
 await p.waitForSelector('.kb-item');
 const allKb = await p.$$eval('.kb-item', (n) => n.length);
-await p.fill('#kbq', 'cPanel');
+await p.fill('.tsearch__input', 'cPanel');
 await p.waitForTimeout(150);
 const someKb = await p.$$eval('.kb-item', (n) => n.length);
 ok('knowledgebase search narrows', someKb < allKb, `${allKb} -> ${someKb}`);
@@ -253,16 +253,20 @@ await p.waitForSelector('.kb-item');
 {
   // The search check above left a term in the box, and a hash that has not changed does not
   // remount the screen — so the box is cleared before the category strip is measured.
-  await p.fill('#kbq', '');
+  await p.fill('.tsearch__input', '');
   await p.waitForTimeout(150);
-  const chips = await p.$$('.filters__btn');
+  const cats = await p.$$eval('.tfilter__select option', (n) => n.map((o) => o.value));
   const total = await p.$$eval('.kb-item', (n) => n.length);
-  await chips[1].click();
+  await p.selectOption('.tfilter__select', cats[1]);
   await p.waitForTimeout(150);
   const inCat = await p.$$eval('.kb-item', (n) => n.length);
   ok('knowledgebase categories narrow the list', inCat > 0 && inCat < total, `${total} -> ${inCat}`);
 
-  const counts = await p.$$eval('.filters__n', (n) => n.map((x) => Number(x.textContent)));
+  // The counts moved onto the options themselves — "Domains (2)" — so the option is both the
+  // name of the category and how much is in it.
+  const counts = await p.$$eval('.tfilter__select option', (n) =>
+    n.map((o) => Number((o.textContent.match(/\((\d+)\)\s*$/) ?? [])[1])),
+  );
   ok('each category states its count', counts.length > 1 && counts[0] === total, counts.join(' '));
 }
 
@@ -283,12 +287,12 @@ await p.waitForSelector('.switch-row input');
   const enrolShown = (await p.$$('.enrol .slot')).length === 1;
   ok('two-factor asks to enrol rather than just flipping', !before && enrolShown);
 
-  const gated = await p.$$eval('.enrol .actions .btn', (n) => n.some((b) => b.disabled));
+  const gated = await p.$$eval('.enrol .form__foot .btn', (n) => n.some((b) => b.disabled));
   ok('confirm is refused without a code', gated);
 
   await p.fill('.enrol input[inputmode=numeric]', '428913');
   await p.waitForTimeout(100);
-  await p.click('.enrol .actions .btn:not(.btn--quiet)');
+  await p.click('.enrol .form__foot .btn:not(.btn--quiet)');
   await p.waitForTimeout(200);
   const codes = await p.$$eval('.codes li', (n) => n.length);
   const on = await p.$eval('.switch-row input', (e) => e.checked);
@@ -299,8 +303,10 @@ await p.waitForSelector('.switch-row input');
 await p.evaluate(() => (location.hash = '#/account/contacts'));
 await p.waitForSelector('.perm-list');
 {
-  const before = await p.$$eval('.cards-list > li:first-child .perm-list .tag', (n) => n.length);
-  await p.click('.cards-list > li:first-child .btn--secondary');
+  // The list is one flush card of ruled rows now, the same shape as the saved cards on
+  // Payment methods, so the contact is a .contact inside it rather than an <li> of its own.
+  const before = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
+  await p.click('.contact:first-child .btn--secondary');
   await p.waitForTimeout(150);
   const boxes = await p.$$('.perm-edit__row input');
   ok('a contact opens a permission list', boxes.length > 0, `${boxes.length} permissions`);
@@ -308,7 +314,7 @@ await p.waitForSelector('.perm-list');
   const unchecked = await p.$$eval('.perm-edit__row input', (n) => n.findIndex((b) => !b.checked));
   await boxes[unchecked].click();
   await p.waitForTimeout(150);
-  const after = await p.$$eval('.cards-list > li:first-child .perm-list .tag', (n) => n.length);
+  const after = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
   ok('granting one shows it on the contact', after === before + 1, `${before} -> ${after}`);
 }
 
@@ -441,7 +447,7 @@ await p.waitForSelector('#reply');
 {
   const before = await p.$$eval('.thread .msg', (n) => n.length);
   await p.fill('#reply', 'شكرًا، جربت وشغال.');
-  await p.click('.card .actions .btn--lg');
+  await p.click('.card .form__foot .btn:not(.btn--quiet)');
   await p.waitForTimeout(200);
   const after = await p.$$eval('.thread .msg', (n) => n.length);
   ok('a sent reply joins the thread', after === before + 1, `${before} -> ${after}`);
@@ -452,7 +458,7 @@ await p.waitForSelector('#reply');
   ok('a reply can carry files, and a message shows them', replyFiles > 0 && shownFiles > 0,
     `${replyFiles} field, ${shownFiles} shown`);
 
-  await p.click('.card .actions .btn--quiet');
+  await p.click('.card .form__foot .btn--quiet');
   await p.waitForTimeout(150);
   const boxGone = (await p.$$('#reply')).length === 0;
   ok('closing a ticket removes the reply box', boxGone);

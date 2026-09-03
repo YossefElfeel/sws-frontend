@@ -100,6 +100,18 @@ with bad wifi.
 
 `font-variant-numeric: lining-nums tabular-nums` on `body`, so figures in a column line up.
 
+**Tracking is a token, not a per-component decision.** The scale above carried size, line-height
+and weight but no letter-spacing, so each component picked its own — ten distinct values in the
+client area alone, four of them on the dashboard at once. Four roles cover all of them:
+
+| Token | Value | For |
+|---|---|---|
+| `tracking-tight` | `-0.02em` | figures at 30px and up, where the default fit is loose |
+| `tracking-snug` | `-0.01em` | headings, screen titles, card headings |
+| `tracking-normal` | `0` | body — and every Arabic run, whose letterforms join |
+| `tracking-wide` | `0.06em` | Latin small-caps labels: table heads, group labels |
+| `tracking-widest` | `0.4em` | a code typed one character at a time |
+
 **Numerals are Latin everywhere** (ADR-0003), including inside Arabic copy, and `flow.mjs`
 asserts zero Eastern Arabic digits render. Arabic never goes below weight 400.
 
@@ -109,6 +121,11 @@ Spacing is base-4 only: `4 8 12 16 24 32 48 64 96`. Nothing else exists, so noth
 reached for.
 
 Radius `sm 8 · md 12 · lg 16 · xl 24 · pill`. Rules `hair 1 · base 2 · heavy 3`.
+
+Radius is assigned by level, not by taste: **`lg` is card level, `md` is a block inside a card,
+`sm` is a control, `pill` is a chip.** `xl` is a marketing radius and does not appear in the
+client area. Before the audit it did, on two screens, alongside `md` stat tiles and `lg` cards —
+three card radii on one product.
 
 Motion: `fast 140ms · base 220ms · slow 340ms`, easing `cubic-bezier(0.22, 1, 0.36, 1)`
 standard and a faster exit curve. Every transition respects `prefers-reduced-motion`.
@@ -157,8 +174,35 @@ an app and keeps every screen linkable, printable and capturable end to end.
 
 ## 4. Components
 
-Ten in `components/`, 32 drawn icons, ~5,900 lines of CSS across six stylesheets, 911 string
-keys in two languages.
+Thirteen in `components/`, 41 drawn icons, ~6,450 lines of CSS across six stylesheets, 911
+string keys in two languages.
+
+Three of the thirteen exist because an audit found the same thing built twice.
+
+`Card` — the client-area card, and the only one. `components.css` also declares `.card`, and
+`app.css` loads last: it was overriding radius, padding and border while leaving the marketing
+`box-shadow` untouched, so every client-area card carried a lifted marketing shadow it never
+asked for — and one that does not render in dark at all, making elevation a language that existed
+in one theme only. The app card is now what this file always said it was: a bordered plane on a
+flat ground. Elevation means one thing, "this floats above the page", and two things do — the
+notifications popover and the mobile drawer.
+
+The component also takes its heading as a prop, because the anatomy had drifted three ways: a
+`.card__head` wrapper on most screens, a bare `.card__heading` on Affiliates, Security and both
+ticket screens — which silently loses the head's 16px `margin-block-end` — and none at all. A
+card with a heading has a head, and the head is the only thing that can render one.
+
+`StatRow` — the four counts a screen opens with. The dashboard drew them as `.stat` and
+Affiliates drew them as `.tile`, a marketing card at `xl` corners on a drop shadow with the
+figure a step larger, no glyph, no qualifier and no arrow. Two screens, one job, two languages.
+
+`Tag` — the status chip, with a tone rather than a colour. The three old classes were spread
+across seventeen call sites with contradictory meanings: an open ticket was green on the tickets
+list and grey on the dashboard, one click apart. `due` — the danger red — was carrying an
+expiring domain, a refund, a high priority and a cheaper plan, none of which is a danger. `warn`,
+the amber all four of those wanted, was declared in the stylesheet and used nowhere. Meanwhile
+the dashboard's own tiles already spoke ok/warn/bad correctly, so a pending service read amber in
+the tile and grey in the row beneath it. The ladder is now declared once, in `Tag.tsx`.
 
 `Button` — `sm | md | lg` × `primary | secondary | quiet | danger`. `danger` is for acts that
 take something away; it stays quiet until you reach for it, then it is unmistakably red.
@@ -218,6 +262,18 @@ of scrolling inside it.
 **In RTL, an element that escapes does so past the left.** A right-only overflow probe reports
 nothing at all while the page scrolls sideways.
 
+**One word for one thing, and the majority wins the vote.** The masthead said النطاقات and the
+whole client area and ordering flow said دومين — nine strings against thirty-seven, for the same
+object, and the one the customer meets first was the one used least. It is دومين everywhere now.
+The same audit found the client area named three times over: لوحة الحساب, لوحة القيادة, and in
+English "Client area", "Account" and "Dashboard" for one room.
+
+**Title Case is an English-only artefact, so it makes the two locales diverge in tone.** Arabic
+has no case: a nav that shouts in English reads level in Arabic, and the product ends up with two
+voices. Nineteen strings were Title Case — the sidebar and the whole Support section — against
+ninety-three in sentence case. Sentence case won, and it is also the quieter of the two in a
+dense application.
+
 ---
 
 ## 6. Layout
@@ -262,7 +318,7 @@ Design intent that is not enforced is design intent that lasts one sprint.
 |---|---|
 | `tokens/build.mjs --check` | dist in sync; both themes complete |
 | `tokens/a11y-gate.mjs` | 74 checks — contrast, focus, hit area |
-| `scripts/flow.mjs` | **62 checks** against a running build |
+| `scripts/flow.mjs` | **82 checks** against a running build |
 | `scripts/capture.mjs` | 76 routes × 2 viewports — overflow, empty main, console errors |
 | `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
 | `scripts/journeys.mjs` | 16 journeys walked by clicking only — a link that goes nowhere stalls the walk |

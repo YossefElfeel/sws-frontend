@@ -25,8 +25,10 @@ const ALLOWED = [
     why: 'The TLD list filters on input. Submitting has nothing left to do, which is correct.',
   },
   {
-    id: 'screens/account/Support.tsx:kb-search',
-    why: 'Same: the knowledgebase filters as you type.',
+    id: 'components/TableToolbar.tsx:search',
+    why:
+      'Same, for every dashboard table now: the toolbar filters as you type. The form exists so ' +
+      'that Enter is a submit the browser understands rather than a keypress that does nothing.',
   },
   {
     id: 'screens/Order.tsx:gatewayDestination',
@@ -94,11 +96,16 @@ for (const f of files) {
 
   // ── 2. forms that only swallow the event ──────────────────────────────────
   for (const m of src.matchAll(/onSubmit=\{\(e\)\s*=>\s*e\.preventDefault\(\)\}/g)) {
-    const near = src.slice(m.index, m.index + 400);
+    /* The window looks backwards as well as forwards: what names a form is sometimes an
+       attribute on the form tag itself, which sits before the onSubmit that matched. */
+    const near = src.slice(Math.max(0, m.index - 200), m.index + 400);
+    /* The knowledgebase search used to live in Support.tsx and was found by its `kbq` id. It is
+       the shared table toolbar now, and every list wears it, so the search form is named once
+       by its role rather than per screen. */
     const id = near.includes('tldq')
       ? 'screens/Compare.tsx:tld-search'
-      : near.includes('kbq')
-        ? 'screens/account/Support.tsx:kb-search'
+      : near.includes('role="search"')
+        ? 'components/TableToolbar.tsx:search'
         : `${short}:${lineOf(m.index)}`;
     if (allow(id)) continue;
     findings.push({ kind: 'form', where: `${short}:${lineOf(m.index)}`, what: 'preventDefault only' });

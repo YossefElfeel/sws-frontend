@@ -1,6 +1,8 @@
-import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
+import { Card } from '../../components/Card';
+import { StatRow, type StatItem } from '../../components/Stat';
+import { Tag, SERVICE_TONE, TICKET_TONE } from '../../components/Tag';
 import {
   IconServer,
   IconGlobe,
@@ -13,6 +15,8 @@ import {
   IconCalendar,
   IconPlus,
   IconBook,
+  IconMegaphone,
+  IconSpark,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
@@ -89,20 +93,12 @@ export function Dashboard() {
     stalled.some((s) => s.status === k),
   );
 
-  const stats: {
-    to: string;
-    icon: ReactNode;
-    n: number;
-    key: string;
-    note: string;
-    tone: 'ok' | 'warn' | 'bad';
-    alert?: boolean;
-  }[] = [
+  const stats: StatItem[] = [
     {
       to: '/account/services',
       icon: <IconServer size={16} />,
       n: SERVICES.length,
-      key: 'acc.services',
+      label: t('acc.services'),
       note: worst
         ? `${stalled.filter((s) => s.status === worst).length} ${t(`status.${worst}` as never)}`
         : `${active} ${t('status.active')}`,
@@ -112,7 +108,7 @@ export function Dashboard() {
       to: '/account/domains',
       icon: <IconGlobe size={16} />,
       n: DOMAINS.length,
-      key: 'acc.domains',
+      label: t('acc.domains'),
       note: expiring > 0 ? `${expiring} ${t('dom.expiring')}` : `${DOMAINS.length} ${t('dom.active')}`,
       tone: expiring > 0 ? 'warn' : 'ok',
     },
@@ -120,7 +116,7 @@ export function Dashboard() {
       to: '/account/invoices',
       icon: <IconInvoice size={16} />,
       n: unpaid.length,
-      key: 'dash.unpaid',
+      label: t('dash.unpaid'),
       // What is owed, not how many envelopes it arrived in — the amount is what decides
       // whether this is worth opening now.
       note: unpaid.length > 0 ? money(dueTotal) : t('dash.settled'),
@@ -131,7 +127,7 @@ export function Dashboard() {
       to: '/account/tickets',
       icon: <IconSupport size={16} />,
       n: openTickets.length,
-      key: 'dash.openTickets',
+      label: t('dash.openTickets'),
       note:
         openTickets.length === 0
           ? t('dash.noneOpen')
@@ -156,55 +152,33 @@ export function Dashboard() {
         </Link>
       }
     >
-      {/* Row 1 — the counts, one shape repeated four times so the row reads as a single object
-          rather than as four things that happen to be near each other. */}
-      <ul className="stat-row">
-        {stats.map((s) => (
-          <li key={s.to}>
-            <Link className={`stat${s.alert ? ' stat--alert' : ''}`} to={s.to}>
-              <span className="stat__top">
-                <span className="stat__icon" aria-hidden="true">
-                  {s.icon}
-                </span>
-                <IconArrow size={14} className="stat__go" />
-              </span>
-              <span className="stat__n serial">{s.n}</span>
-              <span className="stat__label">{t(s.key as never)}</span>
-              {/* The tone is carried by a glyph as well as a colour, so the one tile that is a
-                  debt still reads as one in greyscale or to a red-green eye. */}
-              <span className={`stat__note stat__note--${s.tone} serial`}>
-                {s.tone === 'ok' ? <IconCheck size={13} /> : <IconAlert size={13} />}
-                <span>{s.note}</span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {/* Row 1 — the counts. One component, shared with Affiliates, so the two screens that
+          open with four figures open with the same four-figure object. */}
+      <StatRow items={stats} />
 
       <div className="dash">
         <div className="dash__main">
           {/* Row 2 — the only thing on this screen that is genuinely owed. */}
           {unpaid.length > 0 ? (
-            <section className="card card--urgent">
-              <header className="card__head">
-                <h2 className="card__heading">
-                  <IconAlert size={17} />
-                  {t('dash.needsYou')}
-                </h2>
-              </header>
+            <Card tone="urgent" heading={t('dash.needsYou')} icon={<IconAlert size={17} />}>
               <div className="due">
-                <p className="due__amount serial">{money(dueTotal)}</p>
-                <p className="due__note">
-                  {t('dash.dueNote')} ·{' '}
-                  {unpaid.map((i) => {
-                    const d = daysUntil(i.due);
-                    return (
-                      <span key={i.id}>
-                        {d < 0 ? `${t('dash.overdueBy')} ${-d} ${t('dash.daysShort')}` : `${t('dash.dueOn')} ${i.due}`}
-                      </span>
-                    );
-                  })}
-                </p>
+                <div className="due__text">
+                  <p className="due__amount serial">{money(dueTotal)}</p>
+                  <p className="due__note">
+                    <IconAlert size={14} />
+                    <span>
+                      {t('dash.dueNote')} ·{' '}
+                      {unpaid.map((i) => {
+                        const d = daysUntil(i.due);
+                        return (
+                          <span key={i.id}>
+                            {d < 0 ? `${t('dash.overdueBy')} ${-d} ${t('dash.daysShort')}` : `${t('dash.dueOn')} ${i.due}`}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  </p>
+                </div>
                 <div className="due__actions">
                   <Link className="btn btn--md btn--primary" to={`/account/invoices/${unpaid[0].id}`}>
                     {t('account.pay')}
@@ -215,9 +189,9 @@ export function Dashboard() {
                   </Link>
                 </div>
               </div>
-            </section>
+            </Card>
           ) : (
-            <section className="card card--calm">
+            <Card tone="calm">
               <p className="calm">
                 <IconCheck size={20} />
                 <span>
@@ -225,19 +199,21 @@ export function Dashboard() {
                   <span className="calm__note">{t('dash.allClearNote')}</span>
                 </span>
               </p>
-            </section>
+            </Card>
           )}
 
           {/* Row 3 — what is running, as rows rather than a table: three columns of data do
               not need a table's machinery, and rows survive a narrow column. */}
-          <section className="card">
-            <header className="card__head">
-              <h2 className="card__heading">{t('acc.services')}</h2>
+          <Card
+            heading={t('acc.services')}
+            icon={<IconServer size={17} />}
+            action={
               <Link className="card__more" to="/account/services">
                 {t('dash.viewAll')}
                 <IconArrow size={14} />
               </Link>
-            </header>
+            }
+          >
             <ul className="rows">
               {SERVICES.map((s) => (
                 <li key={s.id}>
@@ -250,9 +226,7 @@ export function Dashboard() {
                       </span>
                     </span>
                     <span className="row__meta">
-                      <span className={`tag tag--${s.status === 'active' ? 'ok' : 'taken'}`}>
-                        {t(`status.${s.status}` as never)}
-                      </span>
+                      <Tag tone={SERVICE_TONE[s.status]}>{t(`status.${s.status}` as never)}</Tag>
                       <span className="row__date serial">
                         <bdi>{s.nextDue}</bdi>
                       </span>
@@ -262,16 +236,18 @@ export function Dashboard() {
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
 
-          <section className="card">
-            <header className="card__head">
-              <h2 className="card__heading">{t('acc.news')}</h2>
+          <Card
+            heading={t('acc.news')}
+            icon={<IconMegaphone size={17} />}
+            action={
               <Link className="card__more" to="/account/announcements">
                 {t('dash.viewAll')}
                 <IconArrow size={14} />
               </Link>
-            </header>
+            }
+          >
             <ul className="feed">
               {ANNOUNCEMENTS.map((n) => (
                 <li className="feed__item" key={n.id}>
@@ -283,32 +259,20 @@ export function Dashboard() {
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
         </div>
 
         <div className="dash__side">
-          <section className="card">
-            <header className="card__head">
-              <h2 className="card__heading">
-                <IconWallet size={17} />
-                {t('dash.credit')}
-              </h2>
-            </header>
+          <Card heading={t('dash.credit')} icon={<IconWallet size={17} />}>
             <p className="credit serial">{money(ACCOUNT.creditUsdMinor)}</p>
             <p className="credit__note">{t('dash.creditNote')}</p>
             <Link className="btn btn--sm btn--secondary" to="/account/funds">
               <IconPlus size={14} />
               {t('acc.funds')}
             </Link>
-          </section>
+          </Card>
 
-          <section className="card">
-            <header className="card__head">
-              <h2 className="card__heading">
-                <IconCalendar size={17} />
-                {t('dash.renewals')}
-              </h2>
-            </header>
+          <Card heading={t('dash.renewals')} icon={<IconCalendar size={17} />}>
             {renewals.length > 0 ? (
               <ul className="sched">
                 {renewals.map((r) => (
@@ -326,27 +290,24 @@ export function Dashboard() {
             ) : (
               <p className="card__body">{t('dash.noRenewals')}</p>
             )}
-          </section>
+          </Card>
 
-          <section className="card">
-            <header className="card__head">
-              <h2 className="card__heading">
-                <IconSupport size={17} />
-                {t('acc.tickets')}
-              </h2>
+          <Card
+            heading={t('acc.tickets')}
+            icon={<IconSupport size={17} />}
+            action={
               <Link className="card__more" to="/account/tickets">
                 {t('dash.viewAll')}
                 <IconArrow size={14} />
               </Link>
-            </header>
+            }
+          >
             {openTickets.length > 0 ? (
               <ul className="sched">
                 {openTickets.map((x) => (
                   <li key={x.id}>
                     <Link className="sched__item" to={`/account/tickets/${x.id}`}>
-                      <span className={`tag tag--${x.status === 'answered' ? 'ok' : 'taken'}`}>
-                        {t(`tkt.${x.status}` as never)}
-                      </span>
+                      <Tag tone={TICKET_TONE[x.status]}>{t(`tkt.${x.status}` as never)}</Tag>
                       <span className="sched__what">
                         <span className="sched__label">{bi(x.subject)}</span>
                         <span className="sched__sub serial">
@@ -360,12 +321,9 @@ export function Dashboard() {
             ) : (
               <p className="card__body">{t('dash.noTickets')}</p>
             )}
-          </section>
+          </Card>
 
-          <section className="card">
-            <header className="card__head">
-              <h2 className="card__heading">{t('dash.quick')}</h2>
-            </header>
+          <Card heading={t('dash.quick')} icon={<IconSpark size={17} />}>
             <ul className="quick">
               <li>
                 <Link className="quick__item" to="/domains">
@@ -386,7 +344,7 @@ export function Dashboard() {
                 </Link>
               </li>
             </ul>
-          </section>
+          </Card>
         </div>
       </div>
     </AccountLayout>

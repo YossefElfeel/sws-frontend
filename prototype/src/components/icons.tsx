@@ -326,3 +326,79 @@ export function IconAlert({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+export function IconLink({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M10.4 13.6a3.6 3.6 0 0 0 5.4.4l2.6-2.6a3.6 3.6 0 0 0-5.1-5.1l-1.5 1.5" />
+      <path d="M13.6 10.4a3.6 3.6 0 0 0-5.4-.4l-2.6 2.6a3.6 3.6 0 0 0 5.1 5.1l1.5-1.5" />
+    </svg>
+  );
+}
+
+/*
+ * The editor toolbar set — spec 9.5.2.
+ *
+ * These exist because the toolbar was drawn in characters: a literal 🔗 emoji, a ❝ quotation
+ * mark, a • bullet, and the letters B, I and H set in bold. The system's own rule is that a
+ * pictogram which changes shape with the reader's platform is not part of the design system,
+ * and an emoji is the clearest case of one — it renders as a different drawing on every OS, in
+ * a different colour, at a different weight to the stroke set around it.
+ */
+
+export function IconBold({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} strokeWidth={2.25}>
+      <path d="M7.5 5h5.2a3.5 3.5 0 0 1 0 7H7.5zM7.5 12h6a3.5 3.5 0 0 1 0 7h-6z" />
+    </svg>
+  );
+}
+
+export function IconItalic({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M14.5 5h-4.2M13.7 19H9.5M13.4 5 10.6 19" />
+    </svg>
+  );
+}
+
+export function IconHeading({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M6.5 5v14M15.5 5v14M6.5 12h9" />
+    </svg>
+  );
+}
+
+export function IconList({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M9.5 7h9M9.5 12h9M9.5 17h9M5.5 7h.01M5.5 12h.01M5.5 17h.01" />
+    </svg>
+  );
+}
+
+export function IconListNumbered({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M10.5 7h8M10.5 12h8M10.5 17h8" />
+      <path d="M5 5.8 6.2 5v3.6M4.6 12h2.2l-2.2 3h2.4M4.6 15.6h2.2" strokeWidth={1.4} />
+    </svg>
+  );
+}
+
+export function IconCode({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="m9 8-4 4 4 4M15 8l4 4-4 4" />
+    </svg>
+  );
+}
+
+export function IconQuote({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M9.5 6.5c-2.5 1-4 3.2-4 5.9V17h4.6v-4.6H7.2c0-1.7.8-3.2 2.3-4zM18 6.5c-2.5 1-4 3.2-4 5.9V17h4.6v-4.6h-2.9c0-1.7.8-3.2 2.3-4z" />
+    </svg>
+  );
+}

@@ -264,6 +264,11 @@ for (const [name, spec] of groupTokens(tokens.typography?.families ?? {})) {
   out(`  ${PREFIX}font-family-${name}: ${stack};`);
 }
 
+section('tracking — the one axis the type scale was missing, so components each invented their own');
+for (const [name, token] of groupTokens(tokens.tracking ?? {})) {
+  out(`  ${PREFIX}tracking-${name}: ${token.$value};`);
+}
+
 section('rule weights — the ledger is built from ruled lines, so these are structural');
 for (const [name, token] of groupTokens(tokens.rule ?? {})) {
   out(`  ${PREFIX}rule-${name}: ${token.$value};`);

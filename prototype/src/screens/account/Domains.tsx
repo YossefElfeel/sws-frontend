@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
+import { Tag, DOMAIN_TONE } from '../../components/Tag';
 import { Button } from '../../components/Button';
 import { IconArrow, IconPlus, IconTrash, IconGlobe } from '../../components/icons';
 import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
@@ -78,9 +79,7 @@ export function MyDomains() {
                   <td className="serial"><bdi>{d.registered}</bdi></td>
                   <td className="serial"><bdi>{d.expires}</bdi></td>
                   <td>
-                    <span className={`tag tag--${d.status === 'active' ? 'ok' : 'due'}`}>
-                      {t(`dom.${d.status}` as never)}
-                    </span>
+                    <Tag tone={DOMAIN_TONE[d.status]}>{t(`dom.${d.status}` as never)}</Tag>
                   </td>
                   <td className="num">
                     <span className="row-actions">
@@ -299,9 +298,7 @@ export function DomainManage() {
               <div>
                 <dt>{t('account.status')}</dt>
                 <dd>
-                  <span className={`tag tag--${dom.status === 'active' ? 'ok' : 'due'}`}>
-                    {t(`dom.${dom.status}` as never)}
-                  </span>
+                  <Tag tone={DOMAIN_TONE[dom.status]}>{t(`dom.${dom.status}` as never)}</Tag>
                 </dd>
               </div>
             </dl>
