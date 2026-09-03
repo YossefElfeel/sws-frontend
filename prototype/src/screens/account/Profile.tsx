@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconCopy, IconPlus, IconCheck, IconKey, IconUsers } from '../../components/icons';
+import { IconCopy, IconPlus, IconCheck, IconKey, IconUsers, IconMegaphone } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
@@ -22,20 +23,45 @@ import {
 /** Announcements — spec 9.1 and 5.4. */
 export function Announcements() {
   const { t } = useLocale();
+  const [q, setQ] = useState('');
+
+  // Announcements are read for one thing — a server name, a date, a payment method that
+  // changed — so the body is searched alongside the headline.
+  const rows = ANNOUNCEMENTS.filter((n) =>
+    matches(q, t(n.titleKey as never), t(n.bodyKey as never), n.date),
+  );
 
   return (
     <AccountLayout title={t('acc.news')}>
-      <ul className="news">
-        {ANNOUNCEMENTS.map((n) => (
-          <li className="news__item news__item--panel" key={n.id}>
-            <p className="news__date serial">
-              <bdi>{n.date}</bdi>
-            </p>
-            <h2 className="card__heading">{t(n.titleKey as never)}</h2>
-            <p className="card__body">{t(n.bodyKey as never)}</p>
-          </li>
-        ))}
-      </ul>
+      {/* No filter: two dates and four words of category would be a control with nothing to
+          choose between. The search alone is the toolbar here. */}
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.news')}
+        shown={rows.length}
+        total={ANNOUNCEMENTS.length}
+      />
+
+      {rows.length > 0 ? (
+        <ul className="news">
+          {rows.map((n) => (
+            <li className="news__item news__item--panel" key={n.id}>
+              <p className="news__date serial">
+                <bdi>{n.date}</bdi>
+              </p>
+              <h2 className="card__heading">{t(n.titleKey as never)}</h2>
+              <p className="card__body">{t(n.bodyKey as never)}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="card empty">
+          <IconMegaphone size={28} />
+          <p className="empty__title">{t('empty.news')}</p>
+          <p className="empty__note">{t('empty.searchNote')}</p>
+        </div>
+      )}
     </AccountLayout>
   );
 }
@@ -133,7 +159,17 @@ export function Security() {
   const [enrolling, setEnrolling] = useState(false);
   const [code, setCode] = useState('');
   const [copied, setCopied] = useState(false);
+  const [logQ, setLogQ] = useState('');
+  const [logResult, setLogResult] = useState<'all' | 'ok' | 'failed'>('all');
   const { saved, mark, clear } = useSaved();
+
+  // This log is read for one reason — "was that me?" — so the filter that matters is the
+  // failed attempts, and the search is an IP address someone is checking against their own.
+  const logRows = LOGIN_LOG.filter(
+    (l) =>
+      (logResult === 'all' || (logResult === 'ok') === l.ok) &&
+      matches(logQ, l.at, l.ip, l.where.ar, l.where.en),
+  );
 
   return (
     <AccountLayout title={t('acc.security')}>
@@ -301,6 +337,24 @@ export function Security() {
       </div>
 
       <h2 className="app__section">{t('sec.log')}</h2>
+      <TableToolbar
+        value={logQ}
+        onChange={setLogQ}
+        label={t('search.log')}
+        shown={logRows.length}
+        total={LOGIN_LOG.length}
+      >
+        <TableFilter
+          label={t('filter.result')}
+          value={logResult}
+          onChange={setLogResult}
+          options={[
+            { value: 'all' as const, label: t('filter.allResults') },
+            { value: 'ok' as const, label: t('sec.ok') },
+            { value: 'failed' as const, label: t('sec.failed') },
+          ]}
+        />
+      </TableToolbar>
       <div className="card card--flush table-scroll">
         <table className="data">
           <thead>
@@ -312,7 +366,7 @@ export function Security() {
             </tr>
           </thead>
           <tbody>
-            {LOGIN_LOG.map((l) => (
+            {logRows.map((l) => (
               <tr key={l.id}>
                 <td className="serial"><bdi>{l.at}</bdi></td>
                 <td className="serial"><bdi>{l.ip}</bdi></td>
@@ -326,6 +380,12 @@ export function Security() {
             ))}
           </tbody>
         </table>
+        {logRows.length === 0 && (
+          <div className="empty empty--inset">
+            <p className="empty__title">{t(logQ.trim() ? 'empty.search' : 'empty.log')}</p>
+            <p className="empty__note">{t(logQ.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
+          </div>
+        )}
       </div>
     </AccountLayout>
   );
@@ -346,8 +406,18 @@ export function Security() {
 export function Contacts() {
   const { t, bi } = useLocale();
   const [rows, setRows] = useState<Contact[]>(CONTACTS);
+  const [q, setQ] = useState('');
+  const [permFilter, setPermFilter] = useState('all');
   const [editing, setEditing] = useState<string | null>(null);
   const { saved, mark, clear } = useSaved();
+
+  // "Who can see my invoices" is the question this screen exists to answer, so the permission
+  // is the filter — a list narrowed to one permission is that question, answered.
+  const shown = rows.filter(
+    (c) =>
+      (permFilter === 'all' || c.permissions.includes(permFilter)) &&
+      matches(q, c.name.ar, c.name.en, c.email),
+  );
 
   const toggle = (id: string, perm: string) =>
     setRows((all) =>
@@ -367,9 +437,27 @@ export function Contacts() {
     <AccountLayout title={t('acc.contacts')} lede={t('con.lede')}>
       <SavedNote saved={saved} onDismiss={clear} />
 
-      {rows.length > 0 ? (
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.contacts')}
+        shown={shown.length}
+        total={rows.length}
+      >
+        <TableFilter
+          label={t('con.perms')}
+          value={permFilter}
+          onChange={setPermFilter}
+          options={[
+            { value: 'all', label: t('filter.allPermissions') },
+            ...PERMISSIONS.map((p) => ({ value: p, label: t(`perm.${p}` as never) })),
+          ]}
+        />
+      </TableToolbar>
+
+      {shown.length > 0 ? (
         <ul className="cards-list">
-          {rows.map((c) => (
+          {shown.map((c) => (
             <li className="contact" key={c.id}>
               <div className="pm">
                 <span className="pm__brand">{bi(c.name)}</span>
@@ -446,8 +534,10 @@ export function Contacts() {
       ) : (
         <div className="card empty">
           <IconUsers size={28} />
-          <p className="empty__title">{t('con.none')}</p>
-          <p className="empty__note">{t('con.lede')}</p>
+          <p className="empty__title">
+            {t(rows.length === 0 ? 'con.none' : 'empty.contactsFilter')}
+          </p>
+          <p className="empty__note">{t(rows.length === 0 ? 'con.lede' : 'empty.searchNote')}</p>
         </div>
       )}
 
@@ -457,7 +547,12 @@ export function Contacts() {
           variant="secondary"
           onClick={() => {
             // A new contact starts with nothing granted and opens straight into its own
-            // permission list, because choosing them is the reason for adding one.
+            // permission list, because choosing them is the reason for adding one. The
+            // toolbar is reset with it: a contact holding no permissions is invisible under
+            // any permission filter, so adding one while filtered would add nothing you
+            // could see.
+            setQ('');
+            setPermFilter('all');
             const id = `ct-new-${rows.length}`;
             setRows((all) => [
               ...all,

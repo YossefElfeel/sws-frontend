@@ -10,6 +10,7 @@ import {
   IconWallet,
   IconAlert,
 } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
@@ -28,9 +29,16 @@ const FILTERS: (InvoiceStatus | 'all')[] = ['all', 'unpaid', 'paid', 'overdue', 
 export function Invoices() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const [q, setQ] = useState('');
   const [filter, setFilter] = useState<InvoiceStatus | 'all'>('all');
 
-  const rows = INVOICES.filter((i) => filter === 'all' || i.status === filter);
+  // An invoice is looked up by its number or by what it was for, so the line items are part of
+  // the haystack: "the one with the .eg domain on it" is how people describe an invoice.
+  const rows = INVOICES.filter(
+    (i) =>
+      (filter === 'all' || i.status === filter) &&
+      matches(q, i.number, i.date, i.due, ...i.lines.map((l) => `${l.product} ${l.domain ?? ''}`)),
+  );
   const owing = INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
   const owed = owing.reduce((s, i) => s + i.totalUsdMinor, 0);
 
@@ -69,31 +77,29 @@ export function Invoices() {
         </section>
       )}
 
-      <div className="bar">
-        <div className="filters" role="group" aria-label={t('account.status')}>
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              type="button"
-              className={`filters__btn${filter === f ? ' is-active' : ''}`}
-              aria-pressed={filter === f}
-              onClick={() => setFilter(f)}
-            >
-              {t(`inv.${f}` as never)}
-            </button>
-          ))}
-        </div>
-        <p className="bar__count">
-          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{INVOICES.length}</span>
-        </p>
-      </div>
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.invoices')}
+        shown={rows.length}
+        total={INVOICES.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={filter}
+          onChange={setFilter}
+          options={FILTERS.map((f) => ({
+            value: f,
+            label: t(f === 'all' ? 'filter.allStatuses' : (`inv.${f}` as never)),
+          }))}
+        />
+      </TableToolbar>
 
       {rows.length === 0 ? (
         <div className="card empty">
           <IconInvoice size={28} />
-          <p className="empty__title">{t('inv.none')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
+          <p className="empty__title">{t(q.trim() ? 'empty.search' : 'inv.none')}</p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       ) : (
         <div className="card card--flush table-scroll">

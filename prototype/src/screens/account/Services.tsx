@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { IconArrow, IconExternal, IconServer, IconSupport } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount } from '../../lib/catalog';
@@ -14,9 +15,14 @@ const STATUSES: (ServiceStatus | 'all')[] = ['all', 'active', 'pending', 'suspen
 export function Services() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const [q, setQ] = useState('');
   const [status, setStatus] = useState<ServiceStatus | 'all'>('all');
 
-  const rows = SERVICES.filter((s) => status === 'all' || s.status === status);
+  // The plan name and the domain are the two things anyone knows a service by, and the domain
+  // is the one they will type — it is what the service is called in every other conversation.
+  const rows = SERVICES.filter(
+    (s) => (status === 'all' || s.status === status) && matches(q, s.product, s.domain, s.nextDue),
+  );
 
   return (
     <AccountLayout
@@ -27,25 +33,23 @@ export function Services() {
         </Link>
       }
     >
-      <div className="bar">
-        <div className="filters" role="group" aria-label={t('account.status')}>
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              type="button"
-              className={`filters__btn${status === s ? ' is-active' : ''}`}
-              aria-pressed={status === s}
-              onClick={() => setStatus(s)}
-            >
-              {t(s === 'all' ? 'inv.all' : (`status.${s}` as never))}
-            </button>
-          ))}
-        </div>
-        <p className="bar__count">
-          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{SERVICES.length}</span>
-        </p>
-      </div>
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.services')}
+        shown={rows.length}
+        total={SERVICES.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={status}
+          onChange={setStatus}
+          options={STATUSES.map((s) => ({
+            value: s,
+            label: t(s === 'all' ? 'filter.allStatuses' : (`status.${s}` as never)),
+          }))}
+        />
+      </TableToolbar>
 
       {rows.length > 0 ? (
         <div className="card card--flush table-scroll">
@@ -89,11 +93,12 @@ export function Services() {
           </table>
         </div>
       ) : (
-        /* A filter that matches nothing says so, rather than showing an empty table frame. */
+        /* A search or filter that matches nothing says so, rather than showing an empty table
+           frame — and it says which of the two emptied the list. */
         <div className="card empty">
           <IconServer size={28} />
-          <p className="empty__title">{t('empty.services')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
+          <p className="empty__title">{t(q.trim() ? 'empty.search' : 'empty.services')}</p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       )}
     </AccountLayout>

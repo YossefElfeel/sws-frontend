@@ -3,13 +3,26 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { IconArrow, IconPlus, IconTrash, IconGlobe } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { DOMAINS, DNS_RECORDS } from '../../lib/account';
 
+/** The states a domain can be in. Expiring is the one anyone filters to. */
+const DOMAIN_STATUSES = ['all', 'active', 'expiring', 'expired'] as const;
+
 /** My Domains — spec 9.3: name, expiry, status, quick renew. */
 export function MyDomains() {
   const { t } = useLocale();
+  const [q, setQ] = useState('');
+  const [status, setStatus] = useState<(typeof DOMAIN_STATUSES)[number]>('all');
+
+  // A domain is its own name, so the search is mostly one field; the two dates are here
+  // because "what expires in 2026" is the other question this list gets asked.
+  const rows = DOMAINS.filter(
+    (d) =>
+      (status === 'all' || d.status === status) && matches(q, d.name, d.registered, d.expires),
+  );
 
   return (
     <AccountLayout
@@ -26,7 +39,25 @@ export function MyDomains() {
         </>
       }
     >
-      {DOMAINS.length > 0 ? (
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.domains')}
+        shown={rows.length}
+        total={DOMAINS.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={status}
+          onChange={setStatus}
+          options={DOMAIN_STATUSES.map((s) => ({
+            value: s,
+            label: t(s === 'all' ? 'filter.allStatuses' : (`dom.${s}` as never)),
+          }))}
+        />
+      </TableToolbar>
+
+      {rows.length > 0 ? (
         <div className="card card--flush table-scroll">
           <table className="data">
             <thead>
@@ -39,7 +70,7 @@ export function MyDomains() {
               </tr>
             </thead>
             <tbody>
-              {DOMAINS.map((d) => (
+              {rows.map((d) => (
                 <tr key={d.id}>
                   <td>
                     <span className="lead serial"><bdi>{d.name}</bdi></span>
@@ -68,10 +99,16 @@ export function MyDomains() {
           </table>
         </div>
       ) : (
+        /* Owning no domains and matching no search are different problems, so the empty
+           state does not offer to sell a domain to someone who just mistyped one. */
         <div className="card empty">
           <IconGlobe size={28} />
-          <p className="empty__title">{t('empty.domains')}</p>
-          <p className="empty__note">{t('empty.domainsNote')}</p>
+          <p className="empty__title">
+            {t(DOMAINS.length === 0 ? 'empty.domains' : 'empty.search')}
+          </p>
+          <p className="empty__note">
+            {t(DOMAINS.length === 0 ? 'empty.domainsNote' : 'empty.searchNote')}
+          </p>
         </div>
       )}
     </AccountLayout>
@@ -99,8 +136,17 @@ export function DomainManage() {
   // straight into inputs — an Add button that adds nothing is the clearest kind of broken.
   const [ns, setNs] = useState<string[]>(dom?.nameservers ?? []);
   const [records, setRecords] = useState(DNS_RECORDS);
+  const [dnsQ, setDnsQ] = useState('');
+  const [dnsType, setDnsType] = useState('all');
   const [epp, setEpp] = useState(false);
   const { saved, mark, clear } = useSaved();
+
+  // The record types actually present, not every type DNS defines: a filter offering SRV on a
+  // zone with no SRV record is four clicks to an empty table.
+  const dnsTypes = ['all', ...new Set(records.map((r) => r.type))];
+  const dnsRows = records.filter(
+    (r) => (dnsType === 'all' || r.type === dnsType) && matches(dnsQ, r.type, r.host, r.value),
+  );
 
   if (!dom) return <Navigate to="/account/domains" replace />;
 
@@ -165,17 +211,39 @@ export function DomainManage() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() =>
+                onClick={() => {
+                  // The toolbar resets with the new row, or a zone filtered to MX would
+                  // answer Add Record by appending an A record you cannot see.
+                  setDnsQ('');
+                  setDnsType('all');
                   setRecords((rows) => [
                     ...rows,
                     { id: `dns-new-${rows.length}`, type: 'A', host: '@', value: '', ttl: 3600 },
-                  ])
-                }
+                  ]);
+                }}
               >
                 <IconPlus size={14} />
                 {t('dom.addRecord')}
               </Button>
             </header>
+            <TableToolbar
+              inset
+              value={dnsQ}
+              onChange={setDnsQ}
+              label={t('search.dns')}
+              shown={dnsRows.length}
+              total={records.length}
+            >
+              <TableFilter
+                label={t('filter.recordType')}
+                value={dnsType}
+                onChange={setDnsType}
+                options={dnsTypes.map((ty) => ({
+                  value: ty,
+                  label: ty === 'all' ? t('filter.allTypes') : ty,
+                }))}
+              />
+            </TableToolbar>
             <div className="table-scroll">
               <table className="data">
                 <thead>
@@ -188,7 +256,7 @@ export function DomainManage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {records.map((r) => (
+                  {dnsRows.map((r) => (
                     <tr key={r.id}>
                       <td><span className="lead serial">{r.type}</span></td>
                       <td className="serial"><bdi>{r.host}</bdi></td>
@@ -209,6 +277,14 @@ export function DomainManage() {
                 </tbody>
               </table>
             </div>
+            {/* A zone with records but none matching says so inside the card, so the Add
+                Record button stays where it was rather than jumping up the page. */}
+            {dnsRows.length === 0 && (
+              <div className="empty empty--inset">
+                <p className="empty__title">{t(dnsQ.trim() ? 'empty.search' : 'empty.dns')}</p>
+                <p className="empty__note">{t(dnsQ.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
+              </div>
+            )}
           </section>
         </div>
 
