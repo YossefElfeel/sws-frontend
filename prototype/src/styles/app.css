@@ -112,18 +112,19 @@
   text-decoration: none;
 }
 
+/* 34px and caption, not 30px and 10px: 10px and 11px are not sizes, they are apologies. */
 .app__mark {
   display: grid;
   place-items: center;
-  inline-size: 30px;
-  block-size: 30px;
+  inline-size: 34px;
+  block-size: 34px;
   flex: none;
   background: var(--sws-action-primary);
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-sm);
-  font-size: 10px;
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .app__brand-text {
@@ -134,7 +135,7 @@
 .app__brand-name {
   font-size: var(--sws-font-size-body-sm);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--sws-tracking-snug);
   line-height: 1.2;
 }
 
@@ -175,24 +176,27 @@
   margin-block-start: var(--sws-space-24);
 }
 
+/* One size in both languages. It used to be 11px in Latin and caption in Arabic, so the nav's
+   group labels were a different size depending on which language you read the product in. */
 .app__group-label {
   padding: 0 var(--sws-space-12) var(--sws-space-8);
-  font-size: 11px;
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
 }
 
+/* Arabic has no case and its letterforms join, so uppercase means nothing here and tracking
+   breaks the join. The size stays. */
 :root[lang='ar'] .app__group-label {
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   text-transform: none;
-  font-size: var(--sws-font-size-caption);
 }
 
 .app__group ul {
   display: grid;
-  gap: 2px;
+  gap: var(--sws-space-4);
 }
 
 .app__link {
@@ -249,14 +253,14 @@
 .app__link-badge {
   display: grid;
   place-items: center;
-  min-inline-size: 20px;
-  block-size: 20px;
-  padding-inline: 6px;
+  min-inline-size: 22px;
+  block-size: 22px;
+  padding-inline: var(--sws-space-8);
   flex: none;
   background: var(--sws-status-danger);
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-pill);
-  font-size: 11px;
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
 }
 
@@ -421,10 +425,11 @@
 
 /* ── bar tools ─────────────────────────────────────────────────────────────── */
 
+/* Four pixels between two 44px targets is a gap one sixth the size of the thing it separates. */
 .app__tools {
   display: flex;
   align-items: center;
-  gap: var(--sws-space-4);
+  gap: var(--sws-space-8);
   flex: none;
 }
 
@@ -491,19 +496,20 @@
 }
 
 /* Sits on the bell's corner in either direction. */
+/* The bell count is the smallest number on the screen and still has to be read. */
 .app__dot {
   position: absolute;
-  inset-block-start: 6px;
-  inset-inline-end: 6px;
+  inset-block-start: var(--sws-space-4);
+  inset-inline-end: var(--sws-space-4);
   display: grid;
   place-items: center;
-  min-inline-size: 16px;
-  block-size: 16px;
-  padding-inline: 4px;
+  min-inline-size: 18px;
+  block-size: 18px;
+  padding-inline: var(--sws-space-4);
   background: var(--sws-status-danger);
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-pill);
-  font-size: 10px;
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
   line-height: 1;
 }
@@ -573,7 +579,7 @@
 .app__title {
   font-size: var(--sws-font-size-h3);
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: var(--sws-tracking-snug);
   line-height: 1.2;
 }
 
@@ -609,9 +615,11 @@
  * ragged reads as broken rather than as responsive. Four counts are a set; they break in half
  * or not at all.
  */
+/* The row shares the gutter of the grid it sits above, so the whole screen breathes on one
+   value; the larger space beneath it is the band break, not a third gutter. */
 .stat-row {
   display: grid;
-  gap: var(--sws-space-12);
+  gap: var(--sws-space-16);
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-block-end: var(--sws-space-24);
 }
@@ -632,6 +640,14 @@
   display: grid;
 }
 
+/*
+ * A stat tile is a card, so it is the card's shape — same ground, same hairline, same `lg`
+ * corners. Only the padding is the tile's own: four of these across a 390px phone at the card's
+ * 24 would leave the figure nowhere to sit, and 16 is the next step down the same scale.
+ *
+ * It used to be `md` corners with a hover that lifted on a drop shadow, which put a third card
+ * shape and a second elevation language on the one screen that shows both at once.
+ */
 .stat {
   display: flex;
   flex-direction: column;
@@ -639,23 +655,42 @@
   padding: var(--sws-space-16);
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  border-radius: var(--sws-radius-md);
+  border-radius: var(--sws-radius-lg);
   color: inherit;
   text-decoration: none;
   transition:
     border-color var(--sws-duration-fast) var(--sws-ease-standard),
-    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
     transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
+/* Hover on a card-level object is the accent taking its edge; hover on a row is the sunken
+   ground. Those are the only two, and nothing in here lifts on a shadow any more. */
 .stat:hover {
   border-color: var(--sws-action-primary);
-  box-shadow: var(--sws-shadow-card);
   transform: translateY(-2px);
 }
 
 .stat:active {
   transform: translateY(0);
+}
+
+/* A tile that reports rather than navigates: no lift, no pointer, no promise of a click. */
+.stat--static {
+  cursor: default;
+}
+
+.stat--static:hover {
+  border-color: var(--sws-border-subtle);
+  transform: none;
+}
+
+/* The unit rides beside the figure at label size, so a row of four keeps one height whether or
+   not the figures carry currencies. */
+.stat__unit {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 600;
+  letter-spacing: var(--sws-tracking-normal);
+  color: var(--sws-text-secondary);
 }
 
 /*
@@ -695,10 +730,14 @@
 }
 
 .stat__n {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sws-space-4);
+  flex-wrap: wrap;
   font-size: var(--sws-font-size-h2);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .stat__label {
@@ -806,11 +845,31 @@
 
 /* ── cards ─────────────────────────────────────────────────────────────────── */
 
+/*
+ * ONE card. Everything at card level in the client area is this shape: raised ground, a
+ * hairline, `lg` corners, 24 of padding, and no shadow.
+ *
+ * The shadow reset is not decoration — it is a correction. `components.css` also declares
+ * `.card`, and this sheet loads last, so it was overriding radius, padding and border while
+ * leaving the marketing `box-shadow` untouched. Every client-area card was carrying a lifted
+ * marketing shadow it never asked for, and in dark it carried a shadow that does not render at
+ * all — an elevation language that existed in one theme only.
+ *
+ * Elevation now means one thing: this floats above the page. Two things do — the notifications
+ * popover and the mobile nav drawer — and only those two carry a shadow.
+ */
 .card {
   padding: var(--sws-space-24);
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-lg);
+  box-shadow: none;
+}
+
+/* The one marketing surface still built from `.card` — the home feature grid. It keeps the
+   lift it was designed with; the app does not inherit it. */
+.card--lifted {
+  box-shadow: var(--sws-shadow-card);
 }
 
 .card__head {
@@ -827,7 +886,7 @@
   gap: var(--sws-space-8);
   font-size: var(--sws-font-size-body);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--sws-tracking-snug);
 }
 
 .card__heading svg {
@@ -857,6 +916,7 @@
 .card__more {
   min-block-size: var(--sws-touch-target-min);
   margin-block: calc((var(--sws-touch-target-min) - 1.5rem) / -2);
+  border-radius: var(--sws-radius-sm);
 }
 
 .card--urgent {
@@ -877,24 +937,57 @@
 
 /* ── the amount owed ───────────────────────────────────────────────────────── */
 
-.due__amount {
-  font-size: var(--sws-font-size-h1);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+/*
+ * The figure and the way to settle it read as one line: what is owed at the reading edge, the
+ * action at the far end. Stacked, they left two-thirds of a full-width card empty — which is
+ * exactly what the Invoices screen was doing, where the same block sits at page width rather
+ * than in the dashboard's narrower column.
+ */
+.due {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
 }
 
+.due__text {
+  min-inline-size: 0;
+}
+
+/* One figure size for money across the client area. This was `h1` (34px) while the balance, the
+   credit and every other `figure__n` were `h2` (30px) — two sizes for the same kind of number,
+   one of them on the same screen as the other. */
+.due__amount {
+  font-size: var(--sws-font-size-h2);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: var(--sws-tracking-tight);
+}
+
+/*
+ * Flex, because `svg { display: block }` is global: an icon dropped inline into a paragraph
+ * takes a line of its own. On the Invoices screen it did exactly that — the alert glyph sat
+ * alone above its own sentence, the one place in 27 routes where that happened.
+ */
 .due__note {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  flex-wrap: wrap;
   margin-block-start: var(--sws-space-4);
   font-size: var(--sws-font-size-body-sm);
   color: var(--sws-text-secondary);
+}
+
+.due__note svg {
+  flex: none;
 }
 
 .due__actions {
   display: flex;
   gap: var(--sws-space-8);
   flex-wrap: wrap;
-  margin-block-start: var(--sws-space-16);
 }
 
 .calm {
@@ -916,7 +1009,7 @@
 
 .calm__note {
   display: block;
-  margin-block-start: 2px;
+  margin-block-start: var(--sws-space-4);
   color: var(--sws-text-secondary);
 }
 
@@ -1011,7 +1104,7 @@
 
 .sched {
   display: grid;
-  gap: 2px;
+  gap: var(--sws-space-4);
   margin: calc(var(--sws-space-8) * -1) calc(var(--sws-space-12) * -1);
 }
 
@@ -1070,7 +1163,7 @@
   font-size: var(--sws-font-size-h2);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .credit__note {
@@ -1083,7 +1176,7 @@
 
 .quick {
   display: grid;
-  gap: 2px;
+  gap: var(--sws-space-4);
   margin: calc(var(--sws-space-8) * -1) calc(var(--sws-space-12) * -1);
 }
 
@@ -1127,7 +1220,7 @@
 }
 
 .feed__title {
-  margin-block: 2px;
+  margin-block: var(--sws-space-4);
   font-size: var(--sws-font-size-body-sm);
   font-weight: 700;
 }
@@ -1217,15 +1310,20 @@
   font-size: var(--sws-font-size-body-sm);
 }
 
+/*
+ * One column head, one size, in both languages. It used to be 11px in Latin and caption in
+ * Arabic — the same table read two different sizes depending on the language, and 11px was the
+ * last surviving apology-size in the client area after the 390 audit cleared out the rest.
+ *
+ * Case and tracking still differ, and that difference is real rather than an oversight: Arabic
+ * has no upper case, and its letterforms join, so tracking pulls them apart. Both come off in
+ * the `[lang='ar']` rule in screens.css, which this inherits.
+ */
 .app__main .data th {
   padding: var(--sws-space-12) var(--sws-space-16);
   background: var(--sws-surface-sunken);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-}
-
-:root[lang='ar'] .app__main .data th {
   font-size: var(--sws-font-size-caption);
+  letter-spacing: var(--sws-tracking-wide);
 }
 
 .app__main .data td {
@@ -1258,26 +1356,19 @@
 .app__main .filters {
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  padding: 3px;
+  padding: var(--sws-space-4);
 }
 
+/*
+ * The pill is genuinely 44px rather than 34px with an invisible expander. The expander works
+ * until the row wraps — and the invoice filters are five pills on a 390px screen, so it wraps;
+ * stacked, each expander is clipped by the row above it and the target lands at 42. Same lesson
+ * as the sidebar rows: on anything that stacks, the trick gives back most of what it claims.
+ */
 .app__main .filters__btn {
-  min-height: 34px;
+  min-block-size: var(--sws-touch-target-min);
   padding-inline: var(--sws-space-12);
   font-size: var(--sws-font-size-body-sm);
-}
-
-/* The visible pill is 34px; the reach is the full 44 (ADR-0004). Filters sit in a row, so
-   the expanders grow sideways into the gap where nothing else is claiming the point. */
-.app__main .filters__btn {
-  position: relative;
-}
-
-.app__main .filters__btn::after {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block: calc((var(--sws-touch-target-min) - 34px) / -2);
 }
 
 .app__main .filters__btn.is-active {
@@ -1367,6 +1458,16 @@
   border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
 }
 
+/*
+ * A primary button in here is filled indigo and nothing else. `--sws-shadow-cta` is a coloured
+ * glow sized for a hero button on a marketing page; seventeen of them were burning on client-area
+ * screens, which is the same reason the cards were carrying a marketing drop shadow. Elevation in
+ * the app means "this floats above the page", and a button in a form does not.
+ */
+.app__main .btn--primary {
+  box-shadow: none;
+}
+
 /* Cancelling a service is not the same kind of act as upgrading one, and should not wear the
    same button. It stays quiet until you reach for it, then it is unmistakably red. */
 .btn--danger {
@@ -1387,14 +1488,49 @@
   gap: var(--sws-space-16);
 }
 
-.form__foot {
+/*
+ * One form footer. The client area had two: `.form__foot` here (start-aligned, 8 gap, a rule
+ * above it) and `.actions` from the marketing sheet (end-aligned, 12 gap, no rule) on the two
+ * ticket screens — so the same "submit or cancel" pair sat at opposite ends of the card
+ * depending on which screen you were on. `.actions` now resolves to this inside the app.
+ *
+ * `align-items: center` is the other half. `.btn--md` is a `min-block-size`, so in a stretching
+ * flex row a 44px button next to a 52px one grew to 52 — the class said `md` and the button
+ * rendered `lg`. The same stretch made the Affiliates copy button 48px, a height that is not on
+ * the button scale at all.
+ */
+.form__foot,
+.app__main .actions {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: var(--sws-space-8);
   flex-wrap: wrap;
   margin-block-start: var(--sws-space-8);
   padding-block-start: var(--sws-space-16);
   border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/*
+ * Every row that lays buttons out side by side centres them, so each keeps the height its size
+ * class declares instead of being stretched to its tallest neighbour. `align-items` on the row
+ * rather than `align-self` on the button: in a flex COLUMN — `.pick`, `.acts` — the cross axis
+ * is horizontal, and centring there would collapse the full-width buttons those two rely on.
+ */
+.app__head-actions,
+.due__actions,
+.copy-row,
+.row-actions {
+  align-items: center;
+}
+
+/*
+ * An action inside a stacked column takes its own width, the same as one in a form footer. Left
+ * to the grid it stretched edge to edge, so "Change password" was a full-width button on the
+ * same screen as an auto-width "Save changes" — two weights for the same kind of act.
+ */
+.app__main .stack > .btn {
+  justify-self: start;
 }
 
 .form__note {
@@ -1414,7 +1550,7 @@
   font-size: var(--sws-font-size-h2);
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .figure__unit {
@@ -1469,17 +1605,18 @@
   border-block-end: 0;
 }
 
+/* A card-scheme tile is small; it is not exempt from being legible. */
 .method-row__mark {
   display: grid;
   place-items: center;
-  inline-size: 46px;
+  inline-size: 52px;
   block-size: 32px;
   flex: none;
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-sm);
-  font-size: 10px;
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .method-row__num {
@@ -1494,6 +1631,26 @@
 
 .method-row__grow {
   flex: 1 1 auto;
+}
+
+
+/* A column of cards — announcements, and anything else that is a list of card-level things. */
+.cards {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+/* The heading inside an enrolment block: below a card heading, above its body. */
+.enrol__heading {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 700;
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+/* A contact carries a name where a saved card carries a scheme mark. */
+.method-row__name {
+  font-weight: 700;
+  min-inline-size: 9rem;
 }
 
 /* ── knowledgebase ─────────────────────────────────────────────────────────── */
@@ -1540,11 +1697,29 @@
 /* The screen title is in the head; this is the level below it, and it stays quiet so the
    cards under it read as the content rather than as a subordinate section of a page. */
 
+/*
+ * A section heading names a group of cards, so it sits a level ABOVE them — and it used to be
+ * set at exactly the same size, weight and tracking as `.card__heading`, which meant "Login
+ * history" and "Account details" were typographically indistinguishable while one contained the
+ * other. Two levels that look identical are one level.
+ *
+ * It takes the same treatment as the sidebar's group labels instead: a quiet small-caps label
+ * over its group. That reads as a level above without competing with the screen title, which is
+ * the only 20px thing on the screen.
+ */
 .app__section {
   margin-block: var(--sws-space-24) var(--sws-space-12);
-  font-size: var(--sws-font-size-body);
+  font-size: var(--sws-font-size-caption);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--sws-tracking-wide);
+  text-transform: uppercase;
+  color: var(--sws-text-secondary);
+}
+
+/* Arabic has no case, and tracking breaks the join between its letterforms. */
+:root[lang='ar'] .app__section {
+  letter-spacing: var(--sws-tracking-normal);
+  text-transform: none;
 }
 
 .app__section:first-child {
@@ -1578,6 +1753,19 @@
   margin-block-start: var(--sws-space-16);
 }
 
+/* A form that is a column of card-sections rather than one card: the sections carry the frames
+   and the footer sits below them, on the ground. */
+.form-stack {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+.form-stack > .form__foot {
+  margin-block-start: 0;
+  padding-block-start: 0;
+  border-block-start: 0;
+}
+
 .app__main .fieldset legend {
   font-size: var(--sws-font-size-body);
   font-weight: 700;
@@ -1596,6 +1784,59 @@
 
 .app__main .domain-search {
   margin-block-end: var(--sws-space-16);
+  align-items: center;
+}
+
+/* The marketing search pairs a 52px field with a 52px button. In here the field scale is 48 and
+   the button scale tops out at 44 for a form control, so the pair is set at the app's own two
+   heights and centred, exactly like every other field-plus-button row on these screens. */
+.app__main .domain-search__input {
+  min-block-size: var(--sws-input-height-md);
+}
+
+/*
+ * The knowledgebase list is shared with the marketing surfaces, where it is a stack of lifted
+ * cards. In here it is ruled rows inside one card, like every other list on these screens.
+ */
+.app__main .kb-item {
+  border-radius: var(--sws-radius-lg);
+  box-shadow: none;
+}
+
+/* ── a file field is a field ───────────────────────────────────────────────── */
+/*
+ * The design system declares a full set of file-uploader tokens — border, ground, height, focus
+ * ring — and nothing consumed a single one of them, so the attachment control on both ticket
+ * screens was raw browser chrome: a grey system button reading "Choose Files / No file chosen"
+ * in English, inside an Arabic right-to-left form, and the only unstyled control in the product.
+ *
+ * The button part cannot be replaced, but it can be made part of the field it lives in.
+ */
+.field[type='file'] {
+  padding-block: var(--sws-space-4);
+  padding-inline: var(--sws-space-12);
+  background: var(--sws-file-uploader-bg);
+  border-color: var(--sws-file-uploader-border);
+  font-size: var(--sws-font-size-body-sm);
+  cursor: pointer;
+}
+
+.field[type='file']::file-selector-button {
+  margin-inline-end: var(--sws-space-12);
+  min-block-size: var(--sws-button-height-sm);
+  padding-inline: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-button-secondary-border);
+  color: var(--sws-button-secondary-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.field[type='file']::file-selector-button:hover {
+  background: var(--sws-action-subtle-bg);
 }
 
 /* ── the invoice, which is a document before it is a screen ────────────────── */
@@ -1684,7 +1925,7 @@
 .pick__name {
   font-size: var(--sws-font-size-body);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--sws-tracking-snug);
 }
 
 .pick__price {
@@ -1694,14 +1935,14 @@
   flex-wrap: wrap;
   font-size: var(--sws-font-size-h3);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .pick__cycle {
   font-size: var(--sws-font-size-caption);
   font-weight: 500;
   color: var(--sws-text-secondary);
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .pick__specs {
@@ -1743,7 +1984,7 @@
 
 .swap__side {
   display: grid;
-  gap: 2px;
+  gap: var(--sws-space-4);
   flex: 1 1 9rem;
   padding: var(--sws-space-16);
   background: var(--sws-surface-sunken);
@@ -1882,7 +2123,8 @@
   content: '';
   position: absolute;
   inset-block: 0;
-  inset-inline-start: 5px;
+  /* The rail runs down the centre of the dot below, so it is derived from the dot. */
+  inset-inline-start: calc((11px - var(--sws-rule-hair)) / 2);
   inline-size: var(--sws-rule-hair);
   background: var(--sws-border-subtle);
 }
@@ -1939,7 +2181,7 @@
 
 .notifs {
   position: absolute;
-  inset-block-start: calc(100% + 6px);
+  inset-block-start: calc(100% + var(--sws-space-8));
   inset-inline-end: 0;
   z-index: 50;
   inline-size: min(22rem, calc(100vw - var(--sws-space-32)));
@@ -1990,9 +2232,13 @@
 
 /* Unread is a dot and a weight, not a colour on its own. */
 .notifs__dot {
-  inline-size: 7px;
-  block-size: 7px;
-  margin-block-start: 6px;
+  --dot: 7px;
+
+  inline-size: var(--dot);
+  block-size: var(--dot);
+  /* Centred on the first line of the label rather than on the block: 1.35 is that label’s
+     line-height, so the dot follows the type instead of a measured pixel. */
+  margin-block-start: calc((1.35em - var(--dot)) / 2);
   flex: none;
   border-radius: var(--sws-radius-pill);
   background: transparent;
@@ -2008,7 +2254,7 @@
 
 .notifs__text {
   display: grid;
-  gap: 2px;
+  gap: var(--sws-space-4);
   min-width: 0;
 }
 
@@ -2061,7 +2307,7 @@
 
 .method__note {
   display: block;
-  margin-block-start: 2px;
+  margin-block-start: var(--sws-space-4);
   font-size: var(--sws-font-size-caption);
   font-weight: 400;
   color: var(--sws-text-secondary);
@@ -2163,67 +2409,6 @@
     font-size: var(--sws-font-size-body-sm);
     color: var(--sws-text-secondary);
   }
-}
-
-/* ── what the 390px audit found in the app shell ───────────────────────────── */
-/*
- * These live here rather than in components.css because app.css loads last and was quietly
- * winning: the same fixes written once in the shared sheet had no effect at all.
- */
-
-/* 10px and 11px are not sizes, they are apologies. The badge especially — it is the number
-   that decides whether you open that section at all. */
-.app__mark {
-  inline-size: 34px;
-  block-size: 34px;
-  font-size: var(--sws-font-size-caption);
-  letter-spacing: 0;
-}
-
-.app__link-badge {
-  min-inline-size: 22px;
-  block-size: 22px;
-  font-size: var(--sws-font-size-caption);
-}
-
-/* Four pixels between two 44px targets is a gap one sixth the size of the thing it separates. */
-.app__tools {
-  gap: var(--sws-space-8);
-}
-
-/* A filter row is a row of separate decisions, so its pills are separable too. */
-.filters {
-  gap: var(--sws-space-8);
-}
-
-/*
- * The app's filter pills were 34px with a 44px expander, which works until the row wraps —
- * and the invoice filters are five pills on a 390px screen, so it wraps. Stacked, each
- * expander is clipped by the row above it and the target lands at 42.
- *
- * Same lesson as the sidebar rows: on anything that stacks, the expander gives back most of
- * what it claims. The pill is genuinely 44 now, and costs one row of height where it wraps.
- */
-.filters__btn,
-.app__main .filters__btn {
-  min-block-size: var(--sws-touch-target-min);
-}
-
-.app__main .filters__btn::after {
-  content: none;
-}
-
-/* The bell count is the smallest number on the screen and still has to be read. */
-.app__dot {
-  min-inline-size: 18px;
-  block-size: 18px;
-  font-size: var(--sws-font-size-caption);
-}
-
-/* A card-scheme tile is small; it is not exempt from being legible. */
-.method-row__mark {
-  font-size: var(--sws-font-size-caption);
-  inline-size: 52px;
 }
 
 /* ── filters become a scrolling strip on a phone ───────────────────────────── */

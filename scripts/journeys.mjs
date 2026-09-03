@@ -235,7 +235,7 @@ await journey('Renew a domain', [
 await journey('Open a ticket', [
   ['tickets', () => start('#/account/tickets')],
   ['new', () => click(['a[href*="tickets/new"]'])],
-  ['send', async () => { await satisfyRequired('form'); await click(['form button[type=submit]', '.actions .btn--lg']); }],
+  ['send', async () => { await satisfyRequired('form'); await click(['form button[type=submit]', '.form__foot .btn:not(.btn--quiet)', '.actions .btn--lg']); }],
 ]);
 
 /* ── M. order paid by bank transfer ─────────────────────────────────────────── */

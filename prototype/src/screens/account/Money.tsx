@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
+import { Tag } from '../../components/Tag';
 import { Button } from '../../components/Button';
 import {
   IconCheck,
@@ -114,9 +115,9 @@ export function Renew() {
                     <span className="term__name">{t(`cycle.${c}` as never)}</span>
                     <span className="term__price serial">{money(priceFor(c))}</span>
                     {CYCLE_META[c].save > 0 && (
-                      <span className="tag tag--ok">
+                      <Tag tone="ok">
                         {t('renew.save')} {CYCLE_META[c].save}%
-                      </span>
+                      </Tag>
                     )}
                   </label>
                 </li>
@@ -227,9 +228,7 @@ export function Transactions() {
                   <tr key={x.id}>
                     <td className="serial"><bdi>{x.at}</bdi></td>
                     <td>
-                      <span className={`tag tag--${x.kind === 'refund' ? 'due' : x.kind === 'credit' ? 'taken' : 'ok'}`}>
-                        {t(`txn.${x.kind}` as never)}
-                      </span>
+                      <Tag tone="neutral">{t(`txn.${x.kind}` as never)}</Tag>
                     </td>
                     <td className="serial">
                       {x.invoice ? <bdi>{x.invoice}</bdi> : <span className="muted">—</span>}

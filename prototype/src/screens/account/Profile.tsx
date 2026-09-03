@@ -2,7 +2,22 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconCopy, IconPlus, IconCheck, IconKey, IconUsers } from '../../components/icons';
+import { Card } from '../../components/Card';
+import { StatRow, type StatItem } from '../../components/Stat';
+import { Tag } from '../../components/Tag';
+import {
+  IconCopy,
+  IconPlus,
+  IconCheck,
+  IconKey,
+  IconUsers,
+  IconMegaphone,
+  IconLink,
+  IconGauge,
+  IconShield,
+  IconCoin,
+  IconWallet,
+} from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
@@ -25,17 +40,19 @@ export function Announcements() {
 
   return (
     <AccountLayout title={t('acc.news')}>
-      <ul className="news">
+      {/* One announcement, one card — the same card the rest of the client area is built from.
+          These used to be `.news__item--panel`, a marketing panel at 24px corners on a drop
+          shadow, so this screen read as a page from a different product to the one beside it. */}
+      <div className="cards">
         {ANNOUNCEMENTS.map((n) => (
-          <li className="news__item news__item--panel" key={n.id}>
+          <Card heading={t(n.titleKey as never)} icon={<IconMegaphone size={17} />} key={n.id}>
             <p className="news__date serial">
               <bdi>{n.date}</bdi>
             </p>
-            <h2 className="card__heading">{t(n.titleKey as never)}</h2>
             <p className="card__body">{t(n.bodyKey as never)}</p>
-          </li>
+          </Card>
         ))}
-      </ul>
+      </div>
     </AccountLayout>
   );
 }
@@ -48,18 +65,20 @@ export function Affiliates() {
 
   // The unit is a separate span, not part of the number: joined into one string it wraps to a
   // second line at this type size and makes two of the four tiles taller than the others.
-  const stats = [
-    { key: 'aff.visits', v: String(AFFILIATE.visits) },
-    { key: 'aff.signups', v: String(AFFILIATE.signups) },
+  const stats: StatItem[] = [
+    { label: t('aff.visits'), n: AFFILIATE.visits, icon: <IconGauge size={16} /> },
+    { label: t('aff.signups'), n: AFFILIATE.signups, icon: <IconUsers size={16} /> },
     {
-      key: 'aff.commission',
-      v: formatAmount(convert(AFFILIATE.commissionUsdMinor, currency), locale),
+      label: t('aff.commission'),
+      n: formatAmount(convert(AFFILIATE.commissionUsdMinor, currency), locale),
       unit: currency,
+      icon: <IconCoin size={16} />,
     },
     {
-      key: 'aff.balance',
-      v: formatAmount(convert(AFFILIATE.balanceUsdMinor, currency), locale),
+      label: t('aff.balance'),
+      n: formatAmount(convert(AFFILIATE.balanceUsdMinor, currency), locale),
       unit: currency,
+      icon: <IconWallet size={16} />,
     },
   ];
 
@@ -73,22 +92,12 @@ export function Affiliates() {
         </Link>
       }
     >
-      <ul className="tiles">
-        {stats.map((s) => (
-          <li key={s.key}>
-            <span className="tile tile--static">
-              <span className="tile__n serial">
-                {s.v}
-                {s.unit && <span className="tile__unit">{s.unit}</span>}
-              </span>
-              <span className="tile__label">{t(s.key as never)}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
+      {/* The same four-figure row the dashboard opens with. It used to be `.tiles` — the
+          marketing tile, 24px corners on a drop shadow with the figure a step larger — so the
+          two screens in the product that open with four counts opened differently. */}
+      <StatRow items={stats} />
 
-      <div className="card">
-        <h2 className="card__heading">{t('aff.link')}</h2>
+      <Card heading={t('aff.link')} icon={<IconLink size={17} />}>
         <div className="copy-row">
           <input className="field serial" dir="ltr" readOnly value={AFFILIATE.link} />
           <Button
@@ -109,7 +118,7 @@ export function Affiliates() {
             {t(copied ? 'aff.copied' : 'aff.copy')}
           </Button>
         </div>
-      </div>
+      </Card>
     </AccountLayout>
   );
 }
@@ -139,8 +148,7 @@ export function Security() {
     <AccountLayout title={t('acc.security')}>
       <SavedNote saved={saved} onDismiss={clear} />
       <div className="split">
-        <div className="card">
-          <h2 className="card__heading">{t('sec.details')}</h2>
+        <Card heading={t('sec.details')} icon={<IconUsers size={17} />}>
           <div className="field-grid">
             <label className="field-label">
               <span className="eyebrow">{t('checkout.name')}</span>
@@ -167,13 +175,12 @@ export function Security() {
               <input className="field serial" dir="ltr" defaultValue={ACCOUNT.postcode} />
             </label>
           </div>
-          <div className="actions actions--split">
+          <div className="form__foot">
             <Button size="md" onClick={() => mark()}>{t('sec.save')}</Button>
           </div>
-        </div>
+        </Card>
 
-        <div className="card">
-          <h2 className="card__heading">{t('sec.access')}</h2>
+        <Card heading={t('sec.access')} icon={<IconShield size={17} />}>
           <div className="stack">
             <label className="field-label">
               <span className="eyebrow">{t('sec.newPassword')}</span>
@@ -254,7 +261,7 @@ export function Security() {
                   />
                 </label>
 
-                <div className="actions actions--split">
+                <div className="form__foot">
                   <Button
                     size="md"
                     variant="quiet"
@@ -285,7 +292,7 @@ export function Security() {
 
             {twofa && (
               <div className="enrol">
-                <h3 className="card__heading">{t('sec.backup')}</h3>
+                <h3 className="enrol__heading">{t('sec.backup')}</h3>
                 <p className="card__body">{t('sec.backupNote')}</p>
                 <ul className="codes">
                   {BACKUP_CODES.map((c) => (
@@ -297,7 +304,7 @@ export function Security() {
               </div>
             )}
           </div>
-        </div>
+        </Card>
       </div>
 
       <h2 className="app__section">{t('sec.log')}</h2>
@@ -318,9 +325,7 @@ export function Security() {
                 <td className="serial"><bdi>{l.ip}</bdi></td>
                 <td>{bi(l.where)}</td>
                 <td>
-                  <span className={`tag tag--${l.ok ? 'ok' : 'due'}`}>
-                    {t(l.ok ? 'sec.ok' : 'sec.failed')}
-                  </span>
+                  <Tag tone={l.ok ? 'ok' : 'bad'}>{t(l.ok ? 'sec.ok' : 'sec.failed')}</Tag>
                 </td>
               </tr>
             ))}
@@ -363,25 +368,54 @@ export function Contacts() {
       ),
     );
 
+  const add = () => {
+    // A new contact starts with nothing granted and opens straight into its own permission
+    // list, because choosing them is the reason for adding one.
+    const id = `ct-new-${rows.length}`;
+    setRows((all) => [
+      ...all,
+      {
+        id,
+        name: { ar: 'جهة جديدة', en: 'New contact' },
+        email: 'new@atelier-kamal.com',
+        permissions: [],
+      },
+    ]);
+    setEditing(id);
+  };
+
   return (
-    <AccountLayout title={t('acc.contacts')} lede={t('con.lede')}>
+    <AccountLayout
+      title={t('acc.contacts')}
+      lede={t('con.lede')}
+      actions={
+        <Button size="md" variant="secondary" onClick={add}>
+          <IconPlus size={15} />
+          {t('con.add')}
+        </Button>
+      }
+    >
       <SavedNote saved={saved} onDismiss={clear} />
 
+      {/* One list, one card, hairline-ruled rows — the same shape as the saved cards on Payment
+          methods. These were `.pm`: separate shadowed panels floating on the ground, so two
+          screens doing the identical job (a list of saved things, each with edit and remove)
+          were built out of two different components. */}
       {rows.length > 0 ? (
-        <ul className="cards-list">
+        <div className="card card--flush">
           {rows.map((c) => (
-            <li className="contact" key={c.id}>
-              <div className="pm">
-                <span className="pm__brand">{bi(c.name)}</span>
-                <span className="pm__num serial">
+            <div className="contact" key={c.id}>
+              <div className="method-row">
+                <span className="method-row__name">{bi(c.name)}</span>
+                <span className="method-row__exp serial">
                   <bdi>{c.email}</bdi>
                 </span>
                 <span className="perm-list">
                   {c.permissions.length > 0 ? (
                     c.permissions.map((p) => (
-                      <span className="tag tag--taken" key={p}>
+                      <Tag tone="neutral" key={p}>
                         {t(`perm.${p}` as never)}
-                      </span>
+                      </Tag>
                     ))
                   ) : (
                     /* A contact with nothing ticked can still sign in, so saying so is
@@ -427,7 +461,7 @@ export function Contacts() {
                       </label>
                     ))}
                   </div>
-                  <div className="actions actions--split">
+                  <div className="form__foot">
                     <Button
                       size="sm"
                       onClick={() => {
@@ -440,9 +474,9 @@ export function Contacts() {
                   </div>
                 </fieldset>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
         <div className="card empty">
           <IconUsers size={28} />
@@ -451,30 +485,6 @@ export function Contacts() {
         </div>
       )}
 
-      <div className="actions actions--split">
-        <Button
-          size="md"
-          variant="secondary"
-          onClick={() => {
-            // A new contact starts with nothing granted and opens straight into its own
-            // permission list, because choosing them is the reason for adding one.
-            const id = `ct-new-${rows.length}`;
-            setRows((all) => [
-              ...all,
-              {
-                id,
-                name: { ar: 'جهة جديدة', en: 'New contact' },
-                email: 'new@atelier-kamal.com',
-                permissions: [],
-              },
-            ]);
-            setEditing(id);
-          }}
-        >
-          <IconPlus size={15} />
-          {t('con.add')}
-        </Button>
-      </div>
     </AccountLayout>
   );
 }

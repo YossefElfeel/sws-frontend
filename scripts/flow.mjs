@@ -283,12 +283,12 @@ await p.waitForSelector('.switch-row input');
   const enrolShown = (await p.$$('.enrol .slot')).length === 1;
   ok('two-factor asks to enrol rather than just flipping', !before && enrolShown);
 
-  const gated = await p.$$eval('.enrol .actions .btn', (n) => n.some((b) => b.disabled));
+  const gated = await p.$$eval('.enrol .form__foot .btn', (n) => n.some((b) => b.disabled));
   ok('confirm is refused without a code', gated);
 
   await p.fill('.enrol input[inputmode=numeric]', '428913');
   await p.waitForTimeout(100);
-  await p.click('.enrol .actions .btn:not(.btn--quiet)');
+  await p.click('.enrol .form__foot .btn:not(.btn--quiet)');
   await p.waitForTimeout(200);
   const codes = await p.$$eval('.codes li', (n) => n.length);
   const on = await p.$eval('.switch-row input', (e) => e.checked);
@@ -299,8 +299,10 @@ await p.waitForSelector('.switch-row input');
 await p.evaluate(() => (location.hash = '#/account/contacts'));
 await p.waitForSelector('.perm-list');
 {
-  const before = await p.$$eval('.cards-list > li:first-child .perm-list .tag', (n) => n.length);
-  await p.click('.cards-list > li:first-child .btn--secondary');
+  // The list is one flush card of ruled rows now, the same shape as the saved cards on
+  // Payment methods, so the contact is a .contact inside it rather than an <li> of its own.
+  const before = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
+  await p.click('.contact:first-child .btn--secondary');
   await p.waitForTimeout(150);
   const boxes = await p.$$('.perm-edit__row input');
   ok('a contact opens a permission list', boxes.length > 0, `${boxes.length} permissions`);
@@ -308,7 +310,7 @@ await p.waitForSelector('.perm-list');
   const unchecked = await p.$$eval('.perm-edit__row input', (n) => n.findIndex((b) => !b.checked));
   await boxes[unchecked].click();
   await p.waitForTimeout(150);
-  const after = await p.$$eval('.cards-list > li:first-child .perm-list .tag', (n) => n.length);
+  const after = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
   ok('granting one shows it on the contact', after === before + 1, `${before} -> ${after}`);
 }
 
@@ -441,7 +443,7 @@ await p.waitForSelector('#reply');
 {
   const before = await p.$$eval('.thread .msg', (n) => n.length);
   await p.fill('#reply', 'شكرًا، جربت وشغال.');
-  await p.click('.card .actions .btn--lg');
+  await p.click('.card .form__foot .btn:not(.btn--quiet)');
   await p.waitForTimeout(200);
   const after = await p.$$eval('.thread .msg', (n) => n.length);
   ok('a sent reply joins the thread', after === before + 1, `${before} -> ${after}`);
@@ -452,7 +454,7 @@ await p.waitForSelector('#reply');
   ok('a reply can carry files, and a message shows them', replyFiles > 0 && shownFiles > 0,
     `${replyFiles} field, ${shownFiles} shown`);
 
-  await p.click('.card .actions .btn--quiet');
+  await p.click('.card .form__foot .btn--quiet');
   await p.waitForTimeout(150);
   const boxGone = (await p.$$('#reply')).length === 0;
   ok('closing a ticket removes the reply box', boxGone);

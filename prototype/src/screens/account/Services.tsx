@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
+import { Tag, SERVICE_TONE } from '../../components/Tag';
 import { IconArrow, IconExternal, IconServer, IconSupport } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
@@ -73,9 +74,7 @@ export function Services() {
                     {formatAmount(convert(s.amountUsdMinor, currency), locale)} {currency}
                   </td>
                   <td>
-                    <span className={`tag tag--${s.status === 'active' ? 'ok' : 'taken'}`}>
-                      {t(`status.${s.status}` as never)}
-                    </span>
+                    <Tag tone={SERVICE_TONE[s.status]}>{t(`status.${s.status}` as never)}</Tag>
                   </td>
                   <td className="num">
                     <Link className="btn btn--sm btn--secondary" to={`/account/services/${s.id}`}>
@@ -192,9 +191,7 @@ export function ServiceDetail() {
               <div>
                 <dt>{t('account.status')}</dt>
                 <dd>
-                  <span className={`tag tag--${svc.status === 'active' ? 'ok' : 'taken'}`}>
-                    {t(`status.${svc.status}` as never)}
-                  </span>
+                  <Tag tone={SERVICE_TONE[svc.status]}>{t(`status.${svc.status}` as never)}</Tag>
                 </dd>
               </div>
             </dl>

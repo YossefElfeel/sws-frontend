@@ -61,7 +61,7 @@ export function Home() {
 
         <ul className="plans">
           {features.map((f) => (
-            <li className="card" key={f.title}>
+            <li className="card card--lifted" key={f.title}>
               <span className="card__tile" aria-hidden="true">
                 {f.icon}
               </span>
