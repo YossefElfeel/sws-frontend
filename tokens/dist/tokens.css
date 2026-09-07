@@ -177,6 +177,13 @@
   --sws-font-family-arabic: Rubik;
   --sws-font-family-stack: Rubik, system-ui, -apple-system, sans-serif;
 
+  /* ── tracking — the one axis the type scale was missing, so components each invented their own ── */
+  --sws-tracking-tight: -0.02em;
+  --sws-tracking-snug: -0.01em;
+  --sws-tracking-normal: 0;
+  --sws-tracking-wide: 0.06em;
+  --sws-tracking-widest: 0.4em;
+
   /* ── rule weights — the ledger is built from ruled lines, so these are structural ── */
   --sws-rule-hair: 1px;
   --sws-rule-base: 2px;

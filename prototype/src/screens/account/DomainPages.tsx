@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { DomainPage } from '../../components/DomainRail';
 import { Button } from '../../components/Button';
+import { Tag, DOMAIN_TONE } from '../../components/Tag';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import {
   IconPlus,
   IconTrash,
@@ -104,9 +106,7 @@ export function DomainOverview() {
               <div>
                 <dt>{t('account.status')}</dt>
                 <dd>
-                  <span className={`tag tag--${dom.status === 'active' ? 'ok' : 'due'}`}>
-                    {t(`dom.${dom.status}` as never)}
-                  </span>
+                  <Tag tone={DOMAIN_TONE[dom.status]}>{t(`dom.${dom.status}` as never)}</Tag>
                 </dd>
               </div>
             </dl>
@@ -320,9 +320,18 @@ export function DomainDns() {
   const [host, setHost] = useState('');
   const [value, setValue] = useState('');
   const [ttl, setTtl] = useState(3600);
+  const [dnsQ, setDnsQ] = useState('');
+  const [dnsType, setDnsType] = useState('all');
 
   if (!dom) return <Navigate to="/account/domains" replace />;
   const rows = dns[dom.id] ?? [];
+
+  // The record types actually present, not every type DNS defines: a filter offering SRV on a
+  // zone with no SRV record is four clicks to an empty table.
+  const dnsTypes = ['all', ...new Set(rows.map((r) => r.type))];
+  const dnsRows = rows.filter(
+    (r) => (dnsType === 'all' || r.type === dnsType) && matches(dnsQ, r.type, r.host, r.value),
+  );
 
   return (
     <DomainPage dom={dom} sectionKey="dom.dns">
@@ -347,6 +356,10 @@ export function DomainDns() {
         onSubmit={(e) => {
           e.preventDefault();
           if (!host.trim() || !value.trim()) return;
+          // The toolbar resets with the new row, or a zone filtered to MX would answer Add
+          // Record by appending an A record you cannot see.
+          setDnsQ('');
+          setDnsType('all');
           setDns(dom.id, [
             ...rows,
             { id: `dns-${Date.now()}`, type, host: host.trim(), value: value.trim(), ttl },
@@ -419,6 +432,24 @@ export function DomainDns() {
           <header className="card__head card__head--flush">
             <h2 className="card__heading">{t('dom.dns')}</h2>
           </header>
+          <TableToolbar
+            inset
+            value={dnsQ}
+            onChange={setDnsQ}
+            label={t('search.dns')}
+            shown={dnsRows.length}
+            total={rows.length}
+          >
+            <TableFilter
+              label={t('filter.recordType')}
+              value={dnsType}
+              onChange={setDnsType}
+              options={dnsTypes.map((ty) => ({
+                value: ty,
+                label: ty === 'all' ? t('filter.allTypes') : ty,
+              }))}
+            />
+          </TableToolbar>
           <div className="table-scroll">
             <table className="data">
               <thead>
@@ -431,7 +462,7 @@ export function DomainDns() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {dnsRows.map((r) => (
                   <tr key={r.id}>
                     <td><span className="lead serial">{r.type}</span></td>
                     <td className="serial"><bdi>{r.host}</bdi></td>
@@ -455,6 +486,14 @@ export function DomainDns() {
               </tbody>
             </table>
           </div>
+          {/* A zone with records but none matching says so inside the card, so the table's
+              head stays where it was rather than the card collapsing to a notice. */}
+          {dnsRows.length === 0 && (
+            <div className="empty empty--inset">
+              <p className="empty__title">{t(dnsQ.trim() ? 'empty.search' : 'empty.dns')}</p>
+              <p className="empty__note">{t(dnsQ.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
+            </div>
+          )}
         </section>
       ) : (
         <div className="card empty">
@@ -870,25 +909,27 @@ export function DomainAddonsPage() {
       <SavedNote saved={saved} onDismiss={clear} />
       <p className="card__body u-mb-16">{t('dom.addonsLede')}</p>
 
-      <div className="cards-list">
+      {/* The same ruled rows the contacts list wears: name, the facts beside it, the state,
+          then the actions at the far end. */}
+      <div className="card card--flush">
         {rows.map((r) => (
-          <div className="pm" key={r.key}>
-            <span className="pm__text">
-              <span className="pm__brand">{t(r.titleKey as never)}</span>
-              <span className="pm__num">{t(r.noteKey as never)}</span>
-              <span className="pm__exp serial">
-                {formatAmount(0, locale)} {currency} / {t('domainsconf.perYear')}
-              </span>
-            </span>
-            <span className="method-row__grow">
-              {r.on && (
-                <span className="tag tag--ok">
-                  <IconCheck size={13} />
-                  {t('dom.enabled')}
+          <div className="contact" key={r.key}>
+            <div className="method-row">
+              <span className="addon-row__text">
+                <span className="method-row__name">{t(r.titleKey as never)}</span>
+                <span className="method-row__exp">{t(r.noteKey as never)}</span>
+                <span className="method-row__exp serial">
+                  {formatAmount(0, locale)} {currency} / {t('domainsconf.perYear')}
                 </span>
-              )}
-            </span>
-            <span className="pm__acts">
+              </span>
+              <span className="method-row__grow">
+                {r.on && (
+                  <Tag tone="ok">
+                    <IconCheck size={13} />
+                    {t('dom.enabled')}
+                  </Tag>
+                )}
+              </span>
               {r.on && r.manage && (
                 <Link className="btn btn--sm btn--secondary" to={r.manage}>
                   {t('svc.manage')}
@@ -904,7 +945,7 @@ export function DomainAddonsPage() {
               >
                 {t(r.on ? 'dom.disable' : 'dom.enable')}
               </Button>
-            </span>
+            </div>
           </div>
         ))}
       </div>

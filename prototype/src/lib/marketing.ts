@@ -170,9 +170,15 @@ export const POST_CATEGORIES = ['all', 'start', 'domains', 'email', 'wordpress']
 
 /* ── contact: M-18 ──────────────────────────────────────────────────────────── */
 
+/*
+ * Two of these three cards used to open a client-area screen, which put a signed-out visitor
+ * inside the account shell — reading someone else's name in the sidebar. A public page sends
+ * people to public destinations: the ticket card offers the door, and written answers come
+ * from the learning centre rather than from the knowledgebase that lives behind sign-in.
+ */
 export const CONTACT_CHANNELS = [
-  { id: 'ticket', titleKey: 'ct.ticket', bodyKey: 'ct.ticketBody', to: '/account/tickets/new' },
-  { id: 'kb', titleKey: 'ct.kb', bodyKey: 'ct.kbBody', to: '/account/knowledgebase' },
+  { id: 'ticket', titleKey: 'ct.ticket', bodyKey: 'ct.ticketBody', to: '/login' },
+  { id: 'kb', titleKey: 'blog.title', bodyKey: 'ct.kbBody', to: '/learn' },
   { id: 'status', titleKey: 'ct.status', bodyKey: 'ct.statusBody', to: '/status' },
 ];
 

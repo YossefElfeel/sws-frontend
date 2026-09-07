@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
+import { Tag, INVOICE_TONE } from '../../components/Tag';
 import { DevNote } from '../../components/DevNote';
 import { GatewayDetails } from '../../components/GatewayDetails';
 import {
@@ -12,6 +14,7 @@ import {
   IconWallet,
   IconAlert,
 } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
@@ -41,9 +44,16 @@ const FILTERS: (InvoiceStatus | 'all')[] = ['all', 'unpaid', 'paid', 'overdue', 
 export function Invoices() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const [q, setQ] = useState('');
   const [filter, setFilter] = useState<InvoiceStatus | 'all'>('all');
 
-  const rows = INVOICES.filter((i) => filter === 'all' || i.status === filter);
+  // An invoice is looked up by its number or by what it was for, so the line items are part of
+  // the haystack: "the one with the .eg domain on it" is how people describe an invoice.
+  const rows = INVOICES.filter(
+    (i) =>
+      (filter === 'all' || i.status === filter) &&
+      matches(q, i.number, i.date, i.due, ...i.lines.map((l) => `${l.product} ${l.domain ?? ''}`)),
+  );
   const owing = INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
   const owed = owing.reduce((s, i) => s + i.totalUsdMinor, 0);
 
@@ -64,14 +74,22 @@ export function Invoices() {
     >
       {/* What is owed belongs above the list of everything ever billed, not inside it. */}
       {owing.length > 0 && (
-        <section className="card card--urgent u-mb-16">
+        <Card
+          tone="urgent"
+          heading={t('dash.needsYou')}
+          icon={<IconAlert size={17} />}
+          className="u-mb-16"
+        >
           <div className="due">
-            <p className="due__amount serial">
-              {formatAmount(convert(owed, currency), locale)} {currency}
-            </p>
-            <p className="due__note">
-              <IconAlert size={14} /> {t('dash.dueNote')}
-            </p>
+            <div className="due__text">
+              <p className="due__amount serial">
+                {formatAmount(convert(owed, currency), locale)} {currency}
+              </p>
+              <p className="due__note">
+                <IconAlert size={14} />
+                <span>{t('dash.dueNote')}</span>
+              </p>
+            </div>
             <div className="due__actions">
               <Link className="btn btn--md btn--primary" to={`/account/invoices/${owing[0].id}`}>
                 {t('account.pay')}
@@ -79,34 +97,32 @@ export function Invoices() {
               </Link>
             </div>
           </div>
-        </section>
+        </Card>
       )}
 
-      <div className="bar">
-        <div className="filters" role="group" aria-label={t('account.status')}>
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              type="button"
-              className={`filters__btn${filter === f ? ' is-active' : ''}`}
-              aria-pressed={filter === f}
-              onClick={() => setFilter(f)}
-            >
-              {t(`inv.${f}` as never)}
-            </button>
-          ))}
-        </div>
-        <p className="bar__count">
-          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{INVOICES.length}</span>
-        </p>
-      </div>
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.invoices')}
+        shown={rows.length}
+        total={INVOICES.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={filter}
+          onChange={setFilter}
+          options={FILTERS.map((f) => ({
+            value: f,
+            label: t(f === 'all' ? 'filter.allStatuses' : (`inv.${f}` as never)),
+          }))}
+        />
+      </TableToolbar>
 
       {rows.length === 0 ? (
         <div className="card empty">
           <IconInvoice size={28} />
-          <p className="empty__title">{t('inv.none')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
+          <p className="empty__title">{t(q.trim() ? 'empty.search' : 'inv.none')}</p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       ) : (
         <div className="card card--flush table-scroll">
@@ -131,9 +147,7 @@ export function Invoices() {
                     {formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}
                   </td>
                   <td>
-                    <span className={`tag tag--${inv.status === 'paid' ? 'ok' : inv.status === 'cancelled' ? 'taken' : 'due'}`}>
-                      {t(`inv.${inv.status}` as never)}
-                    </span>
+                    <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
                   </td>
                   <td className="num">
                     <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
@@ -198,7 +212,6 @@ export function InvoiceDetail() {
   // The credit choice travels with the invoice, so the next screen asks for the figure shown here.
   const payHref = `${dest}${dest.includes('?') ? '&' : '?'}invoice=${inv.id}${useCredit ? '&credit=1' : ''}`;
   const country = COUNTRIES.find((c) => c.code === ACCOUNT.country)?.label ?? ACCOUNT.country;
-  const tagFor = (s: InvoiceStatus) => (s === 'paid' ? 'ok' : s === 'cancelled' ? 'taken' : 'due');
 
   /**
    * The product name and the domain stay as written; only the cycle is a word, so only the
@@ -255,7 +268,7 @@ export function InvoiceDetail() {
                 <span className="serial">
                   <bdi>{inv.number}</bdi>
                 </span>{' '}
-                <span className={`tag tag--${tagFor(inv.status)}`}>{t(`inv.${inv.status}` as never)}</span>
+                <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
               </p>
               <dl className="kv">
                 <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
@@ -385,9 +398,9 @@ export function InvoiceDetail() {
                         <tr key={x.id}>
                           <td className="serial"><bdi>{x.at}</bdi></td>
                           <td>
-                            <span className={`tag tag--${x.kind === 'refund' ? 'due' : x.kind === 'credit' ? 'taken' : 'ok'}`}>
+                            <Tag tone={x.kind === 'refund' ? 'bad' : x.kind === 'credit' ? 'neutral' : 'ok'}>
                               {t(`txn.${x.kind}` as never)}
-                            </span>
+                            </Tag>
                           </td>
                           <td>{g ? t(g.labelKey as never) : x.gateway === 'credit' ? t('pay.credit') : x.gateway}</td>
                           <td className="serial"><bdi>{x.reference}</bdi></td>
@@ -684,10 +697,10 @@ export function PaymentMethods() {
               </span>
               <span className="method-row__grow">
                 {m.primary && (
-                  <span className="tag tag--ok">
+                  <Tag tone="ok">
                     <IconCheck size={13} />
                     {t('pm.primary')}
-                  </span>
+                  </Tag>
                 )}
               </span>
               {!m.primary && (

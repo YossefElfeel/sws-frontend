@@ -258,11 +258,19 @@
 
 /* ── tags ──────────────────────────────────────────────────────────────────── */
 
+/*
+ * Four tones, in one ladder: ok · warn · bad · neutral. See components/Tag.tsx for which state
+ * takes which — the screens pass a tone and never a colour, which is what stopped an open
+ * ticket being green on one screen and grey on the next.
+ *
+ * `due` and `taken` are the marketing vocabulary for the domain search (a name is free or it is
+ * taken) and are kept as aliases so those screens keep reading in their own language.
+ */
 .tag {
   display: inline-flex;
   align-items: center;
   gap: var(--sws-space-4);
-  padding: 3px var(--sws-space-12);
+  padding: var(--sws-space-4) var(--sws-space-12);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-caption);
   font-weight: 600;
@@ -274,13 +282,27 @@
   color: var(--sws-status-success);
 }
 
+.tag--warn {
+  background: var(--sws-banner-warning-bg);
+  color: var(--sws-status-warning);
+}
+
+.tag--bad,
 .tag--due {
   background: var(--sws-banner-danger-bg);
   color: var(--sws-status-danger);
 }
 
+/*
+ * The quiet tone. It takes the raised ground with a hairline rather than the sunken one: in dark
+ * `surface-sunken` is the page colour, so a sunken chip on a raised card punched a hole through
+ * the card instead of sitting on it — the chip's relationship to its own card inverted between
+ * the two themes.
+ */
+.tag--neutral,
 .tag--taken {
-  background: var(--sws-surface-sunken);
+  background: var(--sws-surface-raised);
+  box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-border-subtle);
   color: var(--sws-text-secondary);
 }
 
@@ -650,11 +672,6 @@
 .headline--taken {
   background: var(--sws-banner-info-bg);
   color: var(--sws-status-info);
-}
-
-.tag--warn {
-  background: var(--sws-banner-warning-bg);
-  color: var(--sws-status-warning);
 }
 
 .headline svg {

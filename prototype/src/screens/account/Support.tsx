@@ -1,17 +1,28 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
+import { Card } from '../../components/Card';
+import { Tag, TICKET_TONE, PRIORITY_TONE } from '../../components/Tag';
 import { StatusHeadline, SystemList, IncidentList, worstOf } from '../../components/StatusBoard';
 import {
   IconArrow,
   IconPlus,
-  IconSearch,
   IconBook,
   IconSupport,
   IconCheck,
   IconInfo,
+  IconPaperclip,
+  IconBold,
+  IconItalic,
+  IconHeading,
+  IconLink,
+  IconList,
+  IconListNumbered,
+  IconCode,
+  IconQuote,
 } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import {
@@ -19,49 +30,113 @@ import {
   DEPARTMENTS,
   PRIORITIES,
   ARTICLES,
+  KB_CATEGORIES,
+  SERVICES,
   type TicketStatus,
 } from '../../lib/account';
 import { SYSTEMS, INCIDENTS } from '../../lib/marketing';
 
 const STATUSES: (TicketStatus | 'all')[] = ['all', 'open', 'answered', 'closed'];
 
-/** Ticket list — spec 9.5.1: filtered by status, department and priority. */
+/**
+ * Ticket list — spec 9.5.1, which asks for three filters, not one: status, department and
+ * priority.
+ *
+ * All three are selects, matching every other list in the client area: they share the row with
+ * a search field, and three pill strips would be eleven pills competing with it for width.
+ * Three filters plus a query means an empty result is easy to reach, so the empty state has to
+ * offer the way back out rather than only offering a new ticket.
+ */
 export function Tickets() {
   const { t, bi } = useLocale();
+  const [q, setQ] = useState('');
   const [status, setStatus] = useState<TicketStatus | 'all'>('all');
+  const [dept, setDept] = useState('all');
+  const [priority, setPriority] = useState('all');
 
-  const rows = TICKETS.filter((x) => status === 'all' || x.status === status);
+  // Subjects are authored in both languages, so both are searched: someone reading the Arabic
+  // list still remembers the ticket they opened in English.
+  const rows = TICKETS.filter(
+    (x) =>
+      (status === 'all' || x.status === status) &&
+      (dept === 'all' || x.department === dept) &&
+      (priority === 'all' || x.priority === priority) &&
+      matches(q, x.subject.ar, x.subject.en, x.ref, x.updated),
+  );
+
+  const narrowed = q.trim() !== '' || status !== 'all' || dept !== 'all' || priority !== 'all';
+  const showAll = () => {
+    setQ('');
+    setStatus('all');
+    setDept('all');
+    setPriority('all');
+  };
 
   return (
-    <AccountLayout title={t('acc.tickets')}>
-      <div className="toolbar">
-        <div className="filters" role="group" aria-label={t('account.status')}>
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              type="button"
-              className={`filters__btn${status === s ? ' is-active' : ''}`}
-              aria-pressed={status === s}
-              onClick={() => setStatus(s)}
-            >
-              {t(`tkt.${s}` as never)}
-            </button>
-          ))}
-        </div>
+    /* Opening a ticket moves up to the header action, where every other list keeps its one
+       primary verb — the toolbar row below is now the search, and only the search. */
+    <AccountLayout
+      title={t('acc.tickets')}
+      actions={
         <Link className="btn btn--md btn--primary" to="/account/tickets/new">
           <IconPlus size={15} />
           {t('tkt.open')}
         </Link>
-      </div>
+      }
+    >
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.tickets')}
+        shown={rows.length}
+        total={TICKETS.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={status}
+          onChange={setStatus}
+          options={STATUSES.map((s) => ({
+            value: s,
+            label: t(s === 'all' ? 'filter.allStatuses' : (`tkt.${s}` as never)),
+          }))}
+        />
+        <TableFilter
+          label={t('tkt.department')}
+          value={dept}
+          onChange={setDept}
+          options={[
+            { value: 'all', label: t('filter.allDepartments') },
+            ...DEPARTMENTS.map((d) => ({ value: d.id, label: t(d.nameKey as never) })),
+          ]}
+        />
+        <TableFilter
+          label={t('tkt.priority')}
+          value={priority}
+          onChange={setPriority}
+          options={[
+            { value: 'all', label: t('filter.allPriorities') },
+            ...PRIORITIES.map((p) => ({ value: p, label: t(`prio.${p}` as never) })),
+          ]}
+        />
+      </TableToolbar>
 
       {rows.length === 0 ? (
         <div className="card empty">
           <IconSupport size={28} />
-          <p className="empty__title">{t('tkt.none')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
-          <Link className="btn btn--lg btn--primary" to="/account/tickets/new">
-            {t('tkt.open')}
-          </Link>
+          <p className="empty__title">
+            {t(q.trim() ? 'empty.search' : narrowed ? 'tkt.noneFilter' : 'tkt.none')}
+          </p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
+          <div className="actions actions--split">
+            {narrowed && (
+              <Button size="lg" variant="secondary" onClick={showAll}>
+                {t('tkt.showAll')}
+              </Button>
+            )}
+            <Link className="btn btn--lg btn--primary" to="/account/tickets/new">
+              {t('tkt.open')}
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="card card--flush table-scroll">
@@ -85,15 +160,11 @@ export function Tickets() {
                   </td>
                   <td>{t(`dept.${x.department}` as never)}</td>
                   <td>
-                    <span className={`tag tag--${x.priority === 'high' ? 'due' : 'taken'}`}>
-                      {t(`prio.${x.priority}` as never)}
-                    </span>
+                    <Tag tone={PRIORITY_TONE[x.priority]}>{t(`prio.${x.priority}` as never)}</Tag>
                   </td>
                   <td className="serial"><bdi>{x.updated}</bdi></td>
                   <td>
-                    <span className={`tag tag--${x.status === 'closed' ? 'taken' : 'ok'}`}>
-                      {t(`tkt.${x.status}` as never)}
-                    </span>
+                    <Tag tone={TICKET_TONE[x.status]}>{t(`tkt.${x.status}` as never)}</Tag>
                   </td>
                   <td className="num">
                     <Link className="btn btn--sm btn--secondary" to={`/account/tickets/${x.id}`}>
@@ -123,8 +194,19 @@ export function Tickets() {
 export function TicketNew() {
   const { t } = useLocale();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  /*
+   * Spec 9.2 asks the service page for a support request "related to this service
+   * specifically". Arriving from that button carries the service, so the subject opens
+   * already naming the plan and the domain instead of asking the customer to retype what the
+   * previous screen already knew. The cursor still lands after the colon, so the sentence is
+   * theirs to finish.
+   */
+  const from = SERVICES.find((s) => s.id === params.get('service'));
+
   const [dept, setDept] = useState('tech');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState(from ? `${from.product} — ${from.domain}: ` : '');
   const [body, setBody] = useState('');
 
   const suggestions = useMemo(() => {
@@ -165,8 +247,11 @@ export function TicketNew() {
       </ul>
 
       <div className="with-side">
+        {/* The fieldsets below are already cards, one per section. Wrapping them in another
+            card framed every group twice — a 24px-padded bordered box inside a 24px-padded
+            bordered box, which is a shape that appears nowhere else in the client area. */}
         <form
-          className="card"
+          className="form-stack"
           onSubmit={(e) => {
             e.preventDefault();
             navigate('/account/tickets');
@@ -224,25 +309,25 @@ export function TicketNew() {
                     nothing is the most convincing broken thing on a form. */}
                 {(
                   [
-                    ['B', '**', '**'],
-                    ['I', '_', '_'],
-                    ['H', '## ', ''],
-                    ['🔗', '[', '](https://)'],
-                    ['•', '- ', ''],
-                    ['1.', '1. ', ''],
-                    ['</>', '`', '`'],
-                    ['❝', '> ', ''],
+                    ['bold', <IconBold size={16} />, '**', '**'],
+                    ['italic', <IconItalic size={16} />, '_', '_'],
+                    ['heading', <IconHeading size={16} />, '## ', ''],
+                    ['link', <IconLink size={16} />, '[', '](https://)'],
+                    ['list', <IconList size={16} />, '- ', ''],
+                    ['numbered', <IconListNumbered size={16} />, '1. ', ''],
+                    ['code', <IconCode size={16} />, '`', '`'],
+                    ['quote', <IconQuote size={16} />, '> ', ''],
                   ] as const
-                ).map(([mark, open, close], i) => (
+                ).map(([name, glyph, open, close], i) => (
                   <button
                     type="button"
-                    key={mark}
+                    key={name}
                     className="editor__tool"
                     aria-label={t(`tkt.tool${i}` as never)}
                     title={t(`tkt.tool${i}` as never)}
                     onClick={() => setBody((v) => `${v}${open}${close}`)}
                   >
-                    <bdi>{mark}</bdi>
+                    {glyph}
                   </button>
                 ))}
               </div>
@@ -271,21 +356,25 @@ export function TicketNew() {
             <p className="hint">{t('tkt.attachNote')}</p>
           </fieldset>
 
-          <div className="actions">
+          {/* One footer, one size. This pair used to be a 44px quiet button beside a 52px
+              submit — and because the row stretched its items, the one that said `md` rendered
+              at 52 anyway. */}
+          <div className="form__foot">
+            <Button size="md" type="submit">
+              {t('tkt.send')}
+            </Button>
             <Link className="btn btn--md btn--quiet" to="/account/tickets">
               {t('tkt.cancel')}
             </Link>
-            <Button size="lg" type="submit">
-              {t('tkt.send')}
-            </Button>
           </div>
         </form>
 
-        <aside className="card kb-side" aria-labelledby="kb-sug">
-          <h2 className="card__heading" id="kb-sug">
-            <IconBook size={17} />
-            {t('tkt.suggestions')}
-          </h2>
+        <Card
+          className="kb-side"
+          heading={t('tkt.suggestions')}
+          icon={<IconBook size={17} />}
+          headingId="kb-sug"
+        >
           <p className="card__body">{t('tkt.suggestionsNote')}</p>
 
           {suggestions.length > 0 ? (
@@ -299,7 +388,7 @@ export function TicketNew() {
           ) : (
             <p className="hint">{t('tkt.suggestionsEmpty')}</p>
           )}
-        </aside>
+        </Card>
       </div>
     </AccountLayout>
   );
@@ -313,8 +402,12 @@ export function TicketThread() {
 
   // A reply that vanishes is worse than no reply box, so what is sent joins the thread.
   const [draft, setDraft] = useState('');
+  const [files, setFiles] = useState<string[]>([]);
   const [sent, setSent] = useState<typeof TICKETS[number]['messages']>([]);
   const [closed, setClosed] = useState(false);
+  // The file input keeps its own value, so clearing our state is not enough to clear the
+  // control's own "2 files selected" label after the reply has gone.
+  const fileRef = useRef<HTMLInputElement>(null);
   const { saved, mark, clear } = useSaved();
 
   if (!tkt) return <Navigate to="/account/tickets" replace />;
@@ -342,6 +435,16 @@ export function TicketThread() {
             <p className="msg__body" dir="auto">
               {bi(m.body)}
             </p>
+            {m.attachments && m.attachments.length > 0 && (
+              <ul className="msg__files">
+                {m.attachments.map((f) => (
+                  <li key={f}>
+                    <IconPaperclip size={14} />
+                    <bdi className="serial">{f}</bdi>
+                  </li>
+                ))}
+              </ul>
+            )}
           </article>
         ))}
       </div>
@@ -358,8 +461,7 @@ export function TicketThread() {
           </Link>
         </div>
       ) : (
-        <div className="card">
-          <h2 className="card__heading">{t('tkt.reply')}</h2>
+        <Card heading={t('tkt.reply')} icon={<IconSupport size={17} />}>
           <label className="u-visually-hidden" htmlFor="reply">
             {t('tkt.reply')}
           </label>
@@ -370,12 +472,26 @@ export function TicketThread() {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
           />
-          <div className="actions">
-            <Button size="md" variant="quiet" onClick={() => setClosed(true)}>
-              {t('tkt.close')}
-            </Button>
+
+          {/* Spec 9.5.3: a reply can carry files too. The names are held in state so the
+              chosen files survive until Send and then travel with the message, rather than
+              sitting in an input that quietly empties. */}
+          <label className="field-label">
+            <span className="eyebrow">{t('tkt.attachments')}</span>
+            <input
+              ref={fileRef}
+              className="field"
+              type="file"
+              multiple
+              accept=".jpg,.gif,.jpeg,.png,.txt,.pdf"
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
+            />
+          </label>
+          <p className="hint">{t('tkt.attachNote')}</p>
+
+          <div className="form__foot">
             <Button
-              size="lg"
+              size="md"
               disabled={!draft.trim()}
               onClick={() => {
                 setSent((all) => [
@@ -386,48 +502,76 @@ export function TicketThread() {
                     author: { ar: 'كمال عبدالرحمن', en: 'Kamal Abdelrahman' },
                     at: '2026-09-01 10:24',
                     body: { ar: draft, en: draft },
+                    attachments: files.length > 0 ? files : undefined,
                   },
                 ]);
                 setDraft('');
+                setFiles([]);
+                if (fileRef.current) fileRef.current.value = '';
                 mark(t('tkt.sent'));
               }}
             >
               {t('tkt.send')}
             </Button>
+            <Button size="md" variant="quiet" onClick={() => setClosed(true)}>
+              {t('tkt.close')}
+            </Button>
           </div>
-        </div>
+        </Card>
       )}
     </AccountLayout>
   );
 }
 
-/** Knowledgebase — spec 9.5.4: categories, search, and a helpfulness vote per article. */
+/**
+ * Knowledgebase — spec 9.5.4: categories, search, and a helpfulness vote per article.
+ *
+ * The category filter and the search box narrow the same list rather than replacing one
+ * another: someone who has picked "Domains" and then types is still inside Domains, which is
+ * what picking a category was for. Each option carries its own count, so an empty category is
+ * visible before it is opened.
+ *
+ * The search here was the one field in the client area that already existed, with a submit
+ * button beside it. The button went with the strip: nothing was ever submitted — the list
+ * narrows on every keystroke — so it was a button whose only job was to look like search.
+ */
 export function Knowledgebase() {
   const { t } = useLocale();
   const [q, setQ] = useState('');
+  const [cat, setCat] = useState<string>('all');
 
-  const rows = ARTICLES.filter((a) =>
-    q.trim() ? t(a.titleKey as never).toLowerCase().includes(q.trim().toLowerCase()) : true,
+  // The body is searched as well as the title: what people remember of an article is a phrase
+  // out of it — a port number, a nameserver — not the sentence it was titled with.
+  const rows = ARTICLES.filter(
+    (a) =>
+      (cat === 'all' || a.category === cat) &&
+      matches(q, t(a.titleKey as never), t(a.bodyKey as never)),
   );
+
+  const countIn = (c: string) => ARTICLES.filter((a) => a.category === c).length;
 
   return (
     <AccountLayout title={t('acc.kb')}>
-      <form className="domain-search" onSubmit={(e) => e.preventDefault()}>
-        <label className="u-visually-hidden" htmlFor="kbq">
-          {t('action.search')}
-        </label>
-        <input
-          id="kbq"
-          className="field domain-search__input"
-          placeholder={t('kb.search')}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('kb.search')}
+        shown={rows.length}
+        total={ARTICLES.length}
+      >
+        <TableFilter
+          label={t('kb.categories')}
+          value={cat}
+          onChange={setCat}
+          options={[
+            { value: 'all', label: `${t('filter.allCategories')} (${ARTICLES.length})` },
+            ...KB_CATEGORIES.map((c) => ({
+              value: c,
+              label: `${t(`kb.cat.${c}` as never)} (${countIn(c)})`,
+            })),
+          ]}
         />
-        <Button size="lg" type="submit">
-          <IconSearch size={17} />
-          {t('action.search')}
-        </Button>
-      </form>
+      </TableToolbar>
 
       {rows.length > 0 ? (
         <ul className="card card--flush kb-list">
@@ -465,6 +609,10 @@ export function KbArticle() {
 
   if (!a) return <Navigate to="/account/knowledgebase" replace />;
 
+  // The point of holding a category on an article is to answer the next question as well as
+  // this one, so the siblings are offered here rather than only on the index.
+  const related = ARTICLES.filter((x) => x.category === a.category && x.id !== a.id);
+
   return (
     <AccountLayout
       title={t(a.titleKey as never)}
@@ -494,6 +642,23 @@ export function KbArticle() {
           </div>
         )}
       </div>
+
+      {related.length > 0 && (
+        <>
+          <h2 className="app__section">{t('kb.related')}</h2>
+          <ul className="card card--flush kb-list">
+            {related.map((r) => (
+              <li key={r.id}>
+                <Link className="kb-item" to={`/account/knowledgebase/${r.slug}`}>
+                  <span className="kb-item__cat eyebrow">{t(`kb.cat.${r.category}` as never)}</span>
+                  <span className="kb-item__title">{t(r.titleKey as never)}</span>
+                  <IconArrow size={16} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </AccountLayout>
   );
 }

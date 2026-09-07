@@ -1,4 +1,5 @@
 import { IconCheck, IconAlert } from './icons';
+import { Tag, type TagTone } from './Tag';
 import { useLocale } from '../lib/locale';
 import type { SystemRow, Incident, SystemState } from '../lib/marketing';
 
@@ -12,11 +13,21 @@ import type { SystemRow, Incident, SystemState } from '../lib/marketing';
  * No uptime percentage appears anywhere. None has been verified, and a status page is the one
  * place where an invented "99.9%" is not marketing but a claim someone will hold you to.
  */
+
+/** The headline's ground, keyed to the modifiers the headline rule declares. */
 export const STATE_TAG: Record<SystemState, string> = {
   operational: 'ok',
   degraded: 'warn',
   maintenance: 'taken',
   down: 'due',
+};
+
+/** The chip beside a system or an incident, in the Tag component's own ladder. */
+export const STATE_TONE: Record<SystemState, TagTone> = {
+  operational: 'ok',
+  degraded: 'warn',
+  maintenance: 'neutral',
+  down: 'bad',
 };
 
 /** The one word the page was opened to read. */
@@ -48,9 +59,7 @@ export function SystemList({ systems }: { systems: SystemRow[] }) {
         <li className="sys__row" key={s.id}>
           <span className={`sys__dot sys__dot--${s.state}`} aria-hidden="true" />
           <span className="sys__name">{t(s.labelKey as never)}</span>
-          <span className={`tag tag--${STATE_TAG[s.state]}`}>
-            {t(`status.state.${s.state}` as never)}
-          </span>
+          <Tag tone={STATE_TONE[s.state]}>{t(`status.state.${s.state}` as never)}</Tag>
         </li>
       ))}
     </ul>
@@ -64,9 +73,7 @@ export function IncidentList({ incidents }: { incidents: Incident[] }) {
       {incidents.map((i) => (
         <li className="incident" key={i.id}>
           <div className="incident__head">
-            <span className={`tag tag--${STATE_TAG[i.state]}`}>
-              {t(`status.state.${i.state}` as never)}
-            </span>
+            <Tag tone={STATE_TONE[i.state]}>{t(`status.state.${i.state}` as never)}</Tag>
             <span className="incident__at serial">
               <bdi>{i.at}</bdi>
             </span>

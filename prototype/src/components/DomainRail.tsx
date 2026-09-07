@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { AccountLayout } from './AccountLayout';
+import { Tag, DOMAIN_TONE } from './Tag';
 import { IconArrow, IconPlus } from './icons';
 import { useLocale } from '../lib/locale';
 import type { DomainRecord } from '../lib/account';
@@ -50,11 +51,7 @@ export function DomainPage({
         overview ? { label: dom.name } : { label: dom.name, to: base },
         ...(overview ? [] : [{ label: t(sectionKey as never) }]),
       ]}
-      meta={
-        <span className={`tag tag--${dom.status === 'active' ? 'ok' : 'due'}`}>
-          {t(`dom.${dom.status}` as never)}
-        </span>
-      }
+      meta={<Tag tone={DOMAIN_TONE[dom.status]}>{t(`dom.${dom.status}` as never)}</Tag>}
       actions={
         <Link className="btn btn--md btn--primary" to={`/account/renew/${dom.id}`}>
           {t('dom.renew')}

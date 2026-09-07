@@ -44,7 +44,14 @@ export function Layout({ children }: { children: ReactNode }) {
             <NavLink className="masthead__link" to="/domains">
               {t('nav.domains')}
             </NavLink>
-            <NavLink className="masthead__link" to="/account/knowledgebase">
+            {/*
+              This pointed at /account/knowledgebase, which renders inside the signed-in shell
+              — so "Support" took a logged-out visitor into the client area complete with a
+              sidebar, a notification bell and the account holder's name. The public site
+              answers a public question with a public page; the client-area knowledgebase is
+              reached from inside the account, where it belongs.
+            */}
+            <NavLink className="masthead__link" to="/contact">
               {t('nav.support')}
             </NavLink>
           </nav>
@@ -125,7 +132,6 @@ export function Layout({ children }: { children: ReactNode }) {
               </p>
               <Link to="/about">{t('ab.title')}</Link>
               <Link to="/data-centres">{t('dc.title')}</Link>
-              <Link to="/status">{t('status.title')}</Link>
               <Link to="/learn">{t('blog.title')}</Link>
             </nav>
 
@@ -133,10 +139,15 @@ export function Layout({ children }: { children: ReactNode }) {
               <p className="colophon__head" id="f-help">
                 {t('nav.support')}
               </p>
+              {/*
+                The knowledgebase and the ticket form live inside the account, so the public
+                footer offers the door to them rather than a link that walks a signed-out
+                visitor into someone else's dashboard. Network status moves up from the
+                company column: it is what people actually want when something is wrong.
+              */}
               <Link to="/contact">{t('ct.title')}</Link>
-              <Link to="/account/knowledgebase">{t('acc.kb')}</Link>
-              <Link to="/account/tickets/new">{t('tkt.open')}</Link>
-              <Link to="/account">{t('nav.login')}</Link>
+              <Link to="/status">{t('status.title')}</Link>
+              <Link to="/login">{t('nav.login')}</Link>
             </nav>
           </div>
 

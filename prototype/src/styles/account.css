@@ -51,19 +51,19 @@
   padding: var(--sws-space-8) var(--sws-space-12);
   font-size: var(--sws-font-size-caption);
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
 }
 
 :root[lang='ar'] .rail__head {
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   text-transform: none;
 }
 
 .rail__list {
   display: grid;
-  gap: 2px;
+  gap: var(--sws-space-4);
   margin-block-end: var(--sws-space-8);
 }
 
@@ -222,65 +222,6 @@
   text-align: end;
 }
 
-/* ── tiles ─────────────────────────────────────────────────────────────────── */
-
-.tiles {
-  display: grid;
-  gap: var(--sws-space-16);
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-}
-
-.tile {
-  display: grid;
-  gap: var(--sws-space-4);
-  padding: var(--sws-space-24);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-xl);
-  box-shadow: var(--sws-shadow-card);
-  color: inherit;
-  text-decoration: none;
-  transition:
-    box-shadow var(--sws-duration-base) var(--sws-ease-standard),
-    transform var(--sws-duration-base) var(--sws-ease-standard);
-}
-
-a.tile:hover {
-  box-shadow: var(--sws-shadow-lift);
-  transform: translateY(-2px);
-}
-
-/* A tile that reports rather than navigates: no lift, no pointer, no promise of a click. */
-.tile--static {
-  cursor: default;
-}
-
-.tile__icon {
-  color: var(--sws-action-primary);
-}
-
-.tile__n {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sws-space-4);
-  font-size: var(--sws-font-size-h1);
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-/* The currency rides beside the figure at label size, so a four-tile row keeps one height. */
-.tile__unit {
-  font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
-  letter-spacing: 0;
-  color: var(--sws-text-secondary);
-}
-
-.tile__label {
-  font-size: var(--sws-font-size-body-sm);
-  color: var(--sws-text-secondary);
-}
-
 /* ── meters ────────────────────────────────────────────────────────────────── */
 /* Used-of-total, because what someone needs before buying more is how much is left. */
 
@@ -312,6 +253,192 @@ a.tile:hover {
   border-radius: var(--sws-radius-pill);
 }
 
+/* ── the table toolbar: one search field, then the filters ─────────────────── */
+/*
+ * The row above every dashboard table. The field takes whatever the filters leave, because
+ * what gets typed in it is a domain or an invoice serial, and both are long.
+ *
+ * Pills rather than the 8px radius the rest of the forms use: this row sits above a table with
+ * square corners, and the contrast between the two is what tells you the row is a control and
+ * the thing below it is the data.
+ */
+
+.tbar {
+  margin-block-end: var(--sws-space-16);
+}
+
+.tbar__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+}
+
+.tbar__count {
+  margin-block-start: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * A toolbar inside a flush card takes the card's own padding and a rule under it, so the
+ * search reads as belonging to the table beneath rather than floating on it.
+ */
+.tbar--inset {
+  margin-block-end: 0;
+  padding: var(--sws-space-16) var(--sws-space-24);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/* The same for an empty result: inside a card it is a row, not a whole screen. */
+.empty--inset {
+  padding-block: var(--sws-space-32);
+}
+
+/* The field is the only thing in the row that grows; 14rem is about a domain name, which is
+   the shortest it can be and still show what was typed. */
+.tsearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+.tbar__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+}
+
+.tsearch__icon {
+  position: absolute;
+  inset-inline-start: var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
+}
+
+.tsearch__input {
+  inline-size: 100%;
+  min-block-size: var(--sws-input-height-md);
+  /* 16 + 20 + 12: the margin, the icon, and the gap that keeps a descender off it. */
+  padding-inline-start: calc(var(--sws-space-16) + 20px + var(--sws-space-12));
+  padding-inline-end: var(--sws-space-16);
+  background: var(--sws-input-bg);
+  /*
+   * The reference draws this outline as a pale hairline. It cannot be one here: the field's
+   * white fill sits on a #F8F9FC page, so the border is the only thing that says where the
+   * control is, and border-subtle against that page is 1.2:1 against a 3:1 bar (SC 1.4.11).
+   * input-border is the token the system already gives every other field on these screens,
+   * and it clears the bar in both themes — 4.7:1 light, 3.8:1 dark.
+   */
+  border: var(--sws-rule-hair) solid var(--sws-input-border);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-primary);
+  font: inherit;
+  font-size: var(--sws-font-size-body);
+  transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.tsearch__input::placeholder {
+  color: var(--sws-input-placeholder);
+}
+
+.tsearch__input:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.tsearch__input:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+/* Chrome draws its own clear button inside a search input. It is worth keeping — it is the
+   only one-click way back to the full list — but it sits against the pill's edge without a
+   little room of its own. */
+.tsearch__input::-webkit-search-cancel-button {
+  margin-inline-start: var(--sws-space-8);
+}
+
+/*
+ * A filter is a pill with the chosen option written on it. The select is the whole control
+ * rather than a control inside a box: one element to focus, one to click, and no gap where a
+ * click lands on the wrapper and nothing opens.
+ */
+.tfilter {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.tfilter__select {
+  appearance: none;
+  min-block-size: var(--sws-input-height-md);
+  /* Room for the chevron on the trailing side, which is the inline end in both directions. */
+  padding-inline: var(--sws-space-16) calc(var(--sws-space-16) + 16px + var(--sws-space-8));
+  background: var(--sws-select-bg);
+  border: var(--sws-rule-hair) solid var(--sws-select-border);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-primary);
+  font: inherit;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.tfilter__select:hover {
+  border-color: var(--sws-action-primary);
+}
+
+.tfilter__select:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+}
+
+.tfilter__chev {
+  position: absolute;
+  inset-inline-end: var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
+}
+
+/*
+ * On a phone the filters go under the field rather than beside it: a select wide enough to
+ * read "All departments" and a field wide enough to type into do not both fit on 360px, and
+ * the field is the one that has to stay usable. Two filters share a row; a third takes its own.
+ */
+@media (max-width: 599px) {
+  .tbar__row {
+    gap: var(--sws-space-8);
+  }
+
+  .tsearch {
+    flex: 1 0 100%;
+  }
+
+  .tbar__filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sws-space-8);
+    inline-size: 100%;
+  }
+
+  .tfilter,
+  .tfilter__select {
+    inline-size: 100%;
+  }
+
+  /* An odd filter out — the third of three — spans the row instead of leaving a gap. */
+  .tfilter:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
 /* ── filters and toolbars ──────────────────────────────────────────────────── */
 
 .toolbar {
@@ -322,9 +449,11 @@ a.tile:hover {
   flex-wrap: wrap;
 }
 
+/* A filter row is a row of separate decisions, so its pills are separable too — four pixels
+   between two 44px targets is a gap one sixth the size of the thing it separates. */
 .filters {
   display: flex;
-  gap: var(--sws-space-4);
+  gap: var(--sws-space-8);
   flex-wrap: wrap;
   padding: var(--sws-space-4);
   background: var(--sws-surface-sunken);
@@ -332,7 +461,7 @@ a.tile:hover {
 }
 
 .filters__btn {
-  min-height: var(--sws-touch-target-min);
+  min-block-size: var(--sws-touch-target-min);
   padding-inline: var(--sws-space-16);
   background: transparent;
   border: 0;
@@ -418,7 +547,7 @@ a.tile:hover {
   inline-size: calc(var(--sws-switch-height-md) * 2 - 4px);
   block-size: var(--sws-switch-height-md);
   margin: 0;
-  padding: 3px;
+  padding: calc((var(--sws-switch-height-md) - var(--knob)) / 2);
   background: var(--sws-switch-track-off);
   border: 0;
   border-radius: var(--sws-radius-pill);
@@ -514,7 +643,7 @@ a.tile:hover {
 .editor__bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: var(--sws-space-4);
   padding: var(--sws-space-4);
   background: var(--sws-surface-sunken);
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
@@ -622,67 +751,12 @@ a.tile:hover {
 
 /* ── news ──────────────────────────────────────────────────────────────────── */
 
-.news {
-  display: grid;
-  gap: var(--sws-space-16);
-}
-
-/* On the dashboard the announcements already sit inside a panel, so the item carries only a
-   rule between entries. The full announcements page adds --panel to give each one its own card. */
-.news__item + .news__item {
-  padding-block-start: var(--sws-space-16);
-  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
-}
-
-.news__item--panel {
-  padding: var(--sws-space-24);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-xl);
-  box-shadow: var(--sws-shadow-card);
-}
-
-.news__item--panel + .news__item--panel {
-  padding-block-start: var(--sws-space-24);
-  border-block-start: 0;
-}
-
 .news__date {
   font-size: var(--sws-font-size-caption);
   color: var(--sws-text-secondary);
 }
 
 /* ── list cards (payment methods, contacts) ────────────────────────────────── */
-
-.cards-list {
-  display: grid;
-  gap: var(--sws-space-12);
-}
-
-.pm {
-  display: flex;
-  align-items: center;
-  gap: var(--sws-space-16);
-  flex-wrap: wrap;
-  padding: var(--sws-space-16) var(--sws-space-24);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-lg);
-  box-shadow: var(--sws-shadow-card);
-  font-size: var(--sws-font-size-body-sm);
-}
-
-.pm__brand {
-  font-weight: 700;
-  min-inline-size: 9rem;
-}
-
-.pm__num {
-  color: var(--sws-text-secondary);
-}
-
-.pm__exp {
-  color: var(--sws-text-secondary);
-  margin-inline-end: auto;
-}
 
 .perm-list {
   display: inline-flex;
@@ -706,7 +780,7 @@ a.tile:hover {
   margin-block: var(--sws-space-12);
   font-size: var(--sws-font-size-h1);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .checklist {
@@ -793,7 +867,7 @@ a.tile:hover {
 .auth__title {
   font-size: var(--sws-font-size-h2);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .auth__lede {
@@ -858,7 +932,7 @@ a.tile:hover {
 
 .code-field {
   font-size: var(--sws-font-size-h2);
-  letter-spacing: 0.4em;
+  letter-spacing: var(--sws-tracking-widest);
   text-align: center;
 }
 
@@ -887,7 +961,7 @@ a.tile:hover {
 
 .builder__bar {
   display: flex;
-  gap: 6px;
+  gap: var(--sws-space-8);
   padding-block-end: var(--sws-space-12);
 }
 
@@ -941,6 +1015,108 @@ a.tile:hover {
 
 .os-choice {
   margin-block-start: var(--sws-space-24);
+}
+
+/* ── files on a ticket reply — spec 9.5.3 ──────────────────────────────────── */
+.msg__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-12);
+  padding-block-start: var(--sws-space-12);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  list-style: none;
+}
+
+.msg__files li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  padding: var(--sws-space-4) var(--sws-space-8);
+  border-radius: var(--sws-radius-sm);
+  background: var(--sws-surface-sunken);
+  font-size: var(--sws-font-size-caption);
+}
+
+/* ── two-factor enrolment — spec 9.7 ───────────────────────────────────────── */
+/*
+ * Set apart from the switch that opened it, so it reads as a task that is not finished rather
+ * than as more of the same panel.
+ */
+.enrol {
+  display: grid;
+  gap: var(--sws-space-12);
+  margin-block-start: var(--sws-space-16);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.enrol .slot {
+  margin-block-start: 0;
+}
+
+/* Backup codes are copied by eye, one at a time, so they are set apart and never wrap. */
+.codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--sws-space-8);
+  list-style: none;
+}
+
+.codes li {
+  padding: var(--sws-space-8) var(--sws-space-12);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-sm);
+  background: var(--sws-surface-sunken);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── contact permissions — spec 9.7 ────────────────────────────────────────── */
+.contact {
+  display: grid;
+  gap: 0;
+}
+
+/* The editor opens under the row it belongs to, on the sunken ground, so an open contact reads
+   as one block inside the list rather than as a second card. The list card clips, so no corner
+   handling is needed here. */
+.perm-edit {
+  margin: 0;
+  padding: var(--sws-space-16) var(--sws-space-16) var(--sws-space-24);
+  border: 0;
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  background: var(--sws-surface-sunken);
+}
+
+/* A row followed by its own editor drops the rule that would otherwise double up. */
+.contact:has(.perm-edit) .method-row {
+  border-block-end: 0;
+}
+
+.perm-edit__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--sws-space-12);
+  margin-block: var(--sws-space-12);
+}
+
+.perm-edit__row {
+  display: flex;
+  align-items: start;
+  gap: var(--sws-space-8);
+  min-block-size: var(--sws-touch-target-min);
+}
+
+.perm-edit__label {
+  display: block;
+  font-weight: 600;
+}
+
+.perm-edit__note {
+  display: block;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
 }
 
 /* ── 2026-09-07: the invoice document ───────────────────────────────────────── */
@@ -1018,4 +1194,17 @@ a.tile:hover {
   .with-side {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
   }
+}
+
+/* An add-on row: its facts stack under the name, so the state and the actions keep the end
+   of the row instead of the last button dropping to a line of its own. */
+.addon-row__text {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+}
+
+.addon-row__text .method-row__name {
+  min-inline-size: 0;
 }

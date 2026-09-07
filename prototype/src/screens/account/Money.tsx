@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
+import { Tag } from '../../components/Tag';
 import { Button } from '../../components/Button';
 import { GatewayDetails } from '../../components/GatewayDetails';
 import {
@@ -10,6 +11,7 @@ import {
   IconInvoice,
   IconCalendar,
 } from '../../components/icons';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
 import {
@@ -122,9 +124,9 @@ export function Renew() {
                     <span className="term__name">{t(`cycle.${c}` as never)}</span>
                     <span className="term__price serial">{money(priceFor(c))}</span>
                     {CYCLE_META[c].save > 0 && (
-                      <span className="tag tag--ok">
+                      <Tag tone="ok">
                         {t('renew.save')} {CYCLE_META[c].save}%
-                      </span>
+                      </Tag>
                     )}
                   </label>
                 </li>
@@ -202,32 +204,35 @@ export function Renew() {
 export function Transactions() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const [q, setQ] = useState('');
   const [kind, setKind] = useState<TxnKind | 'all'>('all');
 
-  const rows = TRANSACTIONS.filter((x) => kind === 'all' || x.kind === kind);
+  // The reference is the number someone reads off a bank statement, so it is the field this
+  // search exists for; the invoice and the date are the two they reach for when it is lost.
+  const rows = TRANSACTIONS.filter(
+    (x) => (kind === 'all' || x.kind === kind) && matches(q, x.reference, x.invoice, x.at),
+  );
   const money = (minor: number) => `${formatAmount(convert(Math.abs(minor), currency), locale)} ${currency}`;
 
   return (
     <AccountLayout title={t('txn.title')} lede={t('txn.lede')}>
-      <div className="bar">
-        <div className="filters" role="group" aria-label={t('txn.kind')}>
-          {(['all', 'payment', 'refund', 'credit'] as const).map((k) => (
-            <button
-              key={k}
-              type="button"
-              className={`filters__btn${kind === k ? ' is-active' : ''}`}
-              aria-pressed={kind === k}
-              onClick={() => setKind(k)}
-            >
-              {t(k === 'all' ? 'inv.all' : (`txn.${k}` as never))}
-            </button>
-          ))}
-        </div>
-        <p className="bar__count">
-          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{TRANSACTIONS.length}</span>
-        </p>
-      </div>
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.txns')}
+        shown={rows.length}
+        total={TRANSACTIONS.length}
+      >
+        <TableFilter
+          label={t('txn.kind')}
+          value={kind}
+          onChange={setKind}
+          options={(['all', 'payment', 'refund', 'credit'] as const).map((k) => ({
+            value: k,
+            label: t(k === 'all' ? 'filter.allTypes' : (`txn.${k}` as never)),
+          }))}
+        />
+      </TableToolbar>
 
       {rows.length > 0 ? (
         <div className="card card--flush table-scroll">
@@ -249,9 +254,7 @@ export function Transactions() {
                   <tr key={x.id}>
                     <td className="serial"><bdi>{x.at}</bdi></td>
                     <td>
-                      <span className={`tag tag--${x.kind === 'refund' ? 'due' : x.kind === 'credit' ? 'taken' : 'ok'}`}>
-                        {t(`txn.${x.kind}` as never)}
-                      </span>
+                      <Tag tone="neutral">{t(`txn.${x.kind}` as never)}</Tag>
                     </td>
                     <td className="serial">
                       {x.invoice ? <bdi>{x.invoice}</bdi> : <span className="muted">—</span>}
@@ -274,8 +277,8 @@ export function Transactions() {
       ) : (
         <div className="card empty">
           <IconWallet size={28} />
-          <p className="empty__title">{t('txn.none')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
+          <p className="empty__title">{t(q.trim() ? 'empty.search' : 'txn.none')}</p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       )}
     </AccountLayout>

@@ -42,6 +42,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       }
       return entry[locale];
     };
+    /*
+     * index.html carries the Arabic title so the first paint has one, but it stayed Arabic
+     * after the switch — the browser tab is part of the page, and an English page announcing
+     * itself in Arabic in the tab strip is the one bit of the translation that leaks.
+     */
+    document.title = t('meta.title');
     const bi = (value: Bi) => value[locale];
     return { locale, dir, setLocale, t, bi };
   }, [locale]);
@@ -64,6 +70,11 @@ type StringKey = keyof typeof STRINGS;
  * it says something true instead.
  */
 export const STRINGS = {
+  /* The browser tab. index.html carries the Arabic default so the first paint has a title. */
+  'meta.title': {
+    ar: 'SWS — استضافة سويسرية بدعم مصري',
+    en: 'SWS — Swiss hosting, Egyptian support',
+  },
   'brand.tagline': { ar: 'خدمات الويب', en: 'Web Services' },
 
   'hero.announce': {
@@ -77,7 +88,7 @@ export const STRINGS = {
     en: 'Servers in Switzerland, support in Arabic, and payment with Egyptian wallets. The price is stated in full — what you see is what you pay, the first year and every year after it.',
   },
   'hero.cta': { ar: 'شوف الباقات', en: 'See the plans' },
-  'hero.cta2': { ar: 'ابحث عن نطاق', en: 'Find a domain' },
+  'hero.cta2': { ar: 'ابحث عن دومين', en: 'Find a domain' },
 
   'feat.title': { ar: 'ليه سوميون', en: 'Why Somion' },
   'feat.lede': {
@@ -96,7 +107,7 @@ export const STRINGS = {
   },
   'feat.secure.title': { ar: 'شهادة SSL مجانية', en: 'Free SSL, always' },
   'feat.secure.body': {
-    ar: 'شهادة على كل نطاق، بتتجدد لوحدها، من غير بند إضافي في الفاتورة.',
+    ar: 'شهادة على كل دومين، بتتجدد لوحدها، من غير بند إضافي في الفاتورة.',
     en: 'A certificate on every domain, renewed automatically, with no extra line on the invoice.',
   },
   'feat.billing.title': { ar: 'فوترة واضحة', en: 'Billing you can read' },
@@ -115,7 +126,7 @@ export const STRINGS = {
   skip: { ar: 'تخطَّ إلى المحتوى', en: 'Skip to content' },
 
   'nav.hosting': { ar: 'الاستضافة', en: 'Hosting' },
-  'nav.domains': { ar: 'النطاقات', en: 'Domains' },
+  'nav.domains': { ar: 'الدومينات', en: 'Domains' },
   'nav.support': { ar: 'الدعم', en: 'Support' },
   'nav.login': { ar: 'دخول العملاء', en: 'Client login' },
   'nav.cart': { ar: 'السلة', en: 'Cart' },
@@ -164,7 +175,7 @@ export const STRINGS = {
   'res.unmetered': { ar: 'غير محدود', en: 'Unmetered' },
   'res.bandwidth': { ar: 'نقل بيانات', en: 'Bandwidth' },
   'res.mail': { ar: 'صناديق بريد', en: 'Mailboxes' },
-  'res.freedomain': { ar: 'نطاق مجاني السنة الأولى', en: 'Free domain, first year' },
+  'res.freedomain': { ar: 'دومين مجاني السنة الأولى', en: 'Free domain, first year' },
   'res.tb': { ar: 'تيرابايت', en: 'TB' },
 
   'hosting.title': { ar: 'استضافة مشتركة', en: 'Shared hosting' },
@@ -173,13 +184,13 @@ export const STRINGS = {
     en: 'Four plans, each carrying its renewal price on the card.',
   },
 
-  'domain.title': { ar: 'ابحث عن نطاق', en: 'Find a domain' },
-  'domain.placeholder': { ar: 'اسم النطاق', en: 'Your domain name' },
+  'domain.title': { ar: 'ابحث عن دومين', en: 'Find a domain' },
+  'domain.placeholder': { ar: 'اسم الدومين', en: 'Your domain name' },
   'domain.available': { ar: 'متاح', en: 'Available' },
   'domain.taken': { ar: 'محجوز', en: 'Taken' },
   'domain.register': { ar: 'التسجيل', en: 'Register' },
   'domain.renew': { ar: 'التجديد', en: 'Renewal' },
-  'domain.tldtitle': { ar: 'أسعار النطاقات', en: 'Domain pricing' },
+  'domain.tldtitle': { ar: 'أسعار الدومينات', en: 'Domain pricing' },
   'domain.hint': {
     ar: 'سعر التجديد معروض جنب سعر التسجيل، لأنه الرقم اللي هتدفعه كل سنة بعد الأولى.',
     en: 'Renewal sits beside registration, because it is the figure you pay every year after the first.',
@@ -217,7 +228,11 @@ export const STRINGS = {
   },
   'confirm.account': { ar: 'اذهب إلى لوحة الحساب', en: 'Go to my account' },
 
-  'account.title': { ar: 'لوحة الحساب', en: 'Account' },
+  /* One name for the room, in both languages: the sidebar's own label, the crumb that leads
+     back to it, and this one all resolve here. It used to sit beside 'acc.title' — same Arabic,
+     different English — so the client area was called "Account" in one place and "Client area"
+     in another. */
+  'account.title': { ar: 'لوحة الحساب', en: 'Client area' },
   'account.services': { ar: 'الخدمات', en: 'Services' },
   'account.invoices': { ar: 'الفواتير', en: 'Invoices' },
   'account.nextdue': { ar: 'التجديد القادم', en: 'Next renewal' },
@@ -251,7 +266,7 @@ export const STRINGS = {
   'plan.websitesDual': { ar: 'موقعان', en: '2 Websites Hosting' },
   'plan.storage': { ar: 'تخزين SSD', en: 'Storage SSD' },
   'plan.bandwidth': { ar: 'باندويدث', en: 'Bandwidth' },
-  'plan.subdomains': { ar: 'نطاقات فرعية', en: 'Subdomains' },
+  'plan.subdomains': { ar: 'دومينات فرعية', en: 'Subdomains' },
   'plan.email': { ar: 'حسابات بريد', en: 'Email Accounts' },
   'plan.freeDomain': { ar: 'دومين مجاني السنة الأولى', en: 'Free Domain for the first year' },
   'plan.unlimited': { ar: 'غير محدود', en: 'Unlimited' },
@@ -290,7 +305,7 @@ export const STRINGS = {
   'domainstep.selected': { ar: 'المنتج المختار', en: 'Selected Product' },
   'domainstep.fromCart': { ar: 'دومين من السلة', en: 'Domain From Cart' },
   'domainstep.fromCartBody': { ar: 'استخدم دومين موجود في سلتك.', en: 'Use a domain already in my shopping cart.' },
-  'domainstep.register': { ar: 'تسجيل دومين جديد', en: 'Register a New Domain' },
+  'domainstep.register': { ar: 'تسجيل دومين جديد', en: 'Register a new domain' },
   'domainstep.registerBody': { ar: 'اكتب الدومين اللي عايز تسجله ونتأكد من توفره.', en: 'Type the domain you wish to register below to check availability.' },
   'domainstep.transfer': { ar: 'نقل دومين', en: 'Transfer Domain' },
   'domainstep.transferBody': { ar: 'انقل دومينك من مسجّل آخر.', en: 'Transfer your domain from another registrar.' },
@@ -332,10 +347,10 @@ export const STRINGS = {
 
   'rail.categories': { ar: 'الفئات', en: 'Categories' },
   'rail.actions': { ar: 'إجراءات', en: 'Actions' },
-  'rail.renew': { ar: 'تجديد دومين', en: 'Renew Domains' },
-  'rail.register': { ar: 'تسجيل دومين جديد', en: 'Register a New Domain' },
-  'rail.transfer': { ar: 'نقل دومين', en: 'Transfer in a Domain' },
-  'rail.viewCart': { ar: 'عرض السلة', en: 'View Cart' },
+  'rail.renew': { ar: 'تجديد دومين', en: 'Renew domains' },
+  'rail.register': { ar: 'تسجيل دومين جديد', en: 'Register a new domain' },
+  'rail.transfer': { ar: 'نقل دومين', en: 'Transfer in a domain' },
+  'rail.viewCart': { ar: 'عرض السلة', en: 'View cart' },
 
   'fam.shared': { ar: 'استضافة مشتركة (cPanel)', en: 'Shared Hosting (cPanel)' },
   'fam.shared.lede': { ar: 'أربع باقات على cPanel، وسعر التجديد مكتوب على كل واحدة.', en: 'Four cPanel plans, each carrying its renewal price on the card.' },
@@ -415,20 +430,20 @@ export const STRINGS = {
   'auth.verify': { ar: 'تحقق', en: 'Verify' },
   'auth.backup': { ar: 'استخدم كود احتياطي', en: 'Use a backup code' },
 
-  'acc.title': { ar: 'لوحة الحساب', en: 'Client Area' },
+  'acc.title': { ar: 'لوحة الحساب', en: 'Client area' },
   'acc.dashboard': { ar: 'لوحة القيادة', en: 'Dashboard' },
-  'acc.services': { ar: 'خدماتي', en: 'My Services' },
-  'acc.domains': { ar: 'دوماييناتي', en: 'My Domains' },
+  'acc.services': { ar: 'خدماتي', en: 'My services' },
+  'acc.domains': { ar: 'دوميناتي', en: 'My domains' },
   'acc.invoices': { ar: 'الفواتير', en: 'Invoices' },
-  'acc.funds': { ar: 'إضافة رصيد', en: 'Add Funds' },
-  'acc.methods': { ar: 'طرق الدفع', en: 'Payment Methods' },
-  'acc.tickets': { ar: 'تذاكر الدعم', en: 'Support Tickets' },
+  'acc.funds': { ar: 'إضافة رصيد', en: 'Add funds' },
+  'acc.methods': { ar: 'طرق الدفع', en: 'Payment methods' },
+  'acc.tickets': { ar: 'تذاكر الدعم', en: 'Support tickets' },
   'acc.kb': { ar: 'قاعدة المعرفة', en: 'Knowledgebase' },
   'acc.news': { ar: 'الإعلانات', en: 'Announcements' },
   'acc.affiliates': { ar: 'الأفلييت', en: 'Affiliates' },
   'acc.contacts': { ar: 'جهات الاتصال', en: 'Contacts' },
-  'acc.security': { ar: 'الحساب والأمان', en: 'Account & Security' },
-  'acc.portalHome': { ar: 'الرئيسية', en: 'Portal Home' },
+  'acc.security': { ar: 'الحساب والأمان', en: 'Account & security' },
+  'acc.portalHome': { ar: 'الرئيسية', en: 'Portal home' },
 
 
   // ── client area chrome ────────────────────────────────────────────────────
@@ -791,7 +806,7 @@ export const STRINGS = {
   'cmp.sites': { ar: 'عدد المواقع', en: 'Websites' },
   'cmp.storage': { ar: 'المساحة', en: 'Storage' },
   'cmp.bandwidth': { ar: 'نقل البيانات', en: 'Bandwidth' },
-  'cmp.subdomains': { ar: 'نطاقات فرعية', en: 'Subdomains' },
+  'cmp.subdomains': { ar: 'دومينات فرعية', en: 'Subdomains' },
   'cmp.mailboxes': { ar: 'صناديق بريد', en: 'Mailboxes' },
   'cmp.freeDomain': { ar: 'دومين مجاني أول سنة', en: 'Free domain, first year' },
   'cmp.fairUse': { ar: 'يعني إيه «بلا حدود»', en: 'What "Unlimited" means' },
@@ -952,7 +967,7 @@ export const STRINGS = {
   'ct.title': { ar: 'كلّمنا', en: 'Contact us' },
   'ct.lede': { ar: 'أسرع طريقة أول، والفورم بعدها.', en: 'The fastest routes first, the form after.' },
   'ct.ticket': { ar: 'افتح تذكرة', en: 'Open a ticket' },
-  'ct.ticketBody': { ar: 'أسرع حاجة لو عندك حساب.', en: 'The quickest route if you have an account.' },
+  'ct.ticketBody': { ar: 'ادخل على حسابك وافتح تذكرة — أسرع طريق للرد.', en: 'Sign in to your account and open a ticket — the quickest route to an answer.' },
   'ct.kb': { ar: 'قاعدة المعرفة', en: 'Knowledgebase' },
   'ct.kbBody': { ar: 'أغلب الأسئلة لها إجابة مكتوبة.', en: 'Most questions already have a written answer.' },
   'ct.status': { ar: 'حالة الشبكة', en: 'Network status' },
@@ -1318,7 +1333,13 @@ export const STRINGS = {
   'dash.lede': { ar: 'دي نظرة سريعة على حسابك.', en: 'A quick look at your account.' },
   'dash.unpaid': { ar: 'فواتير غير مدفوعة', en: 'Unpaid invoices' },
   'dash.openTickets': { ar: 'تذاكر مفتوحة', en: 'Open tickets' },
-  'dash.dueNote': { ar: 'عندك مستحق دلوقتي', en: 'You have an amount due:' },
+  'dash.dueNote': { ar: 'عندك مستحق دلوقتي', en: 'You have an amount due' },
+
+  // The qualifier under each count on the dashboard tiles. Every one is two or three words: a
+  // caption line in a 170px tile has no room for a sentence, in either language.
+  'dash.settled': { ar: 'كله مدفوع', en: 'All paid' },
+  'dash.awaiting': { ar: 'في انتظار الرد', en: 'Awaiting reply' },
+  'dash.noneOpen': { ar: 'مفيش مفتوح', en: 'None open' },
 
   'status.active': { ar: 'يعمل', en: 'Active' },
   'status.pending': { ar: 'قيد التجهيز', en: 'Pending' },
@@ -1383,7 +1404,7 @@ export const STRINGS = {
   'pm.add': { ar: 'أضف بطاقة', en: 'Add a card' },
 
   'tkt.all': { ar: 'الكل', en: 'All' },
-  'tkt.open': { ar: 'افتح تذكرة', en: 'Open Ticket' },
+  'tkt.open': { ar: 'افتح تذكرة', en: 'Open a ticket' },
   'tkt.answered': { ar: 'تم الرد', en: 'Answered' },
   'tkt.closed': { ar: 'مغلقة', en: 'Closed' },
   'tkt.none': { ar: 'مفيش تذاكر.', en: 'No tickets yet.' },
@@ -1392,10 +1413,10 @@ export const STRINGS = {
   'tkt.priority': { ar: 'الأولوية', en: 'Priority' },
   'tkt.updated': { ar: 'آخر تحديث', en: 'Last updated' },
   'tkt.view': { ar: 'عرض', en: 'View' },
-  'tkt.submit': { ar: 'إرسال تذكرة', en: 'Submit Ticket' },
-  'tkt.chooseDept': { ar: 'اختر قسم الدعم', en: 'Choose a Support Department' },
-  'tkt.info': { ar: 'بيانات التذكرة', en: 'Ticket Information' },
-  'tkt.details': { ar: 'تفاصيل التذكرة', en: 'Ticket Details' },
+  'tkt.submit': { ar: 'إرسال تذكرة', en: 'Submit ticket' },
+  'tkt.chooseDept': { ar: 'اختر قسم الدعم', en: 'Choose a support department' },
+  'tkt.info': { ar: 'بيانات التذكرة', en: 'Ticket information' },
+  'tkt.details': { ar: 'تفاصيل التذكرة', en: 'Ticket details' },
   'tkt.message': { ar: 'الرسالة', en: 'Message' },
   'tkt.format': { ar: 'تنسيق', en: 'Formatting' },
   'tkt.tool0': { ar: 'عريض', en: 'Bold' },
@@ -1408,15 +1429,17 @@ export const STRINGS = {
   'tkt.tool7': { ar: 'اقتباس', en: 'Quote' },
   'tkt.lines': { ar: 'أسطر', en: 'Lines' },
   'tkt.words': { ar: 'كلمات', en: 'Words' },
-  'tkt.attachments': { ar: 'المرفقات', en: 'Add Attachments' },
+  'tkt.attachments': { ar: 'المرفقات', en: 'Attachments' },
   'tkt.attachNote': { ar: 'الامتدادات المسموحة: jpg, gif, jpeg, png, txt, pdf — بحد أقصى 4 ميجابايت للملف.', en: 'Allowed: jpg, gif, jpeg, png, txt, pdf — up to 4 MB per file.' },
-  'tkt.suggestions': { ar: 'مقالات قد تفيدك', en: 'Knowledgebase Suggestions' },
+  'tkt.suggestions': { ar: 'مقالات قد تفيدك', en: 'Knowledgebase suggestions' },
   'tkt.suggestionsNote': { ar: 'بنبحث في قاعدة المعرفة وانت بتكتب الموضوع.', en: 'We search the knowledgebase while you type the subject.' },
   'tkt.suggestionsEmpty': { ar: 'اكتب الموضوع وهتظهر لك اقتراحات.', en: 'Type a subject and suggestions will appear here.' },
-  'tkt.send': { ar: 'إرسال', en: 'Send Message' },
+  'tkt.send': { ar: 'إرسال', en: 'Send' },
   'tkt.cancel': { ar: 'إلغاء', en: 'Cancel' },
   'tkt.reply': { ar: 'رد', en: 'Reply' },
   'tkt.close': { ar: 'إغلاق التذكرة', en: 'Close ticket' },
+  'tkt.noneFilter': { ar: 'مفيش تذاكر بالفلاتر دي.', en: 'No tickets match these filters.' },
+  'tkt.showAll': { ar: 'اعرض كل التذاكر', en: 'Show all tickets' },
 
   'prio.low': { ar: 'منخفضة', en: 'Low' },
   'prio.medium': { ar: 'متوسطة', en: 'Medium' },
@@ -1432,6 +1455,8 @@ export const STRINGS = {
   'dept.transfer.body': { ar: 'عندك موقع مستضاف في مكان تاني؟ ابعت طلب نقل.', en: 'Hosting a site elsewhere? Submit a transfer request.' },
 
   'kb.search': { ar: 'ابحث في قاعدة المعرفة', en: 'Search the knowledgebase' },
+  'kb.categories': { ar: 'تصنيفات المقالات', en: 'Article categories' },
+  'kb.related': { ar: 'مقالات في نفس التصنيف', en: 'More in this category' },
   'kb.helpful': { ar: 'هل كانت المقالة دي مفيدة؟', en: 'Was this article helpful?' },
   'kb.thanks': { ar: 'شكرًا — رأيك بيساعدنا نحسّن المقالات.', en: 'Thank you — your answer helps us improve these articles.' },
   'kb.yes': { ar: 'نعم', en: 'Yes' },
@@ -1446,6 +1471,10 @@ export const STRINGS = {
   'kb.a2.body': { ar: 'من صفحة الخدمة اضغط «ادخل على cPanel» — الدخول تلقائي من غير كلمة مرور تانية.', en: 'From the service page press "Log in to cPanel" — the sign-in is automatic and needs no second password.' },
   'kb.a3.title': { ar: 'إعداد البريد على الموبايل', en: 'Setting up email on your phone' },
   'kb.a3.body': { ar: 'استخدم IMAP على mail.somion.ch، بورت 993 مع SSL للوارد و465 للصادر.', en: 'Use IMAP on mail.somion.ch, port 993 with SSL for incoming and 465 for outgoing.' },
+  'kb.a5.title': { ar: 'إزاي تنقل دومينك لـ SWS', en: 'How to transfer your domain to SWS' },
+  'kb.a5.body': { ar: 'افتح قفل الدومين عند المُسجِّل الحالي، اطلب كود الـEPP، وبعدين ادخل الكود في صفحة نقل الدومين. النقل بياخد من ٥ لـ٧ أيام وبيضيف سنة على مدة الدومين.', en: 'Unlock the domain at your current registrar, ask it for the EPP code, then enter that code on the domain transfer page. A transfer takes five to seven days and adds a year to the domain.' },
+  'kb.a6.title': { ar: 'إزاي تقرا فاتورتك', en: 'How to read your invoice' },
+  'kb.a6.body': { ar: 'كل بند في الفاتورة بيوضّح الخدمة ودورة الفوترة والمدة اللي بتغطيها. ضريبة القيمة المضافة سطر منفصل، والإجمالي تحتها هو المبلغ اللي هيتخصم فعلًا.', en: 'Each line on an invoice names the service, its billing cycle and the period it covers. VAT is its own line, and the total beneath it is the figure that will actually be charged.' },
   'kb.a4.title': { ar: 'ليه سعر التجديد مختلف أحيانًا', en: 'Why a renewal price can differ' },
   'kb.a4.body': { ar: 'باقات الاستضافة بتتجدد بنفس السعر. الدومينات بس هي اللي سعر تجديدها ممكن يختلف عن سعر التسجيل، والرقمين معروضين جنب بعض في صفحة الدومينات.', en: 'Hosting plans renew at the same price. Only domains can renew at a different figure from registration, and both numbers are shown side by side on the domains page.' },
 
@@ -1470,6 +1499,18 @@ export const STRINGS = {
   'sec.newPassword': { ar: 'كلمة مرور جديدة', en: 'New password' },
   'sec.changePassword': { ar: 'غيّر كلمة المرور', en: 'Change password' },
   'sec.twofaNote': { ar: 'كود إضافي من تطبيق المصادقة عند كل دخول.', en: 'An extra code from your authenticator app at every sign-in.' },
+  'sec.twofaOnNote': { ar: 'مفعّل — هيتطلب منك كود عند كل دخول.', en: 'On — you will be asked for a code at every sign-in.' },
+  'sec.twofaStep1': { ar: '١ — امسح الكود ده من تطبيق المصادقة (Google Authenticator أو أي تطبيق تاني).', en: '1 — Scan this code in your authenticator app (Google Authenticator or any other).' },
+  'sec.twofaStep2': { ar: '٢ — أو أدخل المفتاح ده يدويًا لو مش قادر تمسح الكود.', en: '2 — Or enter this key by hand if you cannot scan the code.' },
+  'sec.twofaStep3': { ar: '٣ — اكتب الكود المكوّن من ٦ أرقام اللي ظهر في التطبيق', en: '3 — Enter the six-digit code your app is showing' },
+  'sec.twofaConfirm': { ar: 'فعّل التحقق بخطوتين', en: 'Turn on two-factor' },
+  'sec.twofaOn': { ar: 'التحقق بخطوتين اتفعّل', en: 'Two-factor is on' },
+  'sec.twofaOff': { ar: 'التحقق بخطوتين اتوقف — حسابك دلوقتي بكلمة المرور بس.', en: 'Two-factor is off — your account is now protected by a password alone.' },
+  'sec.qrLabel': { ar: 'مكان رمز QR الخاص بالتحقق بخطوتين', en: 'Slot for the two-factor QR code' },
+  'sec.qrTag': { ar: 'رمز QR', en: 'QR code' },
+  'sec.qrNote': { ar: 'الرمز بيتولّد في الخادم لكل حساب على حدة، فمش مرسوم هنا.', en: 'The code is minted per account on the server, so it is not drawn here.' },
+  'sec.backup': { ar: 'رموز احتياطية', en: 'Backup codes' },
+  'sec.backupNote': { ar: 'احفظهم في مكان آمن. كل رمز بيشتغل مرة واحدة، ودول طريقك لو ضاع الموبايل.', en: 'Keep these somewhere safe. Each one works once, and they are your way in if you lose your phone.' },
   'sec.log': { ar: 'سجل الدخول', en: 'Login activity' },
   'sec.ip': { ar: 'عنوان IP', en: 'IP address' },
   'sec.where': { ar: 'المكان', en: 'Location' },
@@ -1480,8 +1521,48 @@ export const STRINGS = {
   'con.edit': { ar: 'تعديل', en: 'Edit' },
   'con.add': { ar: 'أضف جهة اتصال', en: 'Add a contact' },
   'perm.invoices': { ar: 'الفواتير', en: 'Invoices' },
+  'perm.invoices.note': { ar: 'يشوف الفواتير ويدفعها.', en: 'Can see invoices and pay them.' },
   'perm.tickets': { ar: 'التذاكر', en: 'Tickets' },
+  'perm.tickets.note': { ar: 'يفتح تذاكر دعم ويرد عليها.', en: 'Can open support tickets and reply to them.' },
   'perm.domains': { ar: 'الدومينات', en: 'Domains' },
+  'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
+  'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
+  'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
+  'con.done': { ar: 'إغلاق', en: 'Done' },
+
+
+  /* Table toolbars — the search field and filter pills above every client-area table. The
+     placeholder is always the plain word; these name the list for a screen reader. */
+  'search.services': { ar: 'ابحث في الخدمات', en: 'Search services' },
+  'search.domains': { ar: 'ابحث في الدومينات', en: 'Search domains' },
+  'search.dns': { ar: 'ابحث في سجلات DNS', en: 'Search DNS records' },
+  'search.invoices': { ar: 'ابحث في الفواتير', en: 'Search invoices' },
+  'search.txns': { ar: 'ابحث في الحركات', en: 'Search transactions' },
+  'search.tickets': { ar: 'ابحث في التذاكر', en: 'Search tickets' },
+  'search.log': { ar: 'ابحث في سجل الدخول', en: 'Search login activity' },
+  'search.notifs': { ar: 'ابحث في التنبيهات', en: 'Search notifications' },
+  'search.contacts': { ar: 'ابحث في جهات الاتصال', en: 'Search contacts' },
+  'search.news': { ar: 'ابحث في الإعلانات', en: 'Search announcements' },
+
+  'filter.allStatuses': { ar: 'كل الحالات', en: 'All statuses' },
+  'filter.allTypes': { ar: 'كل الأنواع', en: 'All types' },
+  'filter.allDepartments': { ar: 'كل الأقسام', en: 'All departments' },
+  'filter.allPriorities': { ar: 'كل الأولويات', en: 'All priorities' },
+  'filter.allCategories': { ar: 'كل التصنيفات', en: 'All categories' },
+  'filter.allChannels': { ar: 'كل القنوات', en: 'All channels' },
+  'filter.allPermissions': { ar: 'كل الصلاحيات', en: 'All permissions' },
+  'filter.allResults': { ar: 'كل المحاولات', en: 'All attempts' },
+  'filter.channel': { ar: 'القناة', en: 'Channel' },
+  'filter.result': { ar: 'نتيجة المحاولة', en: 'Result' },
+  'filter.recordType': { ar: 'نوع السجل', en: 'Record type' },
+
+  'empty.search': { ar: 'مفيش نتايج للبحث ده', en: 'Nothing matches that search' },
+  'empty.searchNote': { ar: 'غيّر كلمة البحث أو ارجع الفلاتر للكل.', en: 'Try different words, or set the filters back to all.' },
+  'empty.dns': { ar: 'مفيش سجل مطابق', en: 'No records match' },
+  'empty.log': { ar: 'مفيش محاولة دخول مطابقة', en: 'No sign-in matches' },
+  'empty.notifs': { ar: 'مفيش تنبيه مطابق', en: 'No notification matches' },
+  'empty.news': { ar: 'مفيش إعلان مطابق', en: 'No announcement matches' },
+  'empty.contactsFilter': { ar: 'مفيش جهة اتصال مطابقة', en: 'No contact matches' },
 
   'footer.privacy': { ar: 'سياسة الخصوصية', en: 'Privacy policy' },
   'footer.terms': { ar: 'الشروط والأحكام', en: 'Terms' },

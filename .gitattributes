@@ -1,0 +1,4 @@
+# The token gate compares dist/tokens.css byte-for-byte against what build.mjs generates,
+# and build.mjs writes LF. Without this, a clone on Windows checks the file out with CRLF
+# and `npm run gate` fails on a file nobody touched.
+tokens/dist/tokens.css text eol=lf

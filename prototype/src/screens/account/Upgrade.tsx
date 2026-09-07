@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
+import { Tag } from '../../components/Tag';
 import { Button } from '../../components/Button';
 import { IconCheck, IconArrow, IconAlert, IconServer } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
@@ -59,13 +60,9 @@ export function UpgradePlan() {
               <div className={`pick${isCurrent ? ' pick--current' : ''}`}>
                 <div className="pick__head">
                   <h2 className="pick__name">{p.name}</h2>
-                  {isCurrent ? (
-                    <span className="tag tag--taken">{t('up.current')}</span>
-                  ) : (
-                    <span className={`tag tag--${dir === 'up' ? 'ok' : 'due'}`}>
-                      {t(dir === 'up' ? 'up.step' : 'up.stepDown')}
-                    </span>
-                  )}
+                  <Tag tone="neutral">
+                    {isCurrent ? t('up.current') : t(dir === 'up' ? 'up.step' : 'up.stepDown')}
+                  </Tag>
                 </div>
 
                 <p className="pick__price">

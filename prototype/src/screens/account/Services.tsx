@@ -3,6 +3,8 @@ import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { DevNote } from '../../components/DevNote';
+import { Tag, SERVICE_TONE, DOMAIN_TONE, INVOICE_TONE } from '../../components/Tag';
+import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import {
   IconArrow,
   IconExternal,
@@ -39,9 +41,14 @@ export function Services() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
   const { services } = useAccountState();
+  const [q, setQ] = useState('');
   const [status, setStatus] = useState<ServiceStatus | 'all'>('all');
 
-  const rows = services.filter((s) => status === 'all' || s.status === status);
+  // The plan name and the domain are the two things anyone knows a service by, and the domain
+  // is the one they will type — it is what the service is called in every other conversation.
+  const rows = services.filter(
+    (s) => (status === 'all' || s.status === status) && matches(q, s.product, s.domain, s.nextDue),
+  );
 
   return (
     <AccountLayout
@@ -52,25 +59,23 @@ export function Services() {
         </Link>
       }
     >
-      <div className="bar">
-        <div className="filters" role="group" aria-label={t('account.status')}>
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              type="button"
-              className={`filters__btn${status === s ? ' is-active' : ''}`}
-              aria-pressed={status === s}
-              onClick={() => setStatus(s)}
-            >
-              {t(s === 'all' ? 'inv.all' : (`status.${s}` as never))}
-            </button>
-          ))}
-        </div>
-        <p className="bar__count">
-          <span className="serial">{rows.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{services.length}</span>
-        </p>
-      </div>
+      <TableToolbar
+        value={q}
+        onChange={setQ}
+        label={t('search.services')}
+        shown={rows.length}
+        total={services.length}
+      >
+        <TableFilter
+          label={t('account.status')}
+          value={status}
+          onChange={setStatus}
+          options={STATUSES.map((s) => ({
+            value: s,
+            label: t(s === 'all' ? 'filter.allStatuses' : (`status.${s}` as never)),
+          }))}
+        />
+      </TableToolbar>
 
       {rows.length > 0 ? (
         <div className="card card--flush table-scroll">
@@ -98,9 +103,7 @@ export function Services() {
                     {formatAmount(convert(s.amountUsdMinor, currency), locale)} {currency}
                   </td>
                   <td>
-                    <span className={`tag tag--${s.status === 'active' ? 'ok' : 'taken'}`}>
-                      {t(`status.${s.status}` as never)}
-                    </span>
+                    <Tag tone={SERVICE_TONE[s.status]}>{t(`status.${s.status}` as never)}</Tag>
                   </td>
                   <td className="num">
                     <Link className="btn btn--sm btn--secondary" to={`/account/services/${s.id}`}>
@@ -114,11 +117,12 @@ export function Services() {
           </table>
         </div>
       ) : (
-        /* A filter that matches nothing says so, rather than showing an empty table frame. */
+        /* A search or filter that matches nothing says so, rather than showing an empty table
+           frame — and it says which of the two emptied the list. */
         <div className="card empty">
           <IconServer size={28} />
-          <p className="empty__title">{t('empty.services')}</p>
-          <p className="empty__note">{t('empty.filter')}</p>
+          <p className="empty__title">{t(q.trim() ? 'empty.search' : 'empty.services')}</p>
+          <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       )}
     </AccountLayout>
@@ -249,9 +253,7 @@ export function ServiceDetail() {
       ]}
       meta={
         <>
-          <span className={`tag tag--${svc.status === 'active' ? 'ok' : 'taken'}`}>
-            {t(`status.${svc.status}` as never)}
-          </span>
+          <Tag tone={SERVICE_TONE[svc.status]}>{t(`status.${svc.status}` as never)}</Tag>
           <span className="app__meta-note">{t(`svc.kind.${svc.kind}` as never)}</span>
         </>
       }
@@ -407,10 +409,10 @@ export function ServiceDetail() {
             {activeAddons.length > 0 ? (
               <p className="tags">
                 {activeAddons.map((a) => (
-                  <span className="tag tag--ok" key={a}>
+                  <Tag tone="ok" key={a}>
                     <IconCheck size={13} />
                     {a}
-                  </span>
+                  </Tag>
                 ))}
               </p>
             ) : (
@@ -489,9 +491,7 @@ export function ServiceDetail() {
                           <td className="serial"><bdi>{inv.date}</bdi></td>
                           <td className="num">{money(inv.totalUsdMinor)}</td>
                           <td>
-                            <span className={`tag tag--${inv.status === 'paid' ? 'ok' : 'due'}`}>
-                              {t(`inv.${inv.status}` as never)}
-                            </span>
+                            <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
                           </td>
                           <td className="num">
                             <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
@@ -519,9 +519,7 @@ export function ServiceDetail() {
                     <div>
                       <dt>{t('account.status')}</dt>
                       <dd>
-                        <span className={`tag tag--${dom.status === 'active' ? 'ok' : 'due'}`}>
-                          {t(`dom.${dom.status}` as never)}
-                        </span>
+                        <Tag tone={DOMAIN_TONE[dom.status]}>{t(`dom.${dom.status}` as never)}</Tag>
                       </dd>
                     </div>
                   </dl>
@@ -599,7 +597,12 @@ export function ServiceDetail() {
                   {t('svc.builder')}
                 </Link>
               )}
-              <Link className="btn btn--md btn--secondary" to="/account/tickets/new">
+              {/* Spec 9.2: support "related to this service specifically" — the service
+                  travels with the link so the ticket form opens knowing which one. */}
+              <Link
+                className="btn btn--md btn--secondary"
+                to={`/account/tickets/new?service=${svc.id}`}
+              >
                 <IconSupport size={15} />
                 {t('svc.support')}
               </Link>
