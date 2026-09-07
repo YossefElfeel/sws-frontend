@@ -1,22 +1,28 @@
-import { useState } from 'react';
-import { IconCoin, IconChevron } from './icons';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { IconCoin, IconChevron, IconLock } from './icons';
 import { Button } from './Button';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { CURRENCIES, convert, formatAmount, type Currency } from '../lib/catalog';
+import { ACCOUNT, BILLING_LOCKED } from '../lib/account';
 
 /**
- * Currency switch — S-04, and the open half of I15.
+ * Currency switch — S-04, and both halves of I15.
  *
- * The decision on the register is framed as a choice between blocking the switch and emptying
- * the cart with a warning. Both are worse than the third option, which is what this does:
- * keep the cart, and show the new total before committing to it.
+ * For a visitor, the decision on the register is framed as a choice between blocking the
+ * switch and emptying the cart with a warning. Both are worse than the third option, which is
+ * what this does: keep the cart, and show the new total before committing to it. Blocking
+ * punishes someone for looking. Emptying destroys work they did not ask to lose. The actual
+ * risk in the spec is neither — it is a total that changes underneath a person without their
+ * noticing, so the fix is to make the change visible rather than to prevent it.
  *
- * Blocking punishes someone for looking. Emptying destroys work they did not ask to lose. The
- * actual risk in the spec is neither — it is a total that changes underneath a person without
- * their noticing, so the fix is to make the change visible rather than to prevent it. If the
- * product owner rules the other way this is one component to change, not every screen.
+ * Inside the client area the question is different. Once a payment has been made the account
+ * is billed in one currency, and re-pricing it from a menu would change what every invoice
+ * says. So the control becomes a lock: it still answers "which currency", it opens a note
+ * saying why it cannot be changed here and where to ask, and it holds the preference to the
+ * account currency so every figure in the account is in the money the person actually pays.
  *
  * With an empty cart there is nothing to be surprised by, so nothing interrupts.
  */
@@ -25,8 +31,68 @@ export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
   const { currency, setCurrency } = usePrefs();
   const { lines, total } = useCart();
   const [pending, setPending] = useState<Currency | null>(null);
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLSpanElement>(null);
+
+  const locked = variant === 'app' && BILLING_LOCKED;
+
+  useEffect(() => {
+    if (locked && currency !== ACCOUNT.currency) setCurrency(ACCOUNT.currency);
+  }, [locked, currency, setCurrency]);
+
+  // The note closes on the next thing you do, like the notification panel does.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    const onDown = (e: MouseEvent) => {
+      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [open]);
 
   const cls = variant === 'masthead' ? 'masthead__select' : 'app__select app__select--currency';
+
+  if (locked) {
+    return (
+      <span className="cur" ref={wrap}>
+        <button
+          type="button"
+          className={`${cls} cur__lock`}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <IconLock size={14} />
+          <span className="u-visually-hidden">{t('cur.lockedLabel')}</span>
+          <span className="serial">{ACCOUNT.currency}</span>
+        </button>
+
+        {open && (
+          <div className="cur__ask" role="dialog" aria-label={t('cur.lockedTitle')}>
+            <p className="cur__title">{t('cur.lockedTitle')}</p>
+            <p className="cur__note">{t('cur.lockedBody')}</p>
+            <div className="cur__acts">
+              <Link
+                className="btn btn--sm btn--secondary"
+                to="/account/tickets/new"
+                onClick={() => setOpen(false)}
+              >
+                {t('cur.lockedAsk')}
+              </Link>
+              <Button size="sm" variant="quiet" onClick={() => setOpen(false)}>
+                {t('cur.lockedClose')}
+              </Button>
+            </div>
+          </div>
+        )}
+      </span>
+    );
+  }
 
   const request = (next: Currency) => {
     if (next === currency) return;

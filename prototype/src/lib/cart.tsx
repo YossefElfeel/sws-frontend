@@ -17,6 +17,16 @@ import {
 } from './catalog';
 import { usePrefs } from './prefs';
 
+/** The three free add-ons a registered or transferred domain can carry — spec 7, O-03. */
+export type DomainAddon = 'dns' | 'idprotect' | 'forwarding';
+
+/** Labels for the add-ons, keyed to the domainsconf.* strings the spec screen already had. */
+export const DOMAIN_ADDON_KEY: Record<DomainAddon, string> = {
+  dns: 'domainsconf.dns',
+  idprotect: 'domainsconf.id',
+  forwarding: 'domainsconf.forwarding',
+};
+
 /** A configured line: the plan, its cycle, its add-on choices and any linked domain. */
 export interface CartLine {
   id: string;
@@ -24,7 +34,17 @@ export interface CartLine {
   cycle: Cycle;
   /** addon group id -> option id */
   addons: Record<string, string>;
-  domain?: { name: string; action: 'register' | 'transfer' | 'own' | 'cart'; years: number };
+  domain?: {
+    name: string;
+    action: 'register' | 'transfer' | 'own' | 'cart';
+    years: number;
+    addons?: DomainAddon[];
+  };
+  /**
+   * VPS only — spec 6.3's OS choice plus the server settings a provisioning module needs.
+   * The root password is carried so the order can be placed; nothing renders it.
+   */
+  server?: { hostname: string; rootPassword: string; ns1: string; ns2: string; os: string };
 }
 
 interface CartValue {

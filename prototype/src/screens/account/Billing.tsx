@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Tag, INVOICE_TONE } from '../../components/Tag';
+import { DevNote } from '../../components/DevNote';
+import { GatewayDetails } from '../../components/GatewayDetails';
 import {
   IconArrow,
   IconInvoice,
@@ -16,14 +18,25 @@ import { TableToolbar, TableFilter, matches } from '../../components/TableToolba
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
-import { convert, formatAmount, gatewaysFor, GATEWAYS } from '../../lib/catalog';
+import {
+  convert,
+  formatAmount,
+  gatewaysFor,
+  GATEWAYS,
+  COUNTRIES,
+  TAX_RATE,
+} from '../../lib/catalog';
 import {
   INVOICES,
   PAYMENT_METHODS_SAVED,
   ACCOUNT,
+  COMPANY,
+  invoiceLedger,
+  invoiceBalanceUsdMinor,
   type InvoiceStatus,
   type InvoiceLine,
 } from '../../lib/account';
+import { gatewayDestination } from '../Order';
 
 const FILTERS: (InvoiceStatus | 'all')[] = ['all', 'unpaid', 'paid', 'overdue', 'cancelled'];
 
@@ -153,23 +166,52 @@ export function Invoices() {
 }
 
 /**
- * Single invoice — spec 9.4: line items, payment method, Pay Now, Download PDF.
+ * Single invoice — spec 9.4, C-15, and the paying of it, C-17.
  *
- * This one screen keeps a document's measure rather than filling the app's width: an invoice
- * is a thing you read, print and file, and a full-bleed one reads as a report.
+ * The document keeps a document's measure rather than filling the app's width: an invoice is
+ * a thing you read, print and file, and a full-bleed one reads as a report. Beside it sits
+ * the one thing a document cannot do — take the payment. The sidebar names what is still
+ * owed, offers the methods the currency allows, says what each one involves before Pay is
+ * pressed, and sends the person to that method's own next screen with this invoice attached.
+ *
+ * Under the lines, the ledger: what money actually moved against this invoice and when. The
+ * balance is arithmetic over it, so a "paid" invoice with a balance would be a fixture error
+ * that shows, not one that hides.
  */
 export function InvoiceDetail() {
-  const { t, locale } = useLocale();
+  const { t, locale, bi } = useLocale();
   const { currency } = usePrefs();
   const { id } = useParams<{ id: string }>();
   const inv = INVOICES.find((i) => i.id === id);
   const { saved, mark, clear } = useSaved(6000);
 
+  const gateways = gatewaysFor(currency);
+  const [method, setMethod] = useState(
+    inv?.method && gateways.some((g) => g.id === inv.method) ? inv.method : gateways[0]?.id ?? 'stripe-card',
+  );
+  const [useCredit, setUseCredit] = useState(false);
+
+  // The EGP wallet leaves the list when the currency does; the choice follows.
+  useEffect(() => {
+    if (!gateways.some((g) => g.id === method)) setMethod(gateways[0]?.id ?? 'stripe-card');
+  }, [gateways, method]);
+
   if (!inv) return <Navigate to="/account/invoices" replace />;
 
+  const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
   const sub = inv.lines.reduce((s, l) => s + l.amountUsdMinor, 0);
-  const method = GATEWAYS.find((g) => g.id === inv.method);
+  const rate = Math.round((inv.taxRate ?? TAX_RATE) * 100);
+  const paidWith = GATEWAYS.find((g) => g.id === inv.method);
   const unpaid = inv.status !== 'paid' && inv.status !== 'cancelled';
+  const ledger = invoiceLedger(inv);
+  const balance = invoiceBalanceUsdMinor(inv);
+  const creditUsable = Math.min(ACCOUNT.creditUsdMinor, balance);
+  const balanceShown = useCredit ? balance - creditUsable : balance;
+  const chosen = gateways.find((g) => g.id === method) ?? gateways[0];
+  const dest = gatewayDestination(method);
+  // The credit choice travels with the invoice, so the next screen asks for the figure shown here.
+  const payHref = `${dest}${dest.includes('?') ? '&' : '?'}invoice=${inv.id}${useCredit ? '&credit=1' : ''}`;
+  const country = COUNTRIES.find((c) => c.code === ACCOUNT.country)?.label ?? ACCOUNT.country;
 
   /**
    * The product name and the domain stay as written; only the cycle is a word, so only the
@@ -178,7 +220,7 @@ export function InvoiceDetail() {
    */
   const lineLabel = (l: InvoiceLine) => (
     <>
-      <bdi>{l.product}</bdi>
+      {l.productKey ? t(l.productKey as never) : <bdi>{l.product}</bdi>}
       {l.domain && (
         <>
           {' — '}
@@ -206,7 +248,7 @@ export function InvoiceDetail() {
             {t('inv.pdf')}
           </Button>
           {unpaid && (
-            <Link className="btn btn--md btn--primary" to="/checkout/card">
+            <Link className="btn btn--md btn--primary" to={payHref}>
               {t('account.pay')}
             </Link>
           )}
@@ -217,59 +259,262 @@ export function InvoiceDetail() {
         {t('inv.pdfPendingNote')}
       </SavedNote>
 
-      <div className="card invoice">
-        <div className="invoice__head">
-          <dl className="kv">
-            <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
-            <div><dt>{t('inv.due')}</dt><dd className="serial"><bdi>{inv.due}</bdi></dd></div>
-            <div>
-              <dt>{t('account.status')}</dt>
-              <dd>
+      <div className="with-side">
+        <div className="dash__main">
+          <article className="card invoice">
+            <div className="invoice__head">
+              <p className="eyebrow">{t('account.invoice')}</p>
+              <p className="invoice__number">
+                <span className="serial">
+                  <bdi>{inv.number}</bdi>
+                </span>{' '}
                 <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
-              </dd>
+              </p>
+              <dl className="kv">
+                <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
+                <div><dt>{t('inv.due')}</dt><dd className="serial"><bdi>{inv.due}</bdi></dd></div>
+                {inv.paidOn && (
+                  <div><dt>{t('inv.paidOn')}</dt><dd className="serial"><bdi>{inv.paidOn}</bdi></dd></div>
+                )}
+                {paidWith && (
+                  <div>
+                    <dt>{t('checkout.method')}</dt>
+                    <dd>{t(paidWith.labelKey as never)}</dd>
+                  </div>
+                )}
+              </dl>
             </div>
-            {method && (
+
+            {/* Who owes and who is owed. The issuer carries only what has been confirmed. */}
+            <div className="parties">
               <div>
-                <dt>{t('checkout.method')}</dt>
-                <dd>{t(method.labelKey as never)}</dd>
+                <p className="eyebrow">{t('inv.invoicedTo')}</p>
+                <p className="lead">{bi(ACCOUNT.name)}</p>
+                {ACCOUNT.company && <p>{bi(ACCOUNT.company)}</p>}
+                <p>{bi(ACCOUNT.address)}</p>
+                <p>
+                  {bi(ACCOUNT.city)} <span className="serial">{ACCOUNT.postcode}</span>
+                </p>
+                <p>{country}</p>
+                <p className="serial">
+                  <bdi>{ACCOUNT.email}</bdi>
+                </p>
+              </div>
+              <div>
+                <p className="eyebrow">{t('inv.issuedBy')}</p>
+                <p className="lead">
+                  <bdi>{COMPANY.name}</bdi>
+                </p>
+                <p>{t(COMPANY.countryKey as never)}</p>
+                {COMPANY.taxId ? (
+                  <p className="serial">
+                    <bdi>{COMPANY.taxId}</bdi>
+                  </p>
+                ) : (
+                  <DevNote>{t('dev.taxId')}</DevNote>
+                )}
+              </div>
+            </div>
+
+            {/* Three columns and a date range: on a phone the table scrolls inside the
+                document rather than widening it. */}
+            <div className="table-scroll">
+              <table className="data data--flush">
+                <thead>
+                  <tr>
+                    <th scope="col">{t('inv.description')}</th>
+                    <th scope="col">{t('inv.period')}</th>
+                    <th scope="col" className="num">{t('col.amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inv.lines.map((l, i) => (
+                    <tr key={`${l.product ?? l.productKey}-${i}`} className={l.sub ? 'is-sub' : undefined}>
+                      <td>
+                        {lineLabel(l)}
+                        {l.taxable !== false && <sup>*</sup>}
+                      </td>
+                      <td className="serial">
+                        {l.from && (
+                          <bdi>
+                            {l.from} – {l.to}
+                          </bdi>
+                        )}
+                      </td>
+                      <td className="num">{formatAmount(convert(l.amountUsdMinor, currency), locale)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="form__note">
+              * {t('inv.taxNote')} <span className="serial">{rate}%</span>
+            </p>
+
+            <dl className="totals">
+              <div className="totals__row">
+                <dt>{t('cart.subtotal')}</dt>
+                <dd>{formatAmount(convert(sub, currency), locale)}</dd>
+              </div>
+              <div className="totals__row">
+                <dt>
+                  {t('inv.tax')} <span className="serial">{rate}%</span>
+                </dt>
+                <dd>{formatAmount(convert(inv.taxUsdMinor, currency), locale)}</dd>
+              </div>
+              {inv.creditUsdMinor ? (
+                <div className="totals__row totals__row--credit">
+                  <dt>{t('inv.creditApplied')}</dt>
+                  <dd>−{formatAmount(convert(inv.creditUsdMinor, currency), locale)}</dd>
+                </div>
+              ) : null}
+              <div className="totals__row totals__row--grand">
+                <dt>{t('cart.total')}</dt>
+                <dd>{money(inv.totalUsdMinor)}</dd>
+              </div>
+            </dl>
+          </article>
+
+          <section className="card card--flush">
+            <header className="card__head card__head--flush">
+              <h2 className="card__heading">{t('inv.ledger')}</h2>
+            </header>
+            {ledger.length > 0 ? (
+              <div className="table-scroll">
+                <table className="data">
+                  <thead>
+                    <tr>
+                      <th scope="col">{t('account.date')}</th>
+                      <th scope="col">{t('txn.kind')}</th>
+                      <th scope="col">{t('checkout.method')}</th>
+                      <th scope="col">{t('txn.reference')}</th>
+                      <th scope="col" className="num">{t('col.amount')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ledger.map((x) => {
+                      const g = GATEWAYS.find((gg) => gg.id === x.gateway);
+                      return (
+                        <tr key={x.id}>
+                          <td className="serial"><bdi>{x.at}</bdi></td>
+                          <td>
+                            <Tag tone={x.kind === 'refund' ? 'bad' : x.kind === 'credit' ? 'neutral' : 'ok'}>
+                              {t(`txn.${x.kind}` as never)}
+                            </Tag>
+                          </td>
+                          <td>{g ? t(g.labelKey as never) : x.gateway === 'credit' ? t('pay.credit') : x.gateway}</td>
+                          <td className="serial"><bdi>{x.reference}</bdi></td>
+                          <td className={`num${x.amountUsdMinor < 0 ? ' is-out' : ''}`}>
+                            <bdi>
+                              {x.amountUsdMinor < 0 ? '−' : ''}
+                              {money(Math.abs(x.amountUsdMinor))}
+                            </bdi>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty">
+                <IconWallet size={28} />
+                <p className="empty__title">{t('inv.noPayments')}</p>
+                <p className="empty__note">{t('inv.noPaymentsNote')}</p>
               </div>
             )}
-          </dl>
+            <dl className="totals invoice__balance">
+              <div className="totals__row totals__row--grand">
+                <dt>{t('inv.balanceDue')}</dt>
+                <dd>{money(balance)}</dd>
+              </div>
+            </dl>
+          </section>
         </div>
 
-        <table className="data data--flush">
-          <thead>
-            <tr>
-              <th scope="col">{t('inv.description')}</th>
-              <th scope="col" className="num">{t('col.amount')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inv.lines.map((l) => (
-              <tr key={`${l.product}-${l.domain ?? ''}`}>
-                <td>{lineLabel(l)}</td>
-                <td className="num">{formatAmount(convert(l.amountUsdMinor, currency), locale)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="dash__side">
+          {unpaid ? (
+            <section className="card">
+              <header className="card__head">
+                <h2 className="card__heading">{t('inv.balanceDue')}</h2>
+              </header>
+              <p className="figure">
+                <span className="figure__n serial">{money(balanceShown)}</span>
+              </p>
 
-        <dl className="totals">
-          <div className="totals__row">
-            <dt>{t('cart.subtotal')}</dt>
-            <dd>{formatAmount(convert(sub, currency), locale)}</dd>
-          </div>
-          <div className="totals__row">
-            <dt>{t('cart.vat')}</dt>
-            <dd>{formatAmount(convert(inv.taxUsdMinor, currency), locale)}</dd>
-          </div>
-          <div className="totals__row totals__row--grand">
-            <dt>{t('cart.total')}</dt>
-            <dd>
-              {formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}
-            </dd>
-          </div>
-        </dl>
+              {/* C-17 use-credit: the balance the person owes is the one the switch leaves. */}
+              {ACCOUNT.creditUsdMinor > 0 && (
+                <label className="switch-row">
+                  <span>
+                    <span className="switch-row__label">{t('inv.useCredit')}</span>
+                    <span className="switch-row__note">
+                      {t('inv.useCreditNote')}{' '}
+                      <span className="serial">{money(ACCOUNT.creditUsdMinor)}</span>
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    name="usecredit"
+                    checked={useCredit}
+                    onChange={(e) => setUseCredit(e.target.checked)}
+                  />
+                </label>
+              )}
+
+              <label className="field-label u-mt-16">
+                <span className="eyebrow">{t('checkout.method')}</span>
+                <select className="field" value={method} onChange={(e) => setMethod(e.target.value)}>
+                  {gateways.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {t(g.labelKey as never)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {chosen && (
+                <div className="u-mt-16">
+                  <GatewayDetails
+                    gateway={chosen}
+                    compact
+                    reference={inv.number}
+                    amountMinor={convert(balanceShown, currency)}
+                  />
+                </div>
+              )}
+
+              <div className="acts u-mt-16">
+                <Link className="btn btn--md btn--primary" to={payHref}>
+                  {t('account.pay')}
+                  <IconArrow size={15} />
+                </Link>
+              </div>
+            </section>
+          ) : (
+            <section className="card card--calm">
+              <header className="card__head">
+                <h2 className="card__heading">
+                  <IconCheck size={17} />
+                  {t('inv.paidInFull')}
+                </h2>
+              </header>
+              <dl className="kv">
+                {inv.paidOn && (
+                  <div><dt>{t('inv.paidOn')}</dt><dd className="serial"><bdi>{inv.paidOn}</bdi></dd></div>
+                )}
+                {paidWith && (
+                  <div><dt>{t('checkout.method')}</dt><dd>{t(paidWith.labelKey as never)}</dd></div>
+                )}
+              </dl>
+              <div className="acts u-mt-16">
+                <Button size="md" variant="secondary" onClick={() => mark(t('inv.pdfPending'))}>
+                  <IconInvoice size={15} />
+                  {t('inv.pdf')}
+                </Button>
+              </div>
+            </section>
+          )}
+        </div>
       </div>
     </AccountLayout>
   );
@@ -281,9 +526,16 @@ export function AddFunds() {
   const { currency } = usePrefs();
   const [amount, setAmount] = useState(2000);
   const [added, setAdded] = useState(false);
+  const gateways = gatewaysFor(currency);
+  const [method, setMethod] = useState(gateways[0]?.id ?? 'stripe-card');
+
+  useEffect(() => {
+    if (!gateways.some((g) => g.id === method)) setMethod(gateways[0]?.id ?? 'stripe-card');
+  }, [gateways, method]);
 
   const presets = [1000, 2000, 5000, 10000];
   const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
+  const chosen = gateways.find((g) => g.id === method);
 
   if (added) {
     return (
@@ -353,15 +605,29 @@ export function AddFunds() {
               <h2 className="card__heading">{t('checkout.method')}</h2>
             </header>
             <ul className="methods">
-              {gatewaysFor(currency).map((g, i) => (
+              {gateways.map((g) => (
                 <li key={g.id}>
-                  <label className={`method${i === 0 ? ' is-selected' : ''}`}>
-                    <input type="radio" name="fundsmethod" defaultChecked={i === 0} />
-                    <span className="method__label">{t(g.labelKey as never)}</span>
+                  <label className={`method${method === g.id ? ' is-selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="fundsmethod"
+                      value={g.id}
+                      checked={method === g.id}
+                      onChange={() => setMethod(g.id)}
+                    />
+                    <span className="method__label">
+                      {t(g.labelKey as never)}
+                      <span className="method__note">{t(g.noteKey as never)}</span>
+                    </span>
                   </label>
                 </li>
               ))}
             </ul>
+            {chosen && (
+              <div className="u-mt-16">
+                <GatewayDetails gateway={chosen} compact amountMinor={convert(amount, currency)} />
+              </div>
+            )}
           </section>
         </div>
 

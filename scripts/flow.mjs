@@ -58,12 +58,47 @@ ok('summary updates on addon choice', before !== after, `${before} -> ${after}`)
 // Spec 7.2.1 domain step
 await p.click('.checkout__aside .btn');
 await p.waitForSelector('.choices');
-ok('four domain options', (await p.$$eval('.choice', (n) => n.length)) === 4);
+// "Domain from cart" is only a card when the cart holds a domain to take — with only the
+// hosting line in it, there are three choices and no way to pick nothing.
+ok('three domain options with no domain in the cart', (await p.$$eval('.choice', (n) => n.length)) === 3);
+ok('no from-cart card on an empty cart', (await p.$$('input[value="cart"]')).length === 0);
+ok('TLD picker beside the field', (await p.$$('.domain-strip__tld')).length === 1);
 await p.fill('#dom', 'kamalatelier');
 await p.click('.domain-strip__form .btn');
 await p.waitForSelector('.result');
 const resolved = await p.$eval('.result', (e) => e.className.includes('result--ok'));
 ok('availability resolves deterministically', typeof resolved === 'boolean', resolved ? 'available' : 'taken');
+
+// Put a standalone domain in the cart through the search, come back, and the fourth card is there.
+{
+  const stepHash = await p.evaluate(() => location.hash);
+  await p.evaluate(() => (location.hash = '#/domains'));
+  await p.waitForSelector('.domain-search input');
+  await p.fill('.domain-search input', 'kamalatelier');
+  await p.click('.domain-search button[type=submit]');
+  await p.waitForSelector('.data tbody tr');
+  await p.evaluate(() => {
+    const row = [...document.querySelectorAll('.data tbody tr')].find(
+      (r) => r.querySelector('.tag--ok') && r.querySelector('button:not([disabled])'),
+    );
+    row?.querySelector('button:not([disabled])')?.click();
+  });
+  await p.waitForTimeout(250);
+  await p.evaluate((h) => (location.hash = h), stepHash);
+  await p.waitForSelector('.choices');
+  ok('from-cart appears once a domain is in the cart', (await p.$$eval('.choice', (n) => n.length)) === 4);
+  await p.check('input[value="cart"]');
+  await p.waitForTimeout(120);
+  ok('from-cart needs a pick', await p.$eval('.step-foot .btn', (b) => b.disabled));
+  await p.selectOption('#dom-cart', { index: 1 });
+  await p.waitForTimeout(120);
+  ok('…and enables once picked', !(await p.$eval('.step-foot .btn', (b) => b.disabled)));
+  // Back to the registration path, so the rest of the walk sees the cart it expects.
+  await p.check('input[value="register"]');
+  await p.fill('#dom', 'kamalatelier');
+  await p.click('.domain-strip__form .btn');
+  await p.waitForSelector('.result');
+}
 
 // Spec 7.1 cart + promo
 await p.evaluate(() => (location.hash = '#/cart'));
@@ -138,7 +173,7 @@ for (const [gw, expect] of [
 await p.evaluate(() => (location.hash = '#/account'));
 await p.waitForSelector('.app__link');
 const sections = await p.$$eval('.app__link', (n) => n.length);
-ok('sidebar reaches every section', sections === 12, `${sections} sections`);
+ok('sidebar reaches every section', sections === 13, `${sections} sections`);
 ok('dashboard shows the four counts', (await p.$$eval('.stat-row .stat', (n) => n.length)) === 4);
 
 // The client area is an application, not another page of the site: none of the marketing
@@ -164,11 +199,15 @@ await p.waitForTimeout(120);
 const someSvc = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('services filter by status', someSvc < allSvc, `${allSvc} -> ${someSvc}`);
 
-// 9.3 DNS records on a managed domain
-await p.evaluate(() => (location.hash = '#/account/domains/dom-1'));
+// 9.3 DNS records on a managed domain — its own page now, behind the domain rail
+await p.evaluate(() => (location.hash = '#/account/domains/dom-1/dns'));
 await p.waitForSelector('.data tbody tr');
 const dns = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('DNS records listed', dns >= 5, `${dns} records`);
+ok('the domain rail lists eight pages', (await p.$$eval('.rail--domain .rail__list:first-of-type .rail__link', (n) => n.length)) === 8);
+await p.evaluate(() => (location.hash = '#/account/domains/dom-3/dns'));
+await p.waitForSelector('.card.empty');
+ok('a domain with no records says so', (await p.$$('.card.empty')).length === 1);
 
 // 9.4 invoices, filtered by status
 await p.evaluate(() => (location.hash = '#/account/invoices'));
@@ -421,24 +460,40 @@ await p.waitForSelector('.compare');
 
 // "Some buttons don't work" was the report, so the controls that were inert are exercised
 // here rather than only counted by the static audit.
-await p.evaluate(() => (location.hash = '#/account/domains/dom-1'));
-await p.waitForSelector('.form .field-label');
+await p.evaluate(() => (location.hash = '#/account/domains/dom-1/nameservers'));
+await p.waitForSelector('.methods input[value="custom"]');
 {
+  // dom-1 sits on our nameservers, so the custom fields appear only once that is chosen.
+  await p.check('.methods input[value="custom"]');
+  await p.waitForSelector('.form .field-label');
   const before = await p.$$eval('.form .field-label', (n) => n.length);
   await p.click('.form__foot .btn--secondary');
   await p.waitForTimeout(150);
   const after = await p.$$eval('.form .field-label', (n) => n.length);
   ok('add-a-nameserver adds one', after === before + 1, `${before} -> ${after}`);
 
+  await p.click('.form__foot .btn--primary');
+  await p.waitForSelector('.banner--success');
+  ok('saving says that it saved', true);
+
+  await p.evaluate(() => (location.hash = '#/account/domains/dom-1/dns'));
+  await p.waitForSelector('.data tbody tr');
   const rows = await p.$$eval('.data tbody tr', (n) => n.length);
   await p.click('.data tbody tr:first-child .btn--danger');
   await p.waitForTimeout(150);
   const left = await p.$$eval('.data tbody tr', (n) => n.length);
   ok('deleting a DNS record deletes it', left === rows - 1, `${rows} -> ${left}`);
 
-  await p.click('.form__foot .btn--primary');
-  await p.waitForSelector('.banner--success');
-  ok('saving says that it saved', true);
+  // The store, not the screen, holds the edit: a switch flipped on one page reads the same
+  // on the next.
+  await p.evaluate(() => (location.hash = '#/account/domains/dom-1/transfer-out'));
+  await p.waitForSelector('input[name="lock"]');
+  await p.click('input[name="lock"]');
+  await p.waitForTimeout(120);
+  await p.evaluate(() => (location.hash = '#/account/domains/dom-1'));
+  await p.waitForSelector('input[name="lock"]');
+  ok('an edit on one domain page shows on another', !(await p.$eval('input[name="lock"]', (i) => i.checked)));
+  await p.click('input[name="lock"]');
 }
 
 // A reply that vanishes is worse than no reply box.
@@ -561,7 +616,7 @@ await p.waitForSelector('.consent');
 
 // PRODUCT.md: no verified proof metrics exist. The company pages are where an invented
 // uptime figure or certification would land, so they are checked for one.
-for (const r of ['#/about', '#/data-centres', '#/status']) {
+for (const r of ['#/about', '#/data-centres', '#/status', '#/account/status']) {
   await p.evaluate((h) => (location.hash = h), r);
   await p.waitForSelector('main h1');
   await p.waitForTimeout(150);
@@ -754,6 +809,80 @@ for (const w of [390, 1440]) {
   );
 }
 await p.setViewportSize({ width: 1440, height: 900 });
+
+// ── 2026-09-07: the flows the competitor screenshots showed ─────────────────────
+
+// S-04 after the first payment: the currency is a lock, not a menu, and it says where to ask.
+await p.evaluate(() => (location.hash = '#/account'));
+await p.waitForSelector('.cur__lock');
+ok('the account currency is locked once a payment exists', (await p.$$('.cur__lock')).length === 1);
+ok('…and there is no select to change it', (await p.$$('.app__select--currency select')).length === 0);
+await p.click('.cur__lock');
+await p.waitForSelector('.cur__ask a[href*="tickets/new"]');
+ok('the lock explains and points at Sales', true);
+await p.keyboard.press('Escape');
+await p.waitForTimeout(120);
+ok('Escape closes the note', (await p.$$('.cur__ask')).length === 0);
+
+// C-15 / C-17: the invoice takes its own payment, per method, with the invoice as reference.
+await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
+await p.waitForSelector('.with-side .invoice');
+ok('the invoice document sits beside its payment', (await p.$$('.with-side .invoice')).length === 1);
+ok('an unpaid invoice has an empty ledger, not a hidden one', (await p.$$('.card--flush .empty')).length === 1);
+await p.selectOption('.dash__side select.field', 'instapay');
+await p.waitForTimeout(120);
+const invRef = await p.$eval('.dash__side .ref__code', (e) => e.textContent.trim());
+ok('InstaPay instructions quote the invoice number', invRef.includes('INV-20260901-4417'), invRef);
+const payHref = await p.$eval('.dash__side a.btn--primary', (a) => a.getAttribute('href'));
+ok('Pay now goes to the method’s own screen with the invoice attached', payHref.includes('order/wallet') && payHref.includes('invoice=inv-4417'), payHref);
+await p.evaluate(() => (location.hash = '#/account/invoices/inv-3950'));
+await p.waitForSelector('.invoice');
+ok('a paid invoice reconciles to nothing owed', (await p.$eval('.invoice__balance dd', (e) => e.textContent)).includes('0.00'));
+ok('credit applied is its own line', (await p.$$('.invoice .totals__row--credit')).length === 1);
+ok('the ledger lists what moved', (await p.$$eval('.card--flush .data tbody tr', (n) => n.length)) >= 2);
+
+// C-03: the service page does the things people open it for.
+await p.evaluate(() => (location.hash = '#/account/services/svc-8841'));
+await p.waitForSelector('.shortcuts');
+ok('ten cPanel shortcuts', (await p.$$eval('.shortcuts a', (n) => n.length)) === 10);
+const firstUpgrade = await p.$eval('a[href*="upgrade"]', (a) => a.getAttribute('href'));
+ok('the first upgrade link is the plan change', firstUpgrade.endsWith('/upgrade'), firstUpgrade);
+ok('exactly one cancel link', (await p.$$('a[href*="cancel"]')).length === 1);
+ok('the auto-renew switch carries its developer note', (await p.$$('.dev-note')).length >= 1);
+await p.click('.card .filters__btn:nth-child(2)');
+await p.waitForTimeout(120);
+ok('the invoices tab lists this service’s invoices', (await p.$$eval('.card .data tbody tr', (n) => n.length)) >= 2);
+
+// O-01 for a VPS: server settings gate Continue until they are real.
+await p.evaluate(() => (location.hash = '#/configure/vps-2'));
+await p.waitForSelector('.server-settings');
+ok('a VPS shows server settings', (await p.$$('.server-settings')).length === 1);
+ok('…and no builder add-on', (await p.$$eval('.addon', (n) => n.length)) === 2);
+ok('Continue waits for the settings', await p.$eval('.checkout__aside .btn', (b) => b.disabled));
+await p.evaluate(() => {
+  const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+  const fill = (name, v) => {
+    const el = document.querySelector(`input[name="${name}"]`);
+    set.call(el, v);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+  fill('hostname', 'srv1.example.com');
+  fill('rootPassword', 'Sws-Prototype-9');
+  fill('ns1', 'ns1.example.com');
+  fill('ns2', 'ns2.example.com');
+});
+await p.waitForTimeout(120);
+ok('…and opens once they are', !(await p.$eval('.checkout__aside .btn', (b) => b.disabled)));
+
+// C-41: the status page inside the account, and the day nothing is wrong.
+await p.evaluate(() => (location.hash = '#/account/status?state=clear'));
+await p.waitForSelector('.card.empty');
+ok('a clear day is an empty state, not an empty list', (await p.$$('.incident')).length === 0);
+await p.evaluate(() => (location.hash = '#/account/status'));
+await p.waitForSelector('.bar select.field');
+await p.selectOption('.bar select.field', 'resolved');
+await p.waitForTimeout(120);
+ok('the incident filter filters', (await p.$$eval('.incident', (n) => n.length)) === 2);
 
 // ADR-0003: Latin numerals everywhere, including inside Arabic copy.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));

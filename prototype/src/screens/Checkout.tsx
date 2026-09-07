@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
-import { IconArrow, IconShield } from '../components/icons';
+import { GatewayDetails } from '../components/GatewayDetails';
+import { IconArrow } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
-import { useCart } from '../lib/cart';
-import { gatewaysFor, formatAmount } from '../lib/catalog';
+import { useCart, DOMAIN_ADDON_KEY } from '../lib/cart';
+import { gatewaysFor, formatAmount, COUNTRIES } from '../lib/catalog';
 import { gatewayDestination } from './Order';
 
 /**
@@ -14,9 +15,10 @@ import { gatewayDestination } from './Order';
  *
  * The gateway list is exactly the five the spec names, in its order, and "Card & Mobile
  * Wallet" disappears when the selected currency is not EGP — the spec ties that to the same
- * currency logic as the rest of the site rather than to a separate setting. Card fields only
- * appear for the card gateways; the others would show transfer instructions instead, which is
- * why the panel is conditional rather than always present.
+ * currency logic as the rest of the site rather than to a separate setting. Every method
+ * carries a one-line note under its name, and the payment-details panel below the list is
+ * the chosen method's own: card fields for a card, a redirect notice for the providers that
+ * collect on their page, account rows and a reference for a transfer.
  */
 export function Checkout() {
   const { t, locale } = useLocale();
@@ -34,7 +36,7 @@ export function Checkout() {
     if (!gateways.some((g) => g.id === method)) setMethod(gateways[0]?.id ?? 'stripe-card');
   }, [gateways, method]);
 
-  const showsCardFields = method === 'stripe-card' || method === 'wallet-egp';
+  const chosen = gateways.find((g) => g.id === method) ?? gateways[0];
 
   return (
     <Layout>
@@ -73,12 +75,11 @@ export function Checkout() {
                 <label className="field-label">
                   <span className="eyebrow">{t('checkout.country')}</span>
                   <select className="field" name="country" defaultValue="EG">
-                    <option value="EG">مصر · Egypt</option>
-                    <option value="CH">سويسرا · Switzerland</option>
-                    <option value="SA">السعودية · Saudi Arabia</option>
-                    <option value="AE">الإمارات · United Arab Emirates</option>
-                    <option value="KW">الكويت · Kuwait</option>
-                    <option value="DE">ألمانيا · Germany</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </div>
@@ -97,7 +98,10 @@ export function Checkout() {
                         checked={method === g.id}
                         onChange={() => setMethod(g.id)}
                       />
-                      <span className="method__label">{t(g.labelKey as never)}</span>
+                      <span className="method__label">
+                        {t(g.labelKey as never)}
+                        <span className="method__note">{t(g.noteKey as never)}</span>
+                      </span>
                       <span className="method__marks" aria-hidden="true">
                         {g.marks.map((m) => (
                           <span className="mark" key={m}>
@@ -112,27 +116,12 @@ export function Checkout() {
               {currency !== 'EGP' && <p className="hint">{t('pay.walletNote')}</p>}
             </fieldset>
 
-            {showsCardFields && (
+            {/* Spec 11: the details panel changes with the method rather than being one form
+                with the wrong fields for four of the five. */}
+            {chosen && (
               <fieldset className="fieldset">
                 <legend>{t('pay.details')}</legend>
-                <p className="secure-note">
-                  <IconShield size={16} />
-                  {t('pay.secure')}
-                </p>
-                <div className="field-grid field-grid--card">
-                  <label className="field-label">
-                    <span className="eyebrow">{t('pay.cardNumber')}</span>
-                    <input className="field" inputMode="numeric" dir="ltr" placeholder="1234 1234 1234 1234" />
-                  </label>
-                  <label className="field-label">
-                    <span className="eyebrow">{t('pay.expiry')}</span>
-                    <input className="field" inputMode="numeric" dir="ltr" placeholder="MM / YY" />
-                  </label>
-                  <label className="field-label">
-                    <span className="eyebrow">{t('pay.cvv')}</span>
-                    <input className="field" inputMode="numeric" dir="ltr" placeholder="CVC" />
-                  </label>
-                </div>
+                <GatewayDetails gateway={chosen} amountMinor={total} />
               </fieldset>
             )}
           </div>
@@ -148,6 +137,21 @@ export function Checkout() {
                   <span>
                     {line.plan.name}
                     <span className="summary__sub">{t(`cycle.${line.cycle}` as never)}</span>
+                    {line.domain?.name && (
+                      <span className="summary__sub serial">
+                        <bdi>{line.domain.name}</bdi>
+                      </span>
+                    )}
+                    {line.domain?.addons?.map((a) => (
+                      <span className="summary__sub" key={a}>
+                        {t(DOMAIN_ADDON_KEY[a] as never)}
+                      </span>
+                    ))}
+                    {line.server && (
+                      <span className="summary__sub serial">
+                        <bdi>{line.server.hostname}</bdi> · {line.server.os}
+                      </span>
+                    )}
                   </span>
                   <span className="serial">{formatAmount(lineTotal(line), locale)}</span>
                 </p>

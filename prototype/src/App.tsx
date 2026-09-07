@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-d
 import { LocaleProvider } from './lib/locale';
 import { PrefsProvider } from './lib/prefs';
 import { CartProvider } from './lib/cart';
+import { AccountStateProvider } from './lib/accountState';
 
 import { Home } from './screens/Home';
 import { Family } from './screens/Family';
@@ -10,6 +11,7 @@ import { Domains } from './screens/Domains';
 import { Transfer } from './screens/Transfer';
 import { Configure } from './screens/Configure';
 import { DomainStep } from './screens/DomainStep';
+import { DomainAddons } from './screens/DomainAddons';
 import { Cart } from './screens/Cart';
 import { Checkout } from './screens/Checkout';
 import { Confirmation } from './screens/Confirmation';
@@ -45,8 +47,18 @@ import {
 } from './screens/Order';
 
 import { Dashboard } from './screens/account/Dashboard';
-import { Services, ServiceDetail } from './screens/account/Services';
-import { MyDomains, DomainManage } from './screens/account/Domains';
+import { Services, ServiceDetail, ServicePassword } from './screens/account/Services';
+import { MyDomains } from './screens/account/Domains';
+import {
+  DomainOverview,
+  DomainNameservers,
+  DomainDns,
+  DomainContacts,
+  DomainPrivateNs,
+  DomainAddonsPage,
+  DomainForwarding,
+  DomainTransferOut,
+} from './screens/account/DomainPages';
 import { Invoices, InvoiceDetail, AddFunds, PaymentMethods } from './screens/account/Billing';
 import {
   Tickets,
@@ -54,6 +66,7 @@ import {
   TicketThread,
   Knowledgebase,
   KbArticle,
+  NetworkStatus,
 } from './screens/account/Support';
 import { Announcements, Affiliates, Security, Contacts } from './screens/account/Profile';
 import {
@@ -109,6 +122,7 @@ export function App() {
     <LocaleProvider>
       <PrefsProvider>
         <CartProvider>
+          <AccountStateProvider>
           <HashRouter>
             <OnRouteChange />
             <Routes>
@@ -139,6 +153,8 @@ export function App() {
               <Route path="/checkout/registrant" element={<Registrant />} />
               <Route path="/checkout/card" element={<CardEntry />} />
               <Route path="/checkout/3ds" element={<ThreeDSecure />} />
+              <Route path="/checkout/redirect" element={<ThreeDSecure kind="redirect" />} />
+              <Route path="/domain/:lineId/addons" element={<DomainAddons />} />
               <Route path="/order/bank" element={<BankTransfer />} />
               <Route path="/order/wallet" element={<WalletTransfer />} />
               <Route path="/order/failed" element={<PaymentFailure />} />
@@ -162,8 +178,17 @@ export function App() {
               <Route path="/account/services/:id/upgrade/review" element={<UpgradeProration />} />
               <Route path="/account/services/:id/upgrade/done" element={<UpgradeResult />} />
               <Route path="/account/services/:id/cancel" element={<CancelService />} />
+              <Route path="/account/services/:id/password" element={<ServicePassword />} />
               <Route path="/account/domains" element={<MyDomains />} />
-              <Route path="/account/domains/:id" element={<DomainManage />} />
+              {/* One domain, eight flat pages behind one rail — C-10 to C-13, C-37 to C-40. */}
+              <Route path="/account/domains/:id" element={<DomainOverview />} />
+              <Route path="/account/domains/:id/nameservers" element={<DomainNameservers />} />
+              <Route path="/account/domains/:id/dns" element={<DomainDns />} />
+              <Route path="/account/domains/:id/contacts" element={<DomainContacts />} />
+              <Route path="/account/domains/:id/private-ns" element={<DomainPrivateNs />} />
+              <Route path="/account/domains/:id/addons" element={<DomainAddonsPage />} />
+              <Route path="/account/domains/:id/forwarding" element={<DomainForwarding />} />
+              <Route path="/account/domains/:id/transfer-out" element={<DomainTransferOut />} />
               <Route path="/account/invoices" element={<Invoices />} />
               <Route path="/account/invoices/:id" element={<InvoiceDetail />} />
               <Route path="/account/renew/:id" element={<Renew />} />
@@ -177,6 +202,7 @@ export function App() {
               <Route path="/account/knowledgebase" element={<Knowledgebase />} />
               <Route path="/account/knowledgebase/:slug" element={<KbArticle />} />
               <Route path="/account/announcements" element={<Announcements />} />
+              <Route path="/account/status" element={<NetworkStatus />} />
               <Route path="/account/affiliates" element={<Affiliates />} />
               <Route path="/account/affiliates/withdraw" element={<AffiliateWithdraw />} />
               <Route path="/account/notifications" element={<NotificationPrefs />} />
@@ -198,6 +224,7 @@ export function App() {
               <Route path="*" element={<ErrorPage kind="404" />} />
             </Routes>
           </HashRouter>
+          </AccountStateProvider>
         </CartProvider>
       </PrefsProvider>
     </LocaleProvider>

@@ -6,7 +6,7 @@ This records the design system **as it shipped**, not as it was intended. Every 
 read out of `tokens/dist/tokens.css` or the built artifact; where the two ever disagree, the
 artifact is right and this file is stale.
 
-Deployed: <https://sws-frontend-mu.vercel.app/> · 76 routes · AR (default) and EN · light and
+Deployed: <https://sws-frontend-mu.vercel.app/> · 96 routes · AR (default) and EN · light and
 dark.
 
 ---
@@ -170,14 +170,21 @@ row; marketing screens get read to be persuaded.
 The document scrolls and the sidebar is sticky, rather than an inner scroll pane. That reads as
 an app and keeps every screen linkable, printable and capturable end to end.
 
+**A domain is eight flat routes behind one rail.** Four contact records alone are forty fields,
+so domain management is not one screen: `DomainRail` brings the `.with-rail` idiom from the
+hosting categories inside `AppShell`, and under 900px it is the same chip strip. What makes
+eight pages one domain is `AccountStateProvider` — the editable copy of the fixtures that a
+lock switched off on Transfer-out reads from on Overview a moment later. Nothing persists
+across reloads; a prototype that remembered edits would review as though it had a server.
+
 ---
 
 ## 4. Components
 
-Thirteen in `components/`, 41 drawn icons, ~6,450 lines of CSS across six stylesheets, 911
+Eighteen in `components/`, 47 drawn icons, ~6,800 lines of CSS across six stylesheets, 1,173
 string keys in two languages.
 
-Three of the thirteen exist because an audit found the same thing built twice.
+Three of the eighteen exist because an audit found the same thing built twice.
 
 `Card` — the client-area card, and the only one. `components.css` also declares `.card`, and
 `app.css` loads last: it was overriding radius, padding and border while leaving the marketing
@@ -219,10 +226,26 @@ is *exactly* as prominent as Accept (both secondary — a filled Accept beside a
 is the same push in a quieter register), and there is no way to dismiss it without answering.
 Both of those refusals are held by gates.
 
-`CurrencySelect` — carries the open half of I15. With an empty cart it just switches; with
+`CurrencySelect` — two behaviours, both halves of I15. For a visitor it keeps the cart: with
 items in it, it shows the old total and the new one side by side before committing. Blocking
 punishes someone for looking and emptying destroys work they did not ask to lose; the actual
-risk is a total changing underneath a person unnoticed.
+risk is a total changing underneath a person unnoticed. Inside the client area, once a payment
+exists, the control is a lock rather than a select: it opens a note saying why the currency
+cannot change here and where to ask (a Sales ticket), and it holds the preference to the
+account currency so every figure in the account is in the money the person actually pays.
+Because the preference persists, the marketing site shows that currency afterwards until it is
+changed.
+
+`GatewayDetails` — one panel per gateway flow: card fields for `inline`, a redirect notice for
+`redirect`, account rows plus a reference and what-to-do-after for `manual`. The rows are the
+gateway's own data, so the checkout, the invoice, Add Funds, Renew and the transfer screens
+cannot disagree about an IBAN.
+
+`DevNote` — the marker for a control WHMCS cannot do natively. Today: the per-service
+auto-renew switch, and the invoice's tax registration line, which waits on I12.
+
+`StatusBoard` — the headline, systems and incidents shared by `/status` and `/account/status`,
+so the two cannot drift.
 
 `icons.tsx` — one stroke weight (1.75), one join, one cap. No emoji and no font glyphs: a
 pictogram that changes shape with the reader's platform is not part of a design system.
@@ -286,8 +309,10 @@ three fields do not need a table's machinery. One exception is deliberate: the *
 preference grid stops being a table below 700px**, because scrolling sideways to reach a toggle
 is the wrong answer on a settings screen.
 
-The invoice keeps a document's measure (46rem) rather than filling the app's width. It is a
-thing you read, print and file; a full-bleed one reads as a report.
+The invoice keeps a document's measure (52rem) inside a two-column `.with-side`. It is a thing
+you read, print and file; a full-bleed one reads as a report. Beside it sits the one thing a
+document cannot do — take the payment — and under it the ledger of what actually moved, so a
+"paid" invoice with a balance is a fixture error that shows rather than hides.
 
 ---
 
@@ -318,11 +343,11 @@ Design intent that is not enforced is design intent that lasts one sprint.
 |---|---|
 | `tokens/build.mjs --check` | dist in sync; both themes complete |
 | `tokens/a11y-gate.mjs` | 74 checks — contrast, focus, hit area |
-| `scripts/flow.mjs` | **82 checks** against a running build |
-| `scripts/capture.mjs` | 76 routes × 2 viewports — overflow, empty main, console errors |
+| `scripts/flow.mjs` | **113 checks** against a running build |
+| `scripts/capture.mjs` | 96 routes × 2 viewports, plus the two funnel steps whose path carries a cart id — overflow, empty main, console errors |
 | `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
-| `scripts/journeys.mjs` | 16 journeys walked by clicking only — a link that goes nowhere stalls the walk |
-| `scripts/mobile.mjs` | 76 routes at 390px — overflow, hit area, crowding, tiny text, covered controls, crushed icons |
+| `scripts/journeys.mjs` | 21 journeys walked by clicking only — a link that goes nowhere stalls the walk |
+| `scripts/mobile.mjs` | 96 routes at 390px — overflow, hit area, crowding, tiny text, covered controls, crushed icons |
 
 `mobile.mjs` walks every route at 390 in Arabic and looks for what a 1440px screen never shows.
 It found the marketing header failing on four counts at once — a 40px language select, a 43px
@@ -358,14 +383,14 @@ prominent as accept.
 
 | | |
 |---|---|
-| **B1** | payment gateway — blocks C-17 |
-| **I12** | invoice PDF — blocks C-16 |
+| **B1** | payment gateway — C-17 is built against the inline / redirect / manual split; the provider is still open |
+| **I12** | invoice PDF — blocks C-16; the invoice's tax registration line is a marked slot until it closes |
 | **I13/I14** | closed here in the direction the decision log recommends; owner has not ratified |
-| **I15** | closed here as *show both totals*; one component to change if ruled otherwise |
+| **I15** | closed 2026-09-07: *show both totals* in the cart; locked to the account currency after the first payment (S-04 `locked-after-payment`) |
 | **I16** | dark mode at launch — tokens and toggle ship either way |
 | **C19** | status page build-vs-buy — decides the data source, not the design |
 | **C22** | visual identity is being built inside the project: +10–15 days, uncounted |
 | **G4** | 50 email templates × 4 languages = 200; estimate was built on 50 |
 | **G8** | **a live password sits in `00-source/` and in git history — rotate it** |
 
-Inventory: **74 built, 8 folded, 2 blocked.**
+Inventory: **85 built, 4 folded, 1 not started** (90 rows; C-37 to C-42 added 2026-09-07).

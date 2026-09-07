@@ -12,17 +12,19 @@ export function AccountLayout({
   title,
   lede,
   crumbs,
+  meta,
   actions,
   children,
 }: {
   title: string;
   lede?: string;
   crumbs?: { label: string; to?: string }[];
+  meta?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <AppShell title={title} lede={lede} crumbs={crumbs} actions={actions}>
+    <AppShell title={title} lede={lede} crumbs={crumbs} meta={meta} actions={actions}>
       {children}
     </AppShell>
   );

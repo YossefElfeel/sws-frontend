@@ -125,10 +125,13 @@ export function Domains() {
                               id: `dom-${stem}${row.tld}`,
                               name: `${stem}${row.tld}`,
                               monthlyUsdMinor: Math.round(row.registerUsdMinor / 12),
+                              // A year of a domain costs the registration price, not twelve
+                              // twelfths with the annual discount taken off.
+                              fixedUsdMinor: row.registerUsdMinor,
                             },
                             cycle: 'annually',
                             addons: {},
-                            domain: { name: `${stem}${row.tld}`, action: 'register', years: 1 },
+                            domain: { name: `${stem}${row.tld}`, action: 'register', years: 1, addons: [] },
                           });
                           navigate('/cart');
                         }}

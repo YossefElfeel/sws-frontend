@@ -100,6 +100,15 @@ unspecified. Read in this order — each depends on the one before it.
 
 ## Status
 
+**2026-09-07** — The flows the competitor's client area has and ours lacked are built, on the
+product owner's decisions of the same day: domain management as eight pages behind a rail
+(nameservers, DNS, contacts, private nameservers, add-ons, forwarding, transfer-out), the
+order-time domain add-ons step (O-03), VPS server settings in Configure, auto-renew on domains
+and services, a per-gateway payment-details panel everywhere a method is chosen, the invoice
+as a document with its ledger beside its own payment (C-17), the currency locked to the
+account's once a payment exists (I15 closed), and network status inside the client area. Six
+inventory rows added (C-37 to C-42); the gates grew with the screens.
+
 **2026-09-01** — Ten decisions closed (B3, B4, B5, B7, B7a, I17, I18, C21, C22, P25), which
 unblocked 13 of the 30 blocked rows in `inventory/screens.csv`. Gap G11 closed. The
 accessibility gate went from 64 checks with 17 unverified to **70 checks, all passing**. The

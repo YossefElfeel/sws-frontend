@@ -20,6 +20,7 @@ import {
   IconMoon,
   IconChevron,
   IconCoin,
+  IconPulse,
   IconGlobe as IconLang,
 } from './icons';
 import { CurrencySelect } from './CurrencySelect';
@@ -84,6 +85,8 @@ function useGroups(): { label: string; items: Section[] }[] {
         { to: '/account/tickets', icon: <IconSupport size={17} />, key: 'acc.tickets', badge: openTickets },
         { to: '/account/knowledgebase', icon: <IconBook size={17} />, key: 'acc.kb' },
         { to: '/account/announcements', icon: <IconMegaphone size={17} />, key: 'acc.news' },
+        // Spec 5.5 puts network status in the client area, beside support — C-41.
+        { to: '/account/status', icon: <IconPulse size={17} />, key: 'acc.status' },
       ],
     },
     {
@@ -101,12 +104,15 @@ export function AppShell({
   title,
   lede,
   crumbs,
+  meta,
   actions,
   children,
 }: {
   title: string;
   lede?: string;
   crumbs?: { label: string; to?: string }[];
+  /** Small facts that belong beside the title — a status tag, a kind. */
+  meta?: ReactNode;
   /** Controls that belong to this screen rather than to the shell. */
   actions?: ReactNode;
   children: ReactNode;
@@ -360,6 +366,7 @@ export function AppShell({
             <div>
               <h1 className="app__title">{title}</h1>
               {lede && <p className="app__lede">{lede}</p>}
+              {meta && <div className="app__meta">{meta}</div>}
             </div>
             {actions && <div className="app__head-actions">{actions}</div>}
           </div>
