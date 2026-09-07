@@ -8,7 +8,7 @@ import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { convert, formatAmount } from '../lib/catalog';
 import { specText } from '../lib/specs';
-import { FAMILIES, OFFERS, VPS, VPS_OS, type Offer } from '../lib/products';
+import { FAMILIES, OFFERS, VPS, type Offer } from '../lib/products';
 
 /**
  * Every hosting category page — spec 6.2 and 6.3.
@@ -121,11 +121,15 @@ function OfferCards({ offers }: { offers: Offer[] }) {
   );
 }
 
-/** Spec 6.3: VPS compares on specification, so it is a table rather than four cards. */
+/**
+ * Spec 6.3: VPS compares on specification, so it is a table rather than four cards. Ordering
+ * one goes through Configure, where the OS is chosen alongside the hostname and root password
+ * the server has to be provisioned with — the OS radios that used to sit under this table
+ * were a choice that reached nothing.
+ */
 function VpsTable() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
-  const { add } = useCart();
   const navigate = useNavigate();
 
   return (
@@ -162,10 +166,7 @@ function VpsTable() {
                   <Button
                     size="sm"
                     variant={row.featured ? 'primary' : 'secondary'}
-                    onClick={() => {
-                      add({ plan: row, cycle: 'monthly', addons: {} });
-                      navigate('/cart');
-                    }}
+                    onClick={() => navigate(`/configure/${row.id}`)}
                   >
                     {t('plan.orderNow')}
                   </Button>
@@ -175,18 +176,6 @@ function VpsTable() {
           </tbody>
         </table>
       </div>
-
-      <fieldset className="fieldset os-choice">
-        <legend>{t('vps.os')}</legend>
-        <div className="methods">
-          {VPS_OS.map((os, i) => (
-            <label className={`method${i === 0 ? ' is-selected' : ''}`} key={os}>
-              <input type="radio" name="os" defaultChecked={i === 0} />
-              <span className="method__label">{os}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
     </>
   );
 }

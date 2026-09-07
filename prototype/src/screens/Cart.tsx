@@ -5,7 +5,7 @@ import { Button } from '../components/Button';
 import { IconTrash, IconArrow, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
-import { useCart } from '../lib/cart';
+import { useCart, DOMAIN_ADDON_KEY } from '../lib/cart';
 import { formatAmount } from '../lib/catalog';
 
 /**
@@ -60,6 +60,17 @@ export function Cart() {
                           {line.domain?.name && (
                             <span className="data__sub serial">
                               <bdi>{line.domain.name}</bdi>
+                            </span>
+                          )}
+                          {/* The free add-ons are still lines on the order, so they are lines here. */}
+                          {line.domain?.addons?.map((a) => (
+                            <span className="data__sub" key={a}>
+                              {t(DOMAIN_ADDON_KEY[a] as never)} · {t('configure.free')}
+                            </span>
+                          ))}
+                          {line.server && (
+                            <span className="data__sub serial">
+                              <bdi>{line.server.hostname}</bdi> · {line.server.os}
                             </span>
                           )}
                         </td>

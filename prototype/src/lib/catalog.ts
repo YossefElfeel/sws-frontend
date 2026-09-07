@@ -142,9 +142,15 @@ export interface Priced {
   id: string;
   name: string;
   monthlyUsdMinor: number;
+  /**
+   * A price that does not scale with the cycle: a yearly domain or a yearly certificate costs
+   * its yearly price, not twelve monthly twelfths with the annual discount taken off.
+   */
+  fixedUsdMinor?: number;
 }
 
 export function planPrice(plan: Priced, cycle: Cycle, currency: Currency): number {
+  if (plan.fixedUsdMinor !== undefined) return Math.round(plan.fixedUsdMinor * RATE[currency]);
   const { months, save } = CYCLE_META[cycle];
   const gross = plan.monthlyUsdMinor * months;
   const net = Math.round(gross * (1 - save / 100));
@@ -212,20 +218,95 @@ export const ADDONS: AddonGroup[] = [
  * "Card & Mobile Wallet" is EGP-only and the spec requires it to hide automatically when the
  * selected currency is not EGP — the same logic that governs currency across the site.
  */
+/**
+ * How a gateway actually collects the money. The three shapes need three different screens,
+ * and each one has to say so before the person commits: inline means the card fields are here,
+ * redirect means the provider's own page and a return, manual means send the money and tell us.
+ */
+export type GatewayFlow = 'inline' | 'redirect' | 'manual';
+
 export interface Gateway {
   id: string;
   labelKey: string;
   marks: string[];
   egpOnly?: boolean;
+  flow: GatewayFlow;
+  /** One line under the label wherever the method is offered. */
+  noteKey: string;
+  /** The paragraph shown once the method is chosen. */
+  instructionsKey: string;
+  /** Rows to copy into a transfer, for manual flows. Values are Latin runs. */
+  details?: { labelKey: string; value: string }[];
+  /** What to do once the money has left, for manual flows. */
+  afterKey?: string;
 }
 
 export const GATEWAYS: Gateway[] = [
-  { id: 'stripe-card', labelKey: 'pay.stripeCard', marks: ['Stripe'] },
-  { id: 'stripe-eu', labelKey: 'pay.stripeEu', marks: ['TWINT', 'Klarna'] },
-  { id: 'wallet-egp', labelKey: 'pay.wallet', marks: ['Mastercard', 'VISA', 'Meeza'], egpOnly: true },
-  { id: 'instapay', labelKey: 'pay.instapay', marks: ['InstaPay'] },
-  { id: 'bank', labelKey: 'pay.bank', marks: [] },
+  {
+    id: 'stripe-card',
+    labelKey: 'pay.stripeCard',
+    marks: ['Stripe'],
+    flow: 'inline',
+    noteKey: 'pay.note.stripeCard',
+    instructionsKey: 'pay.how.stripeCard',
+  },
+  {
+    id: 'stripe-eu',
+    labelKey: 'pay.stripeEu',
+    marks: ['TWINT', 'Klarna'],
+    flow: 'redirect',
+    noteKey: 'pay.note.stripeEu',
+    instructionsKey: 'pay.how.stripeEu',
+  },
+  {
+    id: 'wallet-egp',
+    labelKey: 'pay.wallet',
+    marks: ['Mastercard', 'VISA', 'Meeza'],
+    egpOnly: true,
+    flow: 'redirect',
+    noteKey: 'pay.note.wallet',
+    instructionsKey: 'pay.how.wallet',
+  },
+  {
+    id: 'instapay',
+    labelKey: 'pay.instapay',
+    marks: ['InstaPay'],
+    flow: 'manual',
+    noteKey: 'pay.note.instapay',
+    instructionsKey: 'pay.how.instapay',
+    details: [
+      { labelKey: 'wal.name', value: 'Somion Egypt' },
+      { labelKey: 'wal.number', value: '+20 100 442 8817' },
+      { labelKey: 'wal.instapay', value: 'somion@instapay' },
+    ],
+    afterKey: 'pay.after.manual',
+  },
+  {
+    id: 'bank',
+    labelKey: 'pay.bank',
+    marks: [],
+    flow: 'manual',
+    noteKey: 'pay.note.bank',
+    instructionsKey: 'pay.how.bank',
+    details: [
+      { labelKey: 'bank.beneficiary', value: 'Somion Web Services AG' },
+      { labelKey: 'bank.iban', value: 'CH93 0076 2011 6238 5295 7' },
+      { labelKey: 'bank.swift', value: 'POFICHBEXXX' },
+      { labelKey: 'bank.name', value: 'PostFinance AG, Bern' },
+    ],
+    afterKey: 'pay.after.manual',
+  },
 ];
+
+/** The countries the billing form offers, shared with the domain contact forms. */
+export const COUNTRIES = [
+  { code: 'EG', label: 'مصر · Egypt' },
+  { code: 'CH', label: 'سويسرا · Switzerland' },
+  { code: 'SA', label: 'السعودية · Saudi Arabia' },
+  { code: 'AE', label: 'الإمارات · United Arab Emirates' },
+  { code: 'KW', label: 'الكويت · Kuwait' },
+  { code: 'DE', label: 'ألمانيا · Germany' },
+] as const;
 
 export function gatewaysFor(currency: Currency): Gateway[] {
   return GATEWAYS.filter((g) => !g.egpOnly || currency === 'EGP');

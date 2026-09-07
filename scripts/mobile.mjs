@@ -97,10 +97,25 @@ const audit = () =>
         return true;
       };
 
+      /*
+       * An input wrapped in a label is tapped through the label — that is the whole point of
+       * wrapping it — so the label is the target being measured, not the 14px box inside it.
+       */
+      const targetOf = (el) => {
+        const lab = el.closest('label');
+        return lab && (el.type === 'checkbox' || el.type === 'radio') ? lab : el;
+      };
+
+      /*
+       * "In the viewport" is asked of the same box that is measured. Asking it of the hidden
+       * radio at a label's top edge let a card whose lower half was below the fold through,
+       * and its centre — off screen — hit-tested to nothing, which read as "covered". The
+       * fourth finding that was the audit being wrong; it is documented here like the others.
+       */
       const controls = [...document.querySelectorAll('a, button, select, input:not([type=hidden]), [role=button]')]
         .filter(vis)
         .filter((el) => {
-          const r = el.getBoundingClientRect();
+          const r = targetOf(el).getBoundingClientRect();
           return r.top >= 0 && r.bottom <= window.innerHeight;
         })
         .filter((el) => !inClosedPanel(el))
@@ -117,15 +132,6 @@ const audit = () =>
           if (!hit || !owns(el, hit)) return d - 1;
         }
         return MIN;
-      };
-
-      /*
-       * An input wrapped in a label is tapped through the label — that is the whole point of
-       * wrapping it — so the label is the target being measured, not the 14px box inside it.
-       */
-      const targetOf = (el) => {
-        const lab = el.closest('label');
-        return lab && (el.type === 'checkbox' || el.type === 'radio') ? lab : el;
       };
 
       const boxes = [];

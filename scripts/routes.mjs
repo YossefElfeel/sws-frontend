@@ -89,4 +89,28 @@ export const ROUTES = [
   { name: 'not-found', path: '#/no/such/page' },
 
   { name: 'legal', path: '#/legal/privacy' },
+  // 2026-09-07 — VPS configure, the redirect handoff, invoice-bound transfers, the service
+  // password screen, the eight domain pages, the client-area status page.
+  // The domain step and its add-ons step carry a random cart-line id in the path, so they are
+  // not static entries: capture.mjs photographs them inside fillCart() instead.
+  { name: 'configure-vps', path: '#/configure/vps-2' },
+  { name: 'redirect-go', path: '#/checkout/redirect?gateway=stripe-eu' },
+  { name: 'redirect-back', path: '#/checkout/redirect?gateway=stripe-eu&state=return' },
+  { name: 'bank-transfer-invoice', path: '#/order/bank?invoice=inv-4417' },
+  { name: 'wallet-transfer-invoice', path: '#/order/wallet?invoice=inv-4417' },
+  { name: 'card-entry-invoice', path: '#/checkout/card?invoice=inv-4417' },
+  { name: 'acc-service-email', path: '#/account/services/svc-9033' },
+  { name: 'acc-service-password', path: '#/account/services/svc-8841/password' },
+  { name: 'acc-domain-nameservers', path: '#/account/domains/dom-1/nameservers' },
+  { name: 'acc-domain-ns-custom', path: '#/account/domains/dom-3/nameservers' },
+  { name: 'acc-domain-dns', path: '#/account/domains/dom-1/dns' },
+  { name: 'acc-domain-dns-empty', path: '#/account/domains/dom-3/dns' },
+  { name: 'acc-domain-contacts', path: '#/account/domains/dom-2/contacts' },
+  { name: 'acc-domain-private-ns', path: '#/account/domains/dom-1/private-ns' },
+  { name: 'acc-domain-addons', path: '#/account/domains/dom-1/addons' },
+  { name: 'acc-domain-forwarding', path: '#/account/domains/dom-1/forwarding' },
+  { name: 'acc-domain-transfer-out', path: '#/account/domains/dom-3/transfer-out' },
+  { name: 'acc-invoice-paid', path: '#/account/invoices/inv-3950' },
+  { name: 'acc-status', path: '#/account/status' },
+  { name: 'acc-status-clear', path: '#/account/status?state=clear' },
 ];

@@ -16,9 +16,27 @@ import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { convert, formatAmount, gatewaysFor, GATEWAYS } from '../lib/catalog';
+import { INVOICES, ACCOUNT, invoiceBalanceUsdMinor } from '../lib/account';
 
 /** A fixed reference so the screenshots of these screens do not change between runs. */
 const REF = 'SWS-26090114';
+
+/**
+ * The payment screens serve two callers: the checkout, whose amount is the cart, and an
+ * invoice in the client area, whose amount is what is still owed on it. `?invoice=` is how
+ * the second caller says so, and the invoice number becomes the reference. `&credit=1` means
+ * the person chose to draw on their account credit first, so what they are asked to pay here
+ * is the same figure the invoice showed them.
+ */
+function useInvoiceParam() {
+  const [params] = useSearchParams();
+  const id = params.get('invoice');
+  const inv = id ? INVOICES.find((i) => i.id === id) : undefined;
+  if (!inv) return undefined;
+  const balance = invoiceBalanceUsdMinor(inv);
+  const credit = params.get('credit') === '1' ? Math.min(ACCOUNT.creditUsdMinor, balance) : 0;
+  return { inv, owedUsdMinor: balance - credit };
+}
 
 /** The ordering steps sit outside the app shell and outside the category rail. */
 function OrderPage({
@@ -180,8 +198,13 @@ export function Registrant() {
 export function CardEntry() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
-  const { total } = useCart();
+  const { total: cartTotal } = useCart();
   const navigate = useNavigate();
+  const bound = useInvoiceParam();
+  const inv = bound?.inv;
+  const total = bound ? convert(bound.owedUsdMinor, currency) : cartTotal;
+  const next = inv ? `/checkout/3ds?invoice=${inv.id}` : '/checkout/3ds';
+  const back = inv ? `/account/invoices/${inv.id}` : '/checkout';
 
   return (
     <OrderPage title={t('card.title')}>
@@ -221,10 +244,10 @@ export function CardEntry() {
               </span>
             </p>
             <div className="acts u-mt-16">
-              <Button size="lg" onClick={() => navigate('/checkout/3ds')}>
+              <Button size="lg" onClick={() => navigate(next)}>
                 {t('card.pay')}
               </Button>
-              <Link className="btn btn--md btn--quiet" to="/checkout">
+              <Link className="btn btn--md btn--quiet" to={back}>
                 {t('action.back')}
               </Link>
             </div>
@@ -236,32 +259,46 @@ export function CardEntry() {
 }
 
 /**
- * 3-D Secure — O-09.
+ * 3-D Secure — O-09 — and, with kind="redirect", the same two moments for a gateway that
+ * collects the money on its own page (TWINT and Klarna through Stripe, the EGP card-and-wallet
+ * provider).
  *
  * The challenge itself is a page the bank hosts; we never see it and cannot style it. So this
  * screen is the two moments either side of it: the handoff, which has to say where you are
  * going and that the tab is expected, and the return, which has to say what came back.
  *
- * ?state=return renders the second moment.
+ * ?state=return renders the second moment. ?gateway= names the provider; ?invoice= sends the
+ * return to the invoice that was being paid rather than to the order confirmation.
  */
-export function ThreeDSecure() {
+export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) {
   const { t } = useLocale();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const returning = params.get('state') === 'return';
+  const inv = useInvoiceParam()?.inv;
+  const gateway = GATEWAYS.find((g) => g.id === params.get('gateway'));
+  const redirect = kind === 'redirect';
+  const provider = gateway ? gateway.marks.join(' / ') || t(gateway.labelKey as never) : '';
+
+  const returnHash = (() => {
+    const q = new URLSearchParams(params);
+    q.set('state', 'return');
+    return `${redirect ? '/checkout/redirect' : '/checkout/3ds'}?${q.toString()}`;
+  })();
+  const finishTo = inv ? `/account/invoices/${inv.id}` : '/confirmation';
 
   return (
-    <OrderPage title={t('tds.title')}>
+    <OrderPage title={t(redirect ? 'redir.title' : 'tds.title')}>
       <div className="stage">
         {returning ? (
           <>
             <span className="stage__mark stage__mark--ok" aria-hidden="true">
               <IconCheck size={28} />
             </span>
-            <h2 className="stage__title">{t('tds.backTitle')}</h2>
-            <p className="stage__body">{t('tds.backBody')}</p>
+            <h2 className="stage__title">{t(redirect ? 'redir.backTitle' : 'tds.backTitle')}</h2>
+            <p className="stage__body">{t(redirect ? 'redir.backBody' : 'tds.backBody')}</p>
             <div className="acts u-mt-16">
-              <Button size="lg" onClick={() => navigate('/confirmation')}>
+              <Button size="lg" onClick={() => navigate(finishTo)}>
                 {t('tds.finish')}
                 <IconArrow size={17} />
               </Button>
@@ -272,20 +309,34 @@ export function ThreeDSecure() {
             <span className="stage__mark" aria-hidden="true">
               <IconShield size={28} />
             </span>
-            <h2 className="stage__title">{t('tds.goTitle')}</h2>
-            <p className="stage__body">{t('tds.goBody')}</p>
+            <h2 className="stage__title">
+              {redirect ? (
+                <>
+                  {t('redir.goTitle')} <bdi>{provider}</bdi>
+                </>
+              ) : (
+                t('tds.goTitle')
+              )}
+            </h2>
+            <p className="stage__body">{t(redirect ? 'redir.goBody' : 'tds.goBody')}</p>
 
             {/* The bank's page is not ours to draw, and pretending otherwise in a review build
                 is how a reviewer ends up approving a screen that will never exist. */}
-            <div className="slot slot--tall" role="img" aria-label={t('tds.slotLabel')}>
-              <span className="slot__tag">{t('tds.slotTag')}</span>
-              <p className="slot__note">{t('tds.slotNote')}</p>
+            <div
+              className="slot slot--tall"
+              role="img"
+              aria-label={t(redirect ? 'redir.slotLabel' : 'tds.slotLabel')}
+            >
+              <span className="slot__tag">
+                {redirect ? <bdi>{provider}</bdi> : t('tds.slotTag')}
+              </span>
+              <p className="slot__note">{t(redirect ? 'redir.slotNote' : 'tds.slotNote')}</p>
             </div>
 
             <div className="acts u-mt-16">
-              <Button size="lg" onClick={() => navigate('/checkout/3ds?state=return')}>
+              <Button size="lg" onClick={() => navigate(returnHash)}>
                 <IconExternal size={17} />
-                {t('tds.go')}
+                {t(redirect ? 'redir.go' : 'tds.go')}
               </Button>
               <Link className="btn btn--md btn--quiet" to="/order/failed">
                 {t('tds.cancel')}
@@ -313,23 +364,18 @@ export function ThreeDSecure() {
 export function TransferInstructions({ kind }: { kind: 'bank' | 'wallet' }) {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
-  const { total } = useCart();
+  const { total: cartTotal } = useCart();
   const [copied, setCopied] = useState(false);
   const [sent, setSent] = useState(false);
+  const bound = useInvoiceParam();
+  const inv = bound?.inv;
 
-  const rows =
-    kind === 'bank'
-      ? [
-          { k: 'bank.beneficiary', v: 'Somion Web Services AG' },
-          { k: 'bank.iban', v: 'CH93 0076 2011 6238 5295 7' },
-          { k: 'bank.swift', v: 'POFICHBEXXX' },
-          { k: 'bank.name', v: 'PostFinance AG, Bern' },
-        ]
-      : [
-          { k: 'wal.name', v: 'Somion Egypt' },
-          { k: 'wal.number', v: '+20 100 442 8817' },
-          { k: 'wal.instapay', v: 'somion@instapay' },
-        ];
+  // The account rows are the gateway's own data, so this screen and the invoice sidebar
+  // cannot disagree about an IBAN.
+  const gateway = GATEWAYS.find((g) => g.id === (kind === 'bank' ? 'bank' : 'instapay'));
+  const rows = (gateway?.details ?? []).map((r) => ({ k: r.labelKey, v: r.value }));
+  const reference = inv ? inv.number : REF;
+  const total = bound ? convert(bound.owedUsdMinor, currency) : cartTotal;
 
   if (sent) {
     return (
@@ -341,8 +387,11 @@ export function TransferInstructions({ kind }: { kind: 'bank' | 'wallet' }) {
           <h2 className="stage__title">{t('bank.gotIt')}</h2>
           <p className="stage__body">{t('bank.gotItBody')}</p>
           <div className="acts u-mt-16">
-            <Link className="btn btn--lg btn--primary" to="/account/invoices">
-              {t('acc.invoices')}
+            <Link
+              className="btn btn--lg btn--primary"
+              to={inv ? `/account/invoices/${inv.id}` : '/account/invoices'}
+            >
+              {inv ? t('inv.view') : t('acc.invoices')}
             </Link>
           </div>
         </div>
@@ -360,15 +409,23 @@ export function TransferInstructions({ kind }: { kind: 'bank' | 'wallet' }) {
           {/* The reference is what connects the money to the order. It is the biggest thing on
               the screen because a transfer without it is a support ticket. */}
           <div className="panel panel--pad ref">
-            <p className="ref__label">{t('bank.reference')}</p>
+            <p className="ref__label">
+              {t('bank.reference')}
+              {inv && (
+                <>
+                  {' · '}
+                  {t('inv.forInvoice')} <bdi className="serial">{inv.number}</bdi>
+                </>
+              )}
+            </p>
             <p className="ref__code serial">
-              <bdi>{REF}</bdi>
+              <bdi>{reference}</bdi>
             </p>
             <Button
               size="md"
               variant="secondary"
               onClick={() => {
-                navigator.clipboard?.writeText(REF).then(
+                navigator.clipboard?.writeText(reference).then(
                   () => {
                     setCopied(true);
                     window.setTimeout(() => setCopied(false), 2000);
@@ -419,6 +476,7 @@ export function TransferInstructions({ kind }: { kind: 'bank' | 'wallet' }) {
               <span className="eyebrow">{t('bank.receipt')}</span>
               <input className="field" type="file" accept=".jpg,.jpeg,.png,.pdf" />
             </label>
+            {gateway?.afterKey && <p className="form__note">{t(gateway.afterKey as never)}</p>}
             <div className="form__foot">
               <Button size="lg" type="submit">
                 {t('bank.confirm')}
@@ -615,13 +673,16 @@ export function WalletTransfer() {
   return <TransferInstructions kind="wallet" />;
 }
 
-/** Named so the gateway list in Checkout can reach the right instruction screen. */
+/**
+ * Named so the gateway list in Checkout can reach the right next screen. The flow decides:
+ * a card is entered here, a redirect leaves for the provider and comes back, a transfer goes
+ * to the instructions it cannot complete without.
+ */
 export function gatewayDestination(id: string): string {
   const g = GATEWAYS.find((x) => x.id === id);
-  if (!g) return '/checkout/card';
-  if (g.id === 'bank') return '/order/bank';
-  if (g.id === 'instapay' || g.id === 'wallet-egp') return '/order/wallet';
-  return '/checkout/card';
+  if (!g || g.flow === 'inline') return '/checkout/card';
+  if (g.flow === 'redirect') return `/checkout/redirect?gateway=${g.id}`;
+  return g.id === 'bank' ? '/order/bank' : '/order/wallet';
 }
 
 /** Session expiry — A-07. Kept here because it is the ordering flow that loses the most. */

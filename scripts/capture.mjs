@@ -32,8 +32,11 @@ mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 let failed = false;
 
-/** Order two plans, so the cart-dependent routes have real lines on them. */
-async function fillCart(page) {
+/**
+ * Order a plan, so the cart-dependent routes have real lines on them — and photograph the two
+ * funnel steps that carry a random cart-line id in their path and so cannot be static routes.
+ */
+async function fillCart(page, vp) {
   // Walk the real ordering flow rather than injecting state, so the cart holds a line that
   // actually went through configure and the domain step.
   await page.goto(`${BASE}#/`, { waitUntil: 'networkidle' });
@@ -44,8 +47,15 @@ async function fillCart(page) {
   await page.waitForSelector('.choices');
   await page.fill('#dom', 'kamalatelier');
   await page.locator('.domain-strip__form .btn').click();
+  await page.waitForSelector('.result');
   await page.waitForTimeout(250);
+  await page.screenshot({ path: join(OUT, `domain-step-${vp.name}.png`), fullPage: true });
   await page.locator('.step-foot .btn').click();
+  // A registration continues to its add-ons (O-03) before the cart.
+  await page.waitForSelector('.switch-row');
+  await page.waitForTimeout(250);
+  await page.screenshot({ path: join(OUT, `domain-addons-${vp.name}.png`), fullPage: true });
+  await page.locator('.step-foot .btn--lg').click();
   await page.waitForTimeout(350);
 }
 
@@ -66,7 +76,7 @@ for (const vp of VIEWPORTS) {
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(String(e)));
 
-  await fillCart(page);
+  await fillCart(page, vp);
 
   for (const route of ROUTES) {
     errors = [];

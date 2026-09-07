@@ -260,6 +260,98 @@ await journey('Withdraw earnings', [
   ['recorded', async () => { if (!(await p.locator('.calm').count())) throw new Error('no confirmation'); }],
 ]);
 
+/** Set a controlled input the way a person would, so React sees the change. */
+async function type(name, value) {
+  await p.evaluate(
+    ([n, v]) => {
+      const el = document.querySelector(`input[name="${n}"]`);
+      const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+      set.call(el, v);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    },
+    [name, value],
+  );
+  await p.waitForTimeout(80);
+}
+
+/* ── Q. order a VPS, with the server settings it cannot be provisioned without ─ */
+await journey('Order a VPS', [
+  ['vps', () => start('#/hosting/vps')],
+  ['order', () => click(['.data tbody tr .btn--primary', '.data tbody tr .btn'])],
+  ['configure', async () => { if (!(await hash()).includes('configure/vps-')) throw new Error('no configure step'); }],
+  ['server settings', async () => {
+    await type('hostname', 'srv1.atelier-kamal.com');
+    await type('rootPassword', 'Sws-Prototype-9');
+    await type('ns1', 'ns1.atelier-kamal.com');
+    await type('ns2', 'ns2.atelier-kamal.com');
+    await click(['.checkout__aside .btn']);
+  }],
+  ['cart', async () => {
+    if (!(await hash()).includes('cart')) throw new Error('no cart');
+    const subs = await p.locator('.data__sub').allTextContents();
+    if (!subs.some((s) => s.includes('srv1.atelier-kamal.com'))) throw new Error('hostname not on the line');
+  }],
+]);
+
+/* ── R. register a domain and choose its add-ons ────────────────────────────── */
+await journey('Register a domain with add-ons', [
+  ['configure', () => start('#/configure/ultra')],
+  ['domain step', () => click(['.checkout__aside .btn'])],
+  ['search', async () => {
+    await p.check('input[value="register"]');
+    await p.fill('#dom', 'kamalatelier');
+    await click(['.domain-strip__form .btn']);
+    await p.waitForSelector('.result--ok');
+  }],
+  ['continue', () => click(['.step-foot .btn'])],
+  ['add-ons step', async () => { if (!(await hash()).includes('/addons')) throw new Error('no add-ons step'); }],
+  ['choose', async () => { await satisfyRequired('main'); await click(['.step-foot .btn--lg']); }],
+  ['cart', async () => {
+    if (!(await hash()).includes('cart')) throw new Error('no cart');
+    if ((await p.locator('.data__sub').count()) < 4) throw new Error('add-ons not on the line');
+  }],
+]);
+
+/* ── S. pay an invoice by InstaPay and reach the instructions for it ───────── */
+await journey('Pay an invoice by InstaPay', [
+  ['invoice', () => start('#/account/invoices/inv-4417')],
+  ['choose InstaPay', async () => {
+    await p.selectOption('.dash__side select.field', 'instapay');
+    await p.waitForTimeout(120);
+  }],
+  ['pay', () => click(['.dash__side a.btn--primary'])],
+  ['instructions', async () => {
+    const h = await hash();
+    if (!h.includes('order/wallet') || !h.includes('invoice=inv-4417')) throw new Error(`wrong destination: ${h}`);
+    const ref = await p.locator('.ref__code').first().textContent();
+    if (!ref.includes('INV-20260901-4417')) throw new Error('reference is not the invoice');
+  }],
+  ['confirm sent', () => click(['form.panel button[type=submit]'])],
+  ['received', async () => { if (!(await p.locator('.stage__title').count())) throw new Error('no confirmation'); }],
+]);
+
+/* ── T. switch auto-renew on a domain, and find it still switched on another page */
+await journey('Toggle domain auto-renew', [
+  ['my domains', () => start('#/account/domains')],
+  ['a domain', () => click(['.data tbody tr:first-child a[href$="/account/domains/dom-1"]'])],
+  ['switch', () => click(['input[name="autorenew"]'])],
+  ['saved', async () => { if (!(await p.locator('.banner--success').count())) throw new Error('no confirmation'); }],
+  ['another page', () => click(['.rail__link[href$="/dns"]'])],
+  ['back', () => click(['.rail__link[href$="/account/domains/dom-1"]'])],
+  ['still switched', async () => {
+    if (await p.locator('input[name="autorenew"]').isChecked()) throw new Error('the switch forgot');
+  }],
+]);
+
+/* ── U. give a domain its own contact ───────────────────────────────────────── */
+await journey('Save domain contacts', [
+  ['contacts', () => start('#/account/domains/dom-1/contacts')],
+  ['custom', () => click(['.methods input[value="custom"]'])],
+  ['fill', () => satisfyRequired('form')],
+  ['save', () => click(['form button[type=submit]'])],
+  ['saved', async () => { if (!(await p.locator('.banner--success').count())) throw new Error('no confirmation'); }],
+]);
+
 /* ── report ─────────────────────────────────────────────────────────────────── */
 let failed = 0;
 for (const r of results) {

@@ -942,3 +942,80 @@ a.tile:hover {
 .os-choice {
   margin-block-start: var(--sws-space-24);
 }
+
+/* ── 2026-09-07: the invoice document ───────────────────────────────────────── */
+
+.invoice__number {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+  margin-block: var(--sws-space-4) var(--sws-space-12);
+  font-size: var(--sws-font-size-h3);
+  font-weight: 700;
+}
+
+/* Who owes and who is owed, side by side where there is room. */
+.parties {
+  display: grid;
+  gap: var(--sws-space-24);
+  margin-block: var(--sws-space-16);
+  padding-block-end: var(--sws-space-16);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.parties p {
+  margin: 0;
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.parties .eyebrow {
+  margin-block-end: var(--sws-space-4);
+}
+
+@media (min-width: 600px) {
+  .parties {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* An add-on is a line of its own, indented under the thing it belongs to. */
+.data tr.is-sub td:first-child {
+  padding-inline-start: var(--sws-space-32);
+  color: var(--sws-text-secondary);
+}
+
+.invoice sup {
+  margin-inline-start: 2px;
+  color: var(--sws-text-secondary);
+}
+
+.invoice__balance {
+  margin: var(--sws-space-16);
+  margin-block-start: 0;
+}
+
+/* The taxable mark is small by convention; here it stays a legible 12.5px caption. */
+.invoice sup {
+  font-size: var(--sws-font-size-caption);
+  line-height: 0;
+  vertical-align: super;
+}
+
+/* minmax(0, 1fr), not the implicit auto: an auto track sizes to its content, so a table with
+   a scroll floor inside a card would widen the page instead of scrolling inside the card.
+   The desktop columns are restated here because this rule comes later in the cascade than
+   the one above and would otherwise win over it at every width. */
+.with-side {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.with-side > * {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .with-side {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  }
+}

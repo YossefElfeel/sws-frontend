@@ -318,3 +318,57 @@ export function IconAlert({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+export function IconLock({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+export function IconPulse({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3 12h4l2.5-6 4 12 2.5-6H21" />
+    </svg>
+  );
+}
+
+export function IconFolder({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+    </svg>
+  );
+}
+
+export function IconDatabase({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <ellipse cx="12" cy="6" rx="7" ry="3" />
+      <path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6" />
+      <path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" />
+    </svg>
+  );
+}
+
+export function IconArchive({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="3" y="4" width="18" height="5" rx="1" />
+      <path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9" />
+      <path d="M10 13h4" />
+    </svg>
+  );
+}
+
+export function IconClock({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}

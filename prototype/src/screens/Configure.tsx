@@ -16,7 +16,12 @@ import {
   planPrice,
   formatAmount,
   type Cycle,
+  type Priced,
 } from '../lib/catalog';
+import { VPS, VPS_OS } from '../lib/products';
+
+/** A hostname is a full name with at least one dot and a real top level. */
+const FQDN = /^(?=.{4,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 
 /**
  * Configure Product — spec 7.2.
@@ -27,6 +32,11 @@ import {
  *   2. Add-on groups with a radio per option and the price beside it.
  *   3. A summary box that stays in view and updates on every choice — the reason someone can
  *      pick add-ons without losing track of what they are about to pay.
+ *
+ * A VPS comes through here too (spec 6.3), and brings the fourth thing: server settings — the
+ * hostname, root password and nameservers a provisioning module needs, plus the OS choice.
+ * They sit between the cycles and the add-ons, and Continue waits for them, because an order
+ * placed without a hostname is a ticket before it is a server.
  */
 export function Configure() {
   const { t, locale } = useLocale();
@@ -36,13 +46,27 @@ export function Configure() {
   const { planId } = useParams<{ planId: string }>();
 
   const plan = PLANS.find((p) => p.id === planId);
+  const vps = VPS.find((v) => v.id === planId);
+  const product: Priced | undefined = plan ?? vps;
+
   const [cycle, setCycle] = useState<Cycle>('monthly');
   const [addons, setAddons] = useState<Record<string, string>>(defaultAddons);
+  const [server, setServer] = useState({
+    hostname: '',
+    rootPassword: '',
+    ns1: '',
+    ns2: '',
+    os: VPS_OS[0],
+  });
+  const [showPw, setShowPw] = useState(false);
+
+  // The builder is a website product; it has no meaning on a bare server.
+  const groups = useMemo(() => (vps ? ADDONS.filter((g) => g.id !== 'builder') : ADDONS), [vps]);
 
   const totals = useMemo(() => {
-    if (!plan) return { base: 0, extras: [] as { label: string; amount: number }[], sub: 0, tax: 0, due: 0 };
-    const base = planPrice(plan, cycle, currency);
-    const extras = ADDONS.flatMap((g) => {
+    if (!product) return { base: 0, extras: [] as { label: string; amount: number }[], sub: 0, tax: 0, due: 0 };
+    const base = planPrice(product, cycle, currency);
+    const extras = groups.flatMap((g) => {
       const chosen = g.options.find((o) => o.id === addons[g.id]);
       if (!chosen || chosen.id === 'none') return [];
       return [{ label: `${t(g.titleKey as never)} — ${chosen.label}`, amount: convert(chosen.priceUsdMinor, currency) }];
@@ -50,9 +74,18 @@ export function Configure() {
     const sub = base + extras.reduce((s, e) => s + e.amount, 0);
     const tax = Math.round(sub * TAX_RATE);
     return { base, extras, sub, tax, due: sub + tax };
-  }, [plan, cycle, addons, currency, t]);
+  }, [product, groups, cycle, addons, currency, t]);
 
-  if (!plan) return <Navigate to="/hosting" replace />;
+  if (!product) return <Navigate to="/hosting" replace />;
+
+  const hostnameOk = FQDN.test(server.hostname);
+  const ns1Ok = FQDN.test(server.ns1);
+  const ns2Ok = FQDN.test(server.ns2);
+  const serverValid =
+    !vps || (hostnameOk && server.rootPassword.length >= 10 && ns1Ok && ns2Ok);
+
+  const setField = (key: keyof typeof server) => (value: string) =>
+    setServer((s) => ({ ...s, [key]: value }));
 
   return (
     <Layout>
@@ -65,26 +98,45 @@ export function Configure() {
           <div className="checkout__main">
             {/* What is being configured, restated so the choices below have a subject. */}
             <div className="config-product">
-              <h2 className="card__title">{plan.name}</h2>
-              <ul className="config-product__specs">
-                <li>
-                  {plan.sites === 'unlimited' ? t('plan.unlimited') : plan.sites}{' '}
-                  {t('plan.websites')}
-                </li>
-                <li>
-                  {plan.storageGb === 'unlimited' ? t('plan.unlimited') : `${plan.storageGb} GB`}{' '}
-                  {t('plan.storage')}
-                </li>
-                <li>
-                  {plan.bandwidthGb === 'unlimited' ? t('plan.unlimited') : `${plan.bandwidthGb} GB`}{' '}
-                  {t('plan.bandwidth')}
-                </li>
-                {plan.additional.map((f) => (
-                  <li key={f} className="config-product__extra">
-                    {f}
+              <h2 className="card__title">{product.name}</h2>
+              {plan ? (
+                <ul className="config-product__specs">
+                  <li>
+                    {plan.sites === 'unlimited' ? t('plan.unlimited') : plan.sites}{' '}
+                    {t('plan.websites')}
                   </li>
-                ))}
-              </ul>
+                  <li>
+                    {plan.storageGb === 'unlimited' ? t('plan.unlimited') : `${plan.storageGb} GB`}{' '}
+                    {t('plan.storage')}
+                  </li>
+                  <li>
+                    {plan.bandwidthGb === 'unlimited' ? t('plan.unlimited') : `${plan.bandwidthGb} GB`}{' '}
+                    {t('plan.bandwidth')}
+                  </li>
+                  {plan.additional.map((f) => (
+                    <li key={f} className="config-product__extra">
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                vps && (
+                  <ul className="config-product__specs">
+                    <li>
+                      <span className="serial">{vps.vcpu}</span> {t('vps.cpu')}
+                    </li>
+                    <li>
+                      <span className="serial">{vps.ramGb} GB</span> {t('vps.ram')}
+                    </li>
+                    <li>
+                      <span className="serial">{vps.storageGb} GB</span> {t('vps.disk')}
+                    </li>
+                    <li>
+                      <span className="serial">{vps.bandwidthTb} TB</span> {t('vps.bw')}
+                    </li>
+                  </ul>
+                )
+              )}
             </div>
 
             <fieldset className="fieldset">
@@ -92,8 +144,8 @@ export function Configure() {
               <div className="cycles">
                 {CYCLES.map((c) => {
                   const meta = CYCLE_META[c];
-                  const price = planPrice(plan, c, currency);
-                  const full = plan.monthlyUsdMinor * meta.months;
+                  const price = planPrice(product, c, currency);
+                  const full = product.monthlyUsdMinor * meta.months;
                   return (
                     <label key={c} className={`cycle-opt${cycle === c ? ' is-selected' : ''}`}>
                       <input
@@ -123,10 +175,111 @@ export function Configure() {
               </div>
             </fieldset>
 
+            {vps && (
+              <fieldset className="fieldset server-settings">
+                <legend>{t('vps.settings')}</legend>
+                <p className="hint">{t('vps.settingsNote')}</p>
+                <div className="field-grid">
+                  <label className="field-label">
+                    <span className="eyebrow">{t('vps.hostname')}</span>
+                    <input
+                      className="field serial"
+                      name="hostname"
+                      dir="ltr"
+                      autoComplete="off"
+                      placeholder="srv1.example.com"
+                      required
+                      value={server.hostname}
+                      onChange={(e) => setField('hostname')(e.target.value.trim().toLowerCase())}
+                    />
+                    {server.hostname !== '' && !hostnameOk && (
+                      <span className="hint hint--bad">{t('vps.hostnameBad')}</span>
+                    )}
+                  </label>
+
+                  <label className="field-label field-label--wide">
+                    <span className="eyebrow">{t('vps.rootPassword')}</span>
+                    <span className="copy-row">
+                      <input
+                        className="field serial"
+                        name="rootPassword"
+                        type={showPw ? 'text' : 'password'}
+                        dir="ltr"
+                        autoComplete="new-password"
+                        required
+                        minLength={10}
+                        value={server.rootPassword}
+                        onChange={(e) => setField('rootPassword')(e.target.value)}
+                      />
+                      <Button
+                        size="md"
+                        variant="secondary"
+                        aria-pressed={showPw}
+                        onClick={() => setShowPw((v) => !v)}
+                      >
+                        {t(showPw ? 'vps.hide' : 'vps.show')}
+                      </Button>
+                    </span>
+                    <span className="hint">{t('vps.pwRule')}</span>
+                  </label>
+
+                  <label className="field-label">
+                    <span className="eyebrow">{t('vps.ns1')}</span>
+                    <input
+                      className="field serial"
+                      name="ns1"
+                      dir="ltr"
+                      autoComplete="off"
+                      placeholder="ns1.example.com"
+                      required
+                      value={server.ns1}
+                      onChange={(e) => setField('ns1')(e.target.value.trim().toLowerCase())}
+                    />
+                    {server.ns1 !== '' && !ns1Ok && (
+                      <span className="hint hint--bad">{t('vps.nsBad')}</span>
+                    )}
+                  </label>
+
+                  <label className="field-label">
+                    <span className="eyebrow">{t('vps.ns2')}</span>
+                    <input
+                      className="field serial"
+                      name="ns2"
+                      dir="ltr"
+                      autoComplete="off"
+                      placeholder="ns2.example.com"
+                      required
+                      value={server.ns2}
+                      onChange={(e) => setField('ns2')(e.target.value.trim().toLowerCase())}
+                    />
+                    {server.ns2 !== '' && !ns2Ok && (
+                      <span className="hint hint--bad">{t('vps.nsBad')}</span>
+                    )}
+                  </label>
+
+                  <label className="field-label">
+                    <span className="eyebrow">{t('vps.os')}</span>
+                    <select
+                      className="field"
+                      name="os"
+                      value={server.os}
+                      onChange={(e) => setField('os')(e.target.value)}
+                    >
+                      {VPS_OS.map((os) => (
+                        <option key={os} value={os}>
+                          {os}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </fieldset>
+            )}
+
             <fieldset className="fieldset">
               <legend>{t('configure.addons')}</legend>
               <div className="addons">
-                {ADDONS.map((group) => (
+                {groups.map((group) => (
                   <div className="addon" key={group.id}>
                     <h3 className="addon__title">{t(group.titleKey as never)}</h3>
                     <p className="addon__body">{t(group.bodyKey as never)}</p>
@@ -172,8 +325,13 @@ export function Configure() {
             <div className="summary">
               <p className="summary__line">
                 <span>
-                  {plan.name}
+                  {product.name}
                   <span className="summary__sub">{t(`cycle.${cycle}` as never)}</span>
+                  {vps && server.hostname && (
+                    <span className="summary__sub serial">
+                      <bdi>{server.hostname}</bdi> · {server.os}
+                    </span>
+                  )}
                 </span>
                 <span className="serial">{formatAmount(totals.base, locale)}</span>
               </p>
@@ -206,9 +364,11 @@ export function Configure() {
 
             <Button
               size="lg"
+              disabled={!serverValid}
               onClick={() => {
-                const id = add({ plan, cycle, addons });
-                navigate(`/domain/${id}`);
+                const id = add({ plan: product, cycle, addons, ...(vps ? { server } : {}) });
+                // A server has no domain step: the hostname above is what it is called.
+                navigate(vps ? '/cart' : `/domain/${id}`);
               }}
             >
               {t('action.continue')}

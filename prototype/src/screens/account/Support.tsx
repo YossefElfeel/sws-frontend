@@ -1,8 +1,17 @@
 import { useMemo, useState } from 'react';
-import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
-import { IconArrow, IconPlus, IconSearch, IconBook, IconSupport, IconCheck } from '../../components/icons';
+import { StatusHeadline, SystemList, IncidentList, worstOf } from '../../components/StatusBoard';
+import {
+  IconArrow,
+  IconPlus,
+  IconSearch,
+  IconBook,
+  IconSupport,
+  IconCheck,
+  IconInfo,
+} from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import {
@@ -12,6 +21,7 @@ import {
   ARTICLES,
   type TicketStatus,
 } from '../../lib/account';
+import { SYSTEMS, INCIDENTS } from '../../lib/marketing';
 
 const STATUSES: (TicketStatus | 'all')[] = ['all', 'open', 'answered', 'closed'];
 
@@ -483,6 +493,94 @@ export function KbArticle() {
             </Button>
           </div>
         )}
+      </div>
+    </AccountLayout>
+  );
+}
+
+/* ── network status inside the client area — C-41 ───────────────────────────── */
+
+type IncidentFilter = 'open' | 'all' | 'resolved' | 'maintenance';
+
+/**
+ * The same status the public page shows, where a signed-in person looks for it: under
+ * Support, beside the tickets — the spec's own sitemap (5.5) puts it there.
+ *
+ * The list opens on what is still going on, because that is the question that brought
+ * someone here; the resolved history is one choice away. `?state=clear` renders the day
+ * nothing is wrong, which is the state the page most needs to be good at.
+ *
+ * There is no RSS link. No feed exists, and C19 (build the status page or buy one) is still
+ * open — a link to a feed that does not exist would be the dead end this prototype gates
+ * against. Getting told first is the notification preferences, one link below.
+ */
+export function NetworkStatus() {
+  const { t } = useLocale();
+  const [params] = useSearchParams();
+  const clear = params.get('state') === 'clear';
+  const [filter, setFilter] = useState<IncidentFilter>('open');
+
+  const systems = clear ? SYSTEMS.map((s) => ({ ...s, state: 'operational' as const })) : SYSTEMS;
+  const incidents = clear ? [] : INCIDENTS;
+  const shown = incidents.filter(
+    (i) =>
+      filter === 'all' ||
+      (filter === 'open' && i.minutes === undefined) ||
+      (filter === 'resolved' && i.minutes !== undefined) ||
+      (filter === 'maintenance' && i.state === 'maintenance'),
+  );
+
+  return (
+    <AccountLayout title={t('acc.status')} lede={t('status.lede')}>
+      <StatusHeadline worst={worstOf(systems)} />
+
+      <section className="card">
+        <header className="card__head">
+          <h2 className="card__heading">{t('status.systems')}</h2>
+        </header>
+        <SystemList systems={systems} />
+      </section>
+
+      <div className="bar">
+        <label className="field-label">
+          <span className="eyebrow">{t('status.filter')}</span>
+          <select
+            className="field"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as IncidentFilter)}
+          >
+            {(['open', 'all', 'resolved', 'maintenance'] as IncidentFilter[]).map((f) => (
+              <option key={f} value={f}>
+                {t(`status.filter.${f}` as never)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="bar__count">
+          <span className="serial">{shown.length}</span> {t('dash.of')}{' '}
+          <span className="serial">{incidents.length}</span>
+        </p>
+      </div>
+
+      {shown.length > 0 ? (
+        <IncidentList incidents={shown} />
+      ) : (
+        <div className="card empty">
+          <IconCheck size={28} />
+          <p className="empty__title">{t('status.noneTitle')}</p>
+          <p className="empty__note">{t('status.noneNote')}</p>
+        </div>
+      )}
+
+      <div className="notice notice--spaced">
+        <IconInfo size={20} />
+        <div>
+          <h2 className="card__title">{t('status.updates')}</h2>
+          <p className="card__body">{t('status.updatesBody')}</p>
+          <Link className="btn btn--md btn--secondary u-mt-16" to="/account/notifications">
+            {t('notif.title')}
+          </Link>
+        </div>
       </div>
     </AccountLayout>
   );

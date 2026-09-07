@@ -49,7 +49,7 @@ export function Confirmation() {
                 <tr key={line.id}>
                   <td>
                     <span className="lead">{line.plan.name}</span>
-                    <span className="data__sub serial"><bdi>{line.domain?.name ?? line.id}</bdi></span>
+                    <span className="data__sub serial"><bdi>{line.domain?.name ?? line.server?.hostname ?? line.id}</bdi></span>
                   </td>
                   <td>{t(`cycle.${line.cycle}` as never)}</td>
                   <td className="num">

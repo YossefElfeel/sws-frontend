@@ -12,6 +12,7 @@ import {
   IconAlert,
 } from '../components/icons';
 import { useLocale } from '../lib/locale';
+import { CPANEL_APPS } from '../lib/account';
 
 /**
  * Error pages — S-01.
@@ -122,6 +123,8 @@ export function CpanelTransition() {
   const [params] = useSearchParams();
   const [going, setGoing] = useState(false);
   const domain = params.get('domain') ?? 'atelier-kamal.com';
+  // A shortcut on the service page names where in cPanel it lands; the handoff says so too.
+  const app = CPANEL_APPS.find((a) => a.id === params.get('app'));
 
   return (
     <Layout>
@@ -136,6 +139,11 @@ export function CpanelTransition() {
           <p className="sso__domain serial">
             <bdi>{domain}</bdi>
           </p>
+          {app && (
+            <p className="card__body">
+              {t('sso.opening')} <strong>{t(app.labelKey as never)}</strong>
+            </p>
+          )}
 
           {/* Naming the differences in advance is what keeps them from reading as a fault. */}
           <ul className="sso__notes">

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
+import { GatewayDetails } from '../../components/GatewayDetails';
 import {
   IconCheck,
   IconAlert,
@@ -46,8 +47,15 @@ export function Renew() {
   const dom = DOMAINS.find((d) => d.id === id);
   const [cycle, setCycle] = useState<Cycle>('annually');
   const [done, setDone] = useState(false);
+  const gateways = gatewaysFor(currency);
+  const [method, setMethod] = useState(gateways[0]?.id ?? 'stripe-card');
+
+  useEffect(() => {
+    if (!gateways.some((g) => g.id === method)) setMethod(gateways[0]?.id ?? 'stripe-card');
+  }, [gateways, method]);
 
   if (!svc && !dom) return <Navigate to="/account/services" replace />;
+  const chosen = gateways.find((g) => g.id === method);
 
   const name = svc ? svc.product : dom!.name;
   const sub = svc ? svc.domain : t('acc.domains');
@@ -129,15 +137,29 @@ export function Renew() {
               <h2 className="card__heading">{t('checkout.method')}</h2>
             </header>
             <ul className="methods">
-              {gatewaysFor(currency).map((g, i) => (
+              {gateways.map((g) => (
                 <li key={g.id}>
-                  <label className={`method${i === 0 ? ' is-selected' : ''}`}>
-                    <input type="radio" name="renewmethod" defaultChecked={i === 0} />
-                    <span className="method__label">{t(g.labelKey as never)}</span>
+                  <label className={`method${method === g.id ? ' is-selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="renewmethod"
+                      value={g.id}
+                      checked={method === g.id}
+                      onChange={() => setMethod(g.id)}
+                    />
+                    <span className="method__label">
+                      {t(g.labelKey as never)}
+                      <span className="method__note">{t(g.noteKey as never)}</span>
+                    </span>
                   </label>
                 </li>
               ))}
             </ul>
+            {chosen && (
+              <div className="u-mt-16">
+                <GatewayDetails gateway={chosen} compact amountMinor={convert(priceFor(cycle), currency)} />
+              </div>
+            )}
           </section>
         </div>
 

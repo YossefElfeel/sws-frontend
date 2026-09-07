@@ -4,7 +4,6 @@ import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import {
   IconCheck,
-  IconAlert,
   IconArrow,
   IconServer,
   IconShield,
@@ -14,6 +13,7 @@ import {
   IconInfo,
 } from '../components/icons';
 import { useLocale } from '../lib/locale';
+import { StatusHeadline, SystemList, IncidentList, worstOf } from '../components/StatusBoard';
 import {
   SYSTEMS,
   INCIDENTS,
@@ -24,7 +24,6 @@ import {
   CONTACT_CHANNELS,
   CONTACT_SUBJECTS,
   MIGRATION_PANELS,
-  type SystemState,
 } from '../lib/marketing';
 
 /** A plain page: title, lede, then whatever the page is. No category rail. */
@@ -67,84 +66,27 @@ function Page({
 
 /* ── network status — M-16 ──────────────────────────────────────────────────── */
 
-/*
- * Three tones, not two. Red is for an outage; a slow API and a scheduled maintenance window are
- * not outages, and painting them red is how a status page teaches people to ignore it.
- */
-const STATE_TAG: Record<SystemState, string> = {
-  operational: 'ok',
-  degraded: 'warn',
-  maintenance: 'taken',
-  down: 'due',
-};
-
 /**
  * Network status — M-16.
  *
  * C19 — whether this is an external service or built in-house — is still open. That decision
  * is about where the data comes from, not what the page has to say, so the page is designed
- * against fixtures and the source is swappable.
- *
- * No uptime percentage appears anywhere. None has been verified, and a status page is the one
- * place where an invented "99.9%" is not marketing but a claim someone will hold you to.
+ * against fixtures and the source is swappable. The blocks themselves live in StatusBoard,
+ * shared with the copy of this page inside the client area (C-41).
  */
 export function Status() {
   const { t } = useLocale();
 
-  const worst = SYSTEMS.some((s) => s.state === 'down')
-    ? 'down'
-    : SYSTEMS.some((s) => s.state === 'degraded')
-      ? 'degraded'
-      : SYSTEMS.some((s) => s.state === 'maintenance')
-        ? 'maintenance'
-        : 'operational';
-
   return (
     <Page title={t('status.title')} lede={t('status.lede')}>
       {/* One line that answers the question the page was opened to ask. */}
-      <div className={`headline headline--${STATE_TAG[worst]}`}>
-        {worst === 'operational' ? <IconCheck size={26} /> : <IconAlert size={26} />}
-        <div>
-          <p className="headline__title">{t(`status.all.${worst}` as never)}</p>
-          <p className="headline__note">{t('status.checked')}</p>
-        </div>
-      </div>
+      <StatusHeadline worst={worstOf(SYSTEMS)} />
 
       <h2 className="section__title section__title--sm">{t('status.systems')}</h2>
-      <ul className="sys">
-        {SYSTEMS.map((s) => (
-          <li className="sys__row" key={s.id}>
-            <span className={`sys__dot sys__dot--${s.state}`} aria-hidden="true" />
-            <span className="sys__name">{t(s.labelKey as never)}</span>
-            <span className={`tag tag--${STATE_TAG[s.state]}`}>
-              {t(`status.state.${s.state}` as never)}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <SystemList systems={SYSTEMS} />
 
       <h2 className="section__title section__title--sm">{t('status.history')}</h2>
-      <ul className="incidents">
-        {INCIDENTS.map((i) => (
-          <li className="incident" key={i.id}>
-            <div className="incident__head">
-              <span className={`tag tag--${STATE_TAG[i.state]}`}>
-                {t(`status.state.${i.state}` as never)}
-              </span>
-              <span className="incident__at serial">
-                <bdi>{i.at}</bdi>
-              </span>
-              {i.minutes !== undefined && (
-                <span className="incident__len">
-                  <span className="serial">{i.minutes}</span> {t('status.minutes')}
-                </span>
-              )}
-            </div>
-            <h3 className="incident__title">{t(i.titleKey as never)}</h3>
-            <p className="incident__body">{t(i.bodyKey as never)}</p>
-          </li>
-        ))}
-      </ul>
+      <IncidentList incidents={INCIDENTS} />
 
       <div className="notice notice--spaced">
         <IconInfo size={20} />

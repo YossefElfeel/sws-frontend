@@ -778,3 +778,55 @@ a.method svg {
   display: grid;
   gap: var(--sws-space-8);
 }
+
+/* ── 2026-09-07: TLD picker, VPS server settings, the add-ons step, gateway panels ──── */
+
+/* The extension sits beside the name, narrow, so the name keeps the room. */
+.domain-strip__tld {
+  flex: 0 1 8rem;
+  min-inline-size: 6rem;
+}
+
+/* The password row reuses the input-plus-button row; that row carries a top margin meant for
+   the affiliate link, which a field inside a grid does not want. */
+.server-settings .copy-row {
+  margin-block-start: 0;
+}
+
+.step-foot__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+.pay-details > .card__body {
+  margin-block: 0;
+}
+
+.pay-details .kv {
+  margin-block-start: var(--sws-space-12);
+}
+
+.pay-details__redirect {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+}
+
+.pay-details__redirect svg {
+  flex: none;
+}
+
+/* The password and its Show button share one row even in a three-column grid cell. */
+.server-settings .copy-row .field {
+  flex: 1 1 8rem;
+}
+
+/* The password field carries a Show button beside it, so where the grid has the columns it
+   takes two of them; in a single column it takes the one. */
+@media (min-width: 700px) {
+  .server-settings .field-label--wide {
+    grid-column: span 2;
+  }
+}

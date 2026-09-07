@@ -2187,3 +2187,125 @@
     box-shadow: none;
   }
 }
+
+/* ── 2026-09-07: the locked currency, the developer note ─────────────────────── */
+
+/* The lock is a button in the select's clothes. It has to clear the 44px target on its own,
+   because the select it replaces was measured through its label. */
+.cur__lock {
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  min-inline-size: var(--sws-touch-target-min);
+  min-block-size: var(--sws-touch-target-min);
+}
+
+.cur__lock:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--sws-radius-sm);
+}
+
+/* What WHMCS cannot do natively is said next to the control, in the warning register. */
+.dev-note {
+  display: flex;
+  gap: var(--sws-space-8);
+  align-items: flex-start;
+  margin-block-start: var(--sws-space-8);
+  padding: var(--sws-space-8) var(--sws-space-12);
+  background: var(--sws-banner-warning-bg);
+  border-inline-start: var(--sws-rule-base) solid var(--sws-banner-warning-border);
+  border-radius: var(--sws-radius-sm);
+  font-size: var(--sws-font-size-caption);
+  line-height: var(--sws-line-height-caption);
+  color: var(--sws-status-warning);
+}
+
+.dev-note svg {
+  flex: none;
+  margin-block-start: 2px;
+}
+
+/* ── 2026-09-07: the head's meta row, the domain rail inside the shell, shortcuts ──── */
+
+.app__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-8);
+}
+
+.app__meta-note {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/* The domain pages bring the category rail inside the shell on purpose: eight pages need a
+   place to be listed, and the sidebar is the application's, not the domain's. */
+.app__main .with-rail--domain {
+  display: grid;
+}
+
+.app__main .rail--domain {
+  display: block;
+  inset-block-start: var(--sws-space-16);
+}
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--sws-space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin: 0;
+}
+
+/* A fixed suffix beside a field — @domain, .domain — read as one control. */
+.field-affix {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--sws-input-height-md);
+  padding-inline: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* The add-on cards: a text column, the enabled tag, then the buttons, 8px apart. */
+.pm__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+.pm__text .pm__brand {
+  min-inline-size: 0;
+}
+
+.pm__text .pm__exp {
+  margin-inline-end: 0;
+}
+
+.pm__acts {
+  display: flex;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+/* The same rule as .with-side: the inner columns are grids too, and an auto track would let a
+   table's scroll floor widen the card instead of scrolling inside it. */
+.dash__main,
+.dash__side {
+  grid-template-columns: minmax(0, 1fr);
+}
