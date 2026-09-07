@@ -1,128 +1,319 @@
-# SWS — Phase 0 Execution Kit
+# SWS — سوميون لخدمات الويب: ريبو إعادة التصميم
 
-Working repo for the **Somion Web Services** redesign (marketing site + WHMCS client area).
+> This README is written in Egyptian Arabic at the product owner's request. The technical
+> designs under `technical/`, the tokens, the ADRs and everything a developer touches stay in
+> English — see «اللغات» below.
 
-This repo began as the things that must exist **before** design or development starts — the
-open decisions, the inventory of what has to be built, the gaps nobody had assigned, and the
-four technical designs the planning documents call for but never specify.
+ده الريبو الشغّال بتاع إعادة تصميم **سوميون لخدمات الويب (SWS)**: الموقع التسويقي
+`sws.somion.ch` ولوحة العميل `clients.somion.ch` اللي شغالة على WHMCS.
 
-Since 2026-09-01 it also contains **a design-review prototype** under `prototype/`: a Vite +
-React + TypeScript build of the redesign, for management approval and as a working tool for
-the design team. It is not the production stack, and it is not the product — see
+الريبو بدأ كـ«عدّة المرحلة صفر» — الحاجات اللي لازم تكون موجودة **قبل** ما التصميم أو التطوير
+يبدأ: القرارات المفتوحة، جرد كل شاشة هتتبني، الفجوات اللي محدش كان مسؤول عنها، والأربع
+تصميمات تقنية اللي خطط المشروع بتطلبها ومابتوصفهاش.
+
+ومن 1 سبتمبر 2026 فيه كمان **بروتوتايب للمراجعة** تحت `prototype/`: نسخة Vite + React +
+TypeScript من إعادة التصميم، الإدارة بتوافق عليها أو ترفضها، وفريق التصميم بيشتغل عليها كأداة
+حقيقية فيها كل الحالات مش الـ happy path بس. ده **مش** ستاك الإنتاج ومش المنتج نفسه — شوف
 `PRODUCT.md`.
 
----
-
-## Governance rule
-
-There are two kinds of document here and they must not be confused.
-
-| | Role | Changes when |
-|---|---|---|
-| `00-source/*.html` `00-source/*.pdf` | **Narrative snapshots.** Versioned, presentation-ready, written for a human audience (management, design team). | A new version is issued (v1.2, v2.0). Not edited in place. |
-| Everything else | **Living state.** Trackers, data, and technical specs that the team updates continuously. | Daily, as decisions close and work progresses. |
-
-**Content is never duplicated between the two.** The snapshots carry the argument; the
-trackers carry the state. This exists because the Design Playbook's own closing warning
-applies to itself: a rules document that no longer matches reality is worse than no document,
-because the team stops trusting it and each person quietly reverts to their own rules.
-
-When a decision in `decisions/decision-log.md` closes, it does **not** get written back into
-the HTML. It gets an ADR, and the affected rows in `inventory/screens.csv` unblock.
+**النسخة المنشورة:** <https://sws-frontend-mu.vercel.app/> — 96 مسار، عربي (الافتراضي)
+وإنجليزي، فاتح وداكن.
 
 ---
 
-## Repo map
+## قاعدة الحوكمة — اقراها قبل ما تعدّل أي حاجة
 
-```
-00-source/          The three original documents, unchanged. Read-only baseline.
-decisions/          The 27 open questions blocking work, as a trackable log. (AR)
-  adr/              Architecture Decision Records — one per decision, once made. (EN)
-inventory/          All 74 screens as filterable data. (EN headers, bilingual names)
-gaps/               The 8 gaps the v1.1 plans do not cover. (AR)
-technical/          The four technical designs the plans require but never specify. (EN)
-tokens/             Design tokens as machine-readable data + an automated WCAG gate. (EN)
-actions/            Fixes that are live on production right now and do not wait for Phase 0. (AR)
-prototype/          The design-review prototype. Vite + React + TS. (EN)
-scripts/            capture.mjs and interact.mjs — screenshot and behaviour verification.
-.impeccable/        Design-direction record: the surface brief and its direction contract.
+فيه نوعين من الملفات هنا، وماينفعش يتخلطوا:
+
+| | الدور | بيتغير إمتى |
+| --- | --- | --- |
+| `00-source/*.html` و`00-source/*.pdf` | **لقطات مؤرَّخة.** نسخ رسمية مكتوبة لبشر (الإدارة، فريق التصميم). | لما تطلع نسخة جديدة (v1.2، v2.0). ماتتعدّلش في مكانها أبدًا. |
+| كل حاجة تانية | **حالة حيّة.** تراكرز وبيانات ومواصفات تقنية الفريق بيحدّثها باستمرار. | يوميًا، كل ما قرار يتقفل أو شغل يتقدّم. |
+
+**المحتوى مابيتكررش بين الاتنين.** اللقطات شايلة الحجّة، والتراكرز شايلة الحالة. السبب إن
+تحذير دليل التصميم نفسه بينطبق عليه: مستند قواعد مابقاش مطابق للواقع أسوأ من مفيش مستند،
+لأن الفريق بيبطّل يثق فيه وكل واحد بيرجع لقواعده هو.
+
+لما قرار يتقفل في `decisions/decision-log.md` **مابيتكتبش تاني جوه الـ HTML**. بياخد ADR في
+`decisions/adr/`، والصفوف اللي كانت محجوبة بيه في `inventory/screens.csv` بتتفك — في نفس
+الـ commit.
+
+---
+
+## خريطة الريبو
+
+```text
+00-source/          التلات مستندات الأصلية زي ما هي. للقراءة بس.
+decisions/          الأسئلة المفتوحة اللي بتحجب الشغل، كسجل قابل للتتبع. (عربي)
+  adr/              Architecture Decision Records — واحد لكل قرار اتقفل. (إنجليزي)
+inventory/          الشاشات كلها كبيانات قابلة للفلترة: 90 صف. (عناوين إنجليزي، أسماء بلغتين)
+gaps/               الفجوات اللي خطط v1.1 مابتغطيهاش. (عربي)
+technical/          الأربع تصميمات تقنية اللي الخطط بتطلبها ومابتوصفهاش. (إنجليزي)
+tokens/             رموز التصميم كبيانات + بوابة WCAG أوتوماتيكية. (إنجليزي)
+actions/            إصلاحات على الإنتاج دلوقتي ومابتستناش المرحلة صفر. (عربي)
+prototype/          بروتوتايب المراجعة. Vite + React + TS. (إنجليزي)
+scripts/            بوابات السلوك: ست سكريبتات بتمشي على البِلد وتفحصه.
+email/              قالب البريد الموحد — HTML بريد حقيقي، مش React.
+.impeccable/        سجل اتجاه التصميم، وصور المراجعة اللي capture.mjs بيطلعها.
+.github/workflows/  الـ CI: بوابة الرموز والوصول على كل push وpull request.
 ```
 
-## Running it
+### اللغات
+
+القاعدة بسيطة: **عربي** لكل حاجة الإدارة وفريق التصميم بيقروها (سجل القرارات، سجل الفجوات،
+قائمة الإجراءات، والـ README ده)، و**إنجليزي** لكل حاجة الكود والأدوات والمطورين بيلمسوها
+(عناوين الجرد، المواصفات التقنية، الرموز، الـ ADRs، تعليقات الكود، رسائل الـ commit).
+
+جوه المنتج نفسه اللغتين مواطنين من الدرجة الأولى: كل نص مكتوب بالعربي المصري أصلًا مش
+مترجم، والإنجليزي مكتوب إنجليزي — شوف «مبادئ مابتتفاوضش» تحت.
+
+---
+
+## تشغيل البروتوتايب
 
 ```bash
 npm install
-npm run dev      # the prototype at http://localhost:5173
-npm run gate     # token drift + accessibility, the same two checks CI runs
+npm run dev      # البروتوتايب على http://localhost:5173
+npm run build    # tsc --noEmit ثم vite build → dist-prototype/
+npm run gate     # نفس فحصين الـ CI: انحراف الرموز + الوصول
 ```
 
-`npm run gate` is the one to run before any commit that touches `tokens/`. It fails if
-`dist/tokens.css` has drifted from `tokens.json`, and again on any WCAG 2.2 AA failure.
+`npm run gate` هو اللي تشغّله قبل أي commit بيلمس `tokens/`. بيفشل لو `dist/tokens.css` انحرف
+عن `tokens.json`، وبيفشل تاني على أي سقوط في WCAG 2.2 AA (74 فحص، كلها ناجحة دلوقتي).
 
-**Language split:** Arabic for management- and design-facing artifacts (decision log, gap
-register, action list). English for anything code, tooling, or developers touch (inventory
-headers, technical specs, tokens, ADRs).
+### بوابات السلوك — بتتشغّل يدويًا على سيرفر شغّال
 
----
+كل واحدة بتاخد رابط اختياري (الافتراضي `http://localhost:5173/`) وبتطلع بكود غير صفر لو
+فشلت. شغّل `npm run dev` في طرفية، والسكريبتات في طرفية تانية:
 
-## Where to start
+| السكريبت | بيفحص إيه | الحالة دلوقتي |
+| --- | --- | --- |
+| `node scripts/deadends.mjs` | فحص ثابت من غير متصفح. تلات أنواع من «اللاشيء»: زرار مش موصّل بحاجة، فورم الـ submit بتاعه بيبلع الحدث بس، وشاشة مفيش منها طريق قدام. الاستثناءات مكتوبة بسببها، واستثناء بطّل يطابق بيتبلّغ عنه هو كمان. | مفيش حاجة ميتة، 4 استثناءات موثقة |
+| `node scripts/flow.mjs` | تأكيدات على مستوى الشاشة بـ Playwright: مسار الطلب كامل، العملة والوضع الداكن، سلوك لوحة العميل، إن كل عنصر تحكم بيعدّي 44px، إن مفيش «إثبات» متلفّق على صفحات الشركة، وإن كل الأرقام لاتينية. | 113 فحص، كونسول نظيف |
+| `node scripts/journeys.mjs` | رحلات من الأول للآخر بالضغط بس — مافيش سطر بيغيّر الـ URL في النص، فاللينك اللي بيودي لمكان مش موجود بيوقّف الرحلة بدل ما يتخطّى. | 21 رحلة كاملة |
+| `node scripts/mobile.mjs` | كل المسارات على 390px بالعربي: تجاوز أفقي، أهداف أقل من 44px، عناصر أقرب من 8px لبعض، نص أصغر من 12px، عناصر مغطية، أيقونات معصورة. | 96/96 مسار نظيف |
+| `node scripts/capture.mjs` | صورة كاملة لكل مسار على 1440 و390 في `.impeccable/review/`، وبيفشل على تجاوز أفقي أو `main` فاضية أو أي خطأ في الكونسول. | 192 لقطة نظيفة |
+| `scripts/routes.mjs` | مش بوابة — ده **الجدول الوحيد** للمسارات، اللي `capture.mjs` و`mobile.mjs` بيقروا منه. أي مسار جديد لازم يتضاف هنا وإلا محدش هيصوّره ولا يفحصه. | 96 مسار |
 
-| If you are… | Read |
-|---|---|
-| The manager / product owner | `gaps/gap-register.md`, then `decisions/decision-log.md` |
-| Fixing what is broken today | `actions/this-week.md` |
-| Planning the design work | `inventory/screens.csv` — filter `customization=full AND priority=P0` |
-| Building the front end | `technical/` — all four, in the order listed below |
-| Setting up the design system | `tokens/README.md` |
-
----
-
-## The four technical designs
-
-Each addresses something the planning documents identify as necessary and then leave
-unspecified. Read in this order — each depends on the one before it.
-
-1. **`technical/pricing-sync.md`** — The v1.1 plan's central move is relocating pricing from
-   WHMCS to the marketing site. WHMCS owns the ~1200 price fields. This decides how the
-   marketing site gets them without hand-copying, which is what produced the current
-   `$2.50` vs `250.00 EGP` conflict.
-2. **`technical/url-and-seo-map.md`** — Relocating pricing is called the project's biggest SEO
-   item. This is the mechanism: URL scheme, hreflang, redirect map, structured data, and the
-   architectural line of demarcation written as an enforceable routing rule.
-3. **`technical/analytics-plan.md`** — The marketing site and WHMCS are separate subdomains,
-   so the conversion funnel is severed by default and every KPI in the plan is unmeasurable
-   until that is fixed. Event dictionary, cross-domain setup, and a baseline you can start
-   collecting this week.
-4. **`technical/environments.md`** — Where each system's source lives, how the WHMCS theme is
-   version-controlled, staging, the version freeze, and rollback.
+الـ CI (`.github/workflows/gate.yml`) بيشغّل فحص الرموز وبوابة الوصول على كل push وpull
+request، وVercel بيعمل preview لكل PR. بوابات السلوك الست بتتشغّل يدويًا لحد دلوقتي — بس دي
+عقد المشروع: PR بيكسر واحدة منهم مابيتدمجش.
 
 ---
 
-## Status
+## جوه البروتوتايب — `prototype/src`
 
-**2026-09-07** — The flows the competitor's client area has and ours lacked are built, on the
-product owner's decisions of the same day: domain management as eight pages behind a rail
-(nameservers, DNS, contacts, private nameservers, add-ons, forwarding, transfer-out), the
-order-time domain add-ons step (O-03), VPS server settings in Configure, auto-renew on domains
-and services, a per-gateway payment-details panel everywhere a method is chosen, the invoice
-as a document with its ledger beside its own payment (C-17), the currency locked to the
-account's once a payment exists (I15 closed), and network status inside the client area. Six
-inventory rows added (C-37 to C-42); the gates grew with the screens.
+### `components/` — 18 مكوّن
 
-**2026-09-01** — Ten decisions closed (B3, B4, B5, B7, B7a, I17, I18, C21, C22, P25), which
-unblocked 13 of the 30 blocked rows in `inventory/screens.csv`. Gap G11 closed. The
-accessibility gate went from 64 checks with 17 unverified to **70 checks, all passing**. The
-first surface (`M-01` Homepage) is built.
+| المكوّن | بيعمل إيه |
+| --- | --- |
+| `Layout`، `HostingLayout` | غلاف صفحات التسويق والطلب: الماستهيد، القائمة، السلة، الفوتر، شريط الكوكيز. `HostingLayout` بيزود ريل فئات الاستضافة. |
+| `AppShell`، `AccountLayout` | غلاف لوحة العميل: عمود تنقّل جانبي بأربع مجموعات وعدّادات، شريط بيقول إنت فين، ومفيش أي «كروم» تسويقي جواه. |
+| `Card`، `Tag`، `Stat` | نظام لوحة العميل الموحّد: الكارت بعنوانه كـ prop، الشِبس بـ«نبرة» (ok / warn / bad / neutral) مش بلون، وصف الأرقام اللي الشاشة بتفتح بيه. |
+| `TableToolbar` | الشريط اللي كل جدول في لوحة العميل بيلبسه: خانة بحث واحدة والفلاتر جنبها كـ selects. |
+| `Button`، `Banner` | الزرار بتلات مقاسات وأربع أشكال؛ اللافتة بأربع درجات كل واحدة بأرضية وحافة وأيقونة مش بلون بس. |
+| `CurrencySelect` | مبدّل العملة بسلوكين: للزائر بيعرض الإجمالي القديم والجديد قبل التبديل؛ جوه لوحة العميل بعد أول دفعة بيبقى قفل بيشرح نفسه وبيوجّه لتذكرة مبيعات. |
+| `GatewayDetails` | لوحة «بيانات الدفع» لكل بوابة حسب نوعها: حقول كارت، أو تنبيه تحويل لصفحة المزوّد، أو بيانات حساب ورقم مرجعي وإيه اللي تعمله بعد ما تحوّل. |
+| `DomainRail` | إطار صفحات الدومين الثمانية: الريل الجانبي بالصفحات والإجراءات. |
+| `StatusBoard` | العنوان والأنظمة والأحداث بتوع صفحة حالة الشبكة — مشتركة بين الصفحة العامة واللي جوه لوحة العميل عشان ماينحرفوش عن بعض. |
+| `DevNote` | العلامة اللي بتتحط جنب أي عنصر WHMCS مابيعرفش يعمله أصلًا («محتاج تأكيد المطوّر»)، بدل ما يتراجع كأنه خلصان. |
+| `CookieConsent`، `PlanCards`، `icons` | موافقة الكوكيز بأكتر إعداد محافظ على الخصوصية؛ كروت باقات الاستضافة المشتركة؛ 47 أيقونة مرسومة بسُمك خط واحد. |
 
-Still open and deliberately not invented: the owner of the ~1200 price fields (B5), the WHMCS
-version (B6), the Egyptian payment provider (B1), the homepage numeric claims (B7c), and the
-`$2.50` vs `250.00 EGP` conflict (B7d). The prototype marks each of these on the screen
-rather than designing past them.
+### `lib/` — البيانات والحالة
 
-Phase 0 kit built 2026-07-29. Live-site claims in the v1.1 audit were re-verified the same
-day and all were still true — see `actions/this-week.md` for the evidence.
+- `catalog.ts` — العملات السبعة، دورات الفوترة الستة ونِسب التوفير، باقات الاستضافة المشتركة،
+  مجموعات الإضافات، **بوابات الدفع الخمسة** (كل واحدة بتعلن نوعها: inline / redirect / manual
+  ومعاها ملاحظتها وتعليماتها وبيانات حسابها)، أسعار الامتدادات، نسبة الضريبة.
+- `products.ts` — باقي العائلات: ووردبريس، سحابي، بريد، VPS (جدول مقارنة + أنظمة التشغيل)،
+  مراقبة، SSL، منشئ المواقع.
+- `account.ts` — الفيكستشرز على شكل الـ payloads اللي WHMCS بيرجّعها: الخدمات، الدومينات
+  (بجهات اتصالها وخوادم أسمائها الخاصة وتحويلاتها وكود الـ EPP)، سجلات DNS لكل دومين، الفواتير
+  (ببنودها وفتراتها والرصيد المستخدم)، المعاملات، الحساب، الشركة، التذاكر، قاعدة المعرفة،
+  الإعلانات، الأفلييت. فيه كمان الدوال اللي بتحسب سجل الفاتورة والمتبقي عليها، وثابت
+  `BILLING_LOCKED` اللي بيقفل العملة بعد أول دفعة.
+- `accountState.tsx` — النسخة القابلة للتعديل من الفيكستشرز. صفحات الدومين الثمانية وصفحة
+  الخدمة بيقروا ويكتبوا هنا، فقفل اتفتح في صفحة بيتقري مفتوح في اللي بعدها. مفيش حفظ بعد
+  إعادة التحميل — عن قصد، عشان البروتوتايب مايتراجعش كأن وراه سيرفر.
+- `cart.tsx` — السلة: السطر فيه الباقة والدورة والإضافات، والدومين المربوط بإضافاته المجانية،
+  وإعدادات السيرفر لو VPS.
+- `locale.tsx` — جدول النصوص: 1,173 مفتاح، كل واحد `{ ar, en }`، بيتقري بـ `t('key')` ومفاتيحه
+  متحقق منها بالتايب. النوع `Bi` للنصوص اللي مكتوبة جوه الفيكستشر نفسه (اسم عميل، نص تذكرة).
+- `prefs.tsx` — السمة والعملة، محفوظين في `localStorage`. `saved.tsx` — «اتحفظ»: أصغر حاجة
+  صادقة زرار حفظ يقدر يعملها من غير سيرفر. `proration.ts`، `specs.ts`، `marketing.ts` —
+  حساب فرق الترقية، ترجمة سطور المواصفات، وبيانات صفحات الشركة وحالة الشبكة.
 
-Written without WHMCS admin or marketing-site source access. Anything that could not be
-verified from public pages is marked **ASSUMPTION** in the document that relies on it, with
-a note on how to confirm it. Search the repo for `ASSUMPTION` before treating any of it as
-settled.
+### `screens/` — الشاشات
+
+- **التسويق:** الرئيسية، عائلات الاستضافة، المقارنة، تفاصيل المنتج، البحث عن دومين، أسعار
+  الامتدادات، نقل دومين، نقل موقع، حالة الشبكة، من نحن، مراكز البيانات، اتصل بنا، المدونة،
+  الصفحات القانونية.
+- **الطلب:** تهيئة المنتج (بما فيها إعدادات سيرفر الـ VPS)، اختيار الدومين، تهيئة إضافات
+  الدومين، السلة، الدفع، بيانات مسجّل الدومين، إدخال الكارت، تحدي البنك (3-D Secure)، صفحة
+  تحويل مزوّد الدفع، تعليمات التحويل البنكي وإنستاباي، فشل الدفع، الطلب المعلّق، التأكيد.
+- **المصادقة:** دخول، تسجيل، استعادة كلمة المرور، 2FA، تعيين كلمة مرور، تأكيد البريد، انتهاء
+  الجلسة.
+- **لوحة العميل (`screens/account/`):** لوحة القيادة، خدماتي وتفاصيل الخدمة وتغيير كلمة
+  مرورها، دوميناتي وصفحات الدومين الثمانية، الفواتير والفاتورة المفردة، إضافة رصيد، طرق الدفع
+  المحفوظة، المعاملات، استرداد الدفع الفاشل، التجديد، الترقية بتلات خطواتها، الإلغاء، التذاكر
+  وفتح تذكرة ومحادثتها، قاعدة المعرفة، الإعلانات، حالة الشبكة، الأفلييت وطلب السحب، جهات
+  الاتصال الفرعية، الأمان و2FA، تفضيلات الإشعارات.
+- **النظام:** صفحات الأخطاء الأربعة، شاشة الانتقال إلى cPanel، معرض اللافتات.
+
+### `styles/` و`tokens/`
+
+ست ملفات CSS (~6,800 سطر) ماتحتويش على قيمة لون واحدة: كل حاجة بتيجي من `tokens/dist/tokens.css`
+اللي `tokens/build.mjs` بيولّده من `tokens/tokens.json`. تلات طبقات — بدائية، دلالية، مكوّنات —
+والبدائية **مابتتصدّرش أصلًا**، فمفيش مكوّن يقدر يوصل لهيكس خام. السمتين الفاتحة والداكنة
+كاملتين، والبناء بيفشل لو رمز دلالي موجود في سمة ومش موجود في التانية. التفاصيل في
+`tokens/README.md`.
+
+---
+
+## الشاشات والتدفقات — إيه اللي موجود فعلًا
+
+الجرد في `inventory/screens.csv`: **90 صف — 85 مبني، 4 مطوي جوه شاشات تانية، 1 لسه مابدأش**
+(C-16 فاتورة الـ PDF، محجوبة بالقرار I12). كل صف فيه المجموعة ومستوى التخصيص اللي WHMCS
+بيسمح بيه (`full` / `limited` / `closed`) والحالات اللي الشاشة لازم تغطيها وإجراءات الـ API
+والقرار اللي حاجبها لو فيه.
+
+### اللي اتبنى في جولة 7 سبتمبر 2026
+
+الجولة دي جت من 14 لقطة شاشة من لوحة منافس (WHMCS بقالب Lagom 2) وخمس ملاحظات من مالك
+المنتج، وكل بند فيها اتبنى ضد فقرة المواصفات اللي بيشدّدها:
+
+- **الطلب:** كارت «دومين من السلة» مابيظهرش غير لما السلة فيها دومين فعلًا، ومعاه اختيار أنهي
+  دومين. قائمة الامتدادات جنب خانة البحث (المواصفات 7.2.1). خطوة تهيئة الدومين (O-03) بعد أي
+  تسجيل أو نقل: إدارة DNS وحماية بيانات المالك وتحويل البريد كمفاتيح مجانية بتظهر في السلة
+  والفاتورة. الـ VPS بقى بيتطلب من شاشة التهيئة بإسم الخادم وكلمة مرور الروت وخادمي الأسماء
+  ونظام التشغيل، وزرار المتابعة مستني لحد ما البيانات تبقى صح.
+- **الدفع:** كل بوابة بتعلن نوعها وبتشيل ملاحظتها وتعليماتها، وبتظهر في الدفع والفاتورة
+  وإضافة الرصيد والتجديد. TWINT/Klarna ومحفظة الجنيه بيوصلوا لصفحة تحويل لمزوّد الدفع؛ التحويل
+  البنكي وإنستاباي ليهم شاشات تعليمات بتعرف الفاتورة اللي بتدفعها ورقمها هو المرجع.
+- **الفاتورة:** مستند فيه «الفاتورة باسم» و«صادرة من» (رقم التسجيل الضريبي خانة معلَّمة لحد
+  ما I12 يتقفل)، فترة لكل بند، نجمة الضريبة ونسبتها من البيانات، الرصيد المستخدم، سجل الدفع
+  بحالته الفاضية، والمتبقي للدفع — وجنبه الكارت اللي بياخد الدفعة فعلًا.
+- **العملة:** بعد أول دفعة ناجحة العملة جوه لوحة العميل بتبقى قفل بيشرح ليه وبيوديك لتذكرة
+  مع المبيعات (القرار I15 اتقفل).
+- **إدارة الدومين:** تمان صفحات ورا ريل واحد — نظرة عامة، خوادم الأسماء (افتراضية أو خاصة)،
+  سجلات DNS بفورم إضافة وبحث وفلتر، بيانات الدومين لأربع جهات اتصال، خوادم الأسماء الخاصة
+  (تسجيل وتعديل وحذف)، الخدمات الإضافية، تحويل البريد، ونقل الدومين لمُسجِّل آخر بكود الـ EPP.
+- **صفحة الخدمة:** حالة الخدمة في الرأس، آخر تحديث للاستهلاك، عشر اختصارات لـ cPanel، إنشاء
+  سريع لحساب بريد، شراء إضافة، Webmail، تغيير كلمة المرور، رابط منشئ المواقع لو مفعّل، وتبويبات
+  الفوترة والفواتير والدومين مع طريقة الدفع.
+- **التجديد التلقائي:** مفتاح على الدومينات (وعمود في القائمة) وعلى الخدمات — مفتاح الخدمات
+  معلَّم بـ`DevNote` لأن WHMCS مافيهوش تجديد تلقائي لكل خدمة لوحدها.
+- **حالة الشبكة** جوه لوحة العميل تحت الدعم، بفلتر وحالة «مفيش أعطال».
+
+### اللي **مش** مبني عن قصد — وكل واحد معلَّم على الشاشة أو في تعليق
+
+- تحميل الـ PDF بيقول ليه مستني: بيتولّد على السيرفر ومحتاج قرار الضريبة I12.
+- مفيش رابط RSS في حالة الشبكة: مفيش feed أصلًا والقرار C19 (نبني ولا نشتري) مفتوح.
+- مولّد الدومين بالذكاء الاصطناعي: القرار I10 مفتوح (أنهي مزوّد، بكام، وإيه اللي يحصل لما
+  يفشل).
+- الفيكستشرز مابتتغيرش بعد الدفع: تخلّص دفع بترجع للفاتورة وهي لسه «غير مدفوعة»، لأن مفيش
+  سيرفر. التعديلات جوه الحساب بتفضل بين الصفحات، مش بعد إعادة التحميل.
+- أي إطار طرف تالت (حقول Stripe، صفحة البنك، صفحة مزوّد الدفع، cPanel) بيتعلّم كـ«خانة» بتقول
+  ده بتاع مين، مش بيتزيّف.
+
+---
+
+## مبادئ مابتتفاوضش
+
+1. **مفيش إثبات متلفّق.** مفيش نسبة uptime ولا شهادة ISO ولا عدد عملاء ولا شهادات رأي في
+   البروتوتايب كله، لأن ولا واحد منهم اتأكد (شوف `PRODUCT.md`). لما الصفحة محتاجة إثبات بتسيب
+   خانة معلَّمة، و`flow.mjs` بيدوّر على أشكال الإثبات المتلفّق ويفشل لو لقاها.
+2. **الأرقام لاتينية (0123) في كل مكان**، حتى جوه النص العربي (ADR-0003)، والبوابة بتتأكد إن
+   مفيش رقم هندي واحد بيتعرض.
+3. **الرموز بس.** مفيش قيمة لون برّه `tokens.json`، والمسافات من سُلّم أساسه 4 بس.
+4. **44×44 لأي عنصر لمس** (ADR-0004) وحلقة تركيز 2px — الاتنين فوق مستوى AA عن قصد، لأن
+   الترافيك المصري والخليجي بالموبايل أساسًا.
+5. **العربي أصلي مش مترجم.** RTL اتجاه أصلي بخصائص CSS منطقية، مفيش ستايل شيت معكوس. أي
+   جري لاتيني جوه جملة عربية (دومين، بريد، تاريخ، رقم مرجعي) بيتحط في `<bdi>` مع `.serial`،
+   و`dir="ltr"` بيتحط على عناصر الإدخال بس.
+6. **اعرض القيد، ماتوعدش بعده.** من 84 شاشة في الجرد الأصلي، 43 مقيّدة و8 مقفولة بسبب WHMCS.
+   اللي WHMCS مابيعرفش يعمله بيتعلّم بـ`DevNote` بدل ما يتراجع كأنه خلصان.
+7. **كل زرار بيعمل حاجة.** «فيه زراير مش شغالة» هي العيب الوحيد اللي لقطة الشاشة مابتوريهوش
+   والتايب تشيك مابيمسكوش — عشان كده `deadends.mjs` بيمشي على كل ملف كل مرة.
+
+---
+
+## إزاي تضيف حاجة من غير ما تكسر البوابات
+
+- **مسار جديد:** ضيفه في `prototype/src/App.tsx` (الراوتر مسطّح، المسارات الأعمق بتبقى
+  مسارات أخوات زي `/account/services/:id/upgrade`)، وفي `scripts/routes.mjs` عشان يتصوّر
+  ويتفحص، وصف في `inventory/screens.csv`. لو التدفق متعدد الخطوات، ضيف رحلة في
+  `scripts/journeys.mjs`.
+- **نص جديد:** مفتاح واحد في `STRINGS` جوه `lib/locale.tsx` باللغتين. العربي بالمصري
+  المكتوب («اللي»، «ده»، «عشان»)، الأرقام لاتينية، والنص المشترك بين مكوّنات بيتكتب مرة واحدة.
+  المفتاح الناقص بيطلع تحذير `[i18n] missing key` في الكونسول وبيرجّع المفتاح نفسه، فامشي على
+  المسارات الجديدة باللغتين قبل ما تقفل.
+- **بيانات جديدة:** فيكستشر في `lib/account.ts` على شكل الـ payload بتاع WHMCS، وأي حاجة
+  المستخدم بيعدّلها بتقرا وتكتب من `lib/accountState.tsx`.
+- **عنصر تحكم جديد:** الزرار لازم يكون معاه `onClick` أو `type="submit"` أو يكون
+  `disabled` من غير شرط؛ الفورم لازم يعمل حاجة غير `preventDefault`؛ `disabled={شرط}` مابيعفيش.
+- **جدول جديد في لوحة العميل:** يلبس `TableToolbar` زي كل الجداول، ويتحط جوه `.table-scroll`
+  عشان يتلف جوه الكارت على الموبايل بدل ما يوسّع الصفحة.
+- **حاجة WHMCS مابيعرفش يعملها:** حطها، وحط جنبها `<DevNote>` بيقول الفجوة إيه.
+- **قبل الـ PR:** `npm run build` و`npm run gate` وبوابات السلوك الست على سيرفر شغّال.
+  الفرع بيتقطع من `master`، والـ PR بياخد الـ CI وpreview من Vercel.
+
+---
+
+## مين يبدأ منين
+
+| لو إنت… | اقرا |
+| --- | --- |
+| المدير / مالك المنتج | `gaps/gap-register.md` وبعده `decisions/decision-log.md` |
+| بتصلّح اللي بايظ دلوقتي على الإنتاج | `actions/this-week.md` |
+| بتخطط شغل التصميم | `inventory/screens.csv` — فلتر على `customization=full AND priority=P0` — و`DESIGN.md` اللي بيسجل النظام زي ما اتشحن فعلًا |
+| بتبني الواجهة | `technical/` الأربعة بالترتيب اللي تحت، وبعدها `prototype/src` |
+| بتظبط نظام التصميم | `tokens/README.md` |
+| بتراجع البروتوتايب | `npm run dev` وافتح `#/account`، أو الصور في `.impeccable/review/` |
+
+---
+
+## الأربع تصميمات تقنية
+
+كل واحد بيعالج حاجة خطط المشروع بتقول إنها ضرورية وبعدين مابتوصفهاش. اقراهم بالترتيب — كل
+واحد مبني على اللي قبله:
+
+1. **`technical/pricing-sync.md`** — الحركة المحورية في خطة v1.1 نقل التسعير من WHMCS للموقع
+   التسويقي، بس WHMCS هو مالك ~1200 حقل سعر. ده بيقرر الموقع بياخدهم منين من غير نسخ يدوي —
+   اللي هو السبب في التعارض الحالي بين `$2.50` و`250.00 EGP`.
+2. **`technical/url-and-seo-map.md`** — نقل التسعير اسمه «أكبر بند SEO في المشروع». دي
+   الآلية: بنية الروابط، `hreflang`، خريطة التحويلات، البيانات المنظمة، وخط الفصل المعماري
+   كقاعدة توجيه قابلة للتنفيذ.
+3. **`technical/analytics-plan.md`** — الموقع وWHMCS على نطاقين فرعيين مختلفين، فالقمع مقطوع
+   افتراضيًا وكل مؤشر في الخطة مش قابل للقياس لحد ما ده يتصلّح. قاموس الأحداث والإعداد العابر
+   للنطاقات وخط الأساس اللي تقدر تبدأ تجمعه الأسبوع ده.
+4. **`technical/environments.md`** — فين مصدر كل نظام، إزاي قالب WHMCS بيتحكم في إصداراته،
+   الـ staging، تجميد الإصدار، والتراجع.
+
+---
+
+## الحالة
+
+**2026-09-07** — التدفقات اللي لوحة المنافس فيها وإحنا ماكانتش عندنا اتبنت كلها على قرارات
+مالك المنتج في نفس اليوم (التفاصيل فوق في «جولة 7 سبتمبر»). ست صفوف اتضافت للجرد
+(C-37 لـ C-42)، والبوابات كبرت مع الشاشات: 96 مسار، 113 فحص في `flow.mjs`، 21 رحلة. القرار
+I15 اتقفل. قبلها بأيام اتدمجت جولة «نظام تصميم واحد» للوحة العميل: `Card` و`Tag` و`Stat`
+وشريط الجداول الموحد، والخمس سلوكيات اللي المواصفات سمّتها والشاشات ادّعتها.
+
+**2026-09-01** — عشر قرارات اتقفلت (B3، B4، B5، B7، B7a، I17، I18، C21، C22، P25) ففكّت 13 من
+30 صف محجوب في الجرد. الفجوة G11 اتقفلت. بوابة الوصول طلعت من 64 فحص فيهم 17 غير متحقق منها
+لـ**70 فحص كلها ناجحة** (74 دلوقتي). أول شاشة (M-01 الرئيسية) اتبنت، وبعدها الباقي.
+
+**لسه مفتوح ومش هيتخترع:** مالك ملء ~1200 حقل سعر (B5)، إصدار WHMCS (B6)، مزوّد الدفع المصري
+(B1)، الأرقام على الصفحة الرئيسية (B7c)، تعارض `$2.50` مع `250.00 EGP` (B7d)، مولّد الدومين
+بالذكاء الاصطناعي (I10)، قواعد الضريبة لكل سوق (I12)، وحالة الشبكة نبنيها ولا نشتريها (C19).
+البروتوتايب بيعلّم كل واحدة فيهم على الشاشة بدل ما يصمم من فوقها.
+
+**تحذير قائم (G8):** فيه كلمة مرور حيّة لحساب على `clients.somion.ch` جوه `00-source/` وفي تاريخ
+git — لازم تتدوّر، وده مابيشيلهاش من الـ PDF ولا من أي مكان اتوزّع عليه.
+
+عدّة المرحلة صفر اتبنت يوم 2026-07-29. ادعاءات الموقع الحيّ في تدقيق v1.1 اتراجعت في نفس اليوم
+وكلها لسه صحيحة — شوف `actions/this-week.md` للأدلة.
+
+الريبو اتكتب من غير وصول لإدارة WHMCS ولا لمصدر الموقع التسويقي. أي حاجة ماقدرناش نتأكد منها من
+الصفحات العامة معلَّمة **ASSUMPTION** في المستند اللي بيعتمد عليها، مع ملاحظة إزاي تتأكد منها.
+دوّر على `ASSUMPTION` في الريبو قبل ما تعامل أي حاجة منهم كأنها محسومة.
