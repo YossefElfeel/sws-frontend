@@ -377,12 +377,21 @@
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
 }
 
+/*
+ * A radio card is inset on all four sides, not just the two the label happened to touch. The
+ * Arabic notes wrap to two and three lines, and the 56px floor stopped holding the text off the
+ * border the moment the content outgrew it. Padding sets the box now — 16 all round, off the
+ * 4-point scale — and the floor is the large-control height, so a one-line card is still a
+ * comfortable target. block-size lands the cards in a row level however unevenly the notes wrap,
+ * the way .choice already does.
+ */
 .method {
   display: flex;
   align-items: center;
   gap: var(--sws-space-12);
-  min-block-size: 56px;
-  padding-inline: var(--sws-space-16);
+  block-size: 100%;
+  min-block-size: var(--sws-button-height-lg);
+  padding: var(--sws-space-16);
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-md);
