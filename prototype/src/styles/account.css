@@ -40,7 +40,7 @@
 .rail {
   min-width: 0;
   position: sticky;
-  inset-block-start: 96px;
+  inset-block-start: var(--sws-space-96);
   padding: var(--sws-space-16);
   background: var(--sws-card-bg);
   border-radius: var(--sws-radius-xl);
@@ -50,7 +50,7 @@
 .rail__head {
   padding: var(--sws-space-8) var(--sws-space-12);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
@@ -76,7 +76,7 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
   transition:
     background-color var(--sws-duration-fast) var(--sws-ease-standard),
@@ -95,7 +95,7 @@
 .rail__link.active {
   background: var(--sws-action-subtle-bg);
   color: var(--sws-action-quiet);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 /*
@@ -218,7 +218,7 @@
 
 .kv dd {
   margin: 0;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   text-align: end;
 }
 
@@ -386,7 +386,7 @@
   color: var(--sws-text-primary);
   font: inherit;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   cursor: pointer;
   transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
 }
@@ -468,7 +468,7 @@
   border-radius: var(--sws-radius-pill);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -521,7 +521,7 @@
 .switch-row__label {
   display: block;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .switch-row__note {
@@ -620,7 +620,7 @@
 }
 
 .msg__author {
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .msg__at {
@@ -656,8 +656,14 @@
   border: 0;
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .editor__tool:hover {
@@ -682,7 +688,7 @@
 /* Suggested articles ride alongside the reply box until the page runs out. */
 .kb-side {
   position: sticky;
-  inset-block-start: 96px;
+  inset-block-start: var(--sws-space-96);
 }
 
 @media (max-width: 1023px) {
@@ -719,6 +725,12 @@
   box-shadow: var(--sws-shadow-card);
   color: inherit;
   text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .kb-item:hover {
@@ -732,7 +744,7 @@
 
 .kb-item__title {
   flex: 1 1 auto;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .kb-item svg {
@@ -779,7 +791,7 @@
 .balance {
   margin-block: var(--sws-space-12);
   font-size: var(--sws-font-size-h1);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-tight);
 }
 
@@ -866,7 +878,7 @@
 
 .auth__title {
   font-size: var(--sws-font-size-h2);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-tight);
 }
 
@@ -923,7 +935,7 @@
 
 .auth__foot a {
   color: var(--sws-action-quiet);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .auth .btn {
@@ -1110,7 +1122,7 @@
 
 .perm-edit__label {
   display: block;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .perm-edit__note {
@@ -1128,7 +1140,7 @@
   flex-wrap: wrap;
   margin-block: var(--sws-space-4) var(--sws-space-12);
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 /* Who owes and who is owed, side by side where there is room. */

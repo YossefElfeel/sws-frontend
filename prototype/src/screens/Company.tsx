@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
+import { Banner } from '../components/Banner';
 import {
   IconCheck,
   IconArrow,
@@ -216,6 +217,17 @@ export function DataCentres() {
 export function Contact() {
   const { t } = useLocale();
   const [sent, setSent] = useState(false);
+  /*
+   * The form had two outcomes and one of them did not exist: submit set sent and replaced the
+   * form with a thank-you, so a send that fails had nowhere to be shown. M-18 declares error
+   * and validation. The important part of the failure is not the banner — it is that the form
+   * is still there underneath it with everything the visitor typed still in it, which is the
+   * difference between trying again and giving up.
+   */
+  const [stage, setStage] = useState<'idle' | 'sending' | 'failed'>('idle');
+  const [message, setMessage] = useState('');
+  const timer = useRef<number>();
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   return (
     <Page title={t('ct.title')} lede={t('ct.lede')}>
@@ -248,9 +260,31 @@ export function Contact() {
           className="panel panel--pad"
           onSubmit={(e) => {
             e.preventDefault();
-            setSent(true);
+            setStage('sending');
+            window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => {
+              if (/wrong|خطأ/i.test(message)) {
+                setStage('failed');
+                return;
+              }
+              setSent(true);
+            }, 700);
           }}
         >
+          <div role="status" aria-live="polite">
+            {stage === 'sending' && (
+              <p className="hint domain-status__busy">
+                <span className="spinner" aria-hidden="true" />
+                {t('ct.sending')}
+              </p>
+            )}
+            {stage === 'failed' && (
+              <Banner severity="danger" title={t('ct.failed')}>
+                {t('ct.failedNote')}
+              </Banner>
+            )}
+          </div>
+
           <div className="field-grid">
             <label className="field-label">
               <span className="eyebrow">{t('checkout.name')}</span>
@@ -273,11 +307,25 @@ export function Contact() {
           </label>
           <label className="field-label">
             <span className="eyebrow">{t('tkt.message')}</span>
-            <textarea className="field" rows={5} required />
+            <textarea
+              className="field"
+              rows={5}
+              required
+              value={message}
+              aria-invalid={stage === 'failed' || undefined}
+              aria-describedby="ct-hint"
+              onChange={(e) => {
+                setMessage(e.target.value);
+                if (stage === 'failed') setStage('idle');
+              }}
+            />
           </label>
+          <p className="hint" id="ct-hint">
+            {t('ct.demoHint')}
+          </p>
           <div className="form__foot">
-            <Button size="lg" type="submit">
-              {t('tkt.send')}
+            <Button size="lg" type="submit" disabled={stage === 'sending'}>
+              {t(stage === 'failed' ? 'ct.retry' : 'tkt.send')}
             </Button>
             <p className="form__note">{t('ct.privacyNote')}</p>
           </div>

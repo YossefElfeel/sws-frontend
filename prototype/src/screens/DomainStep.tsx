@@ -88,9 +88,9 @@ export function DomainStep() {
     <Layout>
       <section className="page-head shell">
         <h1 className="page-title">{t('domainstep.title')}…</h1>
-        <p className="chip">
-          <span className="chip__key">{t('domainstep.selected')}</span>
-          <span className="chip__val">{line.plan.name}</span>
+        <p className="pair">
+          <span className="pair__key">{t('domainstep.selected')}</span>
+          <span className="pair__val">{line.plan.name}</span>
         </p>
       </section>
 

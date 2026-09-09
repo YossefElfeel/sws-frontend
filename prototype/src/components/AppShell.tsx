@@ -24,6 +24,7 @@ import {
   IconGlobe as IconLang,
 } from './icons';
 import { CurrencySelect } from './CurrencySelect';
+import { CookieConsent } from './CookieConsent';
 import { useLocale, type Locale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { ACCOUNT, INVOICES, TICKETS, NOTIFICATIONS } from '../lib/account';
@@ -374,6 +375,16 @@ export function AppShell({
           {children}
         </main>
       </div>
+
+      {/*
+        Consent is owed to whoever arrives first, and they do not always arrive through the
+        marketing site. This lived only in Layout, so a first-time visitor opening a link from a
+        WHMCS notification mail — an invoice, a ticket reply, an expiry notice, which is the
+        ordinary way anyone reaches these 42 screens — was never asked. It reads the same stored
+        answer as the marketing bar, so answering it in either place answers it in both, and
+        neither shows it twice.
+      */}
+      <CookieConsent />
     </div>
   );
 }

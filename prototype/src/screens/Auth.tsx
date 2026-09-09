@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
+import { Banner } from '../components/Banner';
 import { IconArrow, IconKey, IconCheck } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { ACCOUNT } from '../lib/account';
@@ -42,9 +43,31 @@ function AuthShell({
   );
 }
 
+/**
+ * The screens below can fail.
+ *
+ * Every sign-in used to succeed: submit navigated on, whatever was typed. A prototype that
+ * cannot be got wrong is not a prototype of a sign-in screen — the wrong-password state is the
+ * one a real user meets most, and it was the one nobody could review. There is no server here
+ * to be right or wrong, so the trigger is a stated one: a password of "wrong", or a code of
+ * six zeros. The hint on the screen says so, because an invented rule the reviewer cannot
+ * discover is the same as no rule at all.
+ */
+const FAIL_CODE = '000000';
+
+/*
+ * Both spellings, because the hint is shown in the reader's own language: the Arabic copy says
+ * to type «خطأ» and the English says to type "wrong", and only one of them worked. A trigger a
+ * screen tells you about and then does not honour is worse than an undocumented one.
+ */
+const FAIL_WORDS = ['wrong', 'خطأ'];
+export const isFailWord = (v: string) => FAIL_WORDS.includes(v.trim().toLowerCase());
+
 export function Login() {
   const { t } = useLocale();
   const navigate = useNavigate();
+  const [failed, setFailed] = useState(false);
+  const [password, setPassword] = useState('');
 
   return (
     <AuthShell
@@ -56,10 +79,20 @@ export function Login() {
         </>
       }
     >
+      {failed && (
+        <Banner severity="danger" title={t('auth.badLogin')}>
+          {t('auth.badLoginNote')}
+        </Banner>
+      )}
+
       <form
         className="auth__form"
         onSubmit={(e) => {
           e.preventDefault();
+          if (isFailWord(password)) {
+            setFailed(true);
+            return;
+          }
           // The spec makes 2FA conditional on the account, so the password step hands off to
           // the code step rather than asking for both at once.
           navigate('/2fa');
@@ -71,8 +104,23 @@ export function Login() {
         </label>
         <label className="field-label">
           <span className="eyebrow">{t('auth.password')}</span>
-          <input className="field" type="password" autoComplete="current-password" required />
+          <input
+            className="field"
+            type="password"
+            autoComplete="current-password"
+            required
+            aria-invalid={failed || undefined}
+            aria-describedby="login-hint"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (failed) setFailed(false);
+            }}
+          />
         </label>
+        <p className="hint" id="login-hint">
+          {t('auth.demoHint')}
+        </p>
 
         <div className="auth__row">
           <label className="agree">
@@ -228,6 +276,8 @@ export function ResetPassword() {
 export function TwoFactor() {
   const { t } = useLocale();
   const navigate = useNavigate();
+  const [failed, setFailed] = useState(false);
+  const [code, setCode] = useState('');
 
   return (
     <AuthShell
@@ -235,10 +285,20 @@ export function TwoFactor() {
       lede={t('auth.twofaLede')}
       foot={<Link to="/login">{t('action.back')}</Link>}
     >
+      {failed && (
+        <Banner severity="danger" title={t('auth.badCode')}>
+          {t('auth.badCodeNote')}
+        </Banner>
+      )}
+
       <form
         className="auth__form"
         onSubmit={(e) => {
           e.preventDefault();
+          if (code.trim() === FAIL_CODE) {
+            setFailed(true);
+            return;
+          }
           navigate('/account');
         }}
       >
@@ -250,10 +310,22 @@ export function TwoFactor() {
             autoComplete="one-time-code"
             maxLength={6}
             dir="ltr"
-            placeholder="000000"
+            /* The placeholder was 000000, which is now the code that fails — a placeholder that
+               demonstrates the failure is a placeholder nobody should copy. */
+            placeholder="123456"
             required
+            aria-invalid={failed || undefined}
+            aria-describedby="code-hint"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value);
+              if (failed) setFailed(false);
+            }}
           />
         </label>
+        <p className="hint" id="code-hint">
+          {t('auth.demoHintCode')}
+        </p>
         <Button size="lg" type="submit">
           <IconKey size={17} />
           {t('auth.verify')}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { DomainPage } from '../../components/DomainRail';
 import { Button } from '../../components/Button';
+import { ConfirmButton } from '../../components/ConfirmButton';
 import { Tag, DOMAIN_TONE } from '../../components/Tag';
 import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
 import {
@@ -469,17 +470,15 @@ export function DomainDns() {
                     <td className="serial"><bdi>{r.value}</bdi></td>
                     <td className="num">{r.ttl}</td>
                     <td className="num">
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        aria-label={`${t('action.remove')} ${r.type} ${r.host}`}
-                        onClick={() => {
+                      <ConfirmButton
+                        label={`${t('action.remove')} ${r.type} ${r.host}`}
+                        onConfirm={() => {
                           setDns(dom.id, rows.filter((x) => x.id !== r.id));
                           mark();
                         }}
                       >
                         <IconTrash size={14} />
-                      </Button>
+                      </ConfirmButton>
                     </td>
                   </tr>
                 ))}
@@ -1007,17 +1006,15 @@ export function DomainForwarding() {
                     </td>
                     <td className="serial"><bdi>{r.to}</bdi></td>
                     <td className="num">
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        aria-label={`${t('action.remove')} ${r.alias}`}
-                        onClick={() => {
+                      <ConfirmButton
+                        label={`${t('action.remove')} ${r.alias}`}
+                        onConfirm={() => {
                           updateDomain(dom.id, { forwarding: rules.filter((x) => x.id !== r.id) });
                           mark();
                         }}
                       >
                         <IconTrash size={14} />
-                      </Button>
+                      </ConfirmButton>
                     </td>
                   </tr>
                 ))}

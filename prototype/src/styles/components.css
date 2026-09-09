@@ -10,7 +10,7 @@
 .masthead {
   position: sticky;
   inset-block-start: 0;
-  z-index: 40;
+  z-index: var(--sws-layer-bar);
   background: var(--sws-surface-raised);
   backdrop-filter: blur(14px);
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
@@ -24,6 +24,9 @@
   padding-block: var(--sws-space-12);
 }
 
+/* The header sequence is stated in full here — brand, nav, tools, cart, login — because it
+   used to be implied by the cart being nested inside .masthead__tools, and lifting the cart out
+   for the drawer quietly moved it to the front. */
 .masthead__brand {
   display: inline-flex;
   align-items: center;
@@ -31,7 +34,7 @@
   min-height: var(--sws-touch-target-min);
   text-decoration: none;
   color: inherit;
-  order: 1;
+  order: 0;
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -46,9 +49,9 @@
   background: var(--sws-action-primary);
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-md);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: var(--sws-font-size-caption);
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .masthead__wordmark {
@@ -59,26 +62,26 @@
 
 .masthead__word {
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
   line-height: 1.1;
 }
 
 .masthead__sub {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-size: var(--sws-font-size-caption);
+  font-weight: var(--sws-weight-medium);
+  letter-spacing: var(--sws-tracking-widest);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
 }
 
 :root[lang='ar'] .masthead__sub {
-  letter-spacing: 0.04em;
+  letter-spacing: var(--sws-tracking-wide);
   text-transform: none;
 }
 
 .masthead__nav {
-  order: 3;
+  order: 1;
   display: flex;
   gap: var(--sws-space-4);
   flex: 1 1 100%;
@@ -98,7 +101,7 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
   white-space: nowrap;
   transition:
@@ -128,6 +131,12 @@
   padding-inline: var(--sws-space-8);
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .masthead__locale:hover {
@@ -138,7 +147,7 @@
   border: 0;
   background: transparent;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   color: var(--sws-text-primary);
   cursor: pointer;
   appearance: none;
@@ -164,9 +173,15 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-primary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
   white-space: nowrap;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .masthead__cart:hover,
@@ -185,12 +200,20 @@
   background: var(--sws-action-primary);
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-pill);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--sws-font-size-caption);
+  font-weight: var(--sws-weight-bold);
+}
+
+/* Lifted out of .masthead__tools so it can stay on the bar when the rest goes into the drawer.
+   It was the last thing in that group, next to Client login, and the order puts it back there:
+   the cart and the login are both account actions, and the two selects and the theme toggle
+   are preferences. */
+.masthead__cart {
+  order: 4;
 }
 
 .masthead__login {
-  order: 2;
+  order: 5;
   display: inline-flex;
   align-items: center;
   min-height: var(--sws-touch-target-min);
@@ -199,7 +222,7 @@
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
   white-space: nowrap;
   box-shadow: var(--sws-shadow-cta);
@@ -261,13 +284,44 @@
   color: var(--sws-action-quiet);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
 }
 
 /* ── hero ──────────────────────────────────────────────────────────────────── */
 
+/*
+ * The headline is capped at 18ch, so on a wide screen it used a little over a third of the
+ * shell and the rest of the first viewport was empty ground. It is a two-column grid from the
+ * shell breakpoint up: the words keep their measure and the drawing holds the side they leave.
+ * Below it, one column, art first — a phone gets the picture and then the sentence.
+ */
 .hero {
+  display: grid;
+  gap: var(--sws-space-32);
+  align-items: center;
   padding-block: var(--sws-space-48) var(--sws-space-64);
+}
+
+.hero__art {
+  order: -1;
+  justify-self: center;
+  inline-size: 100%;
+  max-inline-size: 26rem;
+  color: var(--sws-border-strong);
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr minmax(0, 1.05fr);
+    gap: var(--sws-space-64);
+    padding-block: var(--sws-space-64) var(--sws-space-96);
+  }
+
+  /* Back to source order: the art takes the column the headline does not use. */
+  .hero__art {
+    order: 0;
+    max-inline-size: none;
+  }
 }
 
 .hero__title {
@@ -275,14 +329,14 @@
   font-size: var(--sws-font-size-hero);
   line-height: var(--sws-line-height-hero);
   font-weight: var(--sws-font-weight-hero);
-  letter-spacing: -0.03em;
+  letter-spacing: var(--sws-tracking-tight);
   text-wrap: balance;
   max-width: 18ch;
 }
 
 :root[lang='ar'] .hero__title {
   line-height: 1.28;
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .hero__accent {
@@ -315,7 +369,7 @@
   border: 0;
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-body);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
@@ -357,6 +411,12 @@
   background: var(--sws-button-primary-bg);
   color: var(--sws-button-primary-text);
   box-shadow: var(--sws-shadow-cta);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -368,6 +428,12 @@
   background: var(--sws-surface-raised);
   color: var(--sws-button-secondary-text);
   box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-button-secondary-border);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .btn--secondary:hover:not(:disabled) {
@@ -378,6 +444,12 @@
   background: transparent;
   color: var(--sws-text-secondary);
   box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-border-subtle);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .btn--quiet:hover:not(:disabled) {
@@ -420,7 +492,7 @@
 .card__title {
   font-size: var(--sws-font-size-h3);
   line-height: var(--sws-line-height-h3);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-primary);
 }
 
@@ -433,8 +505,28 @@
 
 /* ── sections ──────────────────────────────────────────────────────────────── */
 
+/*
+ * Every section used to sit on the same near-white with the same 48px above and below, so a
+ * long marketing page read as one continuous field and the eye had nothing to catch on. The
+ * rhythm is now wider, and .section--band puts alternate sections on the raised surface so the
+ * page has bands. The band is full-bleed while the content inside it stays in the shell, which
+ * is why the padding sits here and the width is left to .shell.
+ */
 .section {
-  padding-block: var(--sws-space-48);
+  padding-block: var(--sws-space-64);
+}
+
+.section--band {
+  background: var(--sws-surface-raised);
+  border-block: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/*
+ * A band is a change of ground, so it should not be announced twice. Cards inside one drop
+ * back to the page ground rather than stacking a second white plane on the first.
+ */
+.section--band .card {
+  background: var(--sws-surface-page);
 }
 
 .section__head {
@@ -450,12 +542,12 @@
   font-size: var(--sws-font-size-h2);
   line-height: var(--sws-line-height-h2);
   font-weight: var(--sws-font-weight-h2);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 :root[lang='ar'] .section__title,
 :root[lang='ar'] .page-title {
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   line-height: 1.45;
 }
 
@@ -469,7 +561,7 @@
   font-size: var(--sws-font-size-display);
   line-height: var(--sws-line-height-display);
   font-weight: var(--sws-font-weight-display);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .page-head {
@@ -478,10 +570,16 @@
 
 /* ── footer ────────────────────────────────────────────────────────────────── */
 
+/*
+ * The footer closes the page, so it is allowed to be the heaviest thing on it. It was the
+ * lightest: a hairline, then four columns of small links on the same ground as everything
+ * above. It now sits on the sunken surface, which is the one ground the page does not
+ * otherwise use, so the document has a floor rather than trailing off.
+ */
 .colophon {
-  margin-block-start: var(--sws-space-64);
-  padding-block: var(--sws-space-48);
-  background: var(--sws-surface-raised);
+  margin-block-start: var(--sws-space-96);
+  padding-block: var(--sws-space-64) var(--sws-space-48);
+  background: var(--sws-surface-sunken);
   border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
 }
 
@@ -559,7 +657,7 @@ main:focus {
 
 .banner__title {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .banner__body {
@@ -569,7 +667,15 @@ main:focus {
   color: var(--sws-text-secondary);
 }
 
+/*
+ * The close button pulls itself 8px toward the padding edge so its 44px box looks optically
+ * aligned with the banner's corner. That negative margin also eats into the 12px flex gap, so
+ * an action button sitting next to it ended up 4px away — half the 8px a thumb needs to tell
+ * two controls apart, and the one gap in the product that measured under it. The action gives
+ * back what the close button took, so both keep what they were after.
+ */
 .banner__action {
+  margin-inline-end: var(--sws-space-8);
   flex: none;
   align-self: center;
 }
@@ -586,6 +692,12 @@ main:focus {
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .banner__close:hover {
@@ -634,10 +746,13 @@ main:focus {
   position: fixed;
   inset-block-end: 0;
   inset-inline: 0;
-  z-index: 80;
+  z-index: var(--sws-layer-consent);
   background: var(--sws-surface-raised);
   border-block-start: var(--sws-rule-hair) solid var(--sws-border-strong);
-  box-shadow: var(--sws-shadow-lift);
+  /* It floats over the page, so it takes the overlay elevation — which is the one that has a
+     dark value. shadow-lift was invisible in dark, leaving a legal control separated from the
+     page by a single hairline. */
+  box-shadow: var(--sws-elevation-over);
 }
 
 .consent__inner {
@@ -659,7 +774,7 @@ main:focus {
 
 .consent__title {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .consent__body {
@@ -696,7 +811,7 @@ label.consent__row {
 .consent__name {
   display: block;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .consent__note {
@@ -729,7 +844,7 @@ label.consent__row {
   border: 0;
   color: var(--sws-action-quiet);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -745,7 +860,7 @@ label.consent__row {
   position: absolute;
   inset-block-start: calc(100% + 8px);
   inset-inline-end: 0;
-  z-index: 70;
+  z-index: var(--sws-layer-popover);
   inline-size: min(20rem, calc(100vw - var(--sws-space-32)));
   padding: var(--sws-space-16);
   background: var(--sws-surface-raised);
@@ -757,7 +872,7 @@ label.consent__row {
 
 .cur__title {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 /* Two totals side by side is the whole point: seeing that the number changes, before it does. */
@@ -787,7 +902,7 @@ label.consent__row {
 
 .cur__amount {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .cur__note {
@@ -807,8 +922,8 @@ label.consent__row {
 /* The code matters to whoever you forward the page to. It is not what you need first. */
 .err__code {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-label);
   color: var(--sws-text-secondary);
 }
 
@@ -818,7 +933,7 @@ label.consent__row {
   padding: var(--sws-space-8) var(--sws-space-16);
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .sso__notes {
@@ -851,40 +966,12 @@ label.consent__row {
  * Every rule below fixes something the 390px audit reported and a 1440px screen never shows.
  * They are grouped by what was wrong rather than by component, because the same fault turned
  * up in both shells and fixing it in one place would have left the other.
+ *
+ * The text-size group that used to open this section is gone: 10px and 11px are not sizes,
+ * they are apologies, and an apology restated three files downstream is still an apology.
+ * Those sizes are now correct where they are declared. What is left here is only what this
+ * file itself owns.
  */
-
-/* ── text below the readable floor ─────────────────────────────────────────── */
-/*
- * 10px and 11px are not sizes, they are apologies. The floor is 12px, and the two places that
- * broke it were a wordmark and a count badge — the badge especially, since it is the number
- * that decides whether you open that section at all.
- */
-
-.masthead__sub {
-  font-size: var(--sws-font-size-caption);
-}
-
-.app__mark,
-.masthead__mark {
-  font-size: var(--sws-font-size-caption);
-  letter-spacing: 0;
-}
-
-/* The tile grows with the lettering rather than clipping it. */
-.app__mark {
-  inline-size: 34px;
-  block-size: 34px;
-}
-
-.app__link-badge {
-  min-inline-size: 22px;
-  block-size: 22px;
-  font-size: var(--sws-font-size-caption);
-}
-
-.app__dot {
-  font-size: 11px;
-}
 
 /* ── targets that came up short ────────────────────────────────────────────── */
 
@@ -895,12 +982,6 @@ label.consent__row {
 
 .masthead__cart {
   min-inline-size: var(--sws-touch-target-min);
-}
-
-/* An agreement is a checkbox you have to be able to hit, not a line of small print. */
-.agree {
-  min-block-size: var(--sws-touch-target-min);
-  align-items: center;
 }
 
 /* A list of article links is navigation, so each entry gets a row rather than a text line. */
@@ -920,6 +1001,192 @@ label.consent__row {
   gap: var(--sws-space-8);
 }
 
-.app__tools {
-  gap: var(--sws-space-8);
+/* ── room for the consent bar ──────────────────────────────────────────────── */
+/*
+ * The bar is fixed, so it covers the bottom of whatever is behind it, and the client area
+ * ends in controls rather than in a footer. While the question is unanswered both shells give
+ * up the height at the end of the scroll, so nothing is ever underneath it. The value is
+ * generous on purpose: the bar is two lines and two buttons on a phone, and being wrong here
+ * hides a control rather than leaving a gap.
+ */
+:root[data-consent='open'] .colophon {
+  padding-block-end: var(--sws-space-96);
+}
+
+:root[data-consent='open'] .app__main {
+  padding-block-end: calc(var(--sws-space-96) * 2);
+}
+
+/* ── the site menu, on a phone ─────────────────────────────────────────────── */
+/*
+ * Above the shell breakpoint there is no drawer and no toggle: the panel is `display: contents`,
+ * so the nav, the tools and the login button sit in the header row exactly as they did before
+ * the wrapper existed. Below it the same wrapper becomes an off-canvas drawer, which is the
+ * pattern the client area already uses for the same problem at a different width.
+ */
+.masthead__menu,
+.masthead__scrim {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .masthead__panel {
+    display: contents;
+  }
+}
+
+@media (max-width: 899px) {
+  /*
+   * backdrop-filter makes an element a containing block for its position: fixed descendants.
+   * With the frost on, the drawer and its scrim were laid out against the 68px header instead
+   * of the viewport, so `inset: 0` produced a 68px-tall drawer and a 68px-tall scrim — a
+   * full-height panel rendered as a strip across the top of the page. The frost is decoration
+   * and the header is opaque underneath it, so it costs nothing to drop where the drawer lives.
+   */
+  .masthead {
+    backdrop-filter: none;
+  }
+
+  .masthead__inner {
+    flex-wrap: nowrap;
+    gap: var(--sws-space-8);
+  }
+
+  .masthead__brand {
+    order: 0;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  .masthead__cart {
+    order: 1;
+  }
+
+  .masthead__menu {
+    order: 2;
+  }
+
+  .masthead__menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: var(--sws-size-control);
+    block-size: var(--sws-size-control);
+    padding: 0;
+    background: none;
+    border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+    border-radius: var(--sws-radius-sm);
+    color: var(--sws-text-primary);
+    cursor: pointer;
+    transition:
+      background-color var(--sws-duration-fast) var(--sws-ease-standard),
+      border-color var(--sws-duration-fast) var(--sws-ease-standard);
+  }
+
+  .masthead__menu:hover {
+    border-color: var(--sws-border-strong);
+  }
+
+  .masthead__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: var(--sws-layer-scrim);
+    padding: 0;
+    border: 0;
+    background: var(--sws-scrim);
+    cursor: pointer;
+  }
+
+  .masthead__panel {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: var(--sws-layer-drawer);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sws-space-24);
+    inline-size: min(20rem, 84vw);
+    padding: var(--sws-space-24);
+    overflow-y: auto;
+    background: var(--sws-surface-raised);
+    box-shadow: var(--sws-elevation-over);
+    /*
+     * Closed is stated as visibility and pointer-events, not only as a transform. A panel
+     * pushed off-canvas by a percentage transform is still a 320px-wide element in the hit
+     * test if the sign of that percentage is ever wrong, and in a bidirectional layout the
+     * sign depends on the writing direction: it sat invisibly across the header, swallowing
+     * every tap on the button that opens it. visibility and pointer-events do not have a
+     * direction to get wrong. The slide is kept for the motion and is now decoration.
+     */
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(var(--sws-drawer-slide, 1.5rem));
+    transition:
+      transform var(--sws-duration-base) var(--sws-ease-standard),
+      visibility 0s linear var(--sws-duration-base);
+  }
+
+  :root[dir='rtl'] .masthead__panel {
+    --sws-drawer-slide: -1.5rem;
+  }
+
+  .page--menu .masthead__panel {
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition:
+      transform var(--sws-duration-base) var(--sws-ease-standard),
+      visibility 0s;
+  }
+
+  /*
+   * The three blocks carry `order` for the header row, where the nav belongs last. Stacked in a
+   * drawer that reads as tools, then login, then the links — the reason anyone opened it, at
+   * the bottom. Source order is the right order here, so the header's ordering is dropped.
+   */
+  .masthead__nav,
+  .masthead__tools,
+  .masthead__login {
+    order: 0;
+  }
+
+  /* In a column the nav is a list of rows, not a scrolling strip. */
+  .masthead__nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sws-space-4);
+    flex: none;
+    overflow: visible;
+  }
+
+  .masthead__link {
+    min-block-size: var(--sws-size-control);
+    display: flex;
+    align-items: center;
+    padding-inline: var(--sws-space-12);
+    border-radius: var(--sws-radius-sm);
+    font-size: var(--sws-font-size-body-lg);
+  }
+
+  /* Preferences are a group, and a group of three controls reads better boxed than loose. */
+  .masthead__tools {
+    flex-wrap: wrap;
+    gap: var(--sws-space-8);
+    padding-block-start: var(--sws-space-24);
+    border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  }
+
+  .masthead__login {
+    order: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 899px) and (prefers-reduced-motion: reduce) {
+  .masthead__panel {
+    transition: none;
+  }
 }

@@ -130,6 +130,29 @@ three card radii on one product.
 Motion: `fast 140ms · base 220ms · slow 340ms`, easing `cubic-bezier(0.22, 1, 0.36, 1)`
 standard and a faster exit curve. Every transition respects `prefers-reduced-motion`.
 
+### The scales added on 2026-09-09
+
+Five groups were added because five kinds of value were being decided in the stylesheets rather
+than in the token file. The count is the number of raw values each one retired.
+
+| Group | Steps | Retired |
+|---|---|---|
+| `weight` | `regular 400 · medium 500 · semibold 600 · bold 700` | 134 raw numbers |
+| `layer` | `behind · base · raised · sticky · bar · scrim · drawer · popover · consent · toast` | 9 hand-picked z-indexes |
+| `leading` | `flat 1 · tight 1.1 · snug 1.3 · normal 1.5 · loose 1.7` | line heights outside the type roles |
+| `size` | `icon · control · bar · tile · field · card · panel · column · table · prose · document · shell` | 62 raw `rem` across 28 values |
+| `elevation` | `flat · card · raised · over` — per theme | see §4 |
+
+`weight` has no step below 400 and will not get one: Arabic letterforms lose their joins, and
+the rule was previously enforceable only by eye. `layer` leaves gaps between its steps so a new
+overlay can be inserted without renumbering the ones around it.
+
+`tracking` gained a sixth step, `label 0.1em`. The scale ran `wide 0.06em` then `widest 0.4em`,
+and nine real values sat in that gap — 0.04, 0.08, 0.1, 0.14, 0.18 — so every uppercase label
+invented its own. 28 hardcoded letter-spacings now resolve to the scale, and the four font sizes
+below the 12.5px caption floor are gone: the masthead wordmark, its strapline and the cart count
+were 13px, 10px and 11px, which this file elsewhere calls apologies rather than sizes.
+
 ### Accessibility
 
 Formal target **WCAG 2.2 AA**, with two AAA figures adopted as internal floors because they are
@@ -138,10 +161,18 @@ cheap and they matter on a phone:
 - `touch-target-min` **44px** (AAA) — ADR-0004
 - `focus-ring-width` **2px** (AAA), ring `#3B3CD4` light / `#9B9BF4` dark
 
-`tokens/a11y-gate.mjs` runs **74 checks** and all pass. It verifies contrast pairs, focus rings
+`tokens/a11y-gate.mjs` runs **84 checks** and all pass. It verifies contrast pairs, focus rings
 and hit areas *from the tokens*. It has been wrong once and was fixed: it passed eight banner
 checks while `component.banner` declared only `danger` — a `pass` covering a real absence. It
 now asserts presence before contrast.
+
+`scripts/flow.mjs` has since been caught by the same class of fault, and worse. Two of its four
+fabricated-proof patterns carried their `\b` word boundaries as literal backspace bytes, so both
+required a control character in the page text and neither could match anything a browser is able
+to render. The uptime and data-centre-tier assertions had been reporting a pass while testing for
+nothing — on the one rule PRODUCT.md calls non-negotiable. Repaired and verified against four
+sample claims that all four now catch. The lesson is the banner lesson again: a gate is not
+trustworthy because it is green, only because it has been shown to go red.
 
 ---
 
@@ -190,9 +221,22 @@ Three of the eighteen exist because an audit found the same thing built twice.
 `app.css` loads last: it was overriding radius, padding and border while leaving the marketing
 `box-shadow` untouched, so every client-area card carried a lifted marketing shadow it never
 asked for — and one that does not render in dark at all, making elevation a language that existed
-in one theme only. The app card is now what this file always said it was: a bordered plane on a
-flat ground. Elevation means one thing, "this floats above the page", and two things do — the
-notifications popover and the mobile drawer.
+in one theme only. The app card became a bordered plane on a flat ground.
+
+**Superseded 2026-09-09.** That fix was right about the diagnosis and its remedy has now been
+replaced rather than reverted. The objection was never to depth; it was to depth spelled in a
+medium only one theme can read. So the spelling changed. `elevation` is declared once per theme
+in `tokens.json` and emitted inside each theme block: in light it is a soft shadow, because
+white has no lightness left above it; in dark it is `none`, because the surface is already a
+step lighter than the page and a near-black blur on a near-black ground says nothing. The rank
+is identical in both themes and each theme states it in the only way it can. `--sws-elevation-over`
+does the same for the three surfaces that genuinely float — the notifications popover, the mobile
+drawer and the consent bar, which was previously separated from the page in dark by one hairline.
+
+The dark ramp has exactly one rung of headroom and this is the place it is written down:
+`surface-raised-2` is `slate.800`, and it is the last legal value. `border-strong` on `slate.800`
+measures 3.03:1, which clears SC 1.4.11 by 0.03; on `slate.700` it measures 2.14:1 and fails. A
+third elevation level cannot be signalled by lightness and must use border and radius instead.
 
 The component also takes its heading as a prop, because the anatomy had drifted three ways: a
 `.card__head` wrapper on most screens, a bare `.card__heading` on Affiliates, Security and both
@@ -252,6 +296,79 @@ pictogram that changes shape with the reader's platform is not part of a design 
 
 ---
 
+### Added on 2026-09-09
+
+`ConfirmButton` — a delete that arms before it acts. Four deletions in the client area were one
+click with no confirmation and no undo: a DNS record, an email forwarding rule, a saved card and
+a sub-account contact. Removing an MX or an A record is a dead mailbox or a dead site, and the
+fixtures make it look free. It arms in place rather than opening a dialog, because a dialog for
+a row action costs a scrim, a focus trap, a return-focus contract and another stacking layer,
+and it takes the reader away from the row that tells them they picked the right one. Escape
+disarms; focus moves to the confirm step; the armed state is announced, not only drawn.
+
+`illustrations.tsx` — drawn artwork on the icon set's terms. Every path carries
+`vector-effect="non-scaling-stroke"`, so a 1.75 stroke renders at 1.75 device pixels whatever
+coordinate space the piece is drawn in; a 1.75 stroke on a 400-unit box would otherwise come out
+a tenth as thick as the icons beside it. Two weights, `1.75` for detail and `2.5` for a primary
+contour, and no third. Palette is `currentColor` plus the two lavender fills. No lettering: SVG
+text is real text to the mobile audit, and there is nothing here worth putting under 12px. Every
+piece is schematic and asserts nothing — no numbers, no logos, no charts — because the project
+has no verified proof figure and an illustration that implied one would be the same invention in
+a different medium.
+
+**The site menu is a drawer below 900px.** The marketing header wrapped into four stacked rows
+on a phone — brand, tools, login, nav — and stood 237px tall on a 390×844 screen, 28% of the
+first viewport spent on chrome. The nav, the preferences and the login now live in an off-canvas
+panel on the same terms as the client-area drawer, and the header is 69px. Two things this cost,
+both worth recording: `backdrop-filter` on `.masthead` makes it a containing block for its
+`position: fixed` descendants, so the frost had to come off below the breakpoint or the drawer
+laid itself out against the 68px header and rendered as a strip across the top; and the closed
+state is stated as `visibility` and `pointer-events` rather than only as a transform, because an
+off-canvas percentage transform has a sign that depends on writing direction, and when it was
+wrong the panel sat invisibly across the header swallowing every tap on the button that opens
+it.
+
+**Consent is asked in both shells.** `CookieConsent` rendered only inside `Layout`, so a
+first-time visitor arriving on any of the 42 client-area screens — which is how a WHMCS
+notification email lands one — was never asked. Both shells render it, both read the same stored
+answer, and while the question is open the document carries `data-consent="open"` so each shell
+reserves the bar's height instead of covering its own last control with it.
+
+**A route change announces itself.** Focus moves to `main` on navigation and the tab title is
+read from the screen's own `h1`. Neither happened before: one `<title>` served all 96 routes, and
+focus stayed wherever the link had been, so a screen reader went on reading the previous screen.
+Not on first paint, and not from a route table — a table is a second place to update when a
+heading changes, and it would be wrong the first time someone forgot.
+
+### States that were declared and not built
+
+`inventory/screens.csv` lists the states each screen owes. Four screens owed a failure and did
+not have one, and in every case the missing state was the one a real user meets most often.
+
+- **Sign-in could not be got wrong.** Submit navigated on, whatever was typed, and there was no
+  wrong-password string in the table to render if it had. Same for the 2FA code. The state a
+  reviewer most needs to see was the one screen state nobody could reach.
+- **Domain search had no `searching` and no `error`.** Results appeared on the next paint, so
+  the second or two a registry lookup takes was never on screen, and a lookup that fails had
+  nowhere to say so. A taken name also sorted above available ones, which is the inventory's
+  `unavailable-with-alternatives` state with the alternatives underneath the dead ends.
+- **Transfer accepted any EPP code**, including a wrong one. An EPP code is copied by hand out
+  of another registrar's control panel and expires, so getting it wrong is the normal case.
+- **Contact had no send failure.** Submit replaced the form with a thank-you, so there was
+  nowhere to put a send that did not work — and nowhere for the text the visitor had written to
+  survive, which is the part that decides whether they try again.
+
+There is no server here to be right or wrong, so each failure has a stated trigger and the
+screen says what it is: a password or an EPP code of `wrong`, a 2FA code of six zeros, the word
+`wrong` in a contact message. An invented rule a reviewer cannot discover is the same as no
+rule. The 2FA placeholder moved off `000000` for the same reason — a placeholder demonstrating
+the failure is one nobody should be invited to copy.
+
+Each of the three asynchronous steps now has a `role="status"` region, so the outcome is
+announced rather than only drawn, and the one spinner in the product stops rather than slows
+under `prefers-reduced-motion`: a slow spinner is still motion, and the setting is not a request
+for less of it.
+
 ## 5. The rules that were learned, not chosen
 
 Each of these came out of something being visibly wrong, and each is now held by a gate.
@@ -301,13 +418,35 @@ dense application.
 
 ## 6. Layout
 
-Mobile-first, logical properties throughout — no mirrored stylesheet exists. Breakpoints:
-600 · 700 · 768 · 900 · 1024 · 1200 · 1280.
+Mobile-first, logical properties throughout — no mirrored stylesheet exists. Six breakpoints are
+in use and every one of them is now declared in `tokens.json` with the thing it exists for, so
+a number in a media query can be checked against a reason:
+
+| px | Name | What changes |
+|---|---|---|
+| 600 | `content.compact` | the order summary and the auth card go single-column |
+| 700 | `content.settings` | the notification preference grid stops being a table |
+| 768 | `tablet` | the device band; also where the responsive type sizes step up |
+| 900 | `content.shell` | the masthead gives up its inline nav for a drawer |
+| 1024 | `laptop` | the client-area sidebar stops being off-canvas |
+| 1280 | `content.roomy` | a wider shell gutter and an uneven dashboard split |
+
+Two corrections to what this file used to say. The **1200** it listed was never a breakpoint —
+it is `.shell`'s `max-width` in `world.css`, and no media query has ever used it. And **1440**
+is declared as a device band and deliberately never used: nothing in the product changes there,
+because the last layout change is at 1280 and the shell has stopped growing by 1200. The gap is
+a decision, recorded in the token so it stops looking like an oversight.
 
 Tables stay tables where a column of figures genuinely needs comparing, and become rows where
 three fields do not need a table's machinery. One exception is deliberate: the **notification
 preference grid stops being a table below 700px**, because scrolling sideways to reach a toggle
 is the wrong answer on a settings screen.
+
+Below 600px a table that still has to scroll keeps its **first column pinned**, so the thing
+that says which row you are reading stays on screen while the figures move under it. Restacking
+each row as labelled pairs was considered and rejected: giving `tr` and `td` a display other
+than `table-row` and `table-cell` drops their roles out of the accessibility tree, so the fix
+for a phone would have cost the table its structure for everyone using assistive tech.
 
 The invoice keeps a document's measure (52rem) inside a two-column `.with-side`. It is a thing
 you read, print and file; a full-bleed one reads as a report. Beside it sits the one thing a
@@ -342,8 +481,8 @@ Design intent that is not enforced is design intent that lasts one sprint.
 | Gate | What it holds |
 |---|---|
 | `tokens/build.mjs --check` | dist in sync; both themes complete |
-| `tokens/a11y-gate.mjs` | 74 checks — contrast, focus, hit area |
-| `scripts/flow.mjs` | **113 checks** against a running build |
+| `tokens/a11y-gate.mjs` | 84 checks — contrast, focus, hit area |
+| `scripts/flow.mjs` | **116 checks** against a running build |
 | `scripts/capture.mjs` | 96 routes × 2 viewports, plus the two funnel steps whose path carries a cart id — overflow, empty main, console errors |
 | `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
 | `scripts/journeys.mjs` | 21 journeys walked by clicking only — a link that goes nowhere stalls the walk |

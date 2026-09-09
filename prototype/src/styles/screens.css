@@ -12,14 +12,34 @@
 .plans {
   display: grid;
   gap: var(--sws-space-24);
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--sws-size-card), 1fr));
   align-items: start;
 }
 
+/*
+ * The homepage feature grid. It was .plans, which meant the pricing grid and the feature grid
+ * were one selector doing two jobs and neither could be changed without the other moving.
+ * Same shape, its own name.
+ */
+.features {
+  display: grid;
+  gap: var(--sws-space-24);
+  grid-template-columns: repeat(auto-fit, minmax(var(--sws-size-card), 1fr));
+}
+
+/*
+ * block-size: 100% is what makes `margin-block-start: auto` on the button below actually do
+ * something. The grid sets align-items: start, so without this each card sizes to its own
+ * content, the flex column has no slack, and the auto margin absorbs nothing — four cards
+ * ended at four heights with their CTAs on four baselines, 115px apart on the homepage.
+ * Filling the row is the same fix .pick uses in app.css for the identical arrangement, and it
+ * leaves the grid's own alignment contract alone.
+ */
 .plan {
   position: relative;
   display: flex;
   flex-direction: column;
+  block-size: 100%;
   gap: var(--sws-space-12);
   padding: var(--sws-space-32);
   background: var(--sws-card-bg);
@@ -51,13 +71,13 @@
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   white-space: nowrap;
 }
 
 .plan__name {
   font-size: var(--sws-font-size-h3);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-secondary);
 }
 
@@ -71,14 +91,14 @@
 .plan__amount {
   font-size: var(--sws-font-size-h1);
   line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-tight);
   color: var(--sws-text-primary);
 }
 
 .plan__currency {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-secondary);
 }
 
@@ -91,7 +111,7 @@
 .plan__renewal {
   font-size: var(--sws-font-size-caption);
   color: var(--sws-status-success);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
 }
 
 .plan__specs {
@@ -117,7 +137,7 @@
 
 .plan__perk {
   color: var(--sws-status-success);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
 }
 
 .plan__perk svg {
@@ -127,48 +147,6 @@
 .plan .btn {
   margin-block-start: auto;
   width: 100%;
-}
-
-/* ── cycle switch ──────────────────────────────────────────────────────────── */
-
-.cycle {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sws-space-8);
-  padding: var(--sws-space-4);
-  background: var(--sws-surface-sunken);
-  border-radius: var(--sws-radius-pill);
-}
-
-.cycle__option {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--sws-touch-target-min);
-  padding-inline: var(--sws-space-24);
-  background: transparent;
-  border: 0;
-  border-radius: var(--sws-radius-pill);
-  color: var(--sws-text-secondary);
-  font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background-color var(--sws-duration-fast) var(--sws-ease-standard),
-    color var(--sws-duration-fast) var(--sws-ease-standard);
-}
-
-.cycle__option.is-active {
-  background: var(--sws-surface-raised);
-  color: var(--sws-action-quiet);
-  box-shadow: var(--sws-shadow-sm);
-}
-
-.cycle__save {
-  padding-inline: var(--sws-space-12);
-  font-size: var(--sws-font-size-caption);
-  font-weight: 600;
-  color: var(--sws-status-success);
-  white-space: nowrap;
 }
 
 /* ── data tables ───────────────────────────────────────────────────────────── */
@@ -195,15 +173,15 @@
   background: var(--sws-table-header-bg);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: var(--sws-weight-semibold);
+  letter-spacing: var(--sws-tracking-label);
   text-transform: uppercase;
   text-align: start;
   white-space: nowrap;
 }
 
 :root[lang='ar'] .data th {
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   text-transform: none;
 }
 
@@ -213,6 +191,59 @@
   vertical-align: middle;
 }
 
+/*
+ * The identifying column takes the slack. Without this every column sizes to its own content
+ * and a wide table distributes the leftover width evenly between them, which on the services
+ * list left a hand's width of nothing between the status chip and the row's own button — two
+ * things that belong to the same row, parked at opposite ends of it.
+ */
+.data th:first-child {
+  inline-size: 100%;
+}
+
+/*
+ * A phone has no width to spend on gutters. The wrapper still scrolls below this, but it has
+ * less to scroll, and on most of these tables it stops needing to.
+ */
+@media (max-width: 599px) {
+  .data th,
+  .data td {
+    padding: var(--sws-space-12) var(--sws-space-12);
+  }
+
+  /*
+   * The column that says which row this is stays put while the rest scrolls under it. Scrolling
+   * a table sideways on a phone is survivable; scrolling until the only thing on screen is a
+   * date and an amount with nothing to say whose they are is not.
+   *
+   * The alternative was to restack each row as a list of labelled pairs. It was rejected:
+   * giving tr and td a display other than table-row and table-cell drops their roles out of the
+   * accessibility tree, so the fix for a phone would have cost the table its structure for
+   * everyone reading it with assistive tech. This keeps the table a table.
+   */
+  .table-scroll .data th:first-child,
+  .table-scroll .data td:first-child {
+    position: sticky;
+    inset-inline-start: 0;
+    /* th:first-child takes the slack when there is any; when the table overflows there is
+       none, and the column collapsed to min-content and broke domain names at the hyphen. */
+    min-inline-size: 9rem;
+    z-index: var(--sws-layer-raised);
+    /* Opaque, or the scrolling columns read straight through it. */
+    background: var(--sws-surface-raised);
+    /* A rule rather than a shadow: it has to read in both themes, and this one is 1px. */
+    border-inline-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  }
+
+  .table-scroll .data th:first-child {
+    background: var(--sws-table-header-bg);
+  }
+
+  .table-scroll .data tbody tr:hover td:first-child {
+    background: var(--sws-table-row-hover);
+  }
+}
+
 .data tbody tr:hover {
   background: var(--sws-table-row-hover);
 }
@@ -220,7 +251,7 @@
 .data .num {
   text-align: end;
   font-variant-numeric: lining-nums tabular-nums;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   white-space: nowrap;
 }
 
@@ -232,7 +263,7 @@
 }
 
 .data .lead {
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-primary);
 }
 
@@ -253,7 +284,7 @@
  * card scroll instead, which is the one thing this wrapper existed to do.
  */
 .table-scroll .data {
-  min-width: 32rem;
+  min-inline-size: var(--sws-size-table);
 }
 
 /* ── tags ──────────────────────────────────────────────────────────────────── */
@@ -273,7 +304,7 @@
   padding: var(--sws-space-4) var(--sws-space-12);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   white-space: nowrap;
 }
 
@@ -352,7 +383,7 @@
   margin-block-end: var(--sws-space-16);
   padding: 0;
   font-size: var(--sws-font-size-h3);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 /* ── domain search ─────────────────────────────────────────────────────────── */
@@ -404,7 +435,7 @@
 
 .method__label {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
 }
 
 /* ── checkout ──────────────────────────────────────────────────────────────── */
@@ -424,7 +455,7 @@
   /* The figure stays in view while the form is filled in. */
   .checkout__aside {
     position: sticky;
-    inset-block-start: 96px;
+    inset-block-start: var(--sws-space-96);
   }
 }
 
@@ -472,7 +503,7 @@
 
 .totals__row dd {
   margin: 0;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
 }
 
@@ -485,7 +516,7 @@
 
 .totals__row--grand dt {
   color: var(--sws-text-primary);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .totals + .btn,
@@ -521,18 +552,6 @@
 }
 
 /* ── empty state ───────────────────────────────────────────────────────────── */
-
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sws-space-24);
-  padding: var(--sws-space-64) var(--sws-space-32);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-xl);
-  box-shadow: var(--sws-shadow-card);
-  text-align: center;
-}
 
 .empty__line {
   font-size: var(--sws-font-size-h3);
@@ -601,10 +620,10 @@
 
 .compare th[scope='row'] {
   background: none;
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   color: var(--sws-text-secondary);
   text-transform: none;
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   font-size: var(--sws-font-size-body-sm);
   white-space: nowrap;
 }
@@ -612,8 +631,8 @@
 .compare__plan {
   display: block;
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
   text-transform: none;
   color: var(--sws-text-primary);
 }
@@ -622,10 +641,10 @@
   display: block;
   margin-block-start: 2px;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   color: var(--sws-text-secondary);
   text-transform: none;
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 /* "Unlimited" is a word, not a number, so it does not wear the figure face. */
@@ -637,7 +656,7 @@
 }
 
 .unl {
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-action-quiet);
 }
 
@@ -680,8 +699,8 @@
 
 .headline__title {
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .headline__note {
@@ -740,7 +759,7 @@
 .sys__name {
   flex: 1 1 auto;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 /* ── incidents ─────────────────────────────────────────────────────────────── */
@@ -773,7 +792,7 @@
 
 .incident__title {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .incident__body {
@@ -812,8 +831,8 @@
 
 .stand__title {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
 }
 
 .stand__body {
@@ -851,8 +870,8 @@
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-md);
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .site--primary .site__code {
@@ -867,7 +886,7 @@
 
 .site__city {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .site__country {
@@ -906,7 +925,7 @@
 
 .channel__title {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .channel__body {
@@ -976,8 +995,8 @@
 
 .post__title {
   font-size: var(--sws-font-size-body-lg);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
   line-height: 1.3;
 }
 
@@ -989,7 +1008,7 @@
 
 .prose .lede {
   font-size: var(--sws-font-size-body);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   color: var(--sws-text-secondary);
 }
 
@@ -1015,14 +1034,14 @@
 .colophon__head {
   margin-block-end: var(--sws-space-4);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-label);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
 }
 
 :root[lang='ar'] .colophon__head {
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   text-transform: none;
 }
 
@@ -1038,4 +1057,49 @@
 .colophon__col a:hover {
   color: var(--sws-action-quiet);
   text-decoration: underline;
+}
+
+/* ── search states ─────────────────────────────────────────────────────────── */
+
+.domain-status:empty {
+  display: none;
+}
+
+.domain-status {
+  margin-block-start: var(--sws-space-16);
+}
+
+.domain-status__busy {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+}
+
+/*
+ * The one spinner in the product. It exists because a lookup that takes a second and says
+ * nothing reads as a page that ignored the button. Sized to the text it sits beside, and it
+ * stops turning under prefers-reduced-motion rather than spinning slowly — a slow spinner is
+ * still motion, and the setting is not a request for less of it.
+ */
+.spinner {
+  inline-size: 1em;
+  block-size: 1em;
+  flex: none;
+  border: var(--sws-rule-base) solid var(--sws-border-subtle);
+  border-block-start-color: var(--sws-action-primary);
+  border-radius: var(--sws-radius-pill);
+  animation: spin var(--sws-duration-slow) linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-block-start-color: var(--sws-action-primary);
+  }
 }

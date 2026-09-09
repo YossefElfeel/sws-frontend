@@ -120,6 +120,10 @@ await journey('Register a domain', [
   ['search', async () => {
     await p.fill('.domain-search input', 'atelier-kamal');
     await click(['.domain-search button[type=submit]']);
+    // The lookup is asynchronous — M-11's `searching` state is a real state now — and the
+    // rows are the TLD price list, which is on screen before any search runs. Waiting for a
+    // row would wait for nothing, so wait for a verdict.
+    await p.waitForSelector('.data tbody .tag');
   }],
   ['add an available one', async () => {
     // Results render as rows of the price table; a taken name has no Add button to press.
@@ -143,7 +147,12 @@ await journey('Register a domain', [
 await journey('Transfer a domain in', [
   ['transfer page', () => start('#/transfer')],
   ['submit', async () => { await satisfyRequired('form.panel'); await click(['form.panel button[type=submit]']); }],
-  ['landed on a result', async () => { if (!(await p.locator('.stage__title').count())) throw new Error('no result screen'); }],
+  // The eligibility check is a real step now (M-13), so the result screen arrives a beat after
+  // submit rather than on the same tick.
+  ['landed on a result', async () => {
+    await p.waitForSelector('.stage__title', { timeout: 5000 }).catch(() => {});
+    if (!(await p.locator('.stage__title').count())) throw new Error('no result screen');
+  }],
 ]);
 
 /* ── E. sign up, verify, arrive ─────────────────────────────────────────────── */

@@ -351,7 +351,15 @@ export function TicketNew() {
 
           <fieldset className="fieldset">
             <legend>{t('tkt.attachments')}</legend>
-            <input className="field" type="file" multiple accept=".jpg,.gif,.jpeg,.png,.txt,.pdf" />
+            {/* A legend names the group, not the control inside it, and this fieldset holds
+                exactly one control — so the input itself had no name of its own. */}
+            <input
+              className="field"
+              type="file"
+              multiple
+              aria-label={t('tkt.attachments')}
+              accept=".jpg,.gif,.jpeg,.png,.txt,.pdf"
+            />
             {/* The reference states 4096MB, which is a typo for the 4096KB WHMCS default. */}
             <p className="hint">{t('tkt.attachNote')}</p>
           </fieldset>

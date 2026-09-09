@@ -76,7 +76,10 @@ ok('availability resolves deterministically', typeof resolved === 'boolean', res
   await p.waitForSelector('.domain-search input');
   await p.fill('.domain-search input', 'kamalatelier');
   await p.click('.domain-search button[type=submit]');
-  await p.waitForSelector('.data tbody tr');
+  // The rows are the TLD price list and exist before any search, so waiting for a row waits
+  // for nothing. The lookup is asynchronous now — M-11 declares a `searching` state and the
+  // screen has one — so wait for an availability tag, which only a finished search can produce.
+  await p.waitForSelector('.data tbody .tag');
   await p.evaluate(() => {
     const row = [...document.querySelectorAll('.data tbody tr')].find(
       (r) => r.querySelector('.tag--ok') && r.querySelector('button:not([disabled])'),
@@ -418,12 +421,39 @@ await p.waitForSelector('.panel--bad');
 
 // O-08/O-09 render third-party frames. Faking them would get a screen approved that will
 // never exist, so the slot must stay a marked slot.
-for (const r of ['#/checkout/card', '#/checkout/3ds']) {
+//
+// This check used to look only inside `.slot`, and only on the two /checkout/* screens. Both
+// halves of that were wrong, and together they left the assertion unable to fail: the fake
+// card fields that actually shipped were on #/checkout, which the loop never opened, and they
+// sat in .field-grid--card rather than in a .slot, which the selector could not reach. A gate
+// that cannot see the thing it exists to forbid is worse than no gate, because it reports a
+// pass. It now asks the real question — is there a card field anywhere on this screen — of
+// every screen in the payment path.
+const cardFieldsOn = () =>
+  p.$$eval('main input', (ns) =>
+    ns.filter((n) => {
+      const hay = `${n.placeholder || ''} ${n.name || ''} ${n.autocomplete || ''}`;
+      // Grouped digits, not merely eight of them: an invoice reference like
+      // INV-20260901-4417 is not a card number, and an assertion that cries wolf gets
+      // switched off.
+      return /(?:\d{4}[\s-]){2,}\d{4}|mm\s*\/\s*yy|\bcvc\b|\bcvv\b|cc-(?:number|exp|csc)/i.test(hay);
+    }).length,
+  );
+
+for (const r of ['#/checkout', '#/checkout/card', '#/checkout/3ds']) {
   await p.evaluate((h) => (location.hash = h), r);
-  await p.waitForSelector('.slot');
+  await p.waitForSelector('main');
+  await p.waitForFunction(() => !!document.querySelector('.slot, .checkout'));
+  const drawn = await cardFieldsOn();
+  // The two dedicated frame screens must also carry the marker. #/checkout shows the slot only
+  // when a card gateway is the selected one, so it is held to the drawing rule alone.
   const marked = await p.$$eval('.slot__tag', (n) => n.length);
-  const fakeInputs = await p.$$eval('.slot input', (n) => n.length);
-  ok(`${r} marks the third-party frame rather than faking it`, marked === 1 && fakeInputs === 0);
+  const needsMarker = r !== '#/checkout';
+  ok(
+    `${r} marks the third-party frame rather than faking it`,
+    drawn === 0 && (!needsMarker || marked === 1),
+    `${drawn} card field(s) drawn`,
+  );
 }
 
 // A-05: the rules are checked live, and Save stays out of reach until they pass.
@@ -479,9 +509,16 @@ await p.waitForSelector('.methods input[value="custom"]');
   await p.evaluate(() => (location.hash = '#/account/domains/dom-1/dns'));
   await p.waitForSelector('.data tbody tr');
   const rows = await p.$$eval('.data tbody tr', (n) => n.length);
+  // Deleting an A or MX record is a dead site or a dead mailbox, and there is no undo to
+  // build against, so the first press only arms the control. Both halves are asserted: that
+  // one press does not delete, and that the second one does.
   await p.click('.data tbody tr:first-child .btn--danger');
+  await p.waitForSelector('.confirm');
+  const armedStill = await p.$$eval('.data tbody tr', (n) => n.length);
+  await p.click('.confirm .btn--danger');
   await p.waitForTimeout(150);
   const left = await p.$$eval('.data tbody tr', (n) => n.length);
+  ok('one press does not delete a DNS record', armedStill === rows, `${rows} -> ${armedStill}`);
   ok('deleting a DNS record deletes it', left === rows - 1, `${rows} -> ${left}`);
 
   // The store, not the screen, holds the edit: a switch flipped on one page reads the same
@@ -525,8 +562,17 @@ await p.waitForSelector('.method-row');
 {
   const before = await p.$$eval('.method-row', (n) => n.length);
   await p.click('.method-row:last-child .btn--danger');
+  await p.waitForSelector('.confirm');
+  // Escape has to get you out of it, or arming a control is a trap.
+  await p.keyboard.press('Escape');
+  await p.waitForFunction(() => !document.querySelector('.confirm'));
+  const afterEscape = await p.$$eval('.method-row', (n) => n.length);
+  await p.click('.method-row:last-child .btn--danger');
+  await p.waitForSelector('.confirm');
+  await p.click('.confirm .btn--danger');
   await p.waitForTimeout(150);
   const after = await p.$$eval('.method-row', (n) => n.length);
+  ok('Escape cancels a delete instead of doing it', afterEscape === before, `${before} -> ${afterEscape}`);
   ok('removing a saved card removes it', after === before - 1, `${before} -> ${after}`);
 }
 
@@ -612,10 +658,36 @@ await p.waitForSelector('.consent');
   await p.waitForSelector('.consent__rows');
   const optIns = await p.$$eval('.consent__rows input[type=checkbox]', (n) => n.map((c) => c.checked));
   ok('every optional category starts off', optIns.length > 0 && optIns.every((c) => c === false), `${optIns.length} optional`);
+
+  /*
+   * Answer it before moving on. This block clears the stored consent to make the bar appear,
+   * and every check after it then ran with a fixed bar across the bottom of the viewport. That
+   * was survivable only while the bar existed on marketing routes alone; once the client area
+   * started rendering it too — which it must, since that is where a notification email lands a
+   * first-time visitor — the bar began intercepting clicks on the screens that follow, and the
+   * run died 50 checks early. A gate that leaves the app in a state its own later checks cannot
+   * work in is testing a situation no user is in.
+   */
+  await p.evaluate(() => {
+    localStorage.setItem('sws.consent', JSON.stringify({ analytics: false, marketing: false }));
+  });
+  await p.reload({ waitUntil: 'networkidle' });
+  await p.waitForFunction(() => !document.querySelector('.consent'));
 }
 
 // PRODUCT.md: no verified proof metrics exist. The company pages are where an invented
 // uptime figure or certification would land, so they are checked for one.
+//
+// Two of these four patterns did not work until 2026-09-09. The word boundaries in the uptime
+// and tier patterns had been saved into this file as literal backspace characters (0x08) rather
+// than as the two characters \b, so both regexes required a control character in the page text
+// and neither could match anything a browser can render. They had been reporting a pass on the
+// project's least negotiable rule while testing for nothing at all. Verified after repair
+// against "99.9% uptime", "وقت تشغيل 99.99%", "Tier III data centre" and "Tier 4
+// facility": four missed before, four caught after. Recorded here, and not quietly fixed,
+// because a gate that has once passed vacuously is the thing this project most needs to
+// remember about its own gates — see the same note in tokens/a11y-gate.mjs about the banner
+// tokens. If you are editing these patterns, check the file for 0x08 before you trust them.
 for (const r of ['#/about', '#/data-centres', '#/status', '#/account/status']) {
   await p.evaluate((h) => (location.hash = h), r);
   await p.waitForSelector('main h1');
@@ -623,10 +695,10 @@ for (const r of ['#/about', '#/data-centres', '#/status', '#/account/status']) {
   const txt = await p.$eval('main', (m) => m.textContent ?? '');
   // 99.9%, ISO 27001, Tier III, "10,000 customers" — the shapes a fabricated proof takes.
   const claims = [
-    /9\d(\.\d+)?\s*%/,
+    /\b9\d(\.\d+)?\s*%/,
     /ISO\s*\d{4,}/i,
-    /Tier\s*(I{1,3}V?|[1-4])/i,
-    /\d{1,3}[,،]?\d{3}\+?\s*(customers|عميل|عملاء)/i,
+    /Tier\s*(I{1,3}V?|[1-4])\b/i,
+    /\b\d{1,3}[,،]?\d{3}\+?\s*(customers|عميل|عملاء)/i,
   ];
   const hit = claims.find((c) => c.test(txt));
   ok(`no invented proof on ${r}`, !hit, hit ? txt.match(hit)[0] : 'clean');

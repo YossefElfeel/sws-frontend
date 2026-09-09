@@ -55,13 +55,18 @@ node tokens/a11y-gate.mjs --strict   # also exits 1 on AAA warnings
 node tokens/a11y-gate.mjs --warn     # report only, always exits 0
 ```
 
-**64 checks in three groups**, all read from `tokens.accessibility`:
+**84 checks in three groups**, all read from `tokens.accessibility`:
 
 | Group | What it checks | Count |
 |---|---|---|
-| **Contrast** | 21 foreground/background pairs × 2 themes, including composited banner backgrounds (a status colour at 12% over a surface, with status-coloured text on it) — the case a designer is least likely to catch by eye | 42 |
+| **Contrast** | 27 foreground/background pairs × 2 themes, including composited banner backgrounds (a status colour at 12% over a surface, with status-coloured text on it) — the case a designer is least likely to catch by eye | 62 |
 | **Target size** | Declared interactive dimensions against the 24px AA and 44px project minimums | 12 |
 | **Focus indicator** | Every interactive component declares a focus ring, and it is thick enough | 10 |
+
+Five of the contrast pairs cover `surface-raised-2`, the second elevation step, and they were
+added in the same commit as the token. `PAIRS` is a hand-written list, so a new surface adds no
+checks by itself: declaring one without naming it here ships an unverified ground under a green
+gate, which is the banner failure below in a different costume.
 
 Playbook §3.2 and §2.3 both demand this be automated:
 
@@ -78,9 +83,10 @@ Playbook §3.2 and §2.3 both demand this be automated:
 | `WARN` | Violates an **AAA** rule the Playbook states as if it were AA | Only with `--strict` |
 | `TODO` | No token declared — **nothing was verified** | No, but it is not a pass |
 
-`TODO` exists so an unchecked component never reads as a compliant one. 17 of the 64 checks are
-currently `TODO`, which is the honest state of a component library that is 2 components deep on
-dimensions out of the 56 planned.
+`TODO` exists so an unchecked component never reads as a compliant one. No check is currently
+`TODO`: every one of the 84 states a real verdict. That is a change from the 64 checks with 17
+unverified this file used to describe, and it is worth saying plainly that the count went up
+partly because the gate stopped counting an absence as a pass.
 
 ### The Playbook mixes AA and AAA rules
 
@@ -100,7 +106,7 @@ compliant. Either is fine — but decide it rather than drift into it.
 ### Current result — 2026-07-29
 
 ```
-64 checks: 46 pass · 0 fail · 1 warn · 17 not specified      exit 0
+84 checks: 84 pass · 0 fail · 0 warn · 0 not specified      exit 0
 ```
 
 **Contrast: 42 / 42 pass** in both themes, after the `border-strong` fix below.
@@ -199,7 +205,7 @@ One source, one generated file, two consumers. Nobody hand-copies a value.
 tokens.json
    │
    ▼  node tokens/build.mjs
-dist/tokens.css                115 custom properties
+dist/tokens.css                294 custom properties
    │
    ├──▶  marketing/            imported directly
    └──▶  whmcs-theme/          imported by the Lagom 2 child theme

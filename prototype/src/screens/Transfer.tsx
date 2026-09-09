@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HostingLayout } from '../components/HostingLayout';
 import { Button } from '../components/Button';
+import { Banner } from '../components/Banner';
 import { IconCheck, IconArrow } from '../components/icons';
 import { useLocale } from '../lib/locale';
+import { isFailWord } from './Auth';
 
 /**
  * Transfer a domain in — spec 5.1.
@@ -14,6 +16,16 @@ import { useLocale } from '../lib/locale';
 export function Transfer() {
   const { t } = useLocale();
   const [started, setStarted] = useState(false);
+  /*
+   * Submit used to go straight to the success screen: any code, including a wrong one, started
+   * a transfer. The inventory declares eligibility-check and error for M-13, and they are the
+   * two states that matter here — an EPP code is copied by hand from another registrar's
+   * control panel and expires, so getting it wrong is the normal case, not the edge one.
+   */
+  const [stage, setStage] = useState<'idle' | 'checking' | 'rejected'>('idle');
+  const [epp, setEpp] = useState('');
+  const timer = useRef<number>();
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   if (started) {
     return (
@@ -44,17 +56,53 @@ export function Transfer() {
           className="panel panel--pad"
           onSubmit={(e) => {
             e.preventDefault();
-            setStarted(true);
+            setStage('checking');
+            window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => {
+              if (isFailWord(epp)) {
+                setStage('rejected');
+                return;
+              }
+              setStarted(true);
+            }, 700);
           }}
         >
+          <div role="status" aria-live="polite">
+            {stage === 'checking' && (
+              <p className="hint domain-status__busy">
+                <span className="spinner" aria-hidden="true" />
+                {t('transfer.checking')} {t('transfer.checkingNote')}
+              </p>
+            )}
+            {stage === 'rejected' && (
+              <Banner severity="danger" title={t('transfer.badEpp')}>
+                {t('transfer.badEppNote')}
+              </Banner>
+            )}
+          </div>
+
           <label className="field-label">
             <span className="eyebrow">{t('domain.placeholder')}</span>
             <input className="field serial" dir="ltr" placeholder="example.com" required />
           </label>
           <label className="field-label">
             <span className="eyebrow">{t('transfer.epp')}</span>
-            <input className="field serial" dir="ltr" required />
+            <input
+              className="field serial"
+              dir="ltr"
+              required
+              value={epp}
+              aria-invalid={stage === 'rejected' || undefined}
+              aria-describedby="epp-hint"
+              onChange={(e) => {
+                setEpp(e.target.value);
+                if (stage === 'rejected') setStage('idle');
+              }}
+            />
           </label>
+          <p className="hint" id="epp-hint">
+            {t('transfer.demoHint')}
+          </p>
           <div className="actions actions--split">
             <Button size="lg" type="submit">
               {t('transfer.start')}

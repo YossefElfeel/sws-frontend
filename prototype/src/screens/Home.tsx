@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
+import { ArtHosting } from '../components/illustrations';
 import { PlanCards } from '../components/PlanCards';
 import { Button } from '../components/Button';
 import { IconSpark, IconShield, IconSupport, IconServer, IconGauge } from '../components/icons';
@@ -28,48 +29,57 @@ export function Home() {
   return (
     <Layout>
       <section className="hero shell" aria-labelledby="hero-title">
-        <p className="announce">
-          <IconSpark size={17} />
-          {t('hero.announce')}
-        </p>
+        <div className="hero__copy">
+          <p className="announce">
+            <IconSpark size={17} />
+            {t('hero.announce')}
+          </p>
 
-        <h1 className="hero__title" id="hero-title">
-          {t('hero.title1')} <span className="hero__accent">{t('hero.title2')}</span>
-        </h1>
+          <h1 className="hero__title" id="hero-title">
+            {t('hero.title1')} <span className="hero__accent">{t('hero.title2')}</span>
+          </h1>
 
-        <p className="hero__lede measure">{t('hero.lede')}</p>
+          <p className="hero__lede measure">{t('hero.lede')}</p>
 
-        <div className="hero__actions">
-          <Button size="lg" onClick={() => navigate('/hosting')}>
-            {t('hero.cta')}
-          </Button>
-          <Button size="lg" variant="secondary" onClick={() => navigate('/domains')}>
-            {t('hero.cta2')}
-          </Button>
-        </div>
-      </section>
-
-      <section className="section shell" aria-labelledby="feat-title">
-        <div className="section__head">
-          <div>
-            <h2 className="section__title" id="feat-title">
-              {t('feat.title')}
-            </h2>
-            <p className="section__lede measure">{t('feat.lede')}</p>
+          <div className="hero__actions">
+            <Button size="lg" onClick={() => navigate('/hosting')}>
+              {t('hero.cta')}
+            </Button>
+            <Button size="lg" variant="secondary" onClick={() => navigate('/domains')}>
+              {t('hero.cta2')}
+            </Button>
           </div>
         </div>
 
-        <ul className="plans">
-          {features.map((f) => (
-            <li className="card card--lifted" key={f.title}>
-              <span className="card__tile" aria-hidden="true">
-                {f.icon}
-              </span>
-              <h3 className="card__title">{f.title}</h3>
-              <p className="card__body">{f.body}</p>
-            </li>
-          ))}
-        </ul>
+        <ArtHosting className="hero__art" />
+      </section>
+
+      {/* A band: the ground changes, so the section reads as its own thing rather than as
+          more of the hero. The band is full width and the content inside it is not, which is
+          why this one section wraps a .shell instead of being one. */}
+      <section className="section section--band" aria-labelledby="feat-title">
+        <div className="shell">
+          <div className="section__head">
+            <div>
+              <h2 className="section__title" id="feat-title">
+                {t('feat.title')}
+              </h2>
+              <p className="section__lede measure">{t('feat.lede')}</p>
+            </div>
+          </div>
+
+          <ul className="features">
+            {features.map((f) => (
+              <li className="card card--lifted" key={f.title}>
+                <span className="card__tile" aria-hidden="true">
+                  {f.icon}
+                </span>
+                <h3 className="card__title">{f.title}</h3>
+                <p className="card__body">{f.body}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="section shell" id="pricing" aria-labelledby="price-title">

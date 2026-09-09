@@ -54,6 +54,20 @@ export function CookieConsent() {
     if (read() === null) setOpen(true);
   }, []);
 
+  /*
+   * A fixed bar sits on top of whatever is at the bottom of the page, and on a short screen
+   * that is a real control. Marking the document while the question is open lets each shell
+   * reserve the height instead of covering itself with it — see the `[data-consent='open']`
+   * rules in components.css. Marked on the element rather than measured with a ResizeObserver
+   * because the height that matters is the one CSS already knows.
+   */
+  useEffect(() => {
+    const el = document.documentElement;
+    if (open) el.setAttribute('data-consent', 'open');
+    else el.removeAttribute('data-consent');
+    return () => el.removeAttribute('data-consent');
+  }, [open]);
+
   if (!open) return null;
 
   const decide = (c: Consent) => {

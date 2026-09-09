@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { LocaleProvider } from './lib/locale';
 import { PrefsProvider } from './lib/prefs';
@@ -95,9 +95,32 @@ import { NotificationPrefs } from './screens/account/Notifications';
  */
 function OnRouteChange() {
   const { pathname } = useLocation();
+  /*
+   * The route this effect has already handled. A boolean "is this the first run" does not
+   * survive StrictMode, which mounts, unmounts and remounts every effect in development: the
+   * first invocation spends the flag and the second one then behaves like a navigation, so
+   * focus was taken on page load — the exact thing the guard exists to prevent. Comparing the
+   * path is idempotent, so running twice is the same as running once.
+   */
+  const handled = useRef(pathname);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    /*
+     * A route change was silent. The page scrolled to the top and nothing else happened, so a
+     * screen reader went on reading the old screen and a keyboard user's next Tab carried on
+     * from wherever the link had been. Both shells already render <main id="main" tabIndex={-1}>
+     * with a :focus style, which is the whole mechanism — nothing had ever moved focus to it.
+     *
+     * Not on the first render: focus belongs where the browser put it when the document loaded,
+     * and stealing it on arrival would skip the skip link, which is the one control that exists
+     * to be reached first.
+     */
+    if (handled.current !== pathname) {
+      handled.current = pathname;
+      document.getElementById('main')?.focus({ preventScroll: true });
+    }
 
     const id = window.setTimeout(() => {
       for (const strip of document.querySelectorAll<HTMLElement>('.filters, .rail__list')) {
@@ -113,6 +136,23 @@ function OnRouteChange() {
 
     return () => window.clearTimeout(id);
   }, [pathname]);
+
+  /*
+   * One <title> served all 96 routes, so every history entry, every bookmark and every window
+   * in a task switcher carried the same name, and the accessible name of the page never
+   * changed. The title is read off the screen's own <h1> rather than from a route table: a
+   * table is a second place to update when a heading changes, and it would be wrong the first
+   * time someone forgot. Runs after the paint that follows the route change, and after the
+   * locale effect, so switching language retitles the tab too.
+   */
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      const heading = document.querySelector('main h1')?.textContent?.trim();
+      const site = document.documentElement.lang === 'ar' ? 'سوميون' : 'Somion';
+      document.title = heading ? `${heading} — ${site}` : document.title;
+    }, 0);
+    return () => window.clearTimeout(id);
+  });
 
   return null;
 }

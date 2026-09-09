@@ -48,9 +48,9 @@ export function DomainAddons() {
     <Layout>
       <section className="page-head shell">
         <h1 className="page-title">{t('domainsconf.title')}</h1>
-        <p className="chip">
-          <span className="chip__key">{t('nav.domains')}</span>
-          <span className="chip__val serial">
+        <p className="pair">
+          <span className="pair__key">{t('nav.domains')}</span>
+          <span className="pair__val serial">
             <bdi>{domain.name}</bdi>
           </span>
           <span className="tag tag--ok">

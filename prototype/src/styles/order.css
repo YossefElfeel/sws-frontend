@@ -50,6 +50,12 @@
   padding-inline: var(--sws-space-8);
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .masthead__select:hover {
@@ -60,7 +66,7 @@
   border: 0;
   background: transparent;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   color: var(--sws-text-primary);
   cursor: pointer;
   appearance: none;
@@ -162,12 +168,12 @@
 
 .cycle-opt__name {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .cycle-opt__price {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .cycle-opt__save {
@@ -175,13 +181,13 @@
   align-items: center;
   gap: var(--sws-space-8);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-status-danger);
 }
 
 .cycle-opt__save s {
   color: var(--sws-text-disabled);
-  font-weight: 400;
+  font-weight: var(--sws-weight-regular);
 }
 
 .addons {
@@ -198,7 +204,7 @@
 
 .addon__title {
   font-size: var(--sws-font-size-h3);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .addon__body {
@@ -221,6 +227,12 @@
   border-radius: var(--sws-radius-sm);
   cursor: pointer;
   font-size: var(--sws-font-size-body-sm);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .addon__opt:hover {
@@ -230,7 +242,7 @@
 .addon__opt.is-selected {
   background: var(--sws-action-subtle-bg);
   color: var(--sws-action-quiet);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .addon__label {
@@ -250,7 +262,13 @@
 
 /* ── domain step ───────────────────────────────────────────────────────────── */
 
-.chip {
+/*
+ * A stated fact, not a control. This was called .chip until app.css — which loads last —
+ * turned out to define .chip as the interactive preset-amount button: the pill inherited a
+ * 44px min-height, a border, cursor: pointer and an accent hover, so a paragraph advertised
+ * itself as clickable. Renamed rather than fought over in the cascade.
+ */
+.pair {
   display: inline-flex;
   align-items: center;
   gap: var(--sws-space-8);
@@ -261,12 +279,12 @@
   font-size: var(--sws-font-size-body-sm);
 }
 
-.chip__key {
+.pair__key {
   color: var(--sws-text-secondary);
 }
 
-.chip__val {
-  font-weight: 600;
+.pair__val {
+  font-weight: var(--sws-weight-semibold);
 }
 
 .choices {
@@ -316,7 +334,7 @@
 
 .choice__title {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .choice__body {
@@ -346,7 +364,7 @@
   margin-block-start: var(--sws-space-8);
   color: var(--sws-text-on-action);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .result {
@@ -381,7 +399,7 @@
 
 .result__price {
   margin-inline-start: auto;
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .section__title--sm {
@@ -407,7 +425,7 @@
 
 .tld__name {
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .tld__price {
@@ -468,7 +486,7 @@
 .promo__msg {
   margin-block-start: var(--sws-space-8);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .promo__msg.is-ok {
@@ -479,9 +497,16 @@
   color: var(--sws-status-danger);
 }
 
+/*
+ * An agreement is a checkbox you have to be able to hit, not a line of small print — so the
+ * row keeps a full target even when the label is one short line. flex-start rather than
+ * centre because the label wraps, and a checkbox belongs beside the first line of the text
+ * it governs, not beside the middle of the block.
+ */
 .agree {
   display: flex;
   align-items: flex-start;
+  min-block-size: var(--sws-touch-target-min);
   gap: var(--sws-space-8);
   margin-block-start: var(--sws-space-16);
   font-size: var(--sws-font-size-body-sm);
@@ -501,8 +526,8 @@
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-wide);
   color: var(--sws-text-secondary);
 }
 
@@ -522,7 +547,7 @@
   color: var(--sws-status-success);
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .field-grid--card {
@@ -571,14 +596,14 @@
 
 .slot__tag {
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-label);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
 }
 
 :root[lang='ar'] .slot__tag {
-  letter-spacing: 0;
+  letter-spacing: var(--sws-tracking-normal);
   text-transform: none;
 }
 
@@ -631,8 +656,8 @@
 
 .stage__title {
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-tight);
 }
 
 .stage__body {
@@ -671,14 +696,14 @@
 
 .ref__label {
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-secondary);
 }
 
 .ref__code {
   font-size: var(--sws-font-size-h2);
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-wide);
 }
 
 .ref__warn {
@@ -771,7 +796,7 @@ a.method svg {
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-sm);
   text-align: center;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .methods--stack {

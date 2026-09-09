@@ -1,6 +1,14 @@
-import type { ReactNode } from 'react';
-import { NavLink, Link } from 'react-router-dom';
-import { IconGlobe, IconChevron, IconCart, IconSun, IconMoon } from './icons';
+import { useEffect, useState, type ReactNode } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
+import {
+  IconGlobe,
+  IconChevron,
+  IconCart,
+  IconSun,
+  IconMoon,
+  IconMenu,
+  IconClose,
+} from './icons';
 import { CurrencySelect } from './CurrencySelect';
 import { CookieConsent } from './CookieConsent';
 import { useLocale, type Locale } from '../lib/locale';
@@ -18,9 +26,29 @@ export function Layout({ children }: { children: ReactNode }) {
   const { t, locale, setLocale } = useLocale();
   const { lines } = useCart();
   const { theme, toggleTheme } = usePrefs();
+  const [menu, setMenu] = useState(false);
+  const { pathname } = useLocation();
+
+  /*
+   * Below the shell breakpoint the header used to wrap into four stacked rows — brand, tools,
+   * login, nav — and stand 237px tall on a 390×844 phone. That is 28% of the first viewport
+   * spent on chrome before the page says anything. The rows now live in a drawer, on the same
+   * terms as the client-area one in AppShell: off-canvas, a scrim that only exists while it is
+   * open, and Escape to close, because a panel that can be opened from the keyboard and not
+   * closed from it is a trap.
+   */
+  useEffect(() => {
+    if (!menu) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMenu(false);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [menu]);
+
+  /* Following a link inside the drawer has to leave the drawer behind. */
+  useEffect(() => setMenu(false), [pathname]);
 
   return (
-    <div className="page">
+    <div className={`page${menu ? ' page--menu' : ''}`}>
       <a className="skip-link" href="#main">
         {t('skip')}
       </a>
@@ -37,7 +65,45 @@ export function Layout({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          <nav className="masthead__nav" aria-label={t('nav.hosting')}>
+          {/* The cart stays on the bar rather than going into the drawer: it carries a count,
+              and a count nobody can see is a count that does not do its job. */}
+          <NavLink className="masthead__cart" to="/cart">
+            <IconCart />
+            <span className="masthead__cart-label">{t('nav.cart')}</span>
+            {lines.length > 0 && (
+              <span className="masthead__count serial" aria-hidden="true">
+                {lines.length}
+              </span>
+            )}
+          </NavLink>
+
+          <button
+            type="button"
+            className="masthead__menu"
+            aria-expanded={menu}
+            aria-controls="site-menu"
+            aria-label={t(menu ? 'app.closeMenu' : 'app.menu')}
+            onClick={() => setMenu((v) => !v)}
+          >
+            {menu ? <IconClose /> : <IconMenu />}
+          </button>
+
+          {menu && (
+            <button
+              type="button"
+              className="masthead__scrim"
+              aria-label={t('app.closeMenu')}
+              onClick={() => setMenu(false)}
+            />
+          )}
+
+          {/*
+            display: contents above the breakpoint, so the three blocks below sit in the header
+            row exactly as they did before this wrapper existed and the desktop layout is
+            untouched. Below it, the wrapper becomes the drawer.
+          */}
+          <div className="masthead__panel" id="site-menu">
+          <nav className="masthead__nav" aria-label={t('nav.site')}>
             <NavLink className="masthead__link" to="/hosting">
               {t('nav.hosting')}
             </NavLink>
@@ -81,21 +147,12 @@ export function Layout({ children }: { children: ReactNode }) {
             >
               {theme === 'dark' ? <IconSun /> : <IconMoon />}
             </button>
-
-            <NavLink className="masthead__cart" to="/cart">
-              <IconCart />
-              <span className="masthead__cart-label">{t('nav.cart')}</span>
-              {lines.length > 0 && (
-                <span className="masthead__count serial" aria-hidden="true">
-                  {lines.length}
-                </span>
-              )}
-            </NavLink>
           </div>
 
           <NavLink className="masthead__login" to="/login">
             {t('nav.login')}
           </NavLink>
+          </div>
         </div>
       </header>
 

@@ -52,10 +52,10 @@
     inset-block: 0;
     inset-inline-start: 0;
     inline-size: min(var(--app-side), 84vw);
-    z-index: 60;
+    z-index: var(--sws-layer-drawer);
     transform: translateX(calc(-105% * var(--sws-flip, 1)));
     transition: transform var(--sws-duration-base) var(--sws-ease-standard);
-    box-shadow: var(--sws-shadow-lift);
+    box-shadow: var(--sws-elevation-over);
   }
 
   :root[dir='rtl'] .app__side {
@@ -76,7 +76,7 @@
 .app__scrim {
   position: fixed;
   inset: 0;
-  z-index: 55;
+  z-index: var(--sws-layer-scrim);
   padding: 0;
   border: 0;
   background: rgb(2 6 23 / 0.45);
@@ -123,7 +123,7 @@
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-normal);
 }
 
@@ -134,7 +134,7 @@
 
 .app__brand-name {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-snug);
   line-height: 1.2;
 }
@@ -181,7 +181,7 @@
 .app__group-label {
   padding: 0 var(--sws-space-12) var(--sws-space-8);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
@@ -212,7 +212,7 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
   transition:
     background-color var(--sws-duration-fast) var(--sws-ease-standard),
@@ -242,7 +242,7 @@
 .app__link.active {
   background: var(--sws-action-subtle-bg);
   color: var(--sws-action-quiet);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .app__link.active .app__link-icon {
@@ -261,7 +261,7 @@
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 /* ── the account block ─────────────────────────────────────────────────────── */
@@ -284,7 +284,7 @@
   color: var(--sws-action-quiet);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .app__user-text {
@@ -302,7 +302,7 @@
 
 .app__user-name {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   line-height: 1.3;
 }
 
@@ -320,6 +320,12 @@
   flex: none;
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .app__signout:hover {
@@ -336,7 +342,7 @@
 .app__bar {
   position: sticky;
   inset-block-start: 0;
-  z-index: 40;
+  z-index: var(--sws-layer-bar);
   display: flex;
   align-items: center;
   gap: var(--sws-space-8);
@@ -381,7 +387,7 @@
 .app__where-title {
   display: block;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -415,7 +421,7 @@
 
 .app__crumbs > span:last-child {
   color: var(--sws-text-primary);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .app__crumbs-sep {
@@ -443,8 +449,14 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .app__select:hover {
@@ -488,6 +500,12 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .app__icon-btn:hover {
@@ -510,7 +528,7 @@
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   line-height: 1;
 }
 
@@ -524,9 +542,15 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
   white-space: nowrap;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .app__exit:hover {
@@ -578,7 +602,7 @@
  */
 .app__title {
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-snug);
   line-height: 1.2;
 }
@@ -677,6 +701,12 @@
 /* A tile that reports rather than navigates: no lift, no pointer, no promise of a click. */
 .stat--static {
   cursor: default;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .stat--static:hover {
@@ -688,7 +718,7 @@
    not the figures carry currencies. */
 .stat__unit {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   letter-spacing: var(--sws-tracking-normal);
   color: var(--sws-text-secondary);
 }
@@ -735,7 +765,7 @@
   gap: var(--sws-space-4);
   flex-wrap: wrap;
   font-size: var(--sws-font-size-h2);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   line-height: 1.1;
   letter-spacing: var(--sws-tracking-tight);
 }
@@ -743,7 +773,7 @@
 .stat__label {
   margin-block-start: var(--sws-space-4);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   line-height: 1.3;
   color: var(--sws-text-secondary);
 }
@@ -760,7 +790,7 @@
   margin-block-start: auto;
   padding-block-start: var(--sws-space-8);
   font-size: var(--sws-font-size-caption);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   line-height: 1.3;
   color: var(--sws-text-secondary);
 }
@@ -796,6 +826,12 @@
 .stat--alert {
   border-color: var(--sws-banner-danger-border);
   background: var(--sws-banner-danger-bg);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .stat--alert:hover {
@@ -858,12 +894,20 @@
  * Elevation now means one thing: this floats above the page. Two things do — the notifications
  * popover and the mobile nav drawer — and only those two carry a shadow.
  */
+/*
+ * A card is a plane above the page, and it now says so in both themes. It used to say so in
+ * neither: box-shadow: none was correct while the only elevation available was a marketing
+ * shadow that dark could not render, but it left the client area carrying its whole hierarchy
+ * on one hairline. --sws-elevation-card resolves to a soft shadow in light and to `none` in
+ * dark, where the raise is already carried by surface-raised sitting a step lighter than the
+ * page. Same rank in both themes, spelled the way each theme can actually say it.
+ */
 .card {
   padding: var(--sws-space-24);
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-lg);
-  box-shadow: none;
+  box-shadow: var(--sws-elevation-card);
 }
 
 /* The one marketing surface still built from `.card` — the home feature grid. It keeps the
@@ -885,7 +929,7 @@
   align-items: center;
   gap: var(--sws-space-8);
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-snug);
 }
 
@@ -898,10 +942,16 @@
   align-items: center;
   gap: var(--sws-space-4);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-action-quiet);
   text-decoration: none;
   white-space: nowrap;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .card__more:hover {
@@ -960,7 +1010,7 @@
    one of them on the same screen as the other. */
 .due__amount {
   font-size: var(--sws-font-size-h2);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   line-height: 1.1;
   letter-spacing: var(--sws-tracking-tight);
 }
@@ -1030,6 +1080,12 @@
   border-radius: var(--sws-radius-sm);
   color: inherit;
   text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .row:hover {
@@ -1059,7 +1115,7 @@
 
 .row__title {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   line-height: 1.3;
 }
 
@@ -1117,6 +1173,12 @@
   border-radius: var(--sws-radius-sm);
   color: inherit;
   text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .sched__item:hover {
@@ -1129,7 +1191,7 @@
   flex: none;
   inline-size: 5.5rem;
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-action-quiet);
 }
 
@@ -1141,7 +1203,7 @@
 
 .sched__label {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1161,7 +1223,7 @@
 
 .credit {
   font-size: var(--sws-font-size-h2);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   line-height: 1.1;
   letter-spacing: var(--sws-tracking-tight);
 }
@@ -1189,8 +1251,14 @@
   border-radius: var(--sws-radius-sm);
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .quick__item:hover {
@@ -1222,7 +1290,7 @@
 .feed__title {
   margin-block: var(--sws-space-4);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .feed__body {
@@ -1350,11 +1418,25 @@
 
 /* ── an empty result ───────────────────────────────────────────────────────── */
 
+/*
+ * One definition, and it is the one that was already on screen. `.empty` was declared twice —
+ * a card with a shadow in screens.css and a bare grid here — and because the two blocks
+ * contested different properties, neither was what rendered: the union of both was. Deleting
+ * either would have been a visual change disguised as a cleanup, so the union is written out
+ * once instead. Two corrections while merging: the ground and lift are the same tokens .card
+ * uses, so an empty card and a full one are the same object; and the radius drops from xl to
+ * lg, because xl is a marketing radius and DESIGN.md says it does not appear in the client
+ * area — which is the only place this class is used.
+ */
 .empty {
   display: grid;
   justify-items: center;
   gap: var(--sws-space-8);
   padding: var(--sws-space-48) var(--sws-space-24);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-elevation-card);
   text-align: center;
 }
 
@@ -1364,7 +1446,7 @@
 
 .empty__title {
   font-size: var(--sws-font-size-body);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .empty__note {
@@ -1409,7 +1491,7 @@
 }
 
 .meter__left {
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-primary);
 }
 
@@ -1446,6 +1528,12 @@
   background: transparent;
   border: var(--sws-rule-hair) solid transparent;
   color: var(--sws-status-danger);
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .btn--danger:hover {
@@ -1520,14 +1608,14 @@
 
 .figure__n {
   font-size: var(--sws-font-size-h2);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   line-height: 1.1;
   letter-spacing: var(--sws-tracking-tight);
 }
 
 .figure__unit {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   color: var(--sws-text-secondary);
 }
 
@@ -1547,8 +1635,14 @@
   border-radius: var(--sws-radius-pill);
   color: var(--sws-text-primary);
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .chip:hover {
@@ -1587,13 +1681,13 @@
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-sm);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-normal);
 }
 
 .method-row__num {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .method-row__exp {
@@ -1615,13 +1709,13 @@
 /* The heading inside an enrolment block: below a card heading, above its body. */
 .enrol__heading {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-snug);
 }
 
 /* A contact carries a name where a saved card carries a scheme mark. */
 .method-row__name {
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   min-inline-size: 9rem;
 }
 
@@ -1682,7 +1776,7 @@
 .app__section {
   margin-block: var(--sws-space-24) var(--sws-space-12);
   font-size: var(--sws-font-size-caption);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
@@ -1741,7 +1835,7 @@
 
 .app__main .fieldset legend {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .app__main .choice,
@@ -1792,7 +1886,7 @@
   box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-button-secondary-border);
   color: var(--sws-button-secondary-text);
   font: inherit;
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   cursor: pointer;
 }
 
@@ -1885,7 +1979,7 @@
 
 .pick__name {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-snug);
 }
 
@@ -1895,13 +1989,13 @@
   gap: var(--sws-space-4);
   flex-wrap: wrap;
   font-size: var(--sws-font-size-h3);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-tight);
 }
 
 .pick__cycle {
   font-size: var(--sws-font-size-caption);
-  font-weight: 500;
+  font-weight: var(--sws-weight-medium);
   color: var(--sws-text-secondary);
   letter-spacing: var(--sws-tracking-normal);
 }
@@ -1964,7 +2058,7 @@
 
 .swap__plan {
   font-size: var(--sws-font-size-body);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .swap__price {
@@ -1995,7 +2089,7 @@
 
 .sum__row dd {
   margin: 0;
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   text-align: end;
   white-space: nowrap;
 }
@@ -2010,11 +2104,11 @@
 
 .sum__row--total dt {
   color: var(--sws-text-primary);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .sum__row--total dd {
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 /* ── term picker — C-08 ────────────────────────────────────────────────────── */
@@ -2049,12 +2143,12 @@
 .term__name {
   flex: 1 1 auto;
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .term__price {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
   white-space: nowrap;
 }
 
@@ -2120,7 +2214,7 @@
 
 .steps__item--bad .steps__what {
   color: var(--sws-status-danger);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
 }
 
 .steps__when {
@@ -2144,12 +2238,12 @@
   position: absolute;
   inset-block-start: calc(100% + var(--sws-space-8));
   inset-inline-end: 0;
-  z-index: 50;
+  z-index: var(--sws-layer-popover);
   inline-size: min(22rem, calc(100vw - var(--sws-space-32)));
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-lg);
-  box-shadow: var(--sws-shadow-lift);
+  box-shadow: var(--sws-elevation-over);
   overflow: hidden;
 }
 
@@ -2164,7 +2258,7 @@
 
 .notifs__title {
   font-size: var(--sws-font-size-body-sm);
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .notifs__list {
@@ -2181,6 +2275,12 @@
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
   color: inherit;
   text-decoration: none;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard),
+    transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
 .notifs__list li:last-child .notifs__item {
@@ -2210,7 +2310,7 @@
 }
 
 .notifs__item.is-unread .notifs__label {
-  font-weight: 700;
+  font-weight: var(--sws-weight-bold);
 }
 
 .notifs__text {
@@ -2270,7 +2370,7 @@
   display: block;
   margin-block-start: var(--sws-space-4);
   font-size: var(--sws-font-size-caption);
-  font-weight: 400;
+  font-weight: var(--sws-weight-regular);
   color: var(--sws-text-secondary);
 }
 
@@ -2526,4 +2626,17 @@
 .dash__main,
 .dash__side {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* ── a delete that asks first — ConfirmButton ──────────────────────────────── */
+/*
+ * The armed state replaces one icon button with two labelled ones, so the row gets wider for as
+ * long as it is armed. Keeping them on one line matters more than keeping the width: a confirm
+ * that wraps under its own cancel reads as two unrelated controls.
+ */
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  white-space: nowrap;
 }
