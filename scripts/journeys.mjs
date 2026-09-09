@@ -120,10 +120,11 @@ await journey('Register a domain', [
   ['search', async () => {
     await p.fill('.domain-search input', 'atelier-kamal');
     await click(['.domain-search button[type=submit]']);
-    // The lookup is asynchronous — M-11's `searching` state is a real state now — and the
-    // rows are the TLD price list, which is on screen before any search runs. Waiting for a
-    // row would wait for nothing, so wait for a verdict.
-    await p.waitForSelector('.data tbody .tag');
+    // The lookup is asynchronous — M-11's `searching` state is a real state now. Neither a
+    // row nor a `.tag` is proof it finished: the rows are the TLD price list, and the
+    // pre-search table marks its popular extension with a tag. `.result` is the headline
+    // verdict and only a resolved search renders one.
+    await p.waitForSelector('.result');
   }],
   ['add an available one', async () => {
     // Results render as rows of the price table; a taken name has no Add button to press.

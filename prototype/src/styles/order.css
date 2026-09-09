@@ -34,6 +34,10 @@
 
 .plan__extras {
   display: grid;
+  /* This list sits in the row that absorbs a card's spare height. Left to stretch, a short
+     list would pad its own gaps out to fill that space instead of staying under its
+     separator, and the four cards would disagree again one row further down. */
+  align-content: start;
   gap: var(--sws-space-4);
   margin-block-end: var(--sws-space-16);
   font-size: var(--sws-font-size-body-sm);
@@ -74,9 +78,12 @@
   min-height: var(--sws-touch-target-min);
 }
 
-.masthead__select:focus-within {
+/* Framed as a whole control — see .app__select, which now matches this, including why the
+   ring hangs off :focus-visible rather than off :focus-within. */
+.masthead__select:has(select:focus-visible) {
   outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
   outline-offset: 2px;
+  background: var(--sws-surface-sunken);
 }
 
 .masthead__select select:focus-visible {
@@ -371,6 +378,9 @@
   display: flex;
   align-items: center;
   gap: var(--sws-space-12);
+  /* On the domain search this card carries a price and an Add button as well as the verdict,
+     which is more than a phone's width holds on one line. */
+  flex-wrap: wrap;
   margin-block-end: var(--sws-space-32);
   padding: var(--sws-space-16) var(--sws-space-24);
   background: var(--sws-surface-raised);
@@ -400,6 +410,22 @@
 .result__price {
   margin-inline-start: auto;
   font-weight: var(--sws-weight-bold);
+}
+
+/* The line under the verdict when the name is gone: where to look next. */
+.result__note {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * On the order flow the result is a read-out and the action lives in the step footer. On the
+ * domain search the result *is* the action, so the card takes the primary button itself.
+ */
+.result__cta {
+  flex: 0 0 auto;
 }
 
 .section__title--sm {

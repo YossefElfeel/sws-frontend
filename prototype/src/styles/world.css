@@ -120,6 +120,15 @@ ol {
   position: relative;
   min-height: 100vh;
   isolation: isolate;
+  /*
+   * A table wide enough to scroll inside its own wrapper still lengthened the document: in RTL
+   * the wrapper's inline-start overflow propagated out to documentElement.scrollWidth, so a
+   * page whose every element was properly contained still scrolled sideways by 127px on a
+   * phone. `clip` and not `hidden`, because hidden would make this a scroll container and take
+   * the sticky masthead, the sticky rails and the pinned table column with it; clip only
+   * clips. The wrapper keeps its own scrollbar, which is the one that was meant to exist.
+   */
+  overflow-x: clip;
 }
 
 .page::before {

@@ -123,47 +123,6 @@
   margin-inline-start: auto;
 }
 
-.masthead__locale {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sws-space-4);
-  min-height: var(--sws-touch-target-min);
-  padding-inline: var(--sws-space-8);
-  border-radius: var(--sws-radius-sm);
-  color: var(--sws-text-secondary);
-  transition:
-    background-color var(--sws-duration-fast) var(--sws-ease-standard),
-    border-color var(--sws-duration-fast) var(--sws-ease-standard),
-    box-shadow var(--sws-duration-fast) var(--sws-ease-standard),
-    color var(--sws-duration-fast) var(--sws-ease-standard),
-    transform var(--sws-duration-fast) var(--sws-ease-standard);
-}
-
-.masthead__locale:hover {
-  background: var(--sws-surface-sunken);
-}
-
-.masthead__locale select {
-  border: 0;
-  background: transparent;
-  font-size: var(--sws-font-size-body-sm);
-  font-weight: var(--sws-weight-medium);
-  color: var(--sws-text-primary);
-  cursor: pointer;
-  appearance: none;
-  padding-inline: var(--sws-space-4);
-  min-height: var(--sws-touch-target-min);
-}
-
-.masthead__locale:focus-within {
-  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
-  outline-offset: 2px;
-}
-
-.masthead__locale select:focus-visible {
-  outline: none;
-}
-
 .masthead__cart {
   display: inline-flex;
   align-items: center;
@@ -1121,24 +1080,30 @@ label.consent__row {
      * every tap on the button that opens it. visibility and pointer-events do not have a
      * direction to get wrong. The slide is kept for the motion and is now decoration.
      */
+    /*
+     * Closed is stated as visibility and pointer-events, not as a transform. A panel pushed
+     * off-canvas by a transform has a sign that depends on the writing direction, and when it
+     * was wrong the panel sat invisibly across the header swallowing every tap on the button
+     * that opens it. It also stays in the scroll extent wherever it is put: an outward slide of
+     * 24px was 24px of horizontal overflow on every marketing route, which is a finding the
+     * mobile audit is right to make.
+     *
+     * So it does not move. It fades, which needs no direction and takes up no width.
+     */
     visibility: hidden;
+    opacity: 0;
     pointer-events: none;
-    transform: translateX(var(--sws-drawer-slide, 1.5rem));
     transition:
-      transform var(--sws-duration-base) var(--sws-ease-standard),
+      opacity var(--sws-duration-base) var(--sws-ease-standard),
       visibility 0s linear var(--sws-duration-base);
-  }
-
-  :root[dir='rtl'] .masthead__panel {
-    --sws-drawer-slide: -1.5rem;
   }
 
   .page--menu .masthead__panel {
     visibility: visible;
+    opacity: 1;
     pointer-events: auto;
-    transform: none;
     transition:
-      transform var(--sws-duration-base) var(--sws-ease-standard),
+      opacity var(--sws-duration-base) var(--sws-ease-standard),
       visibility 0s;
   }
 

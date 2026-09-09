@@ -37,14 +37,21 @@
   min-width: 0;
 }
 
+/*
+ * The rail used to be built out of exactly what the cards are built out of — white, the card
+ * radius, the card shadow — so a page read as five cards, one of which happened to contain
+ * links. It is furniture, not merchandise: it is recessed into the page rather than lifted off
+ * it, takes the smaller radius, and carries a hairline instead of a shadow. The cards keep the
+ * lift, which is now the thing that says which of the two you are meant to be looking at.
+ */
 .rail {
   min-width: 0;
   position: sticky;
   inset-block-start: var(--sws-space-96);
-  padding: var(--sws-space-16);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-xl);
-  box-shadow: var(--sws-shadow-card);
+  padding: var(--sws-space-12);
+  background: var(--sws-surface-sunken);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
 }
 
 .rail__head {
@@ -88,13 +95,15 @@
 }
 
 .rail__link:hover {
-  background: var(--sws-surface-sunken);
+  background: var(--sws-surface-raised);
   color: var(--sws-text-primary);
+  box-shadow: var(--sws-shadow-sm);
 }
 
 .rail__link.active {
-  background: var(--sws-action-subtle-bg);
+  background: var(--sws-surface-raised);
   color: var(--sws-action-quiet);
+  box-shadow: var(--sws-shadow-sm);
   font-weight: var(--sws-weight-semibold);
 }
 
@@ -109,7 +118,8 @@
     position: static;
     padding: var(--sws-space-12) 0;
     background: none;
-    box-shadow: none;
+    border: 0;
+    border-radius: 0;
   }
 
   .rail__head {

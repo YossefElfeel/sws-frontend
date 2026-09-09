@@ -76,10 +76,12 @@ ok('availability resolves deterministically', typeof resolved === 'boolean', res
   await p.waitForSelector('.domain-search input');
   await p.fill('.domain-search input', 'kamalatelier');
   await p.click('.domain-search button[type=submit]');
-  // The rows are the TLD price list and exist before any search, so waiting for a row waits
-  // for nothing. The lookup is asynchronous now — M-11 declares a `searching` state and the
-  // screen has one — so wait for an availability tag, which only a finished search can produce.
-  await p.waitForSelector('.data tbody .tag');
+  // The lookup is asynchronous — M-11 declares a `searching` state and the screen has one —
+  // so this has to wait for the answer. Two things that look like the answer are not: the
+  // rows are the TLD price list and exist before any search, and so does a `.tag`, because
+  // the pre-search table marks its popular extension with one. `.result` is the headline
+  // verdict and renders only once a search has resolved.
+  await p.waitForSelector('.result');
   await p.evaluate(() => {
     const row = [...document.querySelectorAll('.data tbody tr')].find(
       (r) => r.querySelector('.tag--ok') && r.querySelector('button:not([disabled])'),

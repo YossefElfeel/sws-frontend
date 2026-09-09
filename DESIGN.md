@@ -419,8 +419,8 @@ dense application.
 ## 6. Layout
 
 Mobile-first, logical properties throughout — no mirrored stylesheet exists. Six breakpoints are
-in use and every one of them is now declared in `tokens.json` with the thing it exists for, so
-a number in a media query can be checked against a reason:
+declared in `tokens.json` with the thing each exists for, so a number in a media query can be
+checked against a reason:
 
 | px | Name | What changes |
 |---|---|---|
@@ -436,6 +436,11 @@ it is `.shell`'s `max-width` in `world.css`, and no media query has ever used it
 is declared as a device band and deliberately never used: nothing in the product changes there,
 because the last layout change is at 1280 and the shell has stopped growing by 1200. The gap is
 a decision, recorded in the token so it stops looking like an oversight.
+
+Three more are in use and not yet declared: **640**, **720** and **1140**, which the plan grid
+uses to decide how many cards fit a row. They are honest values — a card count is exactly the
+kind of thing that earns a breakpoint — but they arrived after the table above was written, and
+declaring them is outstanding rather than done.
 
 Tables stay tables where a column of figures genuinely needs comparing, and become rows where
 three fields do not need a table's machinery. One exception is deliberate: the **notification

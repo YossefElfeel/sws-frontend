@@ -215,7 +215,25 @@ export const STRINGS = {
   },
   'domain.register': { ar: 'التسجيل', en: 'Register' },
   'domain.renew': { ar: 'التجديد', en: 'Renewal' },
-  'domain.tldtitle': { ar: 'أسعار الدومينات', en: 'Domain pricing' },
+  /*
+   * The table under the search is that search's answer, not a second area of the page, so its
+   * heading is subordinate and changes with the state: the extensions and what they cost before
+   * anything is typed, the results for a name after.
+   */
+  'domain.tldtitle': { ar: 'أسعار الامتدادات', en: 'Extension pricing' },
+  'domain.tldnote': {
+    ar: 'اكتب الاسم اللي عايزه فوق وهنقولك مين منهم فاضي.',
+    en: 'Type the name you want above and we will tell you which of these are free.',
+  },
+  'domain.resultsFor': { ar: 'نتايج البحث عن', en: 'Results for' },
+  'domain.freeOf': { ar: 'متاح من', en: 'available of' },
+  'domain.tryOthers': {
+    ar: 'شوف الامتدادات التانية في الجدول تحت.',
+    en: 'Look at the other extensions in the table below.',
+  },
+  'domain.colTld': { ar: 'الامتداد', en: 'Extension' },
+  'domain.colDomain': { ar: 'الدومين', en: 'Domain' },
+  'domain.colAction': { ar: 'الإجراء', en: 'Action' },
   'domain.hint': {
     ar: 'سعر التجديد معروض جنب سعر التسجيل، لأنه الرقم اللي هتدفعه كل سنة بعد الأولى.',
     en: 'Renewal sits beside registration, because it is the figure you pay every year after the first.',
