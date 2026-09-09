@@ -471,6 +471,42 @@
   min-block-size: var(--sws-button-height-lg);
 }
 
+/*
+ * A section that continues the one above it rather than starting a new area of the page. The
+ * domain table is the search's answer, and 48px of section padding under a search field read as
+ * two unrelated blocks that happened to be stacked.
+ */
+.section--tight {
+  padding-block-start: 0;
+}
+
+/* A head whose title is subordinate: the h2 carries no margin of its own, the head sets it. */
+.section__head--sub {
+  align-items: baseline;
+  gap: var(--sws-space-16);
+  margin-block-end: var(--sws-space-16);
+}
+
+.section__head--sub .section__title--sm {
+  margin-block: 0;
+}
+
+.section__note {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * The name and its availability tag. Adjacent JSX expressions collapse the whitespace between
+ * them, so without this the tag sat flush against the last letter of the domain.
+ */
+.domain-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+}
+
 /* ── payment methods ───────────────────────────────────────────────────────── */
 
 .methods {
