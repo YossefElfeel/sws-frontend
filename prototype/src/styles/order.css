@@ -72,9 +72,12 @@
   min-height: var(--sws-touch-target-min);
 }
 
-.masthead__select:focus-within {
+/* Framed as a whole control — see .app__select, which now matches this, including why the
+   ring hangs off :focus-visible rather than off :focus-within. */
+.masthead__select:has(select:focus-visible) {
   outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
   outline-offset: 2px;
+  background: var(--sws-surface-sunken);
 }
 
 .masthead__select select:focus-visible {
