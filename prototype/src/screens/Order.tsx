@@ -324,7 +324,7 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
                 is how a reviewer ends up approving a screen that will never exist. */}
             <div
               className="slot slot--tall"
-              role="img"
+              role="group"
               aria-label={t(redirect ? 'redir.slotLabel' : 'tds.slotLabel')}
             >
               <span className="slot__tag">

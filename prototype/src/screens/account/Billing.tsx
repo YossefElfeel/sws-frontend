@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
+import { ConfirmButton } from '../../components/ConfirmButton';
 import { Card } from '../../components/Card';
 import { Tag, INVOICE_TONE } from '../../components/Tag';
 import { DevNote } from '../../components/DevNote';
@@ -714,14 +715,12 @@ export function PaymentMethods() {
                   {t('pm.makePrimary')}
                 </Button>
               )}
-              <Button
-                size="sm"
-                variant="danger"
-                aria-label={`${t('action.remove')} ${m.kind} ${m.last4}`}
-                onClick={() => setCards((all) => all.filter((x) => x.id !== m.id))}
+              <ConfirmButton
+                label={`${t('action.remove')} ${m.kind} ${m.last4}`}
+                onConfirm={() => setCards((all) => all.filter((x) => x.id !== m.id))}
               >
                 {t('action.remove')}
-              </Button>
+              </ConfirmButton>
             </div>
           ))}
         </div>

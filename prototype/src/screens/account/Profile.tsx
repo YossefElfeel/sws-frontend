@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
+import { ConfirmButton } from '../../components/ConfirmButton';
 import { Card } from '../../components/Card';
 import { StatRow, type StatItem } from '../../components/Stat';
 import { Tag } from '../../components/Tag';
@@ -125,7 +126,15 @@ export function Affiliates() {
 
       <Card heading={t('aff.link')} icon={<IconLink size={17} />}>
         <div className="copy-row">
-          <input className="field serial" dir="ltr" readOnly value={AFFILIATE.link} />
+          {/* The Card heading says what this is, but a heading is not a label: read on its own
+              the field announced only its value. */}
+          <input
+            className="field serial"
+            dir="ltr"
+            readOnly
+            aria-label={t('aff.link')}
+            value={AFFILIATE.link}
+          />
           <Button
             size="md"
             variant="secondary"
@@ -258,14 +267,20 @@ export function Security() {
               <div className="enrol">
                 <p className="card__body">{t('sec.twofaStep1')}</p>
 
-                <div className="slot" role="img" aria-label={t('sec.qrLabel')}>
+                <div className="slot" role="group" aria-label={t('sec.qrLabel')}>
                   <span className="slot__tag">{t('sec.qrTag')}</span>
                   <p className="slot__note">{t('sec.qrNote')}</p>
                 </div>
 
                 <p className="card__body">{t('sec.twofaStep2')}</p>
                 <div className="copy-row">
-                  <input className="field serial" dir="ltr" readOnly value={TWOFA_SECRET} />
+                  <input
+                    className="field serial"
+                    dir="ltr"
+                    readOnly
+                    aria-label={t('sec.twofaStep2')}
+                    value={TWOFA_SECRET}
+                  />
                   <Button
                     size="md"
                     variant="secondary"
@@ -523,16 +538,15 @@ export function Contacts() {
                 >
                   {t(editing === c.id ? 'con.done' : 'con.edit')}
                 </Button>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={() => {
+                <ConfirmButton
+                  label={`${t('action.remove')} ${c.name}`}
+                  onConfirm={() => {
                     setRows((all) => all.filter((x) => x.id !== c.id));
                     if (editing === c.id) setEditing(null);
                   }}
                 >
                   {t('action.remove')}
-                </Button>
+                </ConfirmButton>
               </div>
 
               {editing === c.id && (

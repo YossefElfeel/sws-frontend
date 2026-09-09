@@ -126,6 +126,9 @@ export const STRINGS = {
   skip: { ar: 'تخطَّ إلى المحتوى', en: 'Skip to content' },
 
   'nav.hosting': { ar: 'الاستضافة', en: 'Hosting' },
+  /* Names the landmark, not its first link. It used to borrow nav.hosting, so a nav holding
+     Hosting, Domains and Support announced itself as "Hosting navigation". */
+  'nav.site': { ar: 'روابط الموقع', en: 'Site' },
   'nav.domains': { ar: 'الدومينات', en: 'Domains' },
   'nav.support': { ar: 'الدعم', en: 'Support' },
   'nav.login': { ar: 'دخول العملاء', en: 'Client login' },
@@ -160,6 +163,9 @@ export const STRINGS = {
   'action.continue': { ar: 'متابعة', en: 'Continue' },
   'action.checkout': { ar: 'إتمام الطلب', en: 'Complete order' },
   'action.remove': { ar: 'إزالة', en: 'Remove' },
+  'action.confirmRemove': { ar: 'أكّد الحذف', en: 'Confirm delete' },
+  'action.cancel': { ar: 'إلغاء', en: 'Cancel' },
+  'action.armed': { ar: 'اضغط أكّد الحذف عشان تتم الإزالة، أو إلغاء عشان تسيبها.', en: 'Press confirm delete to remove it, or cancel to leave it.' },
   'action.search': { ar: 'ابحث', en: 'Search' },
   'action.add': { ar: 'أضف', en: 'Add' },
 
@@ -188,6 +194,25 @@ export const STRINGS = {
   'domain.placeholder': { ar: 'اسم الدومين', en: 'Your domain name' },
   'domain.available': { ar: 'متاح', en: 'Available' },
   'domain.taken': { ar: 'محجوز', en: 'Taken' },
+  'domain.searching': { ar: 'بندوّر…', en: 'Searching…' },
+  'domain.searchingNote': {
+    ar: 'بنسأل السجلّات عن كل امتداد.',
+    en: 'Asking each registry in turn.',
+  },
+  'domain.failed': { ar: 'السجلّ مش رادّ', en: 'The registry did not answer' },
+  'domain.failedNote': {
+    ar: 'ده بيحصل ساعات والسجل بيرجع لوحده. جرّب تاني، ولو فضلت كده كلّمنا.',
+    en: 'This happens, and it usually clears on its own. Try again, and tell us if it keeps happening.',
+  },
+  'domain.retry': { ar: 'حاول تاني', en: 'Try again' },
+  'domain.someFree': {
+    ar: 'اللي متاح مكتوب جنبه، واللي محجوز شِلناه من الترتيب لتحت.',
+    en: 'What is free is marked, and what is taken has been sorted to the bottom.',
+  },
+  'domain.noneFree': {
+    ar: 'الاسم ده محجوز على كل امتداد بنبيعه. جرّب اسم تاني أو شوف الامتدادات اللي تحت.',
+    en: 'That name is taken on every extension we sell. Try another name, or look at the extensions below.',
+  },
   'domain.register': { ar: 'التسجيل', en: 'Register' },
   'domain.renew': { ar: 'التجديد', en: 'Renewal' },
   /*
@@ -402,6 +427,20 @@ export const STRINGS = {
   'transfer.title': { ar: 'نقل دومين', en: 'Transfer a domain' },
   'transfer.lede': { ar: 'انقل دومينك لسوميون. النقل بيضيف سنة على تاريخ الانتهاء الحالي.', en: 'Move your domain to Somion. A transfer adds a year to the current expiry date.' },
   'transfer.epp': { ar: 'كود النقل (EPP)', en: 'Authorisation code (EPP)' },
+  'transfer.checking': { ar: 'بنتأكد من الدومين…', en: 'Checking the domain…' },
+  'transfer.checkingNote': {
+    ar: 'بنسأل السجلّ عن حالة القفل وكود النقل.',
+    en: 'Asking the registry about the lock and the transfer code.',
+  },
+  'transfer.badEpp': { ar: 'كود النقل مش مقبول', en: 'The transfer code was not accepted' },
+  'transfer.badEppNote': {
+    ar: 'الكود بيتاخد من المُسجِّل الحالي وبينتهي بعد فترة. اطلب كود جديد منه وجرّب تاني — والدومين لازم يكون مفتوح مش مقفول.',
+    en: 'The code comes from your current registrar and expires. Ask them for a fresh one and try again — and the domain has to be unlocked, not locked.',
+  },
+  'transfer.demoHint': {
+    ar: 'ده نموذج للمراجعة، فمفيش سجلّ بيتحقق من الكود. أي كود بيعدّي؛ اكتب «خطأ» عشان تشوف شكل الرفض.',
+    en: 'This is a review prototype, so no registry checks the code. Any code passes; type "wrong" to see the rejection state.',
+  },
   'transfer.start': { ar: 'ابدأ النقل', en: 'Start transfer' },
   'transfer.req': { ar: 'قبل ما تبدأ', en: 'Before you start' },
   'transfer.req1': { ar: 'الدومين مسجَّل من أكثر من 60 يومًا.', en: 'The domain was registered more than 60 days ago.' },
@@ -445,6 +484,24 @@ export const STRINGS = {
   'auth.twofa': { ar: 'التحقق بخطوتين', en: 'Two-factor authentication' },
   'auth.twofaLede': { ar: 'اكتب الكود من تطبيق المصادقة.', en: 'Enter the code from your authenticator app.' },
   'auth.code': { ar: 'الكود', en: 'Code' },
+  'auth.badLogin': { ar: 'الإيميل أو كلمة المرور غلط', en: 'Wrong email or password' },
+  'auth.badLoginNote': {
+    ar: 'راجع الإيميل وكلمة المرور وجرّب تاني. لو نسيت كلمة المرور، فيه لينك تحت.',
+    en: 'Check the email and password and try again. There is a reset link below if you have forgotten it.',
+  },
+  'auth.badCode': { ar: 'الكود غلط أو انتهت صلاحيته', en: 'Wrong or expired code' },
+  'auth.badCodeNote': {
+    ar: 'الكود بيتغيّر كل 30 ثانية. خُد الرقم الجديد من التطبيق وجرّب تاني.',
+    en: 'The code changes every 30 seconds. Take the new one from your app and try again.',
+  },
+  'auth.demoHint': {
+    ar: 'ده نموذج للمراجعة، فمفيش سيرفر بيتحقق من حاجة. أي كلمة مرور بتدخّلك؛ اكتب «خطأ» عشان تشوف شكل الفشل.',
+    en: 'This is a review prototype, so nothing is verified against a server. Any password signs you in; type "wrong" to see the failure state.',
+  },
+  'auth.demoHintCode': {
+    ar: 'أي كود من 6 أرقام بيعدّي؛ اكتب 000000 عشان تشوف شكل الفشل.',
+    en: 'Any six-digit code passes; enter 000000 to see the failure state.',
+  },
   'auth.verify': { ar: 'تحقق', en: 'Verify' },
   'auth.backup': { ar: 'استخدم كود احتياطي', en: 'Use a backup code' },
 
@@ -1000,6 +1057,17 @@ export const STRINGS = {
   'ct.privacyNote': {
     ar: 'بنستخدم بياناتك للرد بس.',
     en: 'We use what you write here only to reply.',
+  },
+  'ct.sending': { ar: 'بنبعت…', en: 'Sending…' },
+  'ct.failed': { ar: 'الرسالة مبعتتش', en: 'The message did not send' },
+  'ct.failedNote': {
+    ar: 'اللي كتبته لسه موجود في الفورم، فمش هتعيده. جرّب تبعت تاني، ولو فضلت كده ابعتلنا على الإيميل على طول.',
+    en: 'What you wrote is still in the form, so you will not have to type it again. Try sending it once more, and email us directly if it keeps failing.',
+  },
+  'ct.retry': { ar: 'ابعت تاني', en: 'Send again' },
+  'ct.demoHint': {
+    ar: 'ده نموذج للمراجعة، فمفيش رسالة بتتبعت فعلًا. اكتب «خطأ» في الرسالة عشان تشوف شكل الفشل.',
+    en: 'This is a review prototype, so nothing is actually sent. Put "wrong" in the message to see the failure state.',
   },
   'ct.doneTitle': { ar: 'وصلتنا', en: 'We have it' },
   'ct.doneNote': { ar: 'هنرد في خلال يوم عمل.', en: 'We will reply within one working day.' },

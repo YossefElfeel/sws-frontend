@@ -159,7 +159,7 @@ export function CpanelTransition() {
           {going ? (
             /* cPanel is not ours to draw, so the handoff ends at a marked slot rather than at
                an invented control panel. */
-            <div className="slot slot--tall" role="img" aria-label={t('sso.slotLabel')}>
+            <div className="slot slot--tall" role="group" aria-label={t('sso.slotLabel')}>
               <span className="slot__tag">{t('sso.slotTag')}</span>
               <p className="slot__note">{t('sso.slotNote')}</p>
             </div>

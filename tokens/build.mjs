@@ -198,6 +198,13 @@ function themeBlock(theme, indent = '  ') {
     push(name, resolvePrimitive(token.$value));
   }
 
+  // Elevation is spelled differently per theme: shadow in light, surface step in dark. It
+  // therefore cannot live in the flat :root pass the way `shadow` does.
+  for (const [name, token] of Object.entries(tokens.elevation ?? {})) {
+    if (name.startsWith('$')) continue;
+    push(`elevation-${name}`, token[theme]);
+  }
+
   // Alpha-composited component tokens — theme-dependent, so emitted per theme.
   for (const [compName, comp] of components()) {
     for (const [tokenName, token] of groupTokens(comp)) {
@@ -279,6 +286,26 @@ for (const [name, token] of groupTokens(tokens.shadow ?? {})) {
   out(`  ${PREFIX}shadow-${name}: ${token.$value};`);
 }
 
+section('weight — the Arabic floor is 400, so there is deliberately no token below it');
+for (const [name, token] of groupTokens(tokens.weight ?? {})) {
+  out(`  ${PREFIX}weight-${name}: ${token.$value};`);
+}
+
+section('leading — line height for the cases the type roles do not cover');
+for (const [name, token] of groupTokens(tokens.leading ?? {})) {
+  out(`  ${PREFIX}leading-${name}: ${token.$value};`);
+}
+
+section('size — widths that are neither spacing nor type: measures, panels, floors');
+for (const [name, token] of groupTokens(tokens.size ?? {})) {
+  out(`  ${PREFIX}size-${name}: ${token.$value};`);
+}
+
+section('layer — a named stacking order, with gaps left to insert into');
+for (const [name, token] of groupTokens(tokens.layer ?? {})) {
+  out(`  ${PREFIX}layer-${name}: ${token.$value};`);
+}
+
 section('radius — documents do not have rounded corners');
 for (const [name, token] of groupTokens(tokens.radius ?? {})) {
   out(`  ${PREFIX}radius-${name}: ${token.$value};`);
@@ -357,9 +384,22 @@ out(' * here so the numbers are in front of you when writing one, but they must 
 out(' * literals. If a build step needs them programmatically, read tokens.json directly.');
 out(' *');
 for (const [name, bp] of Object.entries(tokens.breakpoints ?? {})) {
-  if (name.startsWith('$')) continue;
+  if (name.startsWith('$') || name === 'content') continue;
   const range = bp.max ? `${bp.min}–${bp.max}` : `${bp.min}+`;
   out(` *   ${name.padEnd(8)} ${String(range).padEnd(10)} ${bp.columns} cols · ${bp.gutter}px gutter · ${bp.margin} margin`);
+}
+// The content band has a different shape — a width and a reason, no grid — so it is listed
+// separately rather than printed through the device formatter, which was rendering it as a
+// row of `undefined`.
+const content = tokens.breakpoints?.content ?? {};
+if (Object.keys(content).some((k) => !k.startsWith('$'))) {
+  out(' *');
+  out(' * Content breakpoints — a width a specific layout earned, not a device:');
+  for (const [name, bp] of Object.entries(content)) {
+    if (name.startsWith('$')) continue;
+    // `use` is this file's convention for a per-entry note; `$description` is the DTCG one.
+    out(` *   ${name.padEnd(8)} ${String(`${bp.$value}px`).padEnd(10)} ${bp.use ?? bp.$description ?? ''}`);
+  }
 }
 out(' *');
 out(' * Design starts at 360px. Most of the Egyptian and Gulf market arrives on a phone.');

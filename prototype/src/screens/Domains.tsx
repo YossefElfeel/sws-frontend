@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
+import { Banner } from '../components/Banner';
 import { IconCheck, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
@@ -26,6 +27,16 @@ export function Domains() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [searched, setSearched] = useState('');
+  /*
+   * The lookup used to be synchronous: results were simply there on the next paint, so the
+   * second or two a registry actually takes never appeared on screen and a lookup that failed
+   * had nowhere to say so. M-11 declares both `searching` and `error`. There is no server here,
+   * so the failure has a stated trigger — a name starting "fail" — and the hint below the
+   * field says so, because a rule the reviewer cannot discover is the same as no rule.
+   */
+  const [stage, setStage] = useState<'idle' | 'searching' | 'done' | 'failed'>('idle');
+  const timer = useRef<number>();
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   /*
    * Someone who types "somion.net" is asking about .net, not about a name called "somionnet".
@@ -45,6 +56,18 @@ export function Domains() {
   }, [stem]);
 
   const freeCount = TLDS.filter((row) => availability.get(row.tld)).length;
+
+  /*
+   * Available first once a search has answered. A taken row is a dead end, and there were four
+   * of them above the first name the visitor could actually buy. Before a search this is a
+   * price list and keeps the price list's own order.
+   */
+  const rows = useMemo(() => {
+    if (!stem) return TLDS;
+    return [...TLDS].sort(
+      (a, b) => Number(availability.get(b.tld) === true) - Number(availability.get(a.tld) === true),
+    );
+  }, [stem, availability]);
   // The extension typed, or .com when none was — the one result the search is really about.
   const hero = typed ?? TLDS[0];
   const heroFree = stem ? availability.get(hero.tld) === true : false;
@@ -83,7 +106,20 @@ export function Domains() {
           className="domain-search"
           onSubmit={(e) => {
             e.preventDefault();
-            setSearched(query);
+            const term = query;
+            setStage('searching');
+            // Drop the previous answer rather than leaving it beside the spinner: a stale
+            // verdict under a loading indicator reads as the answer to the new question.
+            setSearched('');
+            window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => {
+              if (term.trim().toLowerCase().startsWith('fail')) {
+                setStage('failed');
+                return;
+              }
+              setSearched(term);
+              setStage('done');
+            }, 700);
           }}
         >
           <label className="u-visually-hidden" htmlFor="domain-q">
@@ -106,6 +142,31 @@ export function Domains() {
         </form>
 
         <p className="section__lede measure">{t('domain.hint')}</p>
+
+        {/* The transient states. The answered state is the result card below, which carries
+            its own role="status". */}
+        <div className="domain-status" role="status" aria-live="polite">
+          {stage === 'searching' && (
+            <p className="hint domain-status__busy">
+              <span className="spinner" aria-hidden="true" />
+              {t('domain.searching')} {t('domain.searchingNote')}
+            </p>
+          )}
+
+          {stage === 'failed' && (
+            <Banner
+              severity="danger"
+              title={t('domain.failed')}
+              action={
+                <Button size="sm" variant="secondary" onClick={() => setStage('idle')}>
+                  {t('domain.retry')}
+                </Button>
+              }
+            >
+              {t('domain.failedNote')}
+            </Banner>
+          )}
+        </div>
       </section>
 
       <section className="section section--tight shell" aria-labelledby="tld-head">
@@ -182,7 +243,7 @@ export function Domains() {
               </tr>
             </thead>
             <tbody>
-              {TLDS.map((row) => {
+              {rows.map((row) => {
                 const free = stem ? availability.get(row.tld) === true : undefined;
                 const tagClass = free ? 'tag tag--ok' : 'tag tag--taken';
                 return (

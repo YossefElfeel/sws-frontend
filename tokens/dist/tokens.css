@@ -20,7 +20,9 @@
   --sws-surface-page: #F8F9FC;
   --sws-surface-base: #FFFFFF;
   --sws-surface-raised: #FFFFFF;
+  --sws-surface-raised-2: #FFFFFF;
   --sws-surface-sunken: #F1F3F9;
+  --sws-scrim: rgba(2, 6, 23, 0.45);
   --sws-text-primary: #020617;
   --sws-text-secondary: #4B5563;
   --sws-text-disabled: #6B7280;
@@ -38,6 +40,10 @@
   --sws-status-danger: #B3181B;
   --sws-status-warning: #8A4308;
   --sws-status-info: #1D4ED8;
+  --sws-elevation-flat: none;
+  --sws-elevation-card: 0 1px 2px rgba(2, 6, 23, 0.04), 0 2px 8px -2px rgba(2, 6, 23, 0.06);
+  --sws-elevation-raised: 0 2px 4px -1px rgba(2, 6, 23, 0.05), 0 8px 20px -6px rgba(2, 6, 23, 0.10);
+  --sws-elevation-over: 0 12px 32px -8px rgba(2, 6, 23, 0.18), 0 2px 6px rgba(2, 6, 23, 0.06);
   --sws-banner-danger-bg: rgba(179, 24, 27, 0.1);
   --sws-banner-danger-border: rgba(179, 24, 27, 0.35);
   --sws-banner-success-bg: rgba(20, 97, 50, 0.1);
@@ -182,6 +188,7 @@
   --sws-tracking-snug: -0.01em;
   --sws-tracking-normal: 0;
   --sws-tracking-wide: 0.06em;
+  --sws-tracking-label: 0.1em;
   --sws-tracking-widest: 0.4em;
 
   /* ── rule weights — the ledger is built from ruled lines, so these are structural ── */
@@ -194,6 +201,45 @@
   --sws-shadow-card: 0 4px 20px -4px rgba(2, 6, 23, 0.08), 0 1px 3px rgba(2, 6, 23, 0.04);
   --sws-shadow-lift: 0 14px 40px -12px rgba(2, 6, 23, 0.16), 0 2px 8px rgba(2, 6, 23, 0.05);
   --sws-shadow-cta: 0 8px 24px -8px rgba(78, 79, 235, 0.55);
+
+  /* ── weight — the Arabic floor is 400, so there is deliberately no token below it ── */
+  --sws-weight-regular: 400;
+  --sws-weight-medium: 500;
+  --sws-weight-semibold: 600;
+  --sws-weight-bold: 700;
+
+  /* ── leading — line height for the cases the type roles do not cover ───── */
+  --sws-leading-flat: 1;
+  --sws-leading-tight: 1.1;
+  --sws-leading-snug: 1.3;
+  --sws-leading-normal: 1.5;
+  --sws-leading-loose: 1.7;
+
+  /* ── size — widths that are neither spacing nor type: measures, panels, floors ── */
+  --sws-size-icon: 1.25rem;
+  --sws-size-control: 2.75rem;
+  --sws-size-bar: 3.75rem;
+  --sws-size-tile: 8rem;
+  --sws-size-field: 13rem;
+  --sws-size-card: 15rem;
+  --sws-size-panel: 17rem;
+  --sws-size-column: 20rem;
+  --sws-size-table: 32rem;
+  --sws-size-prose: 42rem;
+  --sws-size-document: 52rem;
+  --sws-size-shell: 75rem;
+
+  /* ── layer — a named stacking order, with gaps left to insert into ─────── */
+  --sws-layer-behind: -1;
+  --sws-layer-base: 0;
+  --sws-layer-raised: 10;
+  --sws-layer-sticky: 40;
+  --sws-layer-bar: 50;
+  --sws-layer-scrim: 60;
+  --sws-layer-drawer: 70;
+  --sws-layer-popover: 80;
+  --sws-layer-consent: 90;
+  --sws-layer-toast: 100;
 
   /* ── radius — documents do not have rounded corners ────────────────────── */
   --sws-radius-none: 0px;
@@ -223,7 +269,9 @@
     --sws-surface-page: #020617;
     --sws-surface-base: #0B1220;
     --sws-surface-raised: #141C2E;
+    --sws-surface-raised-2: #1E293B;
     --sws-surface-sunken: #020617;
+    --sws-scrim: rgba(2, 6, 23, 0.65);
     --sws-text-primary: #F8F9FC;
     --sws-text-secondary: #9CA3AF;
     --sws-text-disabled: #6B7280;
@@ -241,6 +289,10 @@
     --sws-status-danger: #F87171;
     --sws-status-warning: #FBBF24;
     --sws-status-info: #93C5FD;
+    --sws-elevation-flat: none;
+    --sws-elevation-card: none;
+    --sws-elevation-raised: none;
+    --sws-elevation-over: 0 12px 32px -8px rgba(2, 6, 23, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     --sws-banner-danger-bg: rgba(248, 113, 113, 0.1);
     --sws-banner-danger-border: rgba(248, 113, 113, 0.35);
     --sws-banner-success-bg: rgba(74, 222, 128, 0.1);
@@ -258,7 +310,9 @@
   --sws-surface-page: #020617;
   --sws-surface-base: #0B1220;
   --sws-surface-raised: #141C2E;
+  --sws-surface-raised-2: #1E293B;
   --sws-surface-sunken: #020617;
+  --sws-scrim: rgba(2, 6, 23, 0.65);
   --sws-text-primary: #F8F9FC;
   --sws-text-secondary: #9CA3AF;
   --sws-text-disabled: #6B7280;
@@ -276,6 +330,10 @@
   --sws-status-danger: #F87171;
   --sws-status-warning: #FBBF24;
   --sws-status-info: #93C5FD;
+  --sws-elevation-flat: none;
+  --sws-elevation-card: none;
+  --sws-elevation-raised: none;
+  --sws-elevation-over: 0 12px 32px -8px rgba(2, 6, 23, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --sws-banner-danger-bg: rgba(248, 113, 113, 0.1);
   --sws-banner-danger-border: rgba(248, 113, 113, 0.35);
   --sws-banner-success-bg: rgba(74, 222, 128, 0.1);
@@ -317,6 +375,12 @@
  *   tablet   768–1023   8 cols · 24px gutter · 24 margin
  *   laptop   1024–1439  12 cols · 24px gutter · 32 margin
  *   wide     1440+      12 cols · 32px gutter · auto margin
+ *
+ * Content breakpoints — a width a specific layout earned, not a device:
+ *   compact  600px      Below this the order summary and the auth card go single-column
+ *   settings 700px      The notification preference grid stops being a table: scrolling sideways to reach a toggle is the wrong answer on a settings screen
+ *   shell    900px      The masthead gives up its inline nav for a drawer; the client-area sidebar goes off-canvas
+ *   roomy    1280px     A wider shell gutter and an uneven dashboard split. The only breakpoint that buys comfort rather than fixing a break
  *
  * Design starts at 360px. Most of the Egyptian and Gulf market arrives on a phone.
  */

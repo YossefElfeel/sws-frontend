@@ -120,6 +120,15 @@ ol {
   position: relative;
   min-height: 100vh;
   isolation: isolate;
+  /*
+   * A table wide enough to scroll inside its own wrapper still lengthened the document: in RTL
+   * the wrapper's inline-start overflow propagated out to documentElement.scrollWidth, so a
+   * page whose every element was properly contained still scrolled sideways by 127px on a
+   * phone. `clip` and not `hidden`, because hidden would make this a scroll container and take
+   * the sticky masthead, the sticky rails and the pinned table column with it; clip only
+   * clips. The wrapper keeps its own scrollbar, which is the one that was meant to exist.
+   */
+  overflow-x: clip;
 }
 
 .page::before {
@@ -128,7 +137,7 @@ ol {
   inset-inline: 0;
   inset-block-start: 0;
   block-size: 78vh;
-  z-index: -1;
+  z-index: var(--sws-layer-behind);
   pointer-events: none;
   opacity: 0.5;
   background-image:
@@ -167,8 +176,8 @@ ol {
 
 .eyebrow {
   font-size: var(--sws-font-size-caption);
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-weight: var(--sws-weight-semibold);
+  letter-spacing: var(--sws-tracking-label);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
 }
@@ -179,14 +188,14 @@ ol {
  */
 :root[lang='ar'] .eyebrow {
   text-transform: none;
-  letter-spacing: 0;
-  font-weight: 700;
+  letter-spacing: var(--sws-tracking-normal);
+  font-weight: var(--sws-weight-bold);
 }
 
 /* Serials, prices and measured values — the places a figure has to align in a column. */
 .serial {
   font-variant-numeric: lining-nums tabular-nums;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--sws-tracking-normal);
 }
 
 .u-visually-hidden {
@@ -224,12 +233,12 @@ ol {
   position: absolute;
   inset-inline-start: var(--sws-space-16);
   inset-block-start: var(--sws-space-16);
-  z-index: 100;
+  z-index: var(--sws-layer-toast);
   padding: var(--sws-space-12) var(--sws-space-16);
   background: var(--sws-action-primary);
   color: var(--sws-text-on-action);
   border-radius: var(--sws-radius-sm);
-  font-weight: 600;
+  font-weight: var(--sws-weight-semibold);
   transform: translateY(calc(-100% - var(--sws-space-24)));
   transition: transform var(--sws-duration-fast) var(--sws-ease-standard);
 }

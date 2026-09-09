@@ -156,6 +156,14 @@ const PAIRS = [
   ['status-success', 'surface-raised', AA_NORMAL,   'Success text on cards',             '1.4.3 AA'],
   ['status-warning', 'surface-raised', AA_NORMAL,   'Warning text on cards',             '1.4.3 AA'],
   ['status-info',    'surface-raised', AA_NORMAL,   'Info text on cards',                '1.4.3 AA'],
+  // The second elevation step. Adding a surface token adds no checks on its own — PAIRS is a
+  // hand-written list — so a new ground ships unverified unless it is named here. That is the
+  // exact shape of the banner false pass recorded below, and the reason these five exist.
+  ['text-primary',   'surface-raised-2', AA_NORMAL,   'Primary text on a raised card',    '1.4.3 AA'],
+  ['text-secondary', 'surface-raised-2', AA_NORMAL,   'Secondary text on a raised card',  '1.4.3 AA'],
+  ['action-quiet',   'surface-raised-2', AA_NORMAL,   'Indigo link text on a raised card','1.4.3 AA'],
+  ['border-strong',  'surface-raised-2', AA_NON_TEXT, 'Input border on a raised card',    '1.4.11 AA'],
+  ['focus-ring',     'surface-raised-2', AA_NON_TEXT, 'Focus ring on a raised card',      '1.4.11 AA'],
   // WCAG 1.4.3 exempts disabled controls. Held to the 3:1 non-text bar anyway as an internal
   // rule: a control nobody can read is a control nobody can find, and the Playbook names
   // disabled text as a usual failure. Scored at AA_NON_TEXT, not AA_NORMAL, so the rule is

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 type Size = 'sm' | 'md' | 'lg';
 /** 'danger' is for acts that take something away — cancelling, deleting, closing. */
@@ -18,17 +18,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * trusting it; an unverifiable promise is what produced the original finding.
  *
  * Restrict `sm` to dense pointer contexts: table row actions and toolbars.
+ *
+ * It forwards its ref because a caller sometimes has to move focus onto it — ConfirmButton
+ * focuses the confirm step so the keyboard path through a deletion is press, read, press again.
  */
-export function Button({
-  size = 'md',
-  variant = 'primary',
-  children,
-  className = '',
-  type = 'button',
-  ...rest
-}: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { size = 'md', variant = 'primary', children, className = '', type = 'button', ...rest },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type={type}
       className={`btn btn--${size} btn--${variant} ${className}`.trim()}
       {...rest}
@@ -36,4 +36,4 @@ export function Button({
       {children}
     </button>
   );
-}
+});

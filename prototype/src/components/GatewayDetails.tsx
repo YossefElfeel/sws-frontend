@@ -54,19 +54,17 @@ export function GatewayDetails({
               <IconShield size={16} />
               {t('pay.secure')}
             </p>
-            <div className="field-grid field-grid--card">
-              <label className="field-label">
-                <span className="eyebrow">{t('pay.cardNumber')}</span>
-                <input className="field" inputMode="numeric" dir="ltr" placeholder="1234 1234 1234 1234" />
-              </label>
-              <label className="field-label">
-                <span className="eyebrow">{t('pay.expiry')}</span>
-                <input className="field" inputMode="numeric" dir="ltr" placeholder="MM / YY" />
-              </label>
-              <label className="field-label">
-                <span className="eyebrow">{t('pay.cvv')}</span>
-                <input className="field" inputMode="numeric" dir="ltr" placeholder="CVC" />
-              </label>
+            {/*
+              The card number, expiry and CVC belong to Stripe and render inside its iframe, so
+              this panel does not draw them. It drew them until now — three inputs with real
+              placeholders — which is the exact thing DESIGN.md forbids and for the exact reason
+              it gives: a screenshot of invented card fields gets reviewed as though it were the
+              real screen. Marked as a slot, matching CardEntry in screens/Order.tsx, which had
+              this right already.
+            */}
+            <div className="slot" role="group" aria-label={t('card.slotLabel')}>
+              <span className="slot__tag">{t('card.slotTag')}</span>
+              <p className="slot__note">{t('card.slotNote')}</p>
             </div>
           </>
         ))}
