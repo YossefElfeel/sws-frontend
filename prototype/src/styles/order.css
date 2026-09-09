@@ -353,6 +353,9 @@
   display: flex;
   align-items: center;
   gap: var(--sws-space-12);
+  /* On the domain search this card carries a price and an Add button as well as the verdict,
+     which is more than a phone's width holds on one line. */
+  flex-wrap: wrap;
   margin-block-end: var(--sws-space-32);
   padding: var(--sws-space-16) var(--sws-space-24);
   background: var(--sws-surface-raised);
@@ -382,6 +385,22 @@
 .result__price {
   margin-inline-start: auto;
   font-weight: 700;
+}
+
+/* The line under the verdict when the name is gone: where to look next. */
+.result__note {
+  display: block;
+  margin-block-start: 2px;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+/*
+ * On the order flow the result is a read-out and the action lives in the step footer. On the
+ * domain search the result *is* the action, so the card takes the primary button itself.
+ */
+.result__cta {
+  flex: 0 0 auto;
 }
 
 .section__title--sm {
