@@ -9,11 +9,39 @@
 
 /* ── pricing cards ─────────────────────────────────────────────────────────── */
 
+/*
+ * A price list is read across, so the cards are a set rather than a flow. `auto-fit` sized the
+ * row from whatever width was left over, which in the family pages' 832px column put three
+ * cards on a line and orphaned the fourth onto a row of its own. Same rule as .stat-row: a set
+ * lines up or it breaks in half, never three and a stray.
+ */
 .plans {
   display: grid;
-  gap: var(--sws-space-24);
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  align-items: start;
+  gap: var(--sws-space-16);
+  grid-template-columns: minmax(0, 1fr);
+  /* stretch, not start: cards of a set are one height, so every Order button sits on one line
+     instead of wherever that card's feature list happened to end. */
+  align-items: stretch;
+}
+
+/* Three fit a line as soon as there is a line to fit. */
+@media (min-width: 720px) {
+  .plans:has(> :nth-child(3):last-child) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Four go two by two until the column is wide enough to hold all four at a readable width. */
+@media (min-width: 640px) {
+  .plans:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1140px) {
+  .plans:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .plan {
@@ -21,7 +49,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--sws-space-12);
-  padding: var(--sws-space-32);
+  /* 24, not 32: four across an 832px column leave 196px each, and 32 on both sides of that
+     spends a quarter of the card on air the price then has to be squeezed into. */
+  padding: var(--sws-space-24);
   background: var(--sws-card-bg);
   border-radius: var(--sws-radius-xl);
   box-shadow: var(--sws-shadow-card);
@@ -41,10 +71,79 @@
     var(--sws-shadow-lift);
 }
 
+/*
+ * Equal height puts the buttons on one line; it does not put the bands between them on one
+ * line — a card carrying one feature more sits its separator, its extras and the air above its
+ * button a line below its neighbour's, and four cards disagreeing about where their middle is
+ * reads as assembled rather than designed. Subgrid hands every card the same seven rows, so
+ * name, price, cycle, features, separator, extras and button each land on one shared line
+ * across the row; the extras row takes the slack that keeps the button at the bottom.
+ *
+ * Only while the cards are a single row. Two by two, every card would claim rows 1–7 and the
+ * second pair would be dealt on top of the first. And only where the row really is plan cards:
+ * the home page's feature strip is a .plans list of plain cards, and it was collecting the six
+ * empty rows' worth of gutter — 96px of nothing — underneath it.
+ */
+@supports (grid-template-rows: subgrid) {
+  .plan__name {
+    grid-row: 1;
+  }
+
+  .plan__price {
+    grid-row: 2;
+  }
+
+  .plan__cycle {
+    grid-row: 3;
+  }
+
+  .plan__specs {
+    grid-row: 4;
+  }
+
+  .plan__divider {
+    grid-row: 5;
+  }
+
+  .plan__extras {
+    grid-row: 6;
+  }
+
+  .plan .btn {
+    grid-row: 7;
+  }
+
+  @media (min-width: 720px) {
+    .plans:has(> .plan:nth-child(3):last-child) {
+      grid-template-rows: auto auto auto auto auto 1fr auto;
+    }
+
+    .plans:has(> .plan:nth-child(3):last-child) > .plan {
+      display: grid;
+      grid-row: 1 / -1;
+      grid-template-rows: subgrid;
+      row-gap: var(--sws-space-12);
+    }
+  }
+
+  @media (min-width: 1140px) {
+    .plans:has(> .plan:nth-child(4):last-child) {
+      grid-template-rows: auto auto auto auto auto 1fr auto;
+    }
+
+    .plans:has(> .plan:nth-child(4):last-child) > .plan {
+      display: grid;
+      grid-row: 1 / -1;
+      grid-template-rows: subgrid;
+      row-gap: var(--sws-space-12);
+    }
+  }
+}
+
 .plan__flag {
   position: absolute;
   inset-block-start: 0;
-  inset-inline-start: var(--sws-space-32);
+  inset-inline-start: var(--sws-space-24);
   transform: translateY(-50%);
   padding: var(--sws-space-4) var(--sws-space-12);
   background: var(--sws-action-primary);
@@ -96,8 +195,11 @@
 
 .plan__specs {
   display: grid;
+  /* start, not the grid default: with the row sized to the longest list, a shorter one would
+     otherwise stretch its own gaps to fill the difference and stop lining up with it. */
+  align-content: start;
   gap: var(--sws-space-8);
-  margin-block: var(--sws-space-8) var(--sws-space-16);
+  margin-block: var(--sws-space-4) 0;
   padding-block-start: var(--sws-space-16);
   border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
   font-size: var(--sws-font-size-body-sm);

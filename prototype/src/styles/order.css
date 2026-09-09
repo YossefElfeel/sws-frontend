@@ -34,6 +34,10 @@
 
 .plan__extras {
   display: grid;
+  /* This list sits in the row that absorbs a card's spare height. Left to stretch, a short
+     list would pad its own gaps out to fill that space instead of staying under its
+     separator, and the four cards would disagree again one row further down. */
+  align-content: start;
   gap: var(--sws-space-4);
   margin-block-end: var(--sws-space-16);
   font-size: var(--sws-font-size-body-sm);

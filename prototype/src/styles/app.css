@@ -2490,9 +2490,19 @@
   display: grid;
 }
 
+/*
+ * The rule is the same in both rooms: the rail is the ground, the cards are what lifts off it.
+ * On a marketing page the ground is near-white, so the rail takes the recessed tint. In here
+ * the ground already is the recessed tint and the shell's cards are white boxes on it — so the
+ * rail keeps no box of its own at all, and it is the hover and the current page that come
+ * forward out of it. Given a panel here it would be a white hairlined box beside white
+ * hairlined boxes, which is the thing being fixed rather than a version of it.
+ */
 .app__main .rail--domain {
   display: block;
   inset-block-start: var(--sws-space-16);
+  background: none;
+  border-color: transparent;
 }
 
 .shortcuts {
