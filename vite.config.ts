@@ -15,6 +15,7 @@ export default defineConfig({
   // root. Allowing the repo root keeps that single generated file as the only source of
   // design values rather than copying it into the prototype.
   optimizeDeps: { entries: ['src/main.tsx'] },
-  server: { port: 5173, strictPort: false },
+  // Several worktrees run this prototype side by side, so each takes the port it is handed.
+  server: { port: Number(process.env.PORT) || 5173, strictPort: false },
   build: { outDir: '../dist-prototype', emptyOutDir: true },
 });
