@@ -945,6 +945,45 @@
   color: var(--sws-text-secondary);
 }
 
+/* ── the systems list beside the incidents — C-41 ──────────────────────────── */
+/*
+ * Not .with-side, which puts the wide track first: here the rail leads, because the systems
+ * list is what someone reads first and a phone has to stack it first. Its own class rather
+ * than a modifier, so it is not fighting .with-side's 1024 rule down the cascade.
+ *
+ * 1280 — content.roomy — and not 1024, where the sidebar arrives. At 1024 the content column
+ * is about 688px, and a 20rem rail would leave the incident prose 344px: narrower than the
+ * measure it needs to be read, which is the thing the second column exists to give it.
+ */
+.status-pair {
+  display: grid;
+  gap: var(--sws-space-24);
+  align-items: start;
+}
+
+.status-pair > * {
+  min-width: 0;
+}
+
+@media (min-width: 1280px) {
+  .status-pair {
+    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+  }
+}
+
+/* The end of a list's header row: what survived the filter, then the filter. The count keeps
+   TableToolbar's own class so it reads like every other count in the client area, and gives
+   back the top margin it wears when it sits under a search field instead of beside a pill. */
+.bar__end {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+}
+
+.bar__end .tbar__count {
+  margin-block-start: 0;
+}
+
 /* ── stands: three things a company page says — M-17 and M-19 ─────────────── */
 
 .stands {

@@ -1896,6 +1896,7 @@ export const STRINGS = {
 
   // Network status inside the client area — C-41.
   'acc.status': { ar: 'حالة الشبكة', en: 'Network status' },
+  'status.entries': { ar: 'الأحداث', en: 'Entries' },
   'status.filter': { ar: 'عرض', en: 'Show' },
   'status.filter.all': { ar: 'كل الأحداث', en: 'All entries' },
   'status.filter.open': { ar: 'الجارية بس', en: 'Open only' },
@@ -1903,6 +1904,9 @@ export const STRINGS = {
   'status.filter.maintenance': { ar: 'الصيانة', en: 'Maintenance' },
   'status.noneTitle': { ar: 'مفيش أعطال على الشبكة', en: 'No network issues' },
   'status.noneNote': { ar: 'كل الأنظمة شغّالة زي ما ينبغي، ومفيش أحداث مطابقة للفلتر ده.', en: 'Every system is running as it should, and nothing matches this filter.' },
+  // The clear day is not a filtered-to-nothing day, and saying "nothing matches this filter"
+  // when no filter is on screen sends someone looking for a control that was never there.
+  'status.noneClear': { ar: 'مفيش أي عطل ولا صيانة متسجّلة على الشبكة.', en: 'No outage or maintenance is recorded on the network.' },
   'status.updates': { ar: 'عايز تعرف أول بأول؟', en: 'Want to be told first?' },
   'status.updatesBody': { ar: 'فعّل إشعارات الخدمة وهنبلّغك بأي عطل أو صيانة قبل ما تلاحظها.', en: 'Turn on service notifications and we tell you about any outage or maintenance before you notice it.' },
 } as const;

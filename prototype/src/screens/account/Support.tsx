@@ -707,43 +707,56 @@ export function NetworkStatus() {
     <AccountLayout title={t('acc.status')} lede={t('status.lede')}>
       <StatusHeadline worst={worstOf(systems)} />
 
-      <section className="card">
-        <header className="card__head">
-          <h2 className="card__heading">{t('status.systems')}</h2>
-        </header>
-        <SystemList systems={systems} />
-      </section>
+      {/* The two halves of the same question, side by side on a roomy screen: which system,
+          and what happened to it. The systems list leads because that is the order the
+          questions arrive in — and it leads in the DOM too, so a phone stacks them that way. */}
+      <div className="status-pair">
+        {/* Six rows of a name and a state is an index, not a table. In the narrow track the
+            state sits a glance from the name it belongs to; across the full column it sat the
+            better part of a metre away, and the eye had to make that trip six times. */}
+        <section className="card card--flush">
+          <header className="card__head card__head--flush">
+            <h2 className="card__heading">{t('status.systems')}</h2>
+          </header>
+          <SystemList systems={systems} />
+        </section>
 
-      <div className="bar">
-        <label className="field-label">
-          <span className="eyebrow">{t('status.filter')}</span>
-          <select
-            className="field"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as IncidentFilter)}
-          >
-            {(['open', 'all', 'resolved', 'maintenance'] as IncidentFilter[]).map((f) => (
-              <option key={f} value={f}>
-                {t(`status.filter.${f}` as never)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <p className="bar__count">
-          <span className="serial">{shown.length}</span> {t('dash.of')}{' '}
-          <span className="serial">{incidents.length}</span>
-        </p>
-      </div>
+        <div>
+          <div className="bar">
+            <h2 className="card__heading">{t('status.entries')}</h2>
+            {/* A filter over nothing is a control that cannot do anything, so on the day the
+                network is clear it is not offered — and neither is a count of nought. */}
+            {incidents.length > 0 && (
+              <div className="bar__end">
+                <p className="tbar__count" role="status">
+                  <span className="serial">{shown.length}</span> {t('dash.of')}{' '}
+                  <span className="serial">{incidents.length}</span>
+                </p>
+                <TableFilter
+                  label={t('status.filter')}
+                  value={filter}
+                  onChange={setFilter}
+                  options={(['open', 'all', 'resolved', 'maintenance'] as IncidentFilter[]).map(
+                    (f) => ({ value: f, label: t(`status.filter.${f}` as never) }),
+                  )}
+                />
+              </div>
+            )}
+          </div>
 
-      {shown.length > 0 ? (
-        <IncidentList incidents={shown} />
-      ) : (
-        <div className="card empty">
-          <IconCheck size={28} />
-          <p className="empty__title">{t('status.noneTitle')}</p>
-          <p className="empty__note">{t('status.noneNote')}</p>
+          {shown.length > 0 ? (
+            <IncidentList incidents={shown} />
+          ) : (
+            <div className="card empty">
+              <IconCheck size={28} />
+              <p className="empty__title">{t('status.noneTitle')}</p>
+              <p className="empty__note">
+                {t(incidents.length > 0 ? 'status.noneNote' : 'status.noneClear')}
+              </p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       <div className="notice notice--spaced">
         <IconInfo size={20} />
