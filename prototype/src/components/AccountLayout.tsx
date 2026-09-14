@@ -14,6 +14,7 @@ export function AccountLayout({
   crumbs,
   meta,
   actions,
+  bare,
   children,
 }: {
   title: string;
@@ -21,10 +22,12 @@ export function AccountLayout({
   crumbs?: { label: string; to?: string }[];
   meta?: ReactNode;
   actions?: ReactNode;
+  /** The screen carries its own title inside its own frame — see AppShell. */
+  bare?: boolean;
   children: ReactNode;
 }) {
   return (
-    <AppShell title={title} lede={lede} crumbs={crumbs} meta={meta} actions={actions}>
+    <AppShell title={title} lede={lede} crumbs={crumbs} meta={meta} actions={actions} bare={bare}>
       {children}
     </AppShell>
   );
