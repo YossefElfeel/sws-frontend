@@ -400,7 +400,11 @@ export const STRINGS = {
   'domainstep.registerBody': { ar: 'اكتب الدومين اللي عايز تسجله ونتأكد من توفره.', en: 'Type the domain you wish to register below to check availability.' },
   'domainstep.transfer': { ar: 'نقل دومين', en: 'Transfer Domain' },
   'domainstep.transferBody': { ar: 'انقل دومينك من مسجّل آخر.', en: 'Transfer your domain from another registrar.' },
-  'domainstep.own': { ar: 'استخدام دومين حالي', en: 'Use Own Domain' },
+  // The Arabic names the condition and the English names the action, which is the two languages
+  // being written rather than one being translated: "do you own a domain" is how the choice is
+  // asked in Arabic, and "use your own domain" is how it is offered in English. The body under
+  // each says the same thing in both.
+  'domainstep.own': { ar: 'تملك دومين', en: 'Use Own Domain' },
   'domainstep.ownBody': { ar: 'هستخدم دوميني الحالي وأحدّث الـnameservers.', en: 'I will use my existing domain and update my nameservers.' },
   'domainstep.required': { ar: 'مطلوب', en: 'Required' },
   'domainstep.available': { ar: 'متاح', en: 'is available' },
