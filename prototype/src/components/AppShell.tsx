@@ -101,6 +101,14 @@ function useGroups(): { label: string; items: Section[] }[] {
   ];
 }
 
+/**
+ * Which navigation groups are open, remembered for as long as the tab is. It lives outside
+ * the component because the shell remounts on every navigation, and a group the reader had
+ * just opened would otherwise shut under the very click that used it. A reload starts closed
+ * again, which is the state the column is designed around.
+ */
+let openedGroups: string[] = [];
+
 export function AppShell({
   title,
   lede,
@@ -133,6 +141,9 @@ export function AppShell({
   const { theme, toggleTheme } = usePrefs();
   const groups = useGroups();
   const [open, setOpen] = useState(false);
+  // Thirteen links standing open is a list to read. Closed, the column is four short
+  // decisions, and the bar above still names where you are.
+  const [openGroups, setOpenGroups] = useState<string[]>(() => openedGroups);
   const [bell, setBell] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
@@ -153,6 +164,12 @@ export function AppShell({
     };
   }, [bell]);
 
+  const toggleGroup = (label: string) =>
+    setOpenGroups((prev) => {
+      openedGroups = prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label];
+      return openedGroups;
+    });
+
   const name = bi(ACCOUNT.name);
   const initials = name
     .split(' ')
@@ -162,9 +179,10 @@ export function AppShell({
 
   // Longest match wins, so /account/services/svc-1 resolves to Services rather than to the
   // dashboard's own /account.
+  const current = (s: Section) => (s.end ? pathname === s.to : pathname.startsWith(s.to));
   const section = groups
     .flatMap((g) => g.items)
-    .filter((s) => (s.end ? pathname === s.to : pathname.startsWith(s.to)))
+    .filter(current)
     .sort((a, b) => b.to.length - a.to.length)
     .map((s) => t(s.key as never))[0];
 
@@ -201,31 +219,57 @@ export function AppShell({
         </div>
 
         <nav className="app__nav">
-          {groups.map((g) => (
-            <div className="app__group" key={g.label}>
-              <p className="app__group-label">{t(g.label as never)}</p>
-              <ul>
-                {g.items.map((s) => (
-                  <li key={s.to}>
-                    <NavLink
-                      className="app__link"
-                      to={s.to}
-                      end={s.end}
-                      onClick={() => setOpen(false)}
-                    >
-                      <span className="app__link-icon" aria-hidden="true">
-                        {s.icon}
-                      </span>
-                      <span className="app__link-label">{t(s.key as never)}</span>
-                      {s.badge ? (
-                        <span className="app__link-badge serial">{s.badge}</span>
-                      ) : null}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {groups.map((g) => {
+            const id = `nav-${g.label.split('.').pop()}`;
+            const isOpen = openGroups.includes(g.label);
+            // A count is the reason to open a section, so a closed section still carries it —
+            // collapsing the column must not hide the two things that are waiting.
+            const waiting = g.items.reduce((n, s) => n + (s.badge ?? 0), 0);
+            return (
+              <div
+                className={`app__group${isOpen ? ' is-open' : ''}${
+                  g.items.some(current) ? ' is-here' : ''
+                }`}
+                key={g.label}
+              >
+                <button
+                  type="button"
+                  className="app__group-label"
+                  aria-expanded={isOpen}
+                  aria-controls={id}
+                  onClick={() => toggleGroup(g.label)}
+                >
+                  <span className="app__group-text">{t(g.label as never)}</span>
+                  {!isOpen && waiting > 0 && (
+                    <span className="app__link-badge serial">{waiting}</span>
+                  )}
+                  <IconChevron size={14} className="app__group-chev" />
+                </button>
+                {/* Hidden rather than unmounted: the links stay in the document, so the group
+                    is one control away and find-in-page still reaches them. */}
+                <ul id={id} hidden={!isOpen}>
+                  {g.items.map((s) => (
+                    <li key={s.to}>
+                      <NavLink
+                        className="app__link"
+                        to={s.to}
+                        end={s.end}
+                        onClick={() => setOpen(false)}
+                      >
+                        <span className="app__link-icon" aria-hidden="true">
+                          {s.icon}
+                        </span>
+                        <span className="app__link-label">{t(s.key as never)}</span>
+                        {s.badge ? (
+                          <span className="app__link-badge serial">{s.badge}</span>
+                        ) : null}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </nav>
 
         <div className="app__user">
