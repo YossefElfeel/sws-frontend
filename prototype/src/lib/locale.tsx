@@ -1479,7 +1479,7 @@ export const STRINGS = {
 
   'funds.lede': { ar: 'اشحن رصيد يتخصم منه أي فاتورة جاية تلقائيًا.', en: 'Top up a balance that later invoices draw on automatically.' },
   'funds.amount': { ar: 'المبلغ', en: 'Amount' },
-  'funds.custom': { ar: 'مبلغ آخر', en: 'Another amount' },
+  'funds.quick': { ar: 'مبالغ جاهزة', en: 'Quick amounts' },
   'funds.add': { ar: 'اشحن الرصيد', en: 'Add funds' },
   'funds.balance': { ar: 'الرصيد الحالي', en: 'Current balance' },
   'funds.balanceNote': { ar: 'الرصيد بيتخصم منه أول ما تتصدر فاتورة جديدة.', en: 'The balance is applied as soon as a new invoice is issued.' },
