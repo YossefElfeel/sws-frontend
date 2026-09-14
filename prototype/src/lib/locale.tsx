@@ -248,6 +248,25 @@ export const STRINGS = {
   'domain.colTld': { ar: 'الامتداد', en: 'Extension' },
   'domain.colDomain': { ar: 'الدومين', en: 'Domain' },
   'domain.colAction': { ar: 'الإجراء', en: 'Action' },
+
+  /*
+   * The three doors at the head of the search page. The same three the order flow offers at its
+   * domain step, and deliberately the same words: a visitor who meets "نقل دومين" here and
+   * "نقل دومين" again inside the funnel has met one thing twice, not two things once.
+   */
+  'domain.doors': { ar: 'إيه اللي عايز تعمله؟', en: 'What do you want to do?' },
+  'domain.hereNow': { ar: 'إنت هنا', en: 'You are here' },
+  'domain.transferCta': { ar: 'ابدأ النقل', en: 'Start the transfer' },
+  'domain.ownCta': { ar: 'شوف باقات الاستضافة', en: 'See hosting plans' },
+
+  /* The shortlist above the full table. It shows before a search only — see the note in the
+     screen; after one, the same four extensions are already in the answer underneath. */
+  'domain.popularTlds': { ar: 'امتدادات شائعة', en: 'Popular extensions' },
+  'domain.popularNote': {
+    ar: 'الأربعة الأكتر طلبًا، وسعر التجديد مكتوب جنب سعر التسجيل.',
+    en: 'The four most asked for, each carrying its renewal price beside its registration price.',
+  },
+  'domain.pick': { ar: 'اختار الامتداد ده', en: 'Choose this extension' },
   'domain.hint': {
     ar: 'سعر التجديد معروض جنب سعر التسجيل، لأنه الرقم اللي هتدفعه كل سنة بعد الأولى.',
     en: 'Renewal sits beside registration, because it is the figure you pay every year after the first.',

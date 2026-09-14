@@ -16,6 +16,14 @@ import { IconChevron } from './icons';
  *
  * The wrapper exists because a `<select>` cannot carry a pseudo-element in Chrome, so the
  * chevron has to be a real element with something positioned to hang it from.
+ *
+ * And the wrapper takes the control's own `dir`, which is the fix for a defect worth naming.
+ * The three extension pickers are `dir="ltr"` — ".com" is Latin text and reads left to right
+ * whatever language the page is in — but the wrapper around them stayed RTL on an Arabic page.
+ * Logical properties then resolved against two different axes at once: the control reserved
+ * its chevron's room at its own inline end, on the right, while `.select__chev` hung itself at
+ * the WRAPPER's inline end, on the left. The arrow was drawn on top of the first letter of the
+ * value, and ".com" read as a smudge. The two have to agree about which end is the end.
  */
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   /**
@@ -27,7 +35,9 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export function Select({ className, wrapClassName, children, ...rest }: SelectProps) {
   return (
-    <span className={`select${wrapClassName ? ` ${wrapClassName}` : ''}`}>
+    // Undefined when the caller says nothing, so a select that has not asked for a direction
+    // goes on inheriting the page's — which is every other select in the product.
+    <span className={`select${wrapClassName ? ` ${wrapClassName}` : ''}`} dir={rest.dir}>
       <select className={`field${className ? ` ${className}` : ''}`} {...rest}>
         {children}
       </select>
