@@ -54,10 +54,27 @@
   border-radius: var(--sws-radius-lg);
 }
 
+/*
+ * A group heading set in the link colour, one weight step off the link weight, and standing
+ * the same distance from the list above it as from the list below, is a link with the hover
+ * taken away — which is how "إدارة" and "إجراءات" were reading over their groups. In
+ * Latin the uppercase and the tracking carried the difference by themselves; the rule under
+ * this one drops both for Arabic, where neither means anything, and left the heading with
+ * nothing.
+ *
+ * So it is given three cues that survive the translation. The full weight step to bold. A
+ * hairline under it, which no link has and no link can be mistaken for. And position: it hugs
+ * the list it names, with the air between two groups belonging to the heading rather than
+ * being split evenly either side of it — a heading that sits with its own list is read as that
+ * list's label, where one standing equidistant between two is read as a member of whichever it
+ * happens to touch.
+ */
 .rail__head {
-  padding: var(--sws-space-8) var(--sws-space-12);
+  margin-block-end: var(--sws-space-8);
+  padding: 0 var(--sws-space-12) var(--sws-space-8);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
   font-size: var(--sws-font-size-caption);
-  font-weight: var(--sws-weight-semibold);
+  font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   color: var(--sws-text-secondary);
@@ -66,6 +83,12 @@
 :root[lang='ar'] .rail__head {
   letter-spacing: var(--sws-tracking-normal);
   text-transform: none;
+}
+
+/* The space between two groups is the heading's, not the list's — it is what tells the heading
+   apart from the last link of the group above it. */
+.rail__list + .rail__head {
+  margin-block-start: var(--sws-space-24);
 }
 
 .rail__list {
@@ -1453,15 +1476,103 @@
   }
 }
 
-/* An add-on row: its facts stack under the name, so the state and the actions keep the end
-   of the row instead of the last button dropping to a line of its own. */
+/*
+ * The add-ons list is a table in everything but its markup, and it was built as a row of
+ * flexible boxes: the text took one share of the width, a growing spacer took the rest, and
+ * the state sat at the *start* of that spacer. So "مفعّل" landed wherever the sentence above it
+ * happened to end — a different place on every row, and nowhere near the buttons it is the
+ * state of. The row that has no إدارة button moved it again.
+ *
+ * Three shared columns instead, one grid for the whole list rather than one flex row per
+ * add-on. The state and the actions each get a column as wide as the widest row needs, so
+ * they line up down the card and the state is read as the label on the buttons beside it,
+ * which is what it is.
+ */
+.addon-list {
+  display: grid;
+}
+
 .addon-row__text {
   display: grid;
+  align-content: center;
   gap: 2px;
-  flex: 1 1 18rem;
   min-inline-size: 0;
 }
 
 .addon-row__text .method-row__name {
   min-inline-size: 0;
+}
+
+.addon-row__state,
+.addon-row__acts {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sws-space-8);
+}
+
+@media (min-width: 600px) {
+  .addon-list {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  /*
+   * The rows are grid rows, not boxes — that is what lets the three columns be measured across
+   * the whole list rather than per row. Each cell therefore carries its own padding and its own
+   * share of the rule, and the cells are left to stretch so that the three pieces of one row's
+   * rule meet at the same height.
+   *
+   * The space between the columns is padding inside the cells and not a `column-gap`, because a
+   * gap is a hole the cell's border cannot cross: a 16px one cut the row's hairline into three
+   * pieces with two breaks in it, which reads as a rule that failed to draw rather than as a
+   * column.
+   */
+  .addon-row {
+    display: contents;
+  }
+
+  .addon-row > * {
+    padding: var(--sws-space-16) var(--sws-space-8);
+    border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  }
+
+  .addon-row > :first-child {
+    padding-inline-start: var(--sws-space-24);
+  }
+
+  .addon-row > :last-child {
+    padding-inline-end: var(--sws-space-24);
+  }
+
+  .addon-row:last-child > * {
+    border-block-end: 0;
+  }
+}
+
+/* Under 600px three columns have nowhere to go, so the row becomes two lines: what the add-on
+   is, and under it the state and the buttons — kept together at the end of that line, which is
+   the whole point of the three columns above and does not stop being the point on a phone. */
+@media (max-width: 599px) {
+  .addon-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--sws-space-12);
+    padding: var(--sws-space-16);
+    border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  }
+
+  .addon-row:last-child {
+    border-block-end: 0;
+  }
+
+  .addon-row__text {
+    flex: 1 1 100%;
+  }
+
+  /* Empty on an add-on that is off, and an empty flex item still spends the row's gap. */
+  .addon-row__state:empty {
+    display: none;
+  }
 }
