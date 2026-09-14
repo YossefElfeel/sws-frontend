@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HostingLayout } from '../components/HostingLayout';
+import { DomainDoors } from '../components/DomainDoors';
 import { Button } from '../components/Button';
 import { Banner } from '../components/Banner';
 import { IconCheck, IconArrow } from '../components/icons';
@@ -51,6 +52,10 @@ export function Transfer() {
 
   return (
     <HostingLayout title={t('transfer.title')} lede={t('transfer.lede')}>
+      {/* The same strip the search page carries, with this page marked as the one you are on.
+          Somebody who picked transfer and meant to register should not have to go back for it. */}
+      <DomainDoors />
+
       <div className="split">
         <form
           className="panel panel--pad transfer-form"
