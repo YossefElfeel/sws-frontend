@@ -107,6 +107,7 @@ export function AppShell({
   crumbs,
   meta,
   actions,
+  bare,
   children,
 }: {
   title: string;
@@ -116,6 +117,16 @@ export function AppShell({
   meta?: ReactNode;
   /** Controls that belong to this screen rather than to the shell. */
   actions?: ReactNode;
+  /**
+   * Set by a screen that draws its own title inside its own frame.
+   *
+   * The default head is right for a screen made of several cards: it names the place once,
+   * above whatever is below it. It is wrong for a screen that is one object — the title ends
+   * up a caption floating on the page ground with the object it names sitting apart from it,
+   * and the frame below opens with no idea what it holds. Such a screen takes the title into
+   * the frame instead, and says so here so the shell does not print it twice.
+   */
+  bare?: boolean;
   children: ReactNode;
 }) {
   const { t, locale, setLocale, bi } = useLocale();
@@ -363,14 +374,16 @@ export function AppShell({
         </header>
 
         <main id="main" className="app__main" tabIndex={-1} key={pathname}>
-          <div className="app__head">
-            <div>
-              <h1 className="app__title">{title}</h1>
-              {lede && <p className="app__lede">{lede}</p>}
-              {meta && <div className="app__meta">{meta}</div>}
+          {!bare && (
+            <div className="app__head">
+              <div>
+                <h1 className="app__title">{title}</h1>
+                {lede && <p className="app__lede">{lede}</p>}
+                {meta && <div className="app__meta">{meta}</div>}
+              </div>
+              {actions && <div className="app__head-actions">{actions}</div>}
             </div>
-            {actions && <div className="app__head-actions">{actions}</div>}
-          </div>
+          )}
 
           {children}
         </main>
