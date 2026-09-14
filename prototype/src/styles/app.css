@@ -1833,14 +1833,21 @@
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-lg);
+  /* A framed fieldset is a card by every other measure — same ground, same hairline, same
+     radius — so it takes the card's rank too. Without it the ticket form's frames sat flat
+     beside the suggestions card in the very same row: two elevations for one kind of box. */
+  box-shadow: var(--sws-elevation-card);
 }
 
-.app__main .fieldset + .fieldset {
-  margin-block-start: var(--sws-space-16);
-}
-
-/* A form that is a column of card-sections rather than one card: the sections carry the frames
-   and the footer sits below them, on the ground. */
+/*
+ * A form that is a column of card-sections rather than one card: the sections carry the frames
+ * and the footer sits below them, on the ground.
+ *
+ * The seam between two frames is this gap and nothing else. `.app__main .fieldset + .fieldset`
+ * used to add a 16px top margin on top of it, and a margin on a grid item adds to the gap
+ * rather than collapsing into it — so every seam in the ticket form measured 32 while every
+ * other column of cards in the client area measured the 16 that `.cards` sets.
+ */
 .form-stack {
   display: grid;
   gap: var(--sws-space-16);
@@ -1852,9 +1859,57 @@
   border-block-start: 0;
 }
 
+/*
+ * The frame's title, inside the frame.
+ *
+ * A legend is the one element a browser lifts out of its own box: the rendered legend is
+ * painted ON the fieldset's block-start border, outside the padding, with the border cut away
+ * behind it. That is the look a bare fieldset is designed for — but these fieldsets are cards,
+ * and it left every group named from outside its own frame while the suggestions card in the
+ * very same row carried its heading within. Two ways of titling a box, side by side.
+ *
+ * Floating it is what takes it back: per the rendering spec only a legend with `float: none`
+ * is the rendered legend, so a floated one is laid out as an ordinary block — the border runs
+ * unbroken and the 24px padding applies above it. `inline-size: 100%` gives it a line of its
+ * own, so the float has no side to escape to and RTL needs no second rule.
+ *
+ * From there it is a card head: the size, weight and tracking of `.card__heading`, over the
+ * 16px that `.card__head` sets.
+ */
 .app__main .fieldset legend {
+  float: inline-start;
+  inline-size: 100%;
+  margin-block-end: var(--sws-space-16);
   font-size: var(--sws-font-size-body);
   font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+/* Only a box that establishes its own formatting context steps around a float, and a bare
+   input is not one. Clearing says it for all of them rather than resting on which is which. */
+.app__main .fieldset > *:not(legend) {
+  clear: both;
+}
+
+/*
+ * One rhythm inside a frame: 16 between blocks, the same figure the field grid keeps between
+ * its own columns and rows. The details frame stacked the subject field straight onto the
+ * editor's toolbar with nothing between them, so the two read as one control with a seam.
+ *
+ * A hint is the exception, and stays at the 12 it sets for itself: it is not a block beside
+ * the control above it, it is a line belonging to it.
+ */
+.app__main .fieldset > *:not(legend) + *:not(.hint) {
+  margin-block-start: var(--sws-space-16);
+}
+
+/*
+ * The chooser closes the group its label opens. The chooser and the form below it are two
+ * groups of cards with nothing between them, so the last choice tile and the first frame
+ * shared an edge — 0px, on a screen where every other seam is 16 or 24.
+ */
+.app__main .choices {
+  margin-block-end: var(--sws-space-24);
 }
 
 .app__main .choice,
