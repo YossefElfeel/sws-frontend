@@ -6,6 +6,7 @@ import { Banner } from '../components/Banner';
 import { IconArrow, IconKey, IconCheck } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { ACCOUNT } from '../lib/account';
+import { Select } from '../components/Select';
 
 /** The countries the spec's billing form offers, named from the string table like everything else. */
 const COUNTRIES = ['EG', 'CH', 'SA', 'AE', 'KW'] as const;
@@ -211,13 +212,13 @@ export function Register() {
           </label>
           <label className="field-label">
             <span className="eyebrow">{t('checkout.country')}</span>
-            <select className="field" defaultValue="EG">
+            <Select defaultValue="EG">
               {COUNTRIES.map((c) => (
                 <option value={c} key={c}>
                   {t(`country.${c.toLowerCase()}` as never)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         </div>
 

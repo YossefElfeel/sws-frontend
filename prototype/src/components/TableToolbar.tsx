@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from 'react';
-import { IconChevron, IconSearch } from './icons';
+import { IconChevron, IconSearch, IconSort } from './icons';
 import { useLocale } from '../lib/locale';
 
 /**
@@ -16,6 +16,9 @@ import { useLocale } from '../lib/locale';
  * that has to stay wide enough to type a domain into. A strip of five statuses is five widths
  * that change with the language; a select is one, and it holds its width when German or Arabic
  * runs long.
+ *
+ * The count that answers the search is not here. It is `<TableCount>`, which the screen puts
+ * under the table — see its note for why.
  */
 
 interface ToolbarProps {
@@ -26,22 +29,11 @@ interface ToolbarProps {
   label: string;
   /** Filters for this table: TableFilter elements, rendered after the field. */
   children?: ReactNode;
-  /** How many rows survived, out of how many there are. */
-  shown?: number;
-  total?: number;
   /** Set when the toolbar sits inside a flush card, above the table it narrows. */
   inset?: boolean;
 }
 
-export function TableToolbar({
-  value,
-  onChange,
-  label,
-  children,
-  shown,
-  total,
-  inset,
-}: ToolbarProps) {
+export function TableToolbar({ value, onChange, label, children, inset }: ToolbarProps) {
   const { t } = useLocale();
   // Not derived from the label: \W eats every Arabic letter, so both languages have to keep
   // their own id rather than one collapsing to the same string on every screen.
@@ -70,15 +62,43 @@ export function TableToolbar({
             the whole group to a second line rather than stranding the last pill on its own. */}
         {children && <div className="tbar__filters">{children}</div>}
       </form>
-
-      {/* The count answers the question the search just asked, so it sits under the field
-          rather than in the row — the row is the control, this is its result. */}
-      {shown !== undefined && total !== undefined && (
-        <p className="tbar__count" role="status">
-          <span className="serial">{shown}</span> {t('dash.of')} <span className="serial">{total}</span>
-        </p>
-      )}
     </div>
+  );
+}
+
+interface CountProps {
+  /** How many rows survived, out of how many there are. */
+  shown: number;
+  total: number;
+  /** Set when the count sits inside the flush card, under the table it counts. */
+  inset?: boolean;
+}
+
+/**
+ * How many rows the list is showing, under the list.
+ *
+ * It used to sit directly under the search field, tight against the control that produced it.
+ * Read in place that is a caption on the search box, and it pushed the table down by a line
+ * on every screen in the client area. A count belongs where a page number belongs — at the
+ * foot of the thing it counts — so that is where it goes, and the toolbar is now only
+ * controls.
+ *
+ * It renders at zero as well, and deliberately: `role="status"` only announces while it is
+ * mounted, so a component that unmounted itself on an empty result would go silent at exactly
+ * the moment there is something to say.
+ *
+ * `inset` follows the toolbar rather than the table: where the search sits inside the flush
+ * card, the count is that card's foot; where the search sits above the card, the count sits
+ * below it. Splitting the pair across the card's edge is what made the DNS card look like two
+ * different components stacked.
+ */
+export function TableCount({ shown, total, inset }: CountProps) {
+  const { t } = useLocale();
+
+  return (
+    <p className={`tcount${inset ? ' tcount--inset' : ''}`} role="status">
+      <span className="serial">{shown}</span> {t('dash.of')} <span className="serial">{total}</span>
+    </p>
   );
 }
 
@@ -91,8 +111,8 @@ interface FilterProps<T extends string> {
 }
 
 /**
- * One pill select. The chosen option is the label — "All statuses" reads as both the state and
- * the name of the control, which is why there is no separate caption above it.
+ * One filter select. The chosen option is the label — "All statuses" reads as both the state
+ * and the name of the control, which is why there is no separate caption above it.
  */
 export function TableFilter<T extends string>({ label, value, onChange, options }: FilterProps<T>) {
   return (
@@ -111,6 +131,65 @@ export function TableFilter<T extends string>({ label, value, onChange, options 
       </select>
       <IconChevron size={16} className="tfilter__chev" />
     </label>
+  );
+}
+
+interface SortProps<T extends string> {
+  value: T;
+  onChange: (next: T) => void;
+  options: { value: T; label: string }[];
+  /** Descending. Its meaning is the key's: latest first, Z–A, dearest first. */
+  desc: boolean;
+  onDesc: (next: boolean) => void;
+}
+
+/**
+ * Sorting, as two controls rather than one.
+ *
+ * The single-select version of this reads "Renewal date, soonest first · Renewal date, latest
+ * first · Name, A–Z · Name, Z–A · Price, highest first · Price, lowest first" — six options for
+ * three decisions, in a pill that has to hold the longest of them in German. Splitting the key
+ * from the direction makes it three plus a switch, and the switch is one target that keeps its
+ * width in every language because its label is a glyph.
+ *
+ * The pill carries a leading sort glyph for the same reason the search field carries a
+ * magnifier: without it, a pill reading "Renewal date" beside a pill reading "All statuses" is
+ * two filters, and only one of them is.
+ */
+export function TableSort<T extends string>({ value, onChange, options, desc, onDesc }: SortProps<T>) {
+  const { t } = useLocale();
+  const dirLabel = t(desc ? 'sort.desc' : 'sort.asc');
+
+  return (
+    <>
+      <label className="tfilter">
+        <span className="u-visually-hidden">{t('sort.label')}</span>
+        <IconSort size={16} className="tfilter__lead" />
+        <select
+          className="tfilter__select tfilter__select--lead"
+          value={value}
+          onChange={(e) => onChange(e.target.value as T)}
+        >
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <IconChevron size={16} className="tfilter__chev" />
+      </label>
+
+      <button
+        type="button"
+        className="tdir"
+        aria-pressed={desc}
+        aria-label={`${t('sort.dir')} — ${dirLabel}`}
+        title={dirLabel}
+        onClick={() => onDesc(!desc)}
+      >
+        <IconChevron size={16} className={`tdir__glyph${desc ? '' : ' tdir__glyph--up'}`} />
+      </button>
+    </>
   );
 }
 

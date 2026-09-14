@@ -173,18 +173,69 @@
 }
 
 .app__group + .app__group {
-  margin-block-start: var(--sws-space-24);
+  margin-block-start: var(--sws-space-4);
 }
 
-/* One size in both languages. It used to be 11px in Latin and caption in Arabic, so the nav's
+/* The group label is the control that opens the group, so it is a row with a real target
+   rather than a caption with a click handler on it.
+
+   One size in both languages. It used to be 11px in Latin and caption in Arabic, so the nav's
    group labels were a different size depending on which language you read the product in. */
 .app__group-label {
-  padding: 0 var(--sws-space-12) var(--sws-space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  inline-size: 100%;
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-family: inherit;
   font-size: var(--sws-font-size-caption);
   font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.app__group-label:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-primary);
+}
+
+.app__group-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Closed, a group still says that the page you are reading is inside it. */
+.app__group.is-here .app__group-label {
+  color: var(--sws-action-quiet);
+}
+
+.app__group-chev {
+  flex: none;
   color: var(--sws-text-secondary);
+  transition: transform var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.app__group.is-open .app__group-chev {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app__group-chev {
+    transition: none;
+  }
 }
 
 /* Arabic has no case and its letterforms join, so uppercase means nothing here and tracking
@@ -197,6 +248,13 @@
 .app__group ul {
   display: grid;
   gap: var(--sws-space-4);
+  padding-block: var(--sws-space-4) var(--sws-space-8);
+}
+
+/* A class selector outranks the browser's own [hidden] rule, so a closed group has to be
+   told to stay closed. */
+.app__group ul[hidden] {
+  display: none;
 }
 
 .app__link {
@@ -715,6 +773,38 @@
 
 .stat:active {
   transform: translateY(0);
+}
+
+/*
+ * A tile that is the filter it counts, rather than a link somewhere else. It is a <button>, so
+ * it needs the four resets a button drags in — the platform font, the platform centring, the
+ * shrink-to-fit width and its own text direction — and nothing else about it changes.
+ */
+button.stat {
+  inline-size: 100%;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/*
+ * Pressed is the accent taking the tile's edge and its ground, which is the same move `.stat`
+ * already makes on hover — held, rather than passing. Two signals rather than one: a reader
+ * who cannot see the tint still has the border, and `aria-pressed` says it outright.
+ */
+.stat[aria-pressed='true'] {
+  background: var(--sws-action-subtle-bg);
+  border-color: var(--sws-action-primary);
+}
+
+.stat[aria-pressed='true'] .stat__label {
+  color: var(--sws-action-quiet);
+}
+
+/* An alert tile that is also the current filter keeps its own ground; the debt outranks the
+   selection, and the border still moves, which is what carries the press. */
+.stat--alert[aria-pressed='true'] {
+  background: var(--sws-banner-danger-bg);
 }
 
 /* A tile that reports rather than navigates: no lift, no pointer, no promise of a click. */
@@ -1418,6 +1508,32 @@
 }
 
 /*
+ * The two outer cells sit on the card's gutter, not 8px inside it.
+ *
+ * Every table in the client area is flush inside a card, under a head or a toolbar that
+ * starts at 24px. At 16px the first column label reached past the heading above it by exactly
+ * enough to read as a slip rather than as a margin, and the last column's figures did the
+ * same on the other edge. Between the columns 16px is still the right measure — density is
+ * what the client area is for — so only the two edges move.
+ *
+ * Above the phone breakpoint only. Below it the table already scrolls, the first column is
+ * sticky and 9rem wide, and spending another 16px of a 342px card on its two outer edges buys
+ * an alignment nobody can see next to a column that has left the viewport. The edges stay at
+ * 16 there, which is where they already were.
+ */
+@media (min-width: 600px) {
+  .app__main .data th:first-child,
+  .app__main .data td:first-child {
+    padding-inline-start: var(--sws-space-24);
+  }
+
+  .app__main .data th:last-child,
+  .app__main .data td:last-child {
+    padding-inline-end: var(--sws-space-24);
+  }
+}
+
+/*
  * No sticky table head. These tables run three to five rows, so a head that follows the scroll
  * has nothing to follow — and under a full-page screenshot a sticky head resolves against the
  * expanded viewport and leaves a phantom band above itself, which puts a defect into the
@@ -1833,14 +1949,21 @@
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-lg);
+  /* A framed fieldset is a card by every other measure — same ground, same hairline, same
+     radius — so it takes the card's rank too. Without it the ticket form's frames sat flat
+     beside the suggestions card in the very same row: two elevations for one kind of box. */
+  box-shadow: var(--sws-elevation-card);
 }
 
-.app__main .fieldset + .fieldset {
-  margin-block-start: var(--sws-space-16);
-}
-
-/* A form that is a column of card-sections rather than one card: the sections carry the frames
-   and the footer sits below them, on the ground. */
+/*
+ * A form that is a column of card-sections rather than one card: the sections carry the frames
+ * and the footer sits below them, on the ground.
+ *
+ * The seam between two frames is this gap and nothing else. `.app__main .fieldset + .fieldset`
+ * used to add a 16px top margin on top of it, and a margin on a grid item adds to the gap
+ * rather than collapsing into it — so every seam in the ticket form measured 32 while every
+ * other column of cards in the client area measured the 16 that `.cards` sets.
+ */
 .form-stack {
   display: grid;
   gap: var(--sws-space-16);
@@ -1852,9 +1975,57 @@
   border-block-start: 0;
 }
 
+/*
+ * The frame's title, inside the frame.
+ *
+ * A legend is the one element a browser lifts out of its own box: the rendered legend is
+ * painted ON the fieldset's block-start border, outside the padding, with the border cut away
+ * behind it. That is the look a bare fieldset is designed for — but these fieldsets are cards,
+ * and it left every group named from outside its own frame while the suggestions card in the
+ * very same row carried its heading within. Two ways of titling a box, side by side.
+ *
+ * Floating it is what takes it back: per the rendering spec only a legend with `float: none`
+ * is the rendered legend, so a floated one is laid out as an ordinary block — the border runs
+ * unbroken and the 24px padding applies above it. `inline-size: 100%` gives it a line of its
+ * own, so the float has no side to escape to and RTL needs no second rule.
+ *
+ * From there it is a card head: the size, weight and tracking of `.card__heading`, over the
+ * 16px that `.card__head` sets.
+ */
 .app__main .fieldset legend {
+  float: inline-start;
+  inline-size: 100%;
+  margin-block-end: var(--sws-space-16);
   font-size: var(--sws-font-size-body);
   font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+/* Only a box that establishes its own formatting context steps around a float, and a bare
+   input is not one. Clearing says it for all of them rather than resting on which is which. */
+.app__main .fieldset > *:not(legend) {
+  clear: both;
+}
+
+/*
+ * One rhythm inside a frame: 16 between blocks, the same figure the field grid keeps between
+ * its own columns and rows. The details frame stacked the subject field straight onto the
+ * editor's toolbar with nothing between them, so the two read as one control with a seam.
+ *
+ * A hint is the exception, and stays at the 12 it sets for itself: it is not a block beside
+ * the control above it, it is a line belonging to it.
+ */
+.app__main .fieldset > *:not(legend) + *:not(.hint) {
+  margin-block-start: var(--sws-space-16);
+}
+
+/*
+ * The chooser closes the group its label opens. The chooser and the form below it are two
+ * groups of cards with nothing between them, so the last choice tile and the first frame
+ * shared an edge — 0px, on a screen where every other seam is 16 or 24.
+ */
+.app__main .choices {
+  margin-block-end: var(--sws-space-24);
 }
 
 .app__main .choice,
@@ -1875,6 +2046,44 @@
 .app__main .kb-item {
   border-radius: var(--sws-radius-lg);
   box-shadow: none;
+}
+
+/*
+ * The status board is shared with the public status page (M-16), where its blocks are lifted
+ * marketing cards at the xl radius. In here xl does not exist, so the headline takes the
+ * client-area radius and the incidents become bordered blocks on the flat ground — the same
+ * move the knowledgebase list makes above, for the same reason.
+ *
+ * The systems list gives up its frame entirely. It is already inside a card that names it, and
+ * a shadowed 24px card inset 24px into a bordered 16px one is the double frame this file spent
+ * an audit removing — visible here as the heading sitting 24px off the rows it labels, because
+ * the head was measuring from the outer card and the rows from the inner one.
+ */
+.app__main .headline {
+  border-radius: var(--sws-radius-lg);
+}
+
+.app__main .incident {
+  border-radius: var(--sws-radius-lg);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  box-shadow: none;
+}
+
+.app__main .sys {
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/*
+ * Between the sidebar arriving at 1024 and the pair splitting at 1280 the list is full width
+ * again, and a row of two words would put the state most of a column away from the name it
+ * belongs to. Capping the name stops the spread without breaking the scan: every name grows to
+ * the same width, so the states still line up in a column — they just stop at a readable
+ * distance. In the rail the cap is wider than the track, so nothing there changes.
+ */
+.app__main .sys__name {
+  max-inline-size: 22rem;
 }
 
 /* ── a file field is a field ───────────────────────────────────────────────── */
@@ -1917,6 +2126,32 @@
 
 .app__main .invoice {
   max-width: 46rem;
+}
+
+/*
+ * The document table's head carries no fill.
+ *
+ * Its outer cells have no inline padding, because the line items have to sit on the same
+ * column as the parties block, the note and the totals — that shared edge is what makes this
+ * card read as a document rather than as a screen. A fill behind labels that begin at its own
+ * edge has no inset left to show, and the first column label ended up touching the band it
+ * sat in. The rule the first row draws under the head says what the band was saying, at the
+ * inset every other rule in this document already uses.
+ */
+.app__main .invoice .data--flush th {
+  background: none;
+}
+
+/*
+ * Except on a phone, where the first column is sticky and the other three scroll under it. It
+ * was the head band that made that cell opaque; with the band gone it takes the card's own
+ * ground, which is what the body cells beneath it already use. Without this the dates scroll
+ * straight through "Description".
+ */
+@media (max-width: 599px) {
+  .app__main .invoice .table-scroll .data--flush th:first-child {
+    background: var(--sws-surface-raised);
+  }
 }
 
 .app__main .invoice .data--flush th:first-child,

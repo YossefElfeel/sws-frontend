@@ -9,6 +9,7 @@ import { usePrefs } from '../lib/prefs';
 import { useCart, DOMAIN_ADDON_KEY } from '../lib/cart';
 import { gatewaysFor, formatAmount, COUNTRIES } from '../lib/catalog';
 import { gatewayDestination } from './Order';
+import { Select } from '../components/Select';
 
 /**
  * Checkout — spec 7.3 and 11.
@@ -74,13 +75,13 @@ export function Checkout() {
                 </label>
                 <label className="field-label">
                   <span className="eyebrow">{t('checkout.country')}</span>
-                  <select className="field" name="country" defaultValue="EG">
+                  <Select name="country" defaultValue="EG">
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>
                         {c.label}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               </div>
             </fieldset>

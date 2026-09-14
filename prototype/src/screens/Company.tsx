@@ -26,6 +26,7 @@ import {
   CONTACT_SUBJECTS,
   MIGRATION_PANELS,
 } from '../lib/marketing';
+import { Select } from '../components/Select';
 
 /** A plain page: title, lede, then whatever the page is. No category rail. */
 function Page({
@@ -297,13 +298,13 @@ export function Contact() {
           </div>
           <label className="field-label">
             <span className="eyebrow">{t('ct.subject')}</span>
-            <select className="field" defaultValue={CONTACT_SUBJECTS[0]}>
+            <Select defaultValue={CONTACT_SUBJECTS[0]}>
               {CONTACT_SUBJECTS.map((s) => (
                 <option key={s} value={s}>
                   {t(s as never)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="field-label">
             <span className="eyebrow">{t('tkt.message')}</span>
@@ -387,13 +388,13 @@ export function Migration() {
             </div>
             <label className="field-label">
               <span className="eyebrow">{t('mig.panel')}</span>
-              <select className="field" defaultValue={MIGRATION_PANELS[0]}>
+              <Select defaultValue={MIGRATION_PANELS[0]}>
                 {MIGRATION_PANELS.map((p) => (
                   <option key={p} value={p}>
                     {p === 'other' ? t('cancel.reason.other') : p}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field-label">
               <span className="eyebrow">{t('mig.size')}</span>

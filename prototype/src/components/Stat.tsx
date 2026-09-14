@@ -19,6 +19,14 @@ export interface StatItem {
   tone?: Tone;
   /** A count is a link wherever there is somewhere to send the reader. */
   to?: string;
+  /**
+   * …and where the reader is already there, it narrows what they are looking at instead. A
+   * tile counting three suspended services, on the services screen, has nowhere to send
+   * anyone; what it can do is show those three. Paired with `pressed`, so the tile is a toggle
+   * and says so, rather than a link that lies about where it goes.
+   */
+  onSelect?: () => void;
+  pressed?: boolean;
   icon?: ReactNode;
   /** The tile is itself the thing that is owed — ground, border, figure and glyph all say so. */
   alert?: boolean;
@@ -51,8 +59,9 @@ export function StatRow({ items }: { items: StatItem[] }) {
   );
 }
 
-function StatTile({ n, unit, label, note, tone = 'ok', to, icon, alert }: StatItem) {
-  const cls = `stat${alert ? ' stat--alert' : ''}${to ? '' : ' stat--static'}`;
+function StatTile({ n, unit, label, note, tone = 'ok', to, onSelect, pressed, icon, alert }: StatItem) {
+  const live = Boolean(to || onSelect);
+  const cls = `stat${alert ? ' stat--alert' : ''}${live ? '' : ' stat--static'}`;
 
   const body = (
     <>
@@ -80,11 +89,21 @@ function StatTile({ n, unit, label, note, tone = 'ok', to, icon, alert }: StatIt
     </>
   );
 
-  return to ? (
-    <Link className={cls} to={to}>
-      {body}
-    </Link>
-  ) : (
-    <span className={cls}>{body}</span>
-  );
+  if (to) {
+    return (
+      <Link className={cls} to={to}>
+        {body}
+      </Link>
+    );
+  }
+
+  if (onSelect) {
+    return (
+      <button type="button" className={cls} aria-pressed={pressed} onClick={onSelect}>
+        {body}
+      </button>
+    );
+  }
+
+  return <span className={cls}>{body}</span>;
 }

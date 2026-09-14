@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Tag, DOMAIN_TONE } from '../../components/Tag';
 import { IconArrow, IconPlus, IconGlobe } from '../../components/icons';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useAccountState } from '../../lib/accountState';
 
@@ -49,8 +49,6 @@ export function MyDomains() {
         value={q}
         onChange={setQ}
         label={t('search.domains')}
-        shown={rows.length}
-        total={domains.length}
       >
         <TableFilter
           label={t('account.status')}
@@ -119,6 +117,8 @@ export function MyDomains() {
           </p>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={domains.length} />
     </AccountLayout>
   );
 }

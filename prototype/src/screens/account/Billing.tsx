@@ -15,7 +15,7 @@ import {
   IconWallet,
   IconAlert,
 } from '../../components/icons';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
@@ -38,6 +38,7 @@ import {
   type InvoiceLine,
 } from '../../lib/account';
 import { gatewayDestination } from '../Order';
+import { Select } from '../../components/Select';
 
 const FILTERS: (InvoiceStatus | 'all')[] = ['all', 'unpaid', 'paid', 'overdue', 'cancelled'];
 
@@ -105,8 +106,6 @@ export function Invoices() {
         value={q}
         onChange={setQ}
         label={t('search.invoices')}
-        shown={rows.length}
-        total={INVOICES.length}
       >
         <TableFilter
           label={t('account.status')}
@@ -162,6 +161,8 @@ export function Invoices() {
           </table>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={INVOICES.length} />
     </AccountLayout>
   );
 }
@@ -418,7 +419,7 @@ export function InvoiceDetail() {
                 </table>
               </div>
             ) : (
-              <div className="empty">
+              <div className="empty empty--inset">
                 <IconWallet size={28} />
                 <p className="empty__title">{t('inv.noPayments')}</p>
                 <p className="empty__note">{t('inv.noPaymentsNote')}</p>
@@ -464,13 +465,13 @@ export function InvoiceDetail() {
 
               <label className="field-label u-mt-16">
                 <span className="eyebrow">{t('checkout.method')}</span>
-                <select className="field" value={method} onChange={(e) => setMethod(e.target.value)}>
+                <Select value={method} onChange={(e) => setMethod(e.target.value)}>
                   {gateways.map((g) => (
                     <option key={g.id} value={g.id}>
                       {t(g.labelKey as never)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
 
               {chosen && (
@@ -572,23 +573,16 @@ export function AddFunds() {
             <header className="card__head">
               <h2 className="card__heading">{t('funds.amount')}</h2>
             </header>
+            {/*
+              The field leads; the presets follow it. The presets used to come first, which made
+              them the offer and left the field as the exception — it was labelled "another
+              amount" — when the amount an account actually wants is the ordinary case and the
+              four figures are the shortcut into it. The card heading labels the field, so the
+              field carries its own label for a screen reader only rather than saying it twice.
+            */}
             <div className="form">
-              <div className="chips" role="group" aria-label={t('funds.amount')}>
-                {presets.map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    className={`chip${amount === p ? ' is-active' : ''}`}
-                    aria-pressed={amount === p}
-                    onClick={() => setAmount(p)}
-                  >
-                    {money(p)}
-                  </button>
-                ))}
-              </div>
-
               <label className="field-label">
-                <span className="eyebrow">{t('funds.custom')}</span>
+                <span className="u-visually-hidden">{t('funds.amount')}</span>
                 <input
                   className="field serial"
                   type="number"
@@ -598,6 +592,23 @@ export function AddFunds() {
                   onChange={(e) => setAmount(Math.round(Number(e.target.value) * 100))}
                 />
               </label>
+
+              <div className="field-label">
+                <span className="eyebrow">{t('funds.quick')}</span>
+                <div className="chips" role="group" aria-label={t('funds.quick')}>
+                  {presets.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      className={`chip${amount === p ? ' is-active' : ''}`}
+                      aria-pressed={amount === p}
+                      onClick={() => setAmount(p)}
+                    >
+                      {money(p)}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
 

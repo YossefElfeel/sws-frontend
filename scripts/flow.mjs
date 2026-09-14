@@ -176,9 +176,21 @@ for (const [gw, expect] of [
 // ── Spec 9, the client area ──────────────────────────────────────────────────
 
 await p.evaluate(() => (location.hash = '#/account'));
-await p.waitForSelector('.app__link');
+// The navigation groups start closed, so the links are in the document rather than on the
+// screen. Wait for the control that opens a group, count what the column can still reach,
+// and check that the closing is real and that one click undoes it.
+await p.waitForSelector('.app__group-label');
 const sections = await p.$$eval('.app__link', (n) => n.length);
 ok('sidebar reaches every section', sections === 13, `${sections} sections`);
+const shut = await p.$$eval('.app__group ul', (n) => n.filter((u) => u.hidden).length);
+ok('every navigation group starts closed', shut === 4, `${shut} of 4 closed`);
+await p.click('.app__group-label');
+await p.waitForTimeout(120);
+ok('…and opens on the one you ask for', await p.$eval('.app__group ul', (u) => !u.hidden));
+ok(
+  'a closed group still carries what is waiting in it',
+  (await p.$$eval('.app__group-label .app__link-badge', (n) => n.length)) === 2,
+);
 ok('dashboard shows the four counts', (await p.$$eval('.stat-row .stat', (n) => n.length)) === 4);
 
 // The client area is an application, not another page of the site: none of the marketing
@@ -352,10 +364,15 @@ await p.waitForSelector('.perm-list');
   const before = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
   await p.click('.contact:first-child .btn--secondary');
   await p.waitForTimeout(150);
-  const boxes = await p.$$('.perm-edit__row input');
+  // `.perm-edit__row` was the bare-checkbox row. 822ab72 made each permission a .switch-row,
+  // the same switch the registrar lock and two-factor use, and left this selector behind it —
+  // so the gate stopped finding any permission to tick and threw on the next line.
+  const boxes = await p.$$('.perm-edit__grid .switch-row input');
   ok('a contact opens a permission list', boxes.length > 0, `${boxes.length} permissions`);
 
-  const unchecked = await p.$$eval('.perm-edit__row input', (n) => n.findIndex((b) => !b.checked));
+  const unchecked = await p.$$eval('.perm-edit__grid .switch-row input', (n) =>
+    n.findIndex((b) => !b.checked),
+  );
   await boxes[unchecked].click();
   await p.waitForTimeout(150);
   const after = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
@@ -923,9 +940,13 @@ const firstUpgrade = await p.$eval('a[href*="upgrade"]', (a) => a.getAttribute('
 ok('the first upgrade link is the plan change', firstUpgrade.endsWith('/upgrade'), firstUpgrade);
 ok('exactly one cancel link', (await p.$$('a[href*="cancel"]')).length === 1);
 ok('the auto-renew switch carries its developer note', (await p.$$('.dev-note')).length >= 1);
+// Billing details belong to the side column and are stated there once, so the chip strip
+// under the page is the two things the side column does not carry, and it opens on invoices.
+ok('the chip strip does not repeat the billing details', (await p.$$eval('.filters__btn', (n) => n.length)) === 2);
+ok('the invoices for this service are what it opens on', (await p.$$eval('.card .data tbody tr', (n) => n.length)) >= 2);
 await p.click('.card .filters__btn:nth-child(2)');
 await p.waitForTimeout(120);
-ok('the invoices tab lists this service’s invoices', (await p.$$eval('.card .data tbody tr', (n) => n.length)) >= 2);
+ok('…and the domain it is attached to is beside them', (await p.$$('.card a[href*="/account/domains/"]')).length === 1);
 
 // O-01 for a VPS: server settings gate Continue until they are real.
 await p.evaluate(() => (location.hash = '#/configure/vps-2'));
@@ -953,8 +974,11 @@ await p.evaluate(() => (location.hash = '#/account/status?state=clear'));
 await p.waitForSelector('.card.empty');
 ok('a clear day is an empty state, not an empty list', (await p.$$('.incident')).length === 0);
 await p.evaluate(() => (location.hash = '#/account/status'));
-await p.waitForSelector('.bar select.field');
-await p.selectOption('.bar select.field', 'resolved');
+// The incident filter was a labelled `select.field` in a bar of its own. 76a5f7a put the
+// systems beside the incidents and made it a TableFilter at the end of the incidents' own
+// heading row, which is a .tfilter__select — this selector went with the old shape.
+await p.waitForSelector('.bar__end .tfilter__select');
+await p.selectOption('.bar__end .tfilter__select', 'resolved');
 await p.waitForTimeout(120);
 ok('the incident filter filters', (await p.$$eval('.incident', (n) => n.length)) === 2);
 

@@ -524,13 +524,20 @@
 
 /* ── fields ────────────────────────────────────────────────────────────────── */
 
+/*
+ * Every control a person types or picks in — input, textarea, select, file — is this one
+ * shape. `md` rather than `sm`: the client area's search and filters were pills and the rest
+ * of the forms were 8px, so the product had two answers to "what shape is a control" and
+ * neither matched the other. One radius settles it, and 12 is the step that reads as a field
+ * beside a 16px card without reading as a chip.
+ */
 .field {
   inline-size: 100%;
   min-block-size: var(--sws-input-height-md);
   padding-inline: var(--sws-space-16);
   background: var(--sws-input-bg);
   border: var(--sws-rule-hair) solid var(--sws-input-border);
-  border-radius: var(--sws-radius-sm);
+  border-radius: var(--sws-radius-md);
   color: var(--sws-text-primary);
   font-size: var(--sws-font-size-body);
   transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
@@ -550,12 +557,60 @@
   gap: var(--sws-space-8);
 }
 
+/*
+ * Stacked fields that are not in a .field-grid sat flush against one another, so the second
+ * field's eyebrow read as a caption hanging off the first field's input rather than the start of
+ * a new question. 12px separates the pair without loosening the 8px that ties a label to its own
+ * input.
+ */
+.transfer-form .field-label + .field-label {
+  margin-block-start: var(--sws-space-12);
+}
+
+/*
+ * A dropdown: the field, plus the chevron the browser would otherwise draw hard against the
+ * frame. See components/Select.tsx for why the wrapper has to exist at all.
+ */
+.select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+}
+
+.select > .field {
+  appearance: none;
+  /* 16 + 16 + 8: the margin the text keeps on the other side, the chevron, and the gap that
+     stops a long option name from touching it. */
+  padding-inline-end: calc(var(--sws-space-16) + 16px + var(--sws-space-8));
+  cursor: pointer;
+}
+
+.select__chev {
+  position: absolute;
+  inset-inline-end: var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
+}
+
 .field-grid {
   display: grid;
   gap: var(--sws-space-16);
   /* 12rem, not 15: at 15 a pair needs 30rem plus the gap, which is a hair more than the auth
      card offers, so first/last name collapsed to one column on the widest screen there is. */
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+/*
+ * Four fields that pair two by two — a name with its address, a department with its priority.
+ * `auto-fit` counts what fits and nothing else, so in a frame this wide it seated three on the
+ * first line and left the fourth alone beside a hole two fields across. A count, not a fit:
+ * the pairs are the reason the four are in one group.
+ */
+@media (min-width: 640px) {
+  .field-grid--pairs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .fieldset {
@@ -1030,6 +1085,41 @@
   font-size: var(--sws-font-size-body-sm);
   line-height: var(--sws-line-height-body-sm);
   color: var(--sws-text-secondary);
+}
+
+/* ── the systems list beside the incidents — C-41 ──────────────────────────── */
+/*
+ * Not .with-side, which puts the wide track first: here the rail leads, because the systems
+ * list is what someone reads first and a phone has to stack it first. Its own class rather
+ * than a modifier, so it is not fighting .with-side's 1024 rule down the cascade.
+ *
+ * 1280 — content.roomy — and not 1024, where the sidebar arrives. At 1024 the content column
+ * is about 688px, and a 20rem rail would leave the incident prose 344px: narrower than the
+ * measure it needs to be read, which is the thing the second column exists to give it.
+ */
+.status-pair {
+  display: grid;
+  gap: var(--sws-space-24);
+  align-items: start;
+}
+
+.status-pair > * {
+  min-width: 0;
+}
+
+@media (min-width: 1280px) {
+  .status-pair {
+    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+  }
+}
+
+/* The end of a list's header row: what survived the filter, then the filter. The count keeps
+   TableToolbar's own class so it reads like every other count in the client area, and gives
+   back the top margin it wears when it sits under a search field instead of beside a pill. */
+.bar__end {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
 }
 
 /* ── stands: three things a company page says — M-17 and M-19 ─────────────── */

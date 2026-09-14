@@ -6,7 +6,7 @@ import { ConfirmButton } from '../../components/ConfirmButton';
 import { Card } from '../../components/Card';
 import { StatRow, type StatItem } from '../../components/Stat';
 import { Tag } from '../../components/Tag';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import {
   IconCopy,
   IconPlus,
@@ -55,8 +55,6 @@ export function Announcements() {
         value={q}
         onChange={setQ}
         label={t('search.news')}
-        shown={rows.length}
-        total={ANNOUNCEMENTS.length}
       />
 
       {/* One announcement, one card — the same card the rest of the client area is built from.
@@ -80,6 +78,8 @@ export function Announcements() {
           <p className="empty__note">{t('empty.searchNote')}</p>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={ANNOUNCEMENTS.length} />
     </AccountLayout>
   );
 }
@@ -363,8 +363,6 @@ export function Security() {
         value={logQ}
         onChange={setLogQ}
         label={t('search.log')}
-        shown={logRows.length}
-        total={LOGIN_LOG.length}
       >
         <TableFilter
           label={t('filter.result')}
@@ -407,8 +405,31 @@ export function Security() {
           </div>
         )}
       </div>
+
+      <TableCount shown={logRows.length} total={LOGIN_LOG.length} />
     </AccountLayout>
   );
+}
+
+/**
+ * The monogram on a contact row: one letter from each of the first two words.
+ *
+ * Two Arabic letters set side by side join into a ligature and read as a word: منى
+ * عبدالرحمن gives م and ع, which run together as مع — the preposition "with". A zero-width
+ * non-joiner between them keeps each letter in its isolated form, so a monogram stays a
+ * monogram. It changes nothing in Latin, where the letters never joined.
+ *
+ * The uppercasing is for the Latin half alone — a contact named "New contact" gives "Nc"
+ * without it. Arabic script carries no case mapping at all, so the same call passes م and ط
+ * through untouched rather than needing a branch that asks which language a name is in.
+ */
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('\u200C');
 }
 
 /**
@@ -474,125 +495,171 @@ export function Contacts() {
   };
 
   return (
-    <AccountLayout
-      title={t('acc.contacts')}
-      lede={t('con.lede')}
-      actions={
-        <Button size="md" variant="secondary" onClick={add}>
-          <IconPlus size={15} />
-          {t('con.add')}
-        </Button>
-      }
-    >
+    /*
+     * `bare`: the shell's own title block is off, because this screen is one object and the
+     * title belongs to it. See the frame head below.
+     */
+    <AccountLayout title={t('acc.contacts')} bare>
       <SavedNote saved={saved} onDismiss={clear} />
 
-      <TableToolbar
-        value={q}
-        onChange={setQ}
-        label={t('search.contacts')}
-        shown={shown.length}
-        total={rows.length}
-      >
-        <TableFilter
-          label={t('con.perms')}
-          value={permFilter}
-          onChange={setPermFilter}
-          options={[
-            { value: 'all', label: t('filter.allPermissions') },
-            ...PERMISSIONS.map((p) => ({ value: p, label: t(`perm.${p}` as never) })),
-          ]}
-        />
-      </TableToolbar>
+      <section className="frame">
+        {/*
+         * The title, what the thing is, and the one act the screen offers — inside the frame
+         * that holds them. It used to sit on the page ground above a separate card, so the
+         * screen read as a caption with an unrelated box under it, and the box opened with no
+         * word for what it listed. Named from the inside, the frame is one object: this is the
+         * contacts list, here is how to add to it, here it is.
+         */}
+        <header className="frame__head">
+          <span className="frame__mark" aria-hidden="true">
+            <IconUsers size={22} />
+          </span>
+          <div className="frame__text">
+            <h1 className="frame__title">{t('acc.contacts')}</h1>
+            <p className="frame__lede">{t('con.lede')}</p>
+          </div>
+          <div className="frame__actions">
+            <Button size="md" onClick={add}>
+              <IconPlus size={15} />
+              {t('con.add')}
+            </Button>
+          </div>
+        </header>
 
-      {/* One list, one card, hairline-ruled rows — the same shape as the saved cards on Payment
-          methods. These were `.pm`: separate shadowed panels floating on the ground, so two
-          screens doing the identical job (a list of saved things, each with edit and remove)
-          were built out of two different components. */}
-      {shown.length > 0 ? (
-        <div className="card card--flush">
-          {shown.map((c) => (
-            <div className="contact" key={c.id}>
-              <div className="method-row">
-                <span className="method-row__name">{bi(c.name)}</span>
-                <span className="method-row__exp serial">
-                  <bdi>{c.email}</bdi>
-                </span>
-                <span className="perm-list">
-                  {c.permissions.length > 0 ? (
-                    c.permissions.map((p) => (
-                      <Tag tone="neutral" key={p}>
-                        {t(`perm.${p}` as never)}
-                      </Tag>
-                    ))
-                  ) : (
-                    /* A contact with nothing ticked can still sign in, so saying so is
-                       kinder than an empty space that reads as "not loaded yet". */
-                    <span className="hint">{t('con.noPerms')}</span>
-                  )}
-                </span>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  aria-expanded={editing === c.id}
-                  onClick={() => setEditing(editing === c.id ? null : c.id)}
-                >
-                  {t(editing === c.id ? 'con.done' : 'con.edit')}
-                </Button>
-                <ConfirmButton
-                  label={`${t('action.remove')} ${c.name}`}
-                  onConfirm={() => {
-                    setRows((all) => all.filter((x) => x.id !== c.id));
-                    if (editing === c.id) setEditing(null);
-                  }}
-                >
-                  {t('action.remove')}
-                </ConfirmButton>
-              </div>
+        {/* A search over nothing is a control with nothing to narrow, so an account with no
+            contacts yet gets the head and the invitation, not a toolbar. */}
+        {rows.length > 0 && (
+          <TableToolbar
+            inset
+            value={q}
+            onChange={setQ}
+            label={t('search.contacts')}
+          >
+            <TableFilter
+              label={t('con.perms')}
+              value={permFilter}
+              onChange={setPermFilter}
+              options={[
+                { value: 'all', label: t('filter.allPermissions') },
+                ...PERMISSIONS.map((p) => ({ value: p, label: t(`perm.${p}` as never) })),
+              ]}
+            />
+          </TableToolbar>
+        )}
 
-              {editing === c.id && (
-                <fieldset className="perm-edit">
-                  <legend className="eyebrow">{t('con.perms')}</legend>
-                  <div className="perm-edit__grid">
-                    {PERMISSIONS.map((p) => (
-                      <label className="perm-edit__row" key={p}>
-                        <input
-                          type="checkbox"
-                          checked={c.permissions.includes(p)}
-                          onChange={() => toggle(c.id, p)}
-                        />
-                        <span>
-                          <span className="perm-edit__label">{t(`perm.${p}` as never)}</span>
-                          <span className="perm-edit__note">{t(`perm.${p}.note` as never)}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  <div className="form__foot">
+        {/* A list of people is a list, so it is a <ul>: its length is announced, and the rows
+            are items rather than a run of anonymous divs. */}
+        {shown.length > 0 ? (
+          <ul className="contacts">
+            {shown.map((c) => (
+              <li className={`contact${editing === c.id ? ' is-open' : ''}`} key={c.id}>
+                <div className="contact__row">
+                  {/* The initial is decoration over the name beside it, not information of its
+                      own, so it is hidden rather than read out twice. */}
+                  <span className="contact__avatar" aria-hidden="true">
+                    {initials(bi(c.name))}
+                  </span>
+                  <span className="contact__id">
+                    <span className="contact__name">{bi(c.name)}</span>
+                    <span className="contact__mail serial">
+                      <bdi>{c.email}</bdi>
+                    </span>
+                  </span>
+                  <span className="perm-list">
+                    {c.permissions.length > 0 ? (
+                      c.permissions.map((p) => (
+                        <Tag tone="neutral" key={p}>
+                          {t(`perm.${p}` as never)}
+                        </Tag>
+                      ))
+                    ) : (
+                      /* A contact with nothing ticked can still sign in, so saying so is
+                         kinder than an empty space that reads as "not loaded yet". */
+                      <span className="contact__none">{t('con.noPerms')}</span>
+                    )}
+                  </span>
+                  <span className="contact__acts">
                     <Button
                       size="sm"
-                      onClick={() => {
-                        setEditing(null);
-                        mark(t('con.edited'));
+                      variant="secondary"
+                      aria-expanded={editing === c.id}
+                      onClick={() => setEditing(editing === c.id ? null : c.id)}
+                    >
+                      {t(editing === c.id ? 'con.done' : 'con.edit')}
+                    </Button>
+                    {/* `c.name` is a two-language pair, so this label read "Remove
+                        [object Object]" — on the one control in the client area where knowing
+                        which row you just armed is the whole point of the label. */}
+                    <ConfirmButton
+                      label={`${t('action.remove')} ${bi(c.name)}`}
+                      onConfirm={() => {
+                        setRows((all) => all.filter((x) => x.id !== c.id));
+                        if (editing === c.id) setEditing(null);
                       }}
                     >
-                      {t('sec.save')}
-                    </Button>
-                  </div>
-                </fieldset>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="card empty">
-          <IconUsers size={28} />
-          <p className="empty__title">
-            {t(rows.length === 0 ? 'con.none' : 'empty.contactsFilter')}
-          </p>
-          <p className="empty__note">{t(rows.length === 0 ? 'con.lede' : 'empty.searchNote')}</p>
-        </div>
-      )}
+                      {t('action.remove')}
+                    </ConfirmButton>
+                  </span>
+                </div>
 
+                {editing === c.id && (
+                  <fieldset className="perm-edit">
+                    <legend className="eyebrow perm-edit__legend">{t('con.perms')}</legend>
+                    {/* Switches, not bare platform checkboxes. Granting a permission is the
+                        same act as the registrar lock, auto-renew and two-factor switches
+                        elsewhere in the account — one label, one note, one thing turned on —
+                        and this was the only one of them still drawing the browser's box. */}
+                    <div className="perm-edit__grid">
+                      {PERMISSIONS.map((p) => (
+                        <label className="switch-row" key={p}>
+                          <span>
+                            <span className="switch-row__label">{t(`perm.${p}` as never)}</span>
+                            <span className="switch-row__note">
+                              {t(`perm.${p}.note` as never)}
+                            </span>
+                          </span>
+                          <input
+                            type="checkbox"
+                            checked={c.permissions.includes(p)}
+                            onChange={() => toggle(c.id, p)}
+                          />
+                        </label>
+                      ))}
+                    </div>
+                    <div className="perm-edit__foot">
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setEditing(null);
+                          mark(t('con.edited'));
+                        }}
+                      >
+                        {t('sec.save')}
+                      </Button>
+                    </div>
+                  </fieldset>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          /* Inside the frame rather than instead of it, so the head that names what is missing
+             and the button that fixes it stay on screen with the notice. */
+          <div className="empty empty--inset">
+            <IconUsers size={28} />
+            <p className="empty__title">
+              {t(rows.length === 0 ? 'con.none' : 'empty.contactsFilter')}
+            </p>
+            <p className="empty__note">
+              {t(rows.length === 0 ? 'con.lede' : 'empty.searchNote')}
+            </p>
+          </div>
+        )}
+
+        {/* The toolbar is inside the frame, so the count it answers is too — the frame's foot
+            rather than a line floating under it. */}
+        {rows.length > 0 && <TableCount shown={shown.length} total={rows.length} inset />}
+      </section>
     </AccountLayout>
   );
 }

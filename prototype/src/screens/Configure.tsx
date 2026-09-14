@@ -19,6 +19,7 @@ import {
   type Priced,
 } from '../lib/catalog';
 import { VPS, VPS_OS } from '../lib/products';
+import { Select } from '../components/Select';
 
 /** A hostname is a full name with at least one dot and a real top level. */
 const FQDN = /^(?=.{4,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
@@ -259,8 +260,7 @@ export function Configure() {
 
                   <label className="field-label">
                     <span className="eyebrow">{t('vps.os')}</span>
-                    <select
-                      className="field"
+                    <Select
                       name="os"
                       value={server.os}
                       onChange={(e) => setField('os')(e.target.value)}
@@ -270,7 +270,7 @@ export function Configure() {
                           {os}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                 </div>
               </fieldset>
