@@ -203,6 +203,15 @@ instead: a standing navigation column grouped into four sections with counts on 
 waiting, a bar naming where you are, and no marketing chrome at all — `flow.mjs` asserts zero
 `.masthead` and `.colophon` elements inside `/account`.
 
+**Every menu collapses, and every menu arrives open.** The four sidebar groups and both
+groups on each rail — the hosting categories and the eight pages of a domain — are disclosures
+on the same control: a heading with a chevron, `aria-expanded`, and the links `hidden` rather
+than unmounted, so a shut group is one press away and find-in-page still reaches it. Open is
+the state you arrive in, because a column that greets you closed is four words and no
+navigation, and the link you came for is behind a guess about which word contains it. What a
+reader closes stays closed for as long as the tab lives, across every navigation. Under 900px a
+rail is a chip strip with no heading to press, so its groups are always open there.
+
 Density in the app is about a third tighter than marketing. These screens get read to find one
 row; marketing screens get read to be persuaded.
 

@@ -62,22 +62,68 @@
  * this one drops both for Arabic, where neither means anything, and left the heading with
  * nothing.
  *
- * So it is given three cues that survive the translation. The full weight step to bold. A
- * hairline under it, which no link has and no link can be mistaken for. And position: it hugs
- * the list it names, with the air between two groups belonging to the heading rather than
- * being split evenly either side of it — a heading that sits with its own list is read as that
+ * So it is given four cues that survive the translation. The full weight step to bold. A
+ * hairline under it, which no link has and no link can be mistaken for. Position: it hugs the
+ * list it names, with the air between two groups belonging to the heading rather than being
+ * split evenly either side of it — a heading that sits with its own list is read as that
  * list's label, where one standing equidistant between two is read as a member of whichever it
- * happens to touch.
+ * happens to touch. And now the chevron, which says what the heading does.
+ *
+ * It is a button, because it opens the group it names — the same control the sidebar's group
+ * labels are, doing the same job on the same furniture. What it is not given is a filled hover
+ * pill: that is the links' own affordance, and borrowing it would undo everything above. The
+ * colour lifts and the chevron turns, which is enough to say "press me" without saying "I am
+ * one of the twelve things under me".
  */
 .rail__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  inline-size: 100%;
+  /* An interactive row, so a real target rather than a caption you have to aim at — ADR-0004. */
+  min-block-size: var(--sws-touch-target-min);
   margin-block-end: var(--sws-space-8);
   padding: 0 var(--sws-space-12) var(--sws-space-8);
+  background: none;
+  border: 0;
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  font-family: inherit;
   font-size: var(--sws-font-size-caption);
   font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
+  text-align: start;
   color: var(--sws-text-secondary);
+  cursor: pointer;
+  transition: color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.rail__head:hover {
+  color: var(--sws-text-primary);
+}
+
+/* A long category name shortens rather than pushing the chevron out of the rail. */
+.rail__head-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail__head-chev {
+  flex: none;
+  transition: transform var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.rail__head.is-open .rail__head-chev {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail__head-chev {
+    transition: none;
+  }
 }
 
 :root[lang='ar'] .rail__head {
@@ -95,6 +141,12 @@
   display: grid;
   gap: var(--sws-space-4);
   margin-block-end: var(--sws-space-8);
+}
+
+/* A class selector outranks the browser's own [hidden] rule, so a closed group has to be told
+   to stay closed — the same footnote the sidebar's groups carry. */
+.rail__list[hidden] {
+  display: none;
 }
 
 .rail__link {
@@ -149,7 +201,15 @@
     display: none;
   }
 
-  .rail__list {
+  .rail__list,
+  /*
+   * The heading is the control that closes a group, and at this width there is no heading —
+   * so a group closed on a desktop and then carried to a phone would be shut with nothing on
+   * the screen able to open it. The strips are always open here, which is also the right
+   * answer on its own terms: a chip row costs one line, and the disclosure it would take to
+   * fold it away costs about as much as the row it hides.
+   */
+  .rail__list[hidden] {
     display: flex;
     gap: var(--sws-space-8);
     overflow-x: auto;

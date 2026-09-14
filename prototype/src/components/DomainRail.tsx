@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { AccountLayout } from './AccountLayout';
+import { RailGroup } from './RailGroup';
 import { Tag, DOMAIN_TONE } from './Tag';
 import { IconArrow, IconPlus } from './icons';
 import { useLocale } from '../lib/locale';
@@ -60,8 +61,7 @@ export function DomainPage({
     >
       <div className="with-rail with-rail--domain">
         <aside className="rail rail--domain" aria-label={t('svc.manage')}>
-          <p className="rail__head">{t('svc.manage')}</p>
-          <ul className="rail__list">
+          <RailGroup id="domain-manage" label={t('svc.manage')}>
             {PAGES.map((p) => (
               <li key={p.slug}>
                 <NavLink className="rail__link" to={p.slug ? `${base}/${p.slug}` : base} end={!p.slug}>
@@ -69,10 +69,9 @@ export function DomainPage({
                 </NavLink>
               </li>
             ))}
-          </ul>
+          </RailGroup>
 
-          <p className="rail__head">{t('rail.actions')}</p>
-          <ul className="rail__list">
+          <RailGroup id="domain-actions" label={t('rail.actions')}>
             <li>
               <Link className="rail__link" to={`/account/renew/${dom.id}`}>
                 <IconArrow size={15} />
@@ -91,7 +90,7 @@ export function DomainPage({
                 {t('rail.transfer')}
               </Link>
             </li>
-          </ul>
+          </RailGroup>
         </aside>
 
         <div className="with-rail__body">{children}</div>
