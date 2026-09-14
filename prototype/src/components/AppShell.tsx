@@ -104,10 +104,13 @@ function useGroups(): { label: string; items: Section[] }[] {
 /**
  * Which navigation groups are open, remembered for as long as the tab is. It lives outside
  * the component because the shell remounts on every navigation, and a group the reader had
- * just opened would otherwise shut under the very click that used it. A reload starts closed
- * again, which is the state the column is designed around.
+ * just closed would otherwise spring open under the very click that used it.
+ *
+ * `null` is "the reader has not said", which is not the same as "the reader closed all four"
+ * — it is what lets the column open every group on arrival and still honour a column closed
+ * down to one. A reload starts open again.
  */
-let openedGroups: string[] = [];
+let openedGroups: string[] | null = null;
 
 export function AppShell({
   title,
@@ -141,9 +144,13 @@ export function AppShell({
   const { theme, toggleTheme } = usePrefs();
   const groups = useGroups();
   const [open, setOpen] = useState(false);
-  // Thirteen links standing open is a list to read. Closed, the column is four short
-  // decisions, and the bar above still names where you are.
-  const [openGroups, setOpenGroups] = useState<string[]>(() => openedGroups);
+  // Open on arrival. A column that greets you shut is four labels and no navigation: every
+  // reader pays a click before the product has a menu at all, and the one link they came for
+  // is behind a guess about which of four words contains it. The groups stay collapsible, so
+  // a reader who has finished with billing can shut it and keep it shut.
+  const [openGroups, setOpenGroups] = useState<string[]>(
+    () => openedGroups ?? groups.map((g) => g.label),
+  );
   const [bell, setBell] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
@@ -166,8 +173,9 @@ export function AppShell({
 
   const toggleGroup = (label: string) =>
     setOpenGroups((prev) => {
-      openedGroups = prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label];
-      return openedGroups;
+      const next = prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label];
+      openedGroups = next;
+      return next;
     });
 
   const name = bi(ACCOUNT.name);

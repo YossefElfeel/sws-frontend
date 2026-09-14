@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Layout } from './Layout';
+import { RailGroup } from './RailGroup';
 import { IconCart, IconArrow } from './icons';
 import { useLocale } from '../lib/locale';
 import { FAMILIES } from '../lib/products';
@@ -50,8 +51,7 @@ export function HostingLayout({
       <section className="section shell">
         <div className="with-rail">
           <aside className="rail" aria-label={t('rail.categories')}>
-            <p className="rail__head">{t('rail.categories')}</p>
-            <ul className="rail__list">
+            <RailGroup id="hosting-categories" label={t('rail.categories')}>
               {FAMILIES.map((f) => (
                 <li key={f.id}>
                   <NavLink className="rail__link" to={f.path}>
@@ -59,10 +59,9 @@ export function HostingLayout({
                   </NavLink>
                 </li>
               ))}
-            </ul>
+            </RailGroup>
 
-            <p className="rail__head">{t('rail.actions')}</p>
-            <ul className="rail__list">
+            <RailGroup id="hosting-actions" label={t('rail.actions')}>
               <li>
                 <Link className="rail__link" to="/domains/pricing">
                   <IconArrow size={15} />
@@ -87,7 +86,7 @@ export function HostingLayout({
                   {t('rail.viewCart')}
                 </Link>
               </li>
-            </ul>
+            </RailGroup>
           </aside>
 
           <div className="with-rail__body">{children}</div>

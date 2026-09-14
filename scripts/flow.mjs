@@ -176,21 +176,31 @@ for (const [gw, expect] of [
 // ── Spec 9, the client area ──────────────────────────────────────────────────
 
 await p.evaluate(() => (location.hash = '#/account'));
-// The navigation groups start closed, so the links are in the document rather than on the
-// screen. Wait for the control that opens a group, count what the column can still reach,
-// and check that the closing is real and that one click undoes it.
+// The navigation groups arrive open, so the column is a menu on sight rather than four words
+// standing over a menu. Count what it reaches, then close every group and check that the
+// closing is real, that a shut group still says what is waiting in it, and that the same
+// control opens it again.
 await p.waitForSelector('.app__group-label');
 const sections = await p.$$eval('.app__link', (n) => n.length);
 ok('sidebar reaches every section', sections === 13, `${sections} sections`);
-const shut = await p.$$eval('.app__group ul', (n) => n.filter((u) => u.hidden).length);
-ok('every navigation group starts closed', shut === 4, `${shut} of 4 closed`);
-await p.click('.app__group-label');
+const shown = await p.$$eval('.app__group ul', (n) => n.filter((u) => !u.hidden).length);
+ok('every navigation group starts open', shown === 4, `${shown} of 4 open`);
+for (const label of await p.$$('.app__group-label')) await label.click();
 await p.waitForTimeout(120);
-ok('…and opens on the one you ask for', await p.$eval('.app__group ul', (u) => !u.hidden));
+const shut = await p.$$eval('.app__group ul', (n) => n.filter((u) => u.hidden).length);
+ok('…and every one of them collapses', shut === 4, `${shut} of 4 closed`);
 ok(
   'a closed group still carries what is waiting in it',
   (await p.$$eval('.app__group-label .app__link-badge', (n) => n.length)) === 2,
 );
+await p.click('.app__group-label');
+await p.waitForTimeout(120);
+ok('…and opens again on the control that closed it', await p.$eval('.app__group ul', (u) => !u.hidden));
+// Left as it is found, so the screens checked below are measured against the standing column.
+for (const label of await p.$$('.app__group-label')) {
+  if (await label.evaluate((b) => b.getAttribute('aria-expanded') === 'false')) await label.click();
+}
+await p.waitForTimeout(120);
 ok('dashboard shows the four counts', (await p.$$eval('.stat-row .stat', (n) => n.length)) === 4);
 
 // The client area is an application, not another page of the site: none of the marketing
@@ -222,6 +232,15 @@ await p.waitForSelector('.data tbody tr');
 const dns = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('DNS records listed', dns >= 5, `${dns} records`);
 ok('the domain rail lists eight pages', (await p.$$eval('.rail--domain .rail__list:first-of-type .rail__link', (n) => n.length)) === 8);
+// The rail's headings are disclosures too, and like the sidebar's they arrive open.
+const railOpen = await p.$$eval('.rail--domain .rail__list', (n) => n.filter((u) => !u.hidden).length);
+ok('the domain rail arrives open', railOpen === 2, `${railOpen} of 2 open`);
+await p.click('.rail--domain .rail__head');
+await p.waitForTimeout(120);
+ok('…and its groups collapse', await p.$eval('.rail--domain .rail__list', (u) => u.hidden));
+await p.click('.rail--domain .rail__head');
+await p.waitForTimeout(120);
+ok('…and open again', await p.$eval('.rail--domain .rail__list', (u) => !u.hidden));
 await p.evaluate(() => (location.hash = '#/account/domains/dom-3/dns'));
 await p.waitForSelector('.card.empty');
 ok('a domain with no records says so', (await p.$$('.card.empty')).length === 1);
@@ -785,7 +804,17 @@ await p.setViewportSize({ width: 1440, height: 900 });
   await p.evaluate(() => (location.hash = '#/account'));
   await p.waitForSelector('.icon--dir');
   const rtl = await p.evaluate(() => {
-    const mirrored = (el) => getComputedStyle(el).transform.includes('-1');
+    /*
+     * Mirrored means flipped across the vertical axis — scaleX(-1), which is a < 0 with d
+     * left alone. Matching the string "-1" anywhere in the matrix also caught every icon
+     * that merely turns: rotate(180deg) is matrix(-1, 0, 0, -1, 0, 0), which is what an open
+     * disclosure chevron and the pager's own arrows compute to. Those are turned, not
+     * flipped, and the distinction is the whole point of the check.
+     */
+    const mirrored = (el) => {
+      const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+      return m.a < 0 && m.d > 0;
+    };
     return {
       dir: document.documentElement.getAttribute('dir'),
       dirTotal: document.querySelectorAll('.icon--dir').length,
