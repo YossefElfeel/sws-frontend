@@ -1990,6 +1990,44 @@
   box-shadow: none;
 }
 
+/*
+ * The status board is shared with the public status page (M-16), where its blocks are lifted
+ * marketing cards at the xl radius. In here xl does not exist, so the headline takes the
+ * client-area radius and the incidents become bordered blocks on the flat ground — the same
+ * move the knowledgebase list makes above, for the same reason.
+ *
+ * The systems list gives up its frame entirely. It is already inside a card that names it, and
+ * a shadowed 24px card inset 24px into a bordered 16px one is the double frame this file spent
+ * an audit removing — visible here as the heading sitting 24px off the rows it labels, because
+ * the head was measuring from the outer card and the rows from the inner one.
+ */
+.app__main .headline {
+  border-radius: var(--sws-radius-lg);
+}
+
+.app__main .incident {
+  border-radius: var(--sws-radius-lg);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  box-shadow: none;
+}
+
+.app__main .sys {
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/*
+ * Between the sidebar arriving at 1024 and the pair splitting at 1280 the list is full width
+ * again, and a row of two words would put the state most of a column away from the name it
+ * belongs to. Capping the name stops the spread without breaking the scan: every name grows to
+ * the same width, so the states still line up in a column — they just stop at a readable
+ * distance. In the rail the cap is wider than the track, so nothing there changes.
+ */
+.app__main .sys__name {
+  max-inline-size: 22rem;
+}
+
 /* ── a file field is a field ───────────────────────────────────────────────── */
 /*
  * The design system declares a full set of file-uploader tokens — border, ground, height, focus
