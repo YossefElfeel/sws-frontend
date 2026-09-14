@@ -7,6 +7,7 @@ import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { TLDS, convert, formatAmount } from '../lib/catalog';
+import { Select } from '../components/Select';
 
 type Choice = 'cart' | 'register' | 'transfer' | 'own';
 
@@ -127,9 +128,8 @@ export function DomainStep() {
               <label className="u-visually-hidden" htmlFor="dom-cart">
                 {t('domainstep.fromCartPick')}
               </label>
-              <select
+              <Select
                 id="dom-cart"
-                className="field"
                 dir="ltr"
                 value={fromCart}
                 onChange={(e) => setFromCart(e.target.value)}
@@ -140,7 +140,7 @@ export function DomainStep() {
                     {d.domain?.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             {!canContinue && <p className="domain-strip__note">{t('domainstep.required')}</p>}
           </div>
@@ -170,8 +170,8 @@ export function DomainStep() {
                 }}
               />
               {choice === 'register' && (
-                <select
-                  className="field domain-strip__tld"
+                <Select
+                  wrapClassName="domain-strip__tld"
                   dir="ltr"
                   aria-label={t('domainstep.tld')}
                   value={tld}
@@ -185,7 +185,7 @@ export function DomainStep() {
                       {x.tld}
                     </option>
                   ))}
-                </select>
+                </Select>
               )}
               <Button size="lg" type="submit" variant="secondary">
                 {choice === 'register' ? <IconSearch size={17} /> : null}

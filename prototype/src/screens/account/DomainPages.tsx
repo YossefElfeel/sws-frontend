@@ -4,7 +4,7 @@ import { DomainPage } from '../../components/DomainRail';
 import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
 import { Tag, DOMAIN_TONE } from '../../components/Tag';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import {
   IconPlus,
   IconTrash,
@@ -29,6 +29,7 @@ import {
   type ContactRole,
   type DnsType,
 } from '../../lib/account';
+import { Select } from '../../components/Select';
 
 /*
  * Domain management — spec 9.3, C-10 to C-13 and C-37 to C-40.
@@ -377,13 +378,13 @@ export function DomainDns() {
           <div className="field-grid dns-add">
             <label className="field-label">
               <span className="eyebrow">{t('dom.type')}</span>
-              <select className="field" value={type} onChange={(e) => setType(e.target.value as DnsType)}>
+              <Select value={type} onChange={(e) => setType(e.target.value as DnsType)}>
                 {DNS_TYPES.map((x) => (
                   <option key={x} value={x}>
                     {x}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field-label">
               <span className="eyebrow">{t('dom.host')}</span>
@@ -438,8 +439,6 @@ export function DomainDns() {
             value={dnsQ}
             onChange={setDnsQ}
             label={t('search.dns')}
-            shown={dnsRows.length}
-            total={rows.length}
           >
             <TableFilter
               label={t('filter.recordType')}
@@ -493,6 +492,7 @@ export function DomainDns() {
               <p className="empty__note">{t(dnsQ.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
             </div>
           )}
+          <TableCount shown={dnsRows.length} total={rows.length} inset />
         </section>
       ) : (
         <div className="card empty">
@@ -608,13 +608,13 @@ function ContactForm({
           </label>
           <label className="field-label">
             <span className="eyebrow">{t('checkout.country')}</span>
-            <select className="field" required {...field('country')}>
+            <Select required {...field('country')}>
               {COUNTRIES.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="field-label">
             <span className="eyebrow">{t('checkout.phone')}</span>
@@ -785,8 +785,7 @@ export function DomainPrivateNs() {
           <div className="field-grid">
             <label className="field-label">
               <span className="eyebrow">{t('dom.nsHost')}</span>
-              <select
-                className="field"
+              <Select
                 value={mod.host}
                 onChange={(e) => setMod((m) => ({ ...m, host: e.target.value }))}
               >
@@ -795,7 +794,7 @@ export function DomainPrivateNs() {
                     {n.host}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="field-label">
               <span className="eyebrow">{t('dom.nsCurrentIp')}</span>
@@ -840,13 +839,13 @@ export function DomainPrivateNs() {
         <div className="form">
           <label className="field-label">
             <span className="eyebrow">{t('dom.nsHost')}</span>
-            <select className="field" value={del} onChange={(e) => setDel(e.target.value)}>
+            <Select value={del} onChange={(e) => setDel(e.target.value)}>
               {list.map((n) => (
                 <option key={n.host} value={n.host}>
                   {n.host}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <div className="form__foot">
             <Button type="submit" size="md" variant="danger" disabled={list.length === 0}>

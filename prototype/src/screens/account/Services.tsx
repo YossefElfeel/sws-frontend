@@ -4,7 +4,7 @@ import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { DevNote } from '../../components/DevNote';
 import { Tag, SERVICE_TONE, DOMAIN_TONE, INVOICE_TONE } from '../../components/Tag';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import {
   IconArrow,
   IconExternal,
@@ -32,6 +32,7 @@ import {
   CPANEL_APPS,
   type ServiceStatus,
 } from '../../lib/account';
+import { Select } from '../../components/Select';
 
 /** The statuses a service can be filtered to, matching invoices and tickets. */
 const STATUSES: (ServiceStatus | 'all')[] = ['all', 'active', 'pending', 'suspended'];
@@ -63,8 +64,6 @@ export function Services() {
         value={q}
         onChange={setQ}
         label={t('search.services')}
-        shown={rows.length}
-        total={services.length}
       >
         <TableFilter
           label={t('account.status')}
@@ -125,6 +124,8 @@ export function Services() {
           <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={services.length} />
     </AccountLayout>
   );
 }
@@ -421,7 +422,7 @@ export function ServiceDetail() {
             <div className="form u-mt-16">
               <label className="field-label">
                 <span className="eyebrow">{t('svc.addonPick')}</span>
-                <select className="field" value={pick} onChange={(e) => setPick(e.target.value)}>
+                <Select value={pick} onChange={(e) => setPick(e.target.value)}>
                   <option value="">{t('svc.addonPick')}</option>
                   {purchasable.map((p) => (
                     <option key={p.key} value={p.key}>
@@ -429,7 +430,7 @@ export function ServiceDetail() {
                       {p.opt.per === 'year' ? 'yr' : 'mo'}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <div className="form__foot">
                 <Button size="md" disabled={!pick} onClick={buyAddon}>

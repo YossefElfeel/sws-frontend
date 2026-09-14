@@ -16,6 +16,9 @@ import { useLocale } from '../lib/locale';
  * that has to stay wide enough to type a domain into. A strip of five statuses is five widths
  * that change with the language; a select is one, and it holds its width when German or Arabic
  * runs long.
+ *
+ * The count that answers the search is not here. It is `<TableCount>`, which the screen puts
+ * under the table — see its note for why.
  */
 
 interface ToolbarProps {
@@ -26,22 +29,11 @@ interface ToolbarProps {
   label: string;
   /** Filters for this table: TableFilter elements, rendered after the field. */
   children?: ReactNode;
-  /** How many rows survived, out of how many there are. */
-  shown?: number;
-  total?: number;
   /** Set when the toolbar sits inside a flush card, above the table it narrows. */
   inset?: boolean;
 }
 
-export function TableToolbar({
-  value,
-  onChange,
-  label,
-  children,
-  shown,
-  total,
-  inset,
-}: ToolbarProps) {
+export function TableToolbar({ value, onChange, label, children, inset }: ToolbarProps) {
   const { t } = useLocale();
   // Not derived from the label: \W eats every Arabic letter, so both languages have to keep
   // their own id rather than one collapsing to the same string on every screen.
@@ -70,15 +62,43 @@ export function TableToolbar({
             the whole group to a second line rather than stranding the last pill on its own. */}
         {children && <div className="tbar__filters">{children}</div>}
       </form>
-
-      {/* The count answers the question the search just asked, so it sits under the field
-          rather than in the row — the row is the control, this is its result. */}
-      {shown !== undefined && total !== undefined && (
-        <p className="tbar__count" role="status">
-          <span className="serial">{shown}</span> {t('dash.of')} <span className="serial">{total}</span>
-        </p>
-      )}
     </div>
+  );
+}
+
+interface CountProps {
+  /** How many rows survived, out of how many there are. */
+  shown: number;
+  total: number;
+  /** Set when the count sits inside the flush card, under the table it counts. */
+  inset?: boolean;
+}
+
+/**
+ * How many rows the list is showing, under the list.
+ *
+ * It used to sit directly under the search field, tight against the control that produced it.
+ * Read in place that is a caption on the search box, and it pushed the table down by a line
+ * on every screen in the client area. A count belongs where a page number belongs — at the
+ * foot of the thing it counts — so that is where it goes, and the toolbar is now only
+ * controls.
+ *
+ * It renders at zero as well, and deliberately: `role="status"` only announces while it is
+ * mounted, so a component that unmounted itself on an empty result would go silent at exactly
+ * the moment there is something to say.
+ *
+ * `inset` follows the toolbar rather than the table: where the search sits inside the flush
+ * card, the count is that card's foot; where the search sits above the card, the count sits
+ * below it. Splitting the pair across the card's edge is what made the DNS card look like two
+ * different components stacked.
+ */
+export function TableCount({ shown, total, inset }: CountProps) {
+  const { t } = useLocale();
+
+  return (
+    <p className={`tcount${inset ? ' tcount--inset' : ''}`} role="status">
+      <span className="serial">{shown}</span> {t('dash.of')} <span className="serial">{total}</span>
+    </p>
   );
 }
 
@@ -91,8 +111,8 @@ interface FilterProps<T extends string> {
 }
 
 /**
- * One pill select. The chosen option is the label — "All statuses" reads as both the state and
- * the name of the control, which is why there is no separate caption above it.
+ * One filter select. The chosen option is the label — "All statuses" reads as both the state
+ * and the name of the control, which is why there is no separate caption above it.
  */
 export function TableFilter<T extends string>({ label, value, onChange, options }: FilterProps<T>) {
   return (

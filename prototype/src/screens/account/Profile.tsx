@@ -6,7 +6,7 @@ import { ConfirmButton } from '../../components/ConfirmButton';
 import { Card } from '../../components/Card';
 import { StatRow, type StatItem } from '../../components/Stat';
 import { Tag } from '../../components/Tag';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import {
   IconCopy,
   IconPlus,
@@ -55,8 +55,6 @@ export function Announcements() {
         value={q}
         onChange={setQ}
         label={t('search.news')}
-        shown={rows.length}
-        total={ANNOUNCEMENTS.length}
       />
 
       {/* One announcement, one card — the same card the rest of the client area is built from.
@@ -80,6 +78,8 @@ export function Announcements() {
           <p className="empty__note">{t('empty.searchNote')}</p>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={ANNOUNCEMENTS.length} />
     </AccountLayout>
   );
 }
@@ -363,8 +363,6 @@ export function Security() {
         value={logQ}
         onChange={setLogQ}
         label={t('search.log')}
-        shown={logRows.length}
-        total={LOGIN_LOG.length}
       >
         <TableFilter
           label={t('filter.result')}
@@ -407,6 +405,8 @@ export function Security() {
           </div>
         )}
       </div>
+
+      <TableCount shown={logRows.length} total={LOGIN_LOG.length} />
     </AccountLayout>
   );
 }
@@ -490,8 +490,6 @@ export function Contacts() {
         value={q}
         onChange={setQ}
         label={t('search.contacts')}
-        shown={shown.length}
-        total={rows.length}
       >
         <TableFilter
           label={t('con.perms')}
@@ -593,6 +591,7 @@ export function Contacts() {
         </div>
       )}
 
+      <TableCount shown={shown.length} total={rows.length} />
     </AccountLayout>
   );
 }

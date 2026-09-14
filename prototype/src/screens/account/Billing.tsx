@@ -15,7 +15,7 @@ import {
   IconWallet,
   IconAlert,
 } from '../../components/icons';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
@@ -38,6 +38,7 @@ import {
   type InvoiceLine,
 } from '../../lib/account';
 import { gatewayDestination } from '../Order';
+import { Select } from '../../components/Select';
 
 const FILTERS: (InvoiceStatus | 'all')[] = ['all', 'unpaid', 'paid', 'overdue', 'cancelled'];
 
@@ -105,8 +106,6 @@ export function Invoices() {
         value={q}
         onChange={setQ}
         label={t('search.invoices')}
-        shown={rows.length}
-        total={INVOICES.length}
       >
         <TableFilter
           label={t('account.status')}
@@ -162,6 +161,8 @@ export function Invoices() {
           </table>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={INVOICES.length} />
     </AccountLayout>
   );
 }
@@ -464,13 +465,13 @@ export function InvoiceDetail() {
 
               <label className="field-label u-mt-16">
                 <span className="eyebrow">{t('checkout.method')}</span>
-                <select className="field" value={method} onChange={(e) => setMethod(e.target.value)}>
+                <Select value={method} onChange={(e) => setMethod(e.target.value)}>
                   {gateways.map((g) => (
                     <option key={g.id} value={g.id}>
                       {t(g.labelKey as never)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
 
               {chosen && (
