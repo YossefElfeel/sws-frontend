@@ -259,7 +259,8 @@ export function TicketNew() {
         >
           <fieldset className="fieldset">
             <legend>{t('tkt.info')}</legend>
-            <div className="field-grid">
+            {/* Two by two, not three and a stray: these four read as the pairs they are. */}
+            <div className="field-grid field-grid--pairs">
               <label className="field-label">
                 <span className="eyebrow">{t('checkout.name')}</span>
                 <input className="field" defaultValue="Kamal Abdelrahman" />

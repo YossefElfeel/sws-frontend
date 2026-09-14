@@ -471,6 +471,18 @@
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
+/*
+ * Four fields that pair two by two — a name with its address, a department with its priority.
+ * `auto-fit` counts what fits and nothing else, so in a frame this wide it seated three on the
+ * first line and left the fourth alone beside a hole two fields across. A count, not a fit:
+ * the pairs are the reason the four are in one group.
+ */
+@media (min-width: 640px) {
+  .field-grid--pairs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .fieldset {
   margin: 0 0 var(--sws-space-32);
   padding: 0;
