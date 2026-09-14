@@ -14,9 +14,15 @@ import { FAMILIES, OFFERS, VPS, type Offer } from '../lib/products';
  * Every hosting category page — spec 6.2 and 6.3.
  *
  * One route serves them all because the spec says they share a template. What differs is the
- * presentation the spec asks for per family: cards for the plan-shaped families, a comparison
- * table for VPS because its options are too technical for cards, and a preview-led page for
- * Website Builder.
+ * presentation per family: cards for the plan-shaped families, and a comparison table for VPS
+ * because its options are too technical for cards.
+ *
+ * Website Builder used to be a third: spec 6.3 asks it to lead with a template preview, and it
+ * did — a drawn wireframe beside a card offering a free trial. Both are gone at the product
+ * owner's request; the page is its tiers now, like every other card family. The drawing was the
+ * reason to keep it and the reason to drop it: with no template set decided, it previewed
+ * nothing, and a preview of nothing at the head of a pricing page is a promise the product
+ * cannot keep yet.
  */
 export function Family() {
   const { t } = useLocale();
@@ -36,13 +42,6 @@ export function Family() {
       {meta.id === 'shared' && <PlanCards />}
       {meta.layout === 'cards' && meta.id !== 'shared' && <OfferCards offers={OFFERS[meta.id] ?? []} />}
       {meta.id === 'vps' && <VpsTable />}
-      {/* Spec 6.3: the preview leads, the tiers follow underneath it. */}
-      {meta.id === 'builder' && (
-        <>
-          <BuilderPreview />
-          <OfferCards offers={OFFERS.builder ?? []} />
-        </>
-      )}
       {meta.id === 'monitoring' && <AlertsNote />}
     </HostingLayout>
   );
@@ -167,50 +166,6 @@ function VpsTable() {
         </table>
       </div>
     </>
-  );
-}
-
-/** Spec 6.3: Website Builder leads with a preview, not a price list. */
-function BuilderPreview() {
-  const { t } = useLocale();
-  const { add } = useCart();
-  const navigate = useNavigate();
-
-  return (
-    <div className="builder">
-      <div className="builder__frame" role="img" aria-label={t('builder.preview')}>
-        <span className="builder__bar" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
-        <span className="builder__canvas" aria-hidden="true">
-          <span className="builder__block builder__block--hero" />
-          <span className="builder__row">
-            <span className="builder__block" />
-            <span className="builder__block" />
-            <span className="builder__block" />
-          </span>
-          <span className="builder__block builder__block--wide" />
-        </span>
-      </div>
-
-      <div className="builder__side">
-        <h2 className="card__title">{t('builder.preview')}</h2>
-        <p className="card__body">{t('builder.previewNote')}</p>
-        <Button
-          size="lg"
-          onClick={() => {
-            // "Try it free" orders the free tier, not an unspecified something.
-            const free = OFFERS.builder?.find((o) => o.monthlyUsdMinor === 0);
-            if (free) add({ plan: free, cycle: 'monthly', addons: {} });
-            navigate('/cart');
-          }}
-        >
-          {t('builder.try')}
-        </Button>
-      </div>
-    </div>
   );
 }
 

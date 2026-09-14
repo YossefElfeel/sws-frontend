@@ -2,10 +2,14 @@
  * The remaining product families — spec 5.1 and 6.3.
  *
  * The spec is specific that these pages share one template but not one presentation: VPS uses
- * a comparison table because its options are too technical for simple cards, SSL uses cards
- * grouped by certificate type with a "most ordered" badge, and Website Builder leads with a
- * preview rather than a price list. Those differences are encoded here rather than left to
- * each screen to reinvent.
+ * a comparison table because its options are too technical for simple cards, and SSL uses cards
+ * grouped by certificate type with a "most ordered" badge. Those differences are encoded here
+ * rather than left to each screen to reinvent.
+ *
+ * Website Builder was a third — spec 6.3 asks it to lead with a template preview — and is a
+ * card family now at the product owner's request. The 'preview' layout went with it rather than
+ * staying as a value nothing selects: a union listing a presentation no family uses sends the
+ * next reader looking for a screen that is not there.
  */
 
 export type Family =
@@ -23,8 +27,8 @@ export interface FamilyMeta {
   path: string;
   titleKey: string;
   ledeKey: string;
-  /** How the spec asks this family to be presented. */
-  layout: 'cards' | 'table' | 'preview';
+  /** How this family is presented. See the note above on the one that changed. */
+  layout: 'cards' | 'table';
 }
 
 export const FAMILIES: FamilyMeta[] = [
@@ -35,7 +39,7 @@ export const FAMILIES: FamilyMeta[] = [
   { id: 'vps', path: '/hosting/vps', titleKey: 'fam.vps', ledeKey: 'fam.vps.lede', layout: 'table' },
   { id: 'monitoring', path: '/hosting/monitoring', titleKey: 'fam.monitoring', ledeKey: 'fam.monitoring.lede', layout: 'cards' },
   { id: 'ssl', path: '/ssl', titleKey: 'fam.ssl', ledeKey: 'fam.ssl.lede', layout: 'cards' },
-  { id: 'builder', path: '/builder', titleKey: 'fam.builder', ledeKey: 'fam.builder.lede', layout: 'preview' },
+  { id: 'builder', path: '/builder', titleKey: 'fam.builder', ledeKey: 'fam.builder.lede', layout: 'cards' },
 ];
 
 /** A generic priced offer, used by every family that presents as cards. */
