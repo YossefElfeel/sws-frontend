@@ -558,13 +558,28 @@
 }
 
 /*
- * Stacked fields that are not in a .field-grid sat flush against one another, so the second
- * field's eyebrow read as a caption hanging off the first field's input rather than the start of
- * a new question. 12px separates the pair without loosening the 8px that ties a label to its own
- * input.
+ * Stacked fields sat flush against one another — zero space — so the second field's eyebrow read
+ * as a caption hanging off the first field's input rather than the start of a new question.
+ *
+ * 16, and the number is forced rather than picked. `.field-label` binds a label to its own input
+ * with 8, so whatever separates two fields has to be clearly more than 8 or the two spacings
+ * read the same and the pairing stops being legible — the thing this rule exists to fix. 16 is
+ * the next step on the scale, and it is already the gap `.field-grid` puts between name and
+ * email, so a form keeps one rhythm whether its fields sit beside each other or under.
+ *
+ * It used to be 12 and scoped to `.transfer-form`, where this was first noticed. Contact and the
+ * migration request had the same defect and none of the fix, which is what a rule scoped to one
+ * screen buys you. It is the panel's own children now.
+ *
+ * Direct children, and that matters: `.field-grid` and `.stack` already space their own contents
+ * with a gap, and a margin on top of a gap doubles it — or, inside the grid's first row, shunts
+ * one field down past the one beside it.
  */
-.transfer-form .field-label + .field-label {
-  margin-block-start: var(--sws-space-12);
+.panel--pad > .field-label + .field-label,
+.panel--pad > .field-label + .field-grid,
+.panel--pad > .field-grid + .field-label,
+.panel--pad > .field-grid + .field-grid {
+  margin-block-start: var(--sws-space-16);
 }
 
 /*
