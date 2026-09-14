@@ -54,14 +54,34 @@
   border-radius: var(--sws-radius-lg);
 }
 
+/*
+ * The group headings carry the brand ink rather than the secondary grey they had.
+ *
+ * There are two groups in this rail and they are different kinds of thing — the categories are
+ * where you are, the actions are what you can do — but in grey, at caption size, one ran into
+ * the other and the rail read as a single twelve-item list with two faint labels in it. Brand
+ * ink says "this is a heading, and a new one starts here".
+ */
 .rail__head {
   padding: var(--sws-space-8) var(--sws-space-12);
   font-size: var(--sws-font-size-caption);
   font-weight: var(--sws-weight-semibold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
-  color: var(--sws-text-secondary);
+  color: var(--sws-action-quiet);
 }
+
+/*
+ * And the space to go with the colour. A heading that follows a list is the start of a second
+ * group, so it gets a rule and a gap — the two blocks were 8px apart, which is the gap between
+ * two links, so the rail offered no way to tell a group break from a list item.
+ */
+.rail__list + .rail__head {
+  margin-block-start: var(--sws-space-16);
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
 
 :root[lang='ar'] .rail__head {
   letter-spacing: var(--sws-tracking-normal);
@@ -90,8 +110,11 @@
     color var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
+/* The actions carry a glyph and the categories do not, so the glyph is where the actions group
+   gets its colour — the link text stays the rail's own ink until it is hovered or current. */
 .rail__link svg {
   flex: none;
+  color: var(--sws-action-primary);
 }
 
 .rail__link:hover {

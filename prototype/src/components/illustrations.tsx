@@ -142,3 +142,125 @@ export function ArtEmpty({ className }: ArtProps) {
     </svg>
   );
 }
+
+/*
+ * The three house-ad drawings — one per promo on the dashboard rail.
+ *
+ * They share a 220x150 box so the rail's art slot never resizes as the promo changes: a
+ * drawing that grows or shrinks between slides moves the headline beside it, and a headline
+ * that moves while it is being read is the reason carousels are disliked. Same rules as the
+ * pieces above — schematic, no lettering, nothing that stands in for a figure.
+ */
+const promoFrame = (className?: string) => frame('0 0 220 150', className);
+
+/** SSL — a certificate with a padlock on it, which is the whole of what a visitor is shown. */
+export function ArtSsl({ className }: ArtProps) {
+  return (
+    <svg {...promoFrame(className)}>
+      <ellipse cx="110" cy="132" rx="74" ry="9" fill="var(--sws-action-subtle-bg)" stroke="none" />
+
+      {/* the browser bar the padlock actually appears in */}
+      <g strokeWidth={HAIR}>
+        <rect x="26" y="24" width="120" height="28" rx="10" fill="var(--sws-card-tile-bg)" {...line} />
+        <path d="M62 38h58" opacity="0.5" {...line} />
+      </g>
+
+      {/* the certificate */}
+      <rect
+        x="26"
+        y="62"
+        width="120"
+        height="56"
+        rx="12"
+        fill="var(--sws-surface-raised)"
+        strokeWidth={EDGE}
+        {...line}
+      />
+      <g strokeWidth={HAIR} opacity="0.5">
+        <path d="M46 80h56" {...line} />
+        <path d="M46 96h34" {...line} />
+      </g>
+
+      {/* the padlock, sitting across both — it is what the certificate buys */}
+      <g strokeWidth={EDGE}>
+        <rect x="150" y="62" width="48" height="40" rx="10" fill="var(--sws-card-tile-bg)" {...line} />
+        <path d="M162 62V50a12 12 0 0 1 24 0v12" strokeWidth={HAIR} {...line} />
+      </g>
+      <circle cx="174" cy="82" r="4" fill="var(--sws-action-primary)" stroke="none" />
+    </svg>
+  );
+}
+
+/** Email — one envelope at the front of a stack, because mailboxes come in more than one. */
+export function ArtMail({ className }: ArtProps) {
+  return (
+    <svg {...promoFrame(className)}>
+      <ellipse cx="110" cy="132" rx="74" ry="9" fill="var(--sws-action-subtle-bg)" stroke="none" />
+
+      {/* the two behind */}
+      <g strokeWidth={HAIR} opacity="0.5">
+        <rect x="46" y="26" width="128" height="72" rx="12" fill="var(--sws-card-tile-bg)" {...line} />
+        <rect x="34" y="38" width="128" height="72" rx="12" fill="var(--sws-card-tile-bg)" {...line} />
+      </g>
+
+      {/* the one in front */}
+      <rect
+        x="22"
+        y="50"
+        width="128"
+        height="72"
+        rx="12"
+        fill="var(--sws-surface-raised)"
+        strokeWidth={EDGE}
+        {...line}
+      />
+      <path d="m22 62 64 38 64-38" strokeWidth={HAIR} {...line} />
+
+      {/* the dot that says one of them is new */}
+      <circle cx="176" cy="40" r="9" fill="var(--sws-action-primary)" stroke="none" />
+    </svg>
+  );
+}
+
+/** Website builder — a canvas being assembled from blocks, with one block held off the grid. */
+export function ArtBuilder({ className }: ArtProps) {
+  return (
+    <svg {...promoFrame(className)}>
+      <ellipse cx="110" cy="132" rx="74" ry="9" fill="var(--sws-action-subtle-bg)" stroke="none" />
+
+      {/* the canvas */}
+      <rect
+        x="26"
+        y="22"
+        width="128"
+        height="96"
+        rx="12"
+        fill="var(--sws-surface-raised)"
+        strokeWidth={EDGE}
+        {...line}
+      />
+      <path d="M26 44h128" strokeWidth={HAIR} {...line} />
+
+      {/* blocks already placed */}
+      <g strokeWidth={HAIR}>
+        <rect x="40" y="56" width="46" height="48" rx="8" fill="var(--sws-card-tile-bg)" {...line} />
+        <path d="M98 62h42" opacity="0.5" {...line} />
+        <path d="M98 78h42" opacity="0.5" {...line} />
+        <path d="M98 94h26" opacity="0.5" {...line} />
+      </g>
+
+      {/* the one being dragged in */}
+      <rect
+        x="158"
+        y="60"
+        width="40"
+        height="34"
+        rx="8"
+        fill="var(--sws-action-subtle-bg)"
+        strokeWidth={HAIR}
+        {...line}
+      />
+      <circle cx="178" cy="77" r="4" fill="var(--sws-action-primary)" stroke="none" />
+    </svg>
+  );
+}
