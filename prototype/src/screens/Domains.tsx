@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import { Banner } from '../components/Banner';
 import { Select } from '../components/Select';
+import { DomainDoors } from '../components/DomainDoors';
 import { IconCheck, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
@@ -113,48 +114,7 @@ export function Domains() {
           {t('domain.title')}
         </h1>
 
-        {/*
-          The three doors, and the same three the order flow offers at its domain step — same
-          words, same card. A visitor who meets "Transfer a domain" here and again inside the
-          funnel has met one thing twice rather than two things once.
-
-          They are doors rather than radio buttons, which is the one difference from the funnel:
-          there is no form on this page to hold a third state, and two of the three already have
-          a screen of their own. A selector would have put a click between the visitor and a
-          page that exists. The first card is the page they are already on, so it says so and
-          does the only useful thing left — puts the cursor in the field.
-        */}
-        <h2 className="u-visually-hidden">{t('domain.doors')}</h2>
-        <ul className="choices choices--doors">
-          <li>
-            <button
-              type="button"
-              className="choice choice--door is-selected"
-              aria-current="page"
-              onClick={() => field.current?.focus()}
-            >
-              <span className="choice__tick" aria-hidden="true">
-                <IconCheck size={13} />
-              </span>
-              <span className="choice__title">{t('domainstep.register')}</span>
-              <span className="choice__body">{t('domainstep.registerBody')}</span>
-            </button>
-          </li>
-          <li>
-            <Link className="choice choice--door" to="/transfer">
-              <span className="choice__title">{t('domainstep.transfer')}</span>
-              <span className="choice__body">{t('domainstep.transferBody')}</span>
-            </Link>
-          </li>
-          <li>
-            {/* Owning a domain already is not a domain purchase — it is a hosting one, with the
-                nameservers pointed here afterwards. So this door opens the plans. */}
-            <Link className="choice choice--door" to="/hosting/shared">
-              <span className="choice__title">{t('domainstep.own')}</span>
-              <span className="choice__body">{t('domainstep.ownBody')}</span>
-            </Link>
-          </li>
-        </ul>
+        <DomainDoors />
 
         <form
           className="domain-search"
