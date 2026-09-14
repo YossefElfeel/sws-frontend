@@ -175,6 +175,48 @@ export function IconTrash({ size = 18, className }: IconProps) {
  * means "onward" points the way the reader is travelling, so in Arabic it points left. It is
  * the one class of icon that is not the same picture in both directions.
  */
+/** The row menu's handle. Vertical, so it reads the same in both directions. */
+export function IconMore({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <circle cx="12" cy="5" r="1.4" />
+      <circle cx="12" cy="12" r="1.4" />
+      <circle cx="12" cy="19" r="1.4" />
+    </svg>
+  );
+}
+
+export function IconEye({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3.2" />
+    </svg>
+  );
+}
+
+export function IconPencil({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M16.4 3.9a2.3 2.3 0 0 1 3.2 3.2L8.4 18.4l-4.2 1 1-4.2Z" />
+      <path d="M14.5 5.8 18.2 9.5" />
+    </svg>
+  );
+}
+
+/**
+ * The sort direction. One glyph that flips with the direction rather than two glyphs, so the
+ * control keeps its width when the reader changes their mind.
+ */
+export function IconSort({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M7 4.5v15M7 19.5 3.75 16M7 19.5 10.25 16" />
+      <path d="M17 19.5v-15M17 4.5 13.75 8M17 4.5l3.25 3.5" />
+    </svg>
+  );
+}
+
 export function IconArrow({ size = 18, className }: IconProps) {
   return (
     <svg {...base(size)} className={`icon--dir${className ? ` ${className}` : ''}`}>

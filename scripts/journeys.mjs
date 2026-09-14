@@ -217,7 +217,7 @@ await journey('Pay an overdue invoice', [
 /* ── I. change plan, all three steps ────────────────────────────────────────── */
 await journey('Upgrade a plan', [
   ['services', () => start('#/account/services')],
-  ['a service', () => click(['.data tbody tr:first-child a.btn'])],
+  ['a service', () => click(['.data tbody tr:first-child .data__link'])],
   ['change plan', () => click(['a[href*="upgrade"]'])],
   ['choose one', () => click(['.pick:not(.pick--current) .btn'])],
   ['confirm', () => click(['.dash__side .acts .btn--primary', '.acts button'])],

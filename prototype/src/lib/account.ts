@@ -10,7 +10,32 @@
 import type { Bi } from './locale';
 import type { Currency, Cycle } from './catalog';
 
-export type ServiceStatus = 'active' | 'pending' | 'suspended' | 'cancelled';
+/**
+ * The six states a service is read in. WHMCS carries four of them natively — Pending, Active,
+ * Suspended and Cancelled — and the other two are things the client area has to say out loud
+ * because a person can act on them: a term that ran out without a renewal, and a renewal whose
+ * charge was declined. Both live in WHMCS as a Suspended product plus an unpaid invoice, which
+ * is two records saying one thing and neither of them saying which thing.
+ */
+export type ServiceStatus =
+  | 'active'
+  | 'pending'
+  | 'suspended'
+  | 'failed'
+  | 'expired'
+  | 'cancelled';
+
+/**
+ * The states that still have a renewal ahead of them. A suspended service does — it is usually
+ * suspended *for* the invoice that is coming — and a failed charge certainly does. An expired
+ * or cancelled one does not, and showing it a date is inventing a future it does not have.
+ */
+export function renews(status: ServiceStatus): boolean {
+  return status !== 'expired' && status !== 'cancelled';
+}
+
+/** The states that are asking something of the reader, as one group the list can filter to. */
+export const NEEDS_ATTENTION: ServiceStatus[] = ['suspended', 'failed', 'expired'];
 
 /** What kind of thing the service is decides which shortcuts and forms its page offers. */
 export type ServiceKind = 'cpanel' | 'email' | 'vps';
@@ -20,6 +45,7 @@ export interface Service {
   product: string;
   domain: string;
   status: ServiceStatus;
+  /** The next renewal date — or, once `renews(status)` is false, the date the term ended. */
   nextDue: string;
   cycle: string;
   amountUsdMinor: number;
@@ -110,6 +136,154 @@ export const SERVICES: Service[] = [
     autoRenew: false,
     paymentMethod: 'instapay',
     usageAt: '2026-08-30 12:00',
+    addons: [],
+  },
+  {
+    id: 'svc-7704',
+    product: 'Cloud 2',
+    domain: 'masr-books.com',
+    status: 'active',
+    nextDue: '2026-11-20',
+    cycle: 'annually',
+    amountUsdMinor: 32000,
+    since: '2024-11-20',
+    server: 'ch-zrh-cloud01',
+    ip: '185.42.118.12',
+    diskUsedGb: 64.2,
+    diskTotalGb: 120,
+    bandwidthUsedGb: 1840,
+    bandwidthTotalGb: 4000,
+    kind: 'cpanel',
+    autoRenew: true,
+    paymentMethod: 'pm1',
+    usageAt: '2026-09-07 02:55',
+    addons: ['ssl:rapidssl', 'monitoring:plus'],
+  },
+  {
+    id: 'svc-5512',
+    product: 'Mail 5',
+    domain: 'zahra-clinic.com',
+    status: 'active',
+    nextDue: '2026-09-22',
+    cycle: 'monthly',
+    amountUsdMinor: 200,
+    since: '2026-02-22',
+    server: 'ch-zrh-mail02',
+    ip: '185.42.118.44',
+    diskUsedGb: 6.8,
+    diskTotalGb: 50,
+    bandwidthUsedGb: 14,
+    bandwidthTotalGb: 500,
+    kind: 'email',
+    autoRenew: true,
+    paymentMethod: 'pm1',
+    usageAt: '2026-09-07 02:55',
+    addons: [],
+  },
+  {
+    id: 'svc-3390',
+    product: 'WP Grow',
+    domain: 'noon-interiors.com',
+    status: 'failed',
+    nextDue: '2026-09-16',
+    cycle: 'monthly',
+    amountUsdMinor: 1100,
+    since: '2025-04-16',
+    server: 'ch-zrh-web03',
+    ip: '185.42.118.91',
+    diskUsedGb: 21.7,
+    diskTotalGb: 40,
+    bandwidthUsedGb: 96,
+    bandwidthTotalGb: 1000,
+    kind: 'cpanel',
+    autoRenew: true,
+    paymentMethod: 'pm2',
+    usageAt: '2026-09-07 02:55',
+    addons: ['builder:starter'],
+    builder: true,
+  },
+  {
+    id: 'svc-4187',
+    product: 'Pro',
+    domain: 'delta-fisheries.com',
+    status: 'suspended',
+    nextDue: '2026-09-05',
+    cycle: 'monthly',
+    amountUsdMinor: 750,
+    since: '2025-09-05',
+    server: 'ch-zrh-web07',
+    ip: '185.42.118.203',
+    diskUsedGb: 11.3,
+    diskTotalGb: 25,
+    bandwidthUsedGb: 38,
+    bandwidthTotalGb: 500,
+    kind: 'cpanel',
+    autoRenew: false,
+    paymentMethod: 'bank',
+    usageAt: '2026-09-05 09:10',
+    addons: [],
+  },
+  {
+    id: 'svc-2265',
+    product: 'Single',
+    domain: 'hoda-ceramics.com',
+    status: 'expired',
+    nextDue: '2026-08-11',
+    cycle: 'annually',
+    amountUsdMinor: 5500,
+    since: '2024-08-11',
+    server: 'ch-zrh-web03',
+    ip: '185.42.118.91',
+    diskUsedGb: 2.4,
+    diskTotalGb: 10,
+    bandwidthUsedGb: 0,
+    bandwidthTotalGb: 100,
+    kind: 'cpanel',
+    autoRenew: false,
+    paymentMethod: 'instapay',
+    usageAt: '2026-08-11 00:00',
+    addons: [],
+  },
+  {
+    id: 'svc-1848',
+    product: 'VPS 2',
+    domain: 'maadi-labs.net',
+    status: 'cancelled',
+    nextDue: '2026-06-30',
+    cycle: 'monthly',
+    amountUsdMinor: 1700,
+    since: '2025-06-30',
+    server: 'ch-zrh-vps04',
+    ip: '185.42.118.157',
+    diskUsedGb: 0,
+    diskTotalGb: 80,
+    bandwidthUsedGb: 0,
+    bandwidthTotalGb: 4000,
+    kind: 'vps',
+    autoRenew: false,
+    paymentMethod: 'pm2',
+    usageAt: '2026-06-30 00:00',
+    addons: [],
+  },
+  {
+    id: 'svc-1109',
+    product: 'Mail 25',
+    domain: 'kamal-studio.eg',
+    status: 'active',
+    nextDue: '2026-10-09',
+    cycle: 'annually',
+    amountUsdMinor: 7700,
+    since: '2023-10-09',
+    server: 'ch-zrh-mail02',
+    ip: '185.42.118.44',
+    diskUsedGb: 41.6,
+    diskTotalGb: 625,
+    bandwidthUsedGb: 112,
+    bandwidthTotalGb: 500,
+    kind: 'email',
+    autoRenew: true,
+    paymentMethod: 'pm1',
+    usageAt: '2026-09-07 02:55',
     addons: [],
   },
 ];

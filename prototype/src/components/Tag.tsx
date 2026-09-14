@@ -27,11 +27,21 @@ export function Tag({ tone, children }: { tone: TagTone; children: ReactNode }) 
   return <span className={`tag tag--${tone}`}>{children}</span>;
 }
 
-/** A service is a thing that runs, so its ladder is running → queued → stopped → gone. */
+/**
+ * A service is a thing that runs, so its ladder is running → queued → stopped → gone.
+ *
+ * Three of the six are `bad`, and that is the ladder rather than a lapse. Suspended, a failed
+ * charge and an expired term are three different causes with one consequence — the site is off
+ * and only the reader can put it back on — so they get one colour and the chip's own word
+ * carries the difference. Cancelled is the one ending nobody has to act on, which is what
+ * makes it `neutral`: it is bookkeeping, not a fault.
+ */
 export const SERVICE_TONE = {
   active: 'ok',
   pending: 'warn',
   suspended: 'bad',
+  failed: 'bad',
+  expired: 'bad',
   cancelled: 'neutral',
 } as const satisfies Record<string, TagTone>;
 

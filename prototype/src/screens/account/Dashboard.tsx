@@ -28,6 +28,7 @@ import {
   TICKETS,
   ANNOUNCEMENTS,
   ACCOUNT,
+  renews,
 } from '../../lib/account';
 
 /**
@@ -63,7 +64,7 @@ export function Dashboard() {
 
   // Nearest first, and only what is close enough to act on.
   const renewals = [
-    ...SERVICES.map((s) => ({ id: s.id, label: s.product, sub: s.domain, on: s.nextDue, to: `/account/services/${s.id}` })),
+    ...SERVICES.filter((s) => renews(s.status)).map((s) => ({ id: s.id, label: s.product, sub: s.domain, on: s.nextDue, to: `/account/services/${s.id}` })),
     ...DOMAINS.map((d) => ({ id: d.id, label: d.name, sub: t('acc.domains'), on: d.expires, to: `/account/domains/${d.id}` })),
   ]
     .map((r) => ({ ...r, days: daysUntil(r.on) }))
@@ -89,7 +90,9 @@ export function Dashboard() {
    * count back.
    */
   const stalled = SERVICES.filter((s) => s.status !== 'active');
-  const worst = (['suspended', 'pending', 'cancelled'] as const).find((k) =>
+  // Worst first, and the order is what it costs the reader to ignore it: a site that is off,
+  // then a charge that failed, then a term that lapsed, then a queue, then bookkeeping.
+  const worst = (['suspended', 'failed', 'expired', 'pending', 'cancelled'] as const).find((k) =>
     stalled.some((s) => s.status === k),
   );
 
