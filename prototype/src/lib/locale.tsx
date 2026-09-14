@@ -120,6 +120,14 @@ export const STRINGS = {
   'plan.renewalSame': { ar: 'التجديد بنفس السعر', en: 'Renews at the same price' },
   'cycle.perMonth': { ar: 'شهر', en: 'month' },
   'cycle.perYear': { ar: 'سنة', en: 'year' },
+  // The billing cycle read as a rate rather than as a noun — "10.00 USD per month" says in one
+  // column what an Amount column and a Term column beside it took two to say.
+  'per.monthly': { ar: 'في الشهر', en: 'per month' },
+  'per.quarterly': { ar: 'كل 3 شهور', en: 'per quarter' },
+  'per.semiannually': { ar: 'كل 6 شهور', en: 'per 6 months' },
+  'per.annually': { ar: 'في السنة', en: 'per year' },
+  'per.biennially': { ar: 'كل سنتين', en: 'per 2 years' },
+  'per.triennially': { ar: 'كل 3 سنين', en: 'per 3 years' },
 
   'brand.name': { ar: 'سوميون لخدمات الويب', en: 'Somion Web Services' },
 
@@ -1378,6 +1386,11 @@ export const STRINGS = {
   // that only says "nothing here" leaves someone wondering whether it is broken.
   'empty.filter': { ar: 'جرّب فلتر تاني أو اعرض الكل.', en: 'Try another filter, or show all.' },
   'empty.services': { ar: 'مفيش خدمات في الفلتر ده', en: 'No services match this filter' },
+  'empty.servicesNone': { ar: 'لسه مافيش خدمات', en: 'No services yet' },
+  'empty.servicesNoneNote': {
+    ar: 'اطلب أول استضافة وهتلاقيها هنا على طول.',
+    en: 'Order your first hosting plan and it shows up here.',
+  },
   'empty.domains': { ar: 'لسه مافيش دومينات', en: 'No domains yet' },
   'empty.domainsNote': {
     ar: 'سجّل دومين جديد أو انقل واحد عندك دلوقتي.',
@@ -1430,9 +1443,45 @@ export const STRINGS = {
   'status.active': { ar: 'يعمل', en: 'Active' },
   'status.pending': { ar: 'قيد التجهيز', en: 'Pending' },
   'status.suspended': { ar: 'موقوف', en: 'Suspended' },
+  'status.failed': { ar: 'الدفع فشل', en: 'Payment failed' },
+  'status.expired': { ar: 'منتهي', en: 'Expired' },
   'status.cancelled': { ar: 'ملغي', en: 'Cancelled' },
 
   'svc.manage': { ar: 'إدارة', en: 'Manage' },
+  'svc.add': { ar: 'أضف خدمة', en: 'Add service' },
+
+  // The counts above the services table. Each is also the filter it counts, so the label has
+  // to read as a category and not as a sentence about one.
+  'svc.all': { ar: 'كل الخدمات', en: 'All services' },
+  'svc.attention': { ar: 'محتاجة تدخّل', en: 'Needs attention' },
+  'svc.allRunning': { ar: 'كله شغّال', en: 'All running' },
+  'svc.noneSetup': { ar: 'مفيش تحت التجهيز', en: 'None in setup' },
+  'svc.inSetup': { ar: 'تحت التجهيز', en: 'Being set up' },
+
+  // The row switch. "Running" rather than "Active", because the chip beside it already says
+  // Active and a column repeating the word would read as the same fact twice.
+  'col.running': { ar: 'شغّالة', en: 'Running' },
+  'svc.runOn': { ar: 'الخدمة شغّالة', en: 'Service is running' },
+  'svc.runOff': { ar: 'الخدمة موقوفة', en: 'Service is stopped' },
+  'svc.runLocked': { ar: 'مش ممكن تتشغّل أو تتوقف وهي في الحالة دي', en: 'Cannot be switched while it is in this state' },
+  'svc.stoppedMsg': { ar: 'الخدمة اتوقفت', en: 'Service stopped' },
+  'svc.startedMsg': { ar: 'الخدمة رجعت تشتغل', en: 'Service is running again' },
+
+  // The row menu.
+  'svc.rowMenu': { ar: 'إجراءات الخدمة', en: 'Service actions' },
+
+  // A service that has stopped. The date is real either way; only its name changes, from a
+  // promise about the future to a fact about the past.
+  'svc.ended': { ar: 'انتهت في', en: 'Ended' },
+  'svc.noRenewal': { ar: 'مفيش تجديد', en: 'No renewal' },
+  'svc.over.expired': { ar: 'الخدمة دي انتهت', en: 'This service has expired' },
+  'svc.over.cancelled': { ar: 'الخدمة دي اتلغت', en: 'This service was cancelled' },
+  'svc.overNote': {
+    ar: 'البيانات هنا للسجل بس، والخدمة مابقتش شغّالة. آخر يوم فيها كان',
+    en: 'What is here is the record; the service itself is no longer running. Its last day was',
+  },
+  'svc.view': { ar: 'افتح الخدمة', en: 'View service' },
+  'svc.edit': { ar: 'غيّر الباقة', en: 'Edit plan' },
   'svc.server': { ar: 'بيانات الخادم', en: 'Server information' },
   'svc.hostname': { ar: 'اسم الخادم', en: 'Hostname' },
   'svc.ip': { ar: 'عنوان IP', en: 'IP address' },
@@ -1631,6 +1680,7 @@ export const STRINGS = {
   'search.news': { ar: 'ابحث في الإعلانات', en: 'Search announcements' },
 
   'filter.allStatuses': { ar: 'كل الحالات', en: 'All statuses' },
+  'filter.attention': { ar: 'محتاجة تدخّل', en: 'Needs attention' },
   'filter.allTypes': { ar: 'كل الأنواع', en: 'All types' },
   'filter.allDepartments': { ar: 'كل الأقسام', en: 'All departments' },
   'filter.allPriorities': { ar: 'كل الأولويات', en: 'All priorities' },
@@ -1641,6 +1691,23 @@ export const STRINGS = {
   'filter.channel': { ar: 'القناة', en: 'Channel' },
   'filter.result': { ar: 'نتيجة المحاولة', en: 'Result' },
   'filter.recordType': { ar: 'نوع السجل', en: 'Record type' },
+
+  // Sorting. The key names what is compared; the direction is its own control beside it, so
+  // neither label has to spell out six combinations.
+  'sort.label': { ar: 'الترتيب', en: 'Sort' },
+  'sort.renewal': { ar: 'تاريخ التجديد', en: 'Renewal date' },
+  'sort.name': { ar: 'الاسم', en: 'Name' },
+  'sort.amount': { ar: 'السعر', en: 'Price' },
+  'sort.dir': { ar: 'اتجاه الترتيب', en: 'Sort direction' },
+  'sort.asc': { ar: 'تصاعدي', en: 'Ascending' },
+  'sort.desc': { ar: 'تنازلي', en: 'Descending' },
+
+  // Pagination.
+  'page.label': { ar: 'تنقّل بين الصفحات', en: 'Pagination' },
+  'page.prev': { ar: 'السابق', en: 'Previous' },
+  'page.next': { ar: 'التالي', en: 'Next' },
+  'page.n': { ar: 'صفحة', en: 'Page' },
+  'page.filteredFrom': { ar: 'مفلترة من', en: 'filtered from' },
 
   'empty.search': { ar: 'مفيش نتايج للبحث ده', en: 'Nothing matches that search' },
   'empty.searchNote': { ar: 'غيّر كلمة البحث أو ارجع الفلاتر للكل.', en: 'Try different words, or set the filters back to all.' },
@@ -1777,6 +1844,10 @@ export const STRINGS = {
   'dev.autoRenew': {
     ar: 'WHMCS ماعندوش تجديد تلقائي لكل خدمة لوحدها — الزرار ده محتاج حقل مخصص أو hook قبل ما يتنفذ.',
     en: 'WHMCS has no per-service auto-renew — this switch needs a custom field or a hook before it can be built.',
+  },
+  'dev.suspend': {
+    ar: 'إيقاف الخدمة وتشغيلها في WHMCS إجراء إداري (ModuleSuspend و ModuleUnsuspend) — المفتاح ده محتاج hook قبل ما العميل يوصله بنفسه.',
+    en: 'Suspending and unsuspending a product is an admin action in WHMCS (ModuleSuspend and ModuleUnsuspend) — this switch needs a hook before a client can reach it.',
   },
   'dev.taxId': {
     ar: 'رقم التسجيل الضريبي بيتحدد لكل سوق (القرار I12) وهيتضاف هنا أول ما يتأكد.',

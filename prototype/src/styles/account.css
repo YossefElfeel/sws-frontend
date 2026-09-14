@@ -547,9 +547,12 @@
  * by colour, which is what makes it readable without colour.
  *
  * The 44px hit area (ADR-0004) comes from the enclosing label, which is the whole row: the
- * visible track is 24px, but nothing on this row is smaller than the row itself to hit.
+ * visible track is 24px, but nothing on this row is smaller than the row itself to hit. The
+ * bare `.switch` in a table cell has no row to borrow that from and pays it back itself — see
+ * `.switch::after` further down.
  */
-.switch-row input[type='checkbox'] {
+.switch-row input[type='checkbox'],
+.switch {
   --knob: calc(var(--sws-switch-height-md) - 6px);
 
   appearance: none;
@@ -565,7 +568,8 @@
   transition: background-color var(--sws-duration-base) var(--sws-ease-standard);
 }
 
-.switch-row input[type='checkbox']::before {
+.switch-row input[type='checkbox']::before,
+.switch::before {
   content: '';
   display: block;
   inline-size: var(--knob);
@@ -576,21 +580,26 @@
   transition: transform var(--sws-duration-base) var(--sws-ease-standard);
 }
 
-.switch-row input[type='checkbox']:checked {
+.switch-row input[type='checkbox']:checked,
+.switch:checked {
   background: var(--sws-switch-track-on);
 }
 
-.switch-row input[type='checkbox']:checked::before {
+.switch-row input[type='checkbox']:checked::before,
+.switch:checked::before {
   transform: translateX(calc(var(--knob) * var(--sws-flip, 1)));
 }
 
-:root[dir='rtl'] .switch-row input[type='checkbox'] {
+:root[dir='rtl'] .switch-row input[type='checkbox'],
+:root[dir='rtl'] .switch {
   --sws-flip: -1;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .switch-row input[type='checkbox'],
-  .switch-row input[type='checkbox']::before {
+  .switch-row input[type='checkbox']::before,
+  .switch,
+  .switch::before {
     transition: none;
   }
 }
@@ -1229,4 +1238,343 @@
 
 .addon-row__text .method-row__name {
   min-inline-size: 0;
+}
+
+/* ── sort: the key, then its direction ─────────────────────────────────────── */
+
+/*
+ * The sort pill wears a leading glyph for the same reason the search field wears a magnifier.
+ * Without it, a pill reading "Renewal date" sits beside a pill reading "All statuses" and the
+ * two read as two filters — and only one of them is.
+ */
+.tfilter__lead {
+  position: absolute;
+  inset-inline-start: var(--sws-space-12);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
+}
+
+.tfilter__select--lead {
+  /* 12 + 16 + 8: the margin, the glyph, and the gap that keeps a letter off it. */
+  padding-inline-start: calc(var(--sws-space-12) + 16px + var(--sws-space-8));
+}
+
+/*
+ * Direction is a square on the same pill scale as the select beside it. A glyph rather than a
+ * word, because "Ascending" and "تصاعدي" and the German for either are three widths, and this
+ * control sits in a row that already wraps.
+ */
+.tdir {
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-input-height-md);
+  block-size: var(--sws-input-height-md);
+  flex: none;
+  background: var(--sws-select-bg);
+  border: var(--sws-rule-hair) solid var(--sws-select-border);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.tdir:hover {
+  border-color: var(--sws-action-primary);
+  color: var(--sws-text-primary);
+}
+
+/* One glyph that turns over, not two glyphs that swap — the control keeps its meaning when
+   the reader is watching it change rather than reading it fresh. */
+.tdir__glyph {
+  transition: transform var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.tdir__glyph--up {
+  transform: rotate(180deg);
+}
+
+/* ── the switch, on its own ────────────────────────────────────────────────── */
+
+/*
+ * The same switch as `.switch-row`'s, without the row around it — a table cell has its own
+ * label in the column head and no room for a second one beside the control.
+ *
+ * The row version takes its 44px target from the whole row it sits in (ADR-0004). This one has
+ * no row to borrow from: the visible track is 44 x 24, so the pseudo-element pays the missing
+ * 20px of height back as pointer target, the way `.btn--sm::after` does.
+ */
+.switch-cell {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  cursor: pointer;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc((var(--sws-switch-height-md) - var(--sws-switch-hit-area)) / 2);
+}
+
+.switch:disabled {
+  background: var(--sws-switch-disabled-track);
+  cursor: not-allowed;
+}
+
+.switch-cell:has(.switch:disabled) {
+  cursor: not-allowed;
+}
+
+/* ── the row menu ──────────────────────────────────────────────────────────── */
+
+/*
+ * The handle. Sized to the 44px target rather than to the three dots inside it, so the whole
+ * end of the row is the target and not a 16px circle in the middle of one.
+ */
+.rowmenu__btn {
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  margin-inline-start: auto;
+  background: none;
+  border: var(--sws-rule-hair) solid transparent;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.rowmenu__btn:hover,
+.rowmenu__btn[aria-expanded='true'] {
+  background: var(--sws-surface-sunken);
+  border-color: var(--sws-border-subtle);
+  color: var(--sws-text-primary);
+}
+
+/*
+ * Fixed, not absolute — see components/RowMenu.tsx. The panel is one of the three things in
+ * this product that float above the page, so it takes the same elevation as the notifications
+ * popover rather than inventing a fourth.
+ */
+.rowmenu {
+  position: fixed;
+  z-index: var(--sws-layer-popover);
+  min-inline-size: 13rem;
+  max-inline-size: min(18rem, calc(100vw - var(--sws-space-32)));
+  padding: var(--sws-space-4);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-elevation-over);
+}
+
+.rowmenu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  inline-size: 100%;
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-md);
+  color: var(--sws-text-primary);
+  font: inherit;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-medium);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rowmenu__item svg {
+  flex: none;
+  color: var(--sws-text-secondary);
+}
+
+.rowmenu__item:hover {
+  background: var(--sws-surface-sunken);
+}
+
+/*
+ * The one item that takes something away is the one item with a colour, and it is separated
+ * by a rule rather than only by that colour — a menu where the last item is merely red is a
+ * menu you can hit on the way past.
+ */
+.rowmenu__item--danger {
+  margin-block-start: var(--sws-space-4);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  color: var(--sws-status-danger);
+}
+
+.rowmenu__item--danger svg {
+  color: var(--sws-status-danger);
+}
+
+.rowmenu__item--danger:hover {
+  background: var(--sws-banner-danger-bg);
+}
+
+/* ── pagination ────────────────────────────────────────────────────────────── */
+
+/*
+ * Under the table, where the rows run out — which is where someone reading down a list arrives
+ * with the question "is that all of them". It used to be a bare count above the table, tucked
+ * under the search field, answering before it had been asked.
+ *
+ * `pagination-item` was declared in tokens.json when the design system was written and had
+ * never been drawn. These are the tokens it declared.
+ */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-12);
+  flex-wrap: wrap;
+  margin-block-start: var(--sws-space-16);
+}
+
+.pager__count {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+/* The clause that says the number above it is not the whole list. Quieter than the count, but
+   present — a filtered total that looks like a full one is the number people quote back. */
+.pager__from {
+  color: var(--sws-text-disabled);
+}
+
+.pager__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  margin-inline-start: auto;
+}
+
+.pager__n,
+.pager__go {
+  display: grid;
+  place-items: center;
+  min-inline-size: var(--sws-pagination-item-size);
+  block-size: var(--sws-pagination-item-size);
+  padding-inline: var(--sws-space-8);
+  background: none;
+  border: var(--sws-rule-hair) solid transparent;
+  border-radius: var(--sws-radius-md);
+  color: var(--sws-pagination-item-text);
+  font: inherit;
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    border-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.pager__n:hover:not(.is-current),
+.pager__go:hover:not(:disabled) {
+  background: var(--sws-surface-sunken);
+  border-color: var(--sws-border-subtle);
+}
+
+.pager__n.is-current {
+  background: var(--sws-pagination-item-active-bg);
+  border-color: var(--sws-pagination-item-active-bg);
+  color: var(--sws-pagination-item-active-text);
+  font-weight: var(--sws-weight-semibold);
+  cursor: default;
+}
+
+.pager__go {
+  color: var(--sws-text-secondary);
+}
+
+.pager__go:disabled {
+  color: var(--sws-pagination-item-disabled-text);
+  cursor: not-allowed;
+}
+
+/*
+ * A chevron rather than an arrow, and it turns rather than mirrors. `icon--dir` mirrors an
+ * arrow in RTL, which is right for "onward" and wrong here: these two point at each other, so
+ * in Arabic they have to swap rather than both flip.
+ */
+.pager__go svg {
+  transform: rotate(var(--pager-turn));
+}
+
+.pager__go--prev {
+  --pager-turn: 90deg;
+}
+
+.pager__go--next {
+  --pager-turn: -90deg;
+}
+
+:root[dir='rtl'] .pager__go--prev {
+  --pager-turn: -90deg;
+}
+
+:root[dir='rtl'] .pager__go--next {
+  --pager-turn: 90deg;
+}
+
+.pager__gap {
+  min-inline-size: var(--sws-space-16);
+  color: var(--sws-text-disabled);
+  text-align: center;
+}
+
+/* ── the item column's own link ────────────────────────────────────────────── */
+
+/*
+ * The row's name is the way into the row. It used to be a "Manage" button at the far end of the
+ * line, which meant the one thing a person wanted to click was the one thing furthest from what
+ * they had just read — and now that the end of the row carries a switch and a menu, a third
+ * control there would be a crowd. The name was always the target people aimed at first.
+ */
+
+/*
+ * A cell that is its own containing block, which it needs for two different reasons.
+ *
+ * The item cell: the link stretches over the whole cell rather than fitting the word, because
+ * "Pro" is a 23px target and the floor is 44 (ADR-0004). Pointing at the row's name, its
+ * domain, or the space beside either now all mean the same thing, which is what a reader
+ * pointing at a row means anyway.
+ *
+ * The menu column's head: its label is visually hidden, and a `position: absolute` box with no
+ * positioned ancestor resolves against the page — so at 390px it was landing 575px out, past
+ * the card that was supposed to be clipping it, and dragging the document's own scroll width
+ * with it. An empty <th> would also have "fixed" it, by deleting the column's name.
+ */
+.data__own {
+  position: relative;
+}
+
+.data__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.data__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.data__link:hover {
+  color: var(--sws-action-quiet);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

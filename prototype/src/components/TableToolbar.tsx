@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from 'react';
-import { IconChevron, IconSearch } from './icons';
+import { IconChevron, IconSearch, IconSort } from './icons';
 import { useLocale } from '../lib/locale';
 
 /**
@@ -111,6 +111,65 @@ export function TableFilter<T extends string>({ label, value, onChange, options 
       </select>
       <IconChevron size={16} className="tfilter__chev" />
     </label>
+  );
+}
+
+interface SortProps<T extends string> {
+  value: T;
+  onChange: (next: T) => void;
+  options: { value: T; label: string }[];
+  /** Descending. Its meaning is the key's: latest first, Z–A, dearest first. */
+  desc: boolean;
+  onDesc: (next: boolean) => void;
+}
+
+/**
+ * Sorting, as two controls rather than one.
+ *
+ * The single-select version of this reads "Renewal date, soonest first · Renewal date, latest
+ * first · Name, A–Z · Name, Z–A · Price, highest first · Price, lowest first" — six options for
+ * three decisions, in a pill that has to hold the longest of them in German. Splitting the key
+ * from the direction makes it three plus a switch, and the switch is one target that keeps its
+ * width in every language because its label is a glyph.
+ *
+ * The pill carries a leading sort glyph for the same reason the search field carries a
+ * magnifier: without it, a pill reading "Renewal date" beside a pill reading "All statuses" is
+ * two filters, and only one of them is.
+ */
+export function TableSort<T extends string>({ value, onChange, options, desc, onDesc }: SortProps<T>) {
+  const { t } = useLocale();
+  const dirLabel = t(desc ? 'sort.desc' : 'sort.asc');
+
+  return (
+    <>
+      <label className="tfilter">
+        <span className="u-visually-hidden">{t('sort.label')}</span>
+        <IconSort size={16} className="tfilter__lead" />
+        <select
+          className="tfilter__select tfilter__select--lead"
+          value={value}
+          onChange={(e) => onChange(e.target.value as T)}
+        >
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <IconChevron size={16} className="tfilter__chev" />
+      </label>
+
+      <button
+        type="button"
+        className="tdir"
+        aria-pressed={desc}
+        aria-label={`${t('sort.dir')} — ${dirLabel}`}
+        title={dirLabel}
+        onClick={() => onDesc(!desc)}
+      >
+        <IconChevron size={16} className={`tdir__glyph${desc ? '' : ' tdir__glyph--up'}`} />
+      </button>
+    </>
   );
 }
 

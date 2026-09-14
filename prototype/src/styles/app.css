@@ -717,6 +717,38 @@
   transform: translateY(0);
 }
 
+/*
+ * A tile that is the filter it counts, rather than a link somewhere else. It is a <button>, so
+ * it needs the four resets a button drags in — the platform font, the platform centring, the
+ * shrink-to-fit width and its own text direction — and nothing else about it changes.
+ */
+button.stat {
+  inline-size: 100%;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/*
+ * Pressed is the accent taking the tile's edge and its ground, which is the same move `.stat`
+ * already makes on hover — held, rather than passing. Two signals rather than one: a reader
+ * who cannot see the tint still has the border, and `aria-pressed` says it outright.
+ */
+.stat[aria-pressed='true'] {
+  background: var(--sws-action-subtle-bg);
+  border-color: var(--sws-action-primary);
+}
+
+.stat[aria-pressed='true'] .stat__label {
+  color: var(--sws-action-quiet);
+}
+
+/* An alert tile that is also the current filter keeps its own ground; the debt outranks the
+   selection, and the border still moves, which is what carries the press. */
+.stat--alert[aria-pressed='true'] {
+  background: var(--sws-banner-danger-bg);
+}
+
 /* A tile that reports rather than navigates: no lift, no pointer, no promise of a click. */
 .stat--static {
   cursor: default;
