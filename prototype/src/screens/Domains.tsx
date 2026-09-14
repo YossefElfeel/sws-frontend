@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import { Banner } from '../components/Banner';
+import { Select } from '../components/Select';
 import { IconCheck, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
@@ -39,6 +40,16 @@ export function Domains() {
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   /*
+   * The extension is a control now rather than something to be guessed at from the typing.
+   * Someone who knows they want a .eg had to type it and hope the parser agreed; the select
+   * says which extensions exist and makes the choice before the search rather than after it.
+   * Typing one still wins — see `typed` below — because a person who writes the whole name
+   * has been more specific than a dropdown left at its default.
+   */
+  const [tld, setTld] = useState(TLDS[0].tld);
+  const field = useRef<HTMLInputElement>(null);
+
+  /*
    * Someone who types "somion.net" is asking about .net, not about a name called "somionnet".
    * Splitting the extension off here is what lets the headline result answer the question that
    * was actually asked; without it the extension was silently folded into the stem.
@@ -68,8 +79,8 @@ export function Domains() {
       (a, b) => Number(availability.get(b.tld) === true) - Number(availability.get(a.tld) === true),
     );
   }, [stem, availability]);
-  // The extension typed, or .com when none was — the one result the search is really about.
-  const hero = typed ?? TLDS[0];
+  // The extension typed, or the one chosen beside the field — the result the search is about.
+  const hero = typed ?? TLDS.find((x) => x.tld === tld) ?? TLDS[0];
   const heroFree = stem ? availability.get(hero.tld) === true : false;
 
   /*
@@ -102,6 +113,49 @@ export function Domains() {
           {t('domain.title')}
         </h1>
 
+        {/*
+          The three doors, and the same three the order flow offers at its domain step — same
+          words, same card. A visitor who meets "Transfer a domain" here and again inside the
+          funnel has met one thing twice rather than two things once.
+
+          They are doors rather than radio buttons, which is the one difference from the funnel:
+          there is no form on this page to hold a third state, and two of the three already have
+          a screen of their own. A selector would have put a click between the visitor and a
+          page that exists. The first card is the page they are already on, so it says so and
+          does the only useful thing left — puts the cursor in the field.
+        */}
+        <h2 className="u-visually-hidden">{t('domain.doors')}</h2>
+        <ul className="choices choices--doors">
+          <li>
+            <button
+              type="button"
+              className="choice choice--door is-selected"
+              aria-current="page"
+              onClick={() => field.current?.focus()}
+            >
+              <span className="choice__tick" aria-hidden="true">
+                <IconCheck size={13} />
+              </span>
+              <span className="choice__title">{t('domainstep.register')}</span>
+              <span className="choice__body">{t('domainstep.registerBody')}</span>
+            </button>
+          </li>
+          <li>
+            <Link className="choice choice--door" to="/transfer">
+              <span className="choice__title">{t('domainstep.transfer')}</span>
+              <span className="choice__body">{t('domainstep.transferBody')}</span>
+            </Link>
+          </li>
+          <li>
+            {/* Owning a domain already is not a domain purchase — it is a hosting one, with the
+                nameservers pointed here afterwards. So this door opens the plans. */}
+            <Link className="choice choice--door" to="/hosting/shared">
+              <span className="choice__title">{t('domainstep.own')}</span>
+              <span className="choice__body">{t('domainstep.ownBody')}</span>
+            </Link>
+          </li>
+        </ul>
+
         <form
           className="domain-search"
           onSubmit={(e) => {
@@ -127,6 +181,7 @@ export function Domains() {
           </label>
           <input
             id="domain-q"
+            ref={field}
             className="field domain-search__input"
             type="text"
             inputMode="url"
@@ -135,6 +190,19 @@ export function Domains() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+          <Select
+            wrapClassName="domain-search__tld"
+            dir="ltr"
+            aria-label={t('domainstep.tld')}
+            value={tld}
+            onChange={(e) => setTld(e.target.value)}
+          >
+            {TLDS.map((x) => (
+              <option key={x.tld} value={x.tld}>
+                {x.tld}
+              </option>
+            ))}
+          </Select>
           <Button size="lg" type="submit">
             <IconSearch size={17} />
             {t('action.search')}
@@ -199,6 +267,63 @@ export function Domains() {
               </>
             )}
           </div>
+        )}
+
+        {/*
+          The shortlist, before a search only.
+
+          Four extensions with their two prices on them is the fastest answer to "what does a
+          domain cost here", and it is the state a visitor lands in. Once a search has answered,
+          the answer is the card above and the table below, and the same four extensions
+          repeated a third time in between would be noise rather than a shortcut.
+
+          The button chooses rather than buys, for the reason the table's action column already
+          gives: before a search there is no product in a row, because an extension on its own
+          cannot be bought. It sets the select and puts the cursor where the name goes.
+        */}
+        {!stem && (
+          <div className="section__head section__head--sub">
+            <h2 className="section__title section__title--sm" id="pop-head">
+              {t('domain.popularTlds')}
+            </h2>
+            <p className="section__note">{t('domain.popularNote')}</p>
+          </div>
+        )}
+
+        {!stem && (
+          <ul className="tld-cards" aria-labelledby="pop-head">
+            {TLDS.filter((row) => row.featured).map((row) => (
+              <li className="tld-card" key={row.tld}>
+                <p className="tld-card__name serial" dir="ltr">
+                  {row.tld}
+                </p>
+                <p className="tld-card__price">
+                  <span className="serial">
+                    {formatAmount(convert(row.registerUsdMinor, currency), locale)} {currency}
+                  </span>
+                  <span className="tld-card__per">/ {t('cycle.perYear')}</span>
+                </p>
+                {/* The renewal, on the card. It is the whole point of this page. */}
+                <p className="tld-card__renew">
+                  {t('domain.renew')}{' '}
+                  <span className="serial">
+                    {formatAmount(convert(row.renewUsdMinor, currency), locale)} {currency}
+                  </span>{' '}
+                  {t('dom.perYear')}
+                </p>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    setTld(row.tld);
+                    field.current?.focus();
+                  }}
+                >
+                  {t('domain.pick')}
+                </Button>
+              </li>
+            ))}
+          </ul>
         )}
 
         <div className="section__head section__head--sub">
