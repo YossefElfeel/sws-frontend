@@ -1811,7 +1811,7 @@ export const STRINGS = {
   'svc.addonsNone': { ar: 'مفيش إضافات مفعّلة على الخدمة دي.', en: 'No add-ons are active on this service.' },
   'svc.addonPick': { ar: 'اختار إضافة…', en: 'Choose an add-on…' },
   'svc.addonBuy': { ar: 'شراء وتفعيل', en: 'Buy and activate' },
-  'svc.tab.details': { ar: 'تفاصيل الفوترة', en: 'Billing details' },
+  'svc.related': { ar: 'الفواتير والدومين', en: 'Invoices and domain' },
   'svc.tab.invoices': { ar: 'الفواتير', en: 'Invoices' },
   'svc.tab.domain': { ar: 'الدومين', en: 'Domain' },
   'svc.noInvoices': { ar: 'مفيش فواتير على الخدمة دي لسه.', en: 'No invoices for this service yet.' },
