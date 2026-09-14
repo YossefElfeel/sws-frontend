@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { IconBell, IconMail, IconInfo } from '../../components/icons';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { NOTIF_PREFS, ACCOUNT, type NotifPref } from '../../lib/account';
@@ -51,8 +51,6 @@ export function NotificationPrefs() {
         value={q}
         onChange={setQ}
         label={t('search.notifs')}
-        shown={rows.length}
-        total={prefs.length}
       >
         <TableFilter
           label={t('filter.channel')}
@@ -116,6 +114,8 @@ export function NotificationPrefs() {
           </div>
         )}
       </div>
+
+      <TableCount shown={rows.length} total={prefs.length} />
 
       <section className="card u-mt-16">
         <header className="card__head">

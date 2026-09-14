@@ -44,6 +44,7 @@ import {
   type Service,
   type ServiceStatus,
 } from '../../lib/account';
+import { Select } from '../../components/Select';
 
 /**
  * What the list can be narrowed to. `attention` is not a status WHMCS stores — it is the three
@@ -295,10 +296,6 @@ export function Services() {
               </tbody>
             </table>
           </div>
-
-          <TablePager page={here} onPage={setPage} matched={sorted.length} total={services.length} />
-
-          <DevNote>{t('dev.suspend')}</DevNote>
         </>
       ) : (
         /* Three empty lists, not one. Owning no services, filtering them all away and
@@ -332,6 +329,13 @@ export function Services() {
           )}
         </div>
       )}
+
+      {/* Outside the branch above, so it is still mounted when the list comes back empty —
+          `role="status"` announces while it is on the page, and a count that unmounted itself
+          on an empty result would go quiet at the one moment it has something to say. */}
+      <TablePager page={here} onPage={setPage} matched={sorted.length} total={services.length} />
+
+      {rows.length > 0 && <DevNote>{t('dev.suspend')}</DevNote>}
     </AccountLayout>
   );
 }
@@ -731,7 +735,7 @@ export function ServiceDetail() {
               <div className="form u-mt-16">
                 <label className="field-label">
                   <span className="eyebrow">{t('svc.addonPick')}</span>
-                  <select className="field" value={pick} onChange={(e) => setPick(e.target.value)}>
+                  <Select value={pick} onChange={(e) => setPick(e.target.value)}>
                     <option value="">{t('svc.addonPick')}</option>
                     {purchasable.map((p) => (
                       <option key={p.key} value={p.key}>
@@ -739,7 +743,7 @@ export function ServiceDetail() {
                         {money(p.opt.priceUsdMinor)} /{p.opt.per === 'year' ? 'yr' : 'mo'}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
                 <div className="form__foot">
                   <Button size="md" disabled={!pick} onClick={buyAddon}>

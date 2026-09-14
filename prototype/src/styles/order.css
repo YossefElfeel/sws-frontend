@@ -362,8 +362,15 @@
   flex-wrap: wrap;
 }
 
-.domain-strip__form .field {
+/* A select in this row is wrapped (see .select), so the frame is what the row has to size —
+   the control inside it then fills the frame. */
+.domain-strip__form > .field,
+.domain-strip__form > .select {
   flex: 1 1 16rem;
+  min-block-size: var(--sws-button-height-lg);
+}
+
+.domain-strip__form > .select > .field {
   min-block-size: var(--sws-button-height-lg);
 }
 

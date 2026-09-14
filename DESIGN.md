@@ -122,10 +122,18 @@ reached for.
 
 Radius `sm 8 · md 12 · lg 16 · xl 24 · pill`. Rules `hair 1 · base 2 · heavy 3`.
 
-Radius is assigned by level, not by taste: **`lg` is card level, `md` is a block inside a card,
-`sm` is a control, `pill` is a chip.** `xl` is a marketing radius and does not appear in the
-client area. Before the audit it did, on two screens, alongside `md` stat tiles and `lg` cards —
-three card radii on one product.
+Radius is assigned by level, not by taste: **`lg` is card level, `md` is a form control and a
+block inside a card, `sm` is a button and the small affordances, `pill` is a chip.** `xl` is a
+marketing radius and does not appear in the client area. Before the audit it did, on two
+screens, alongside `md` stat tiles and `lg` cards — three card radii on one product.
+
+Form controls moved from `sm` to `md` on 2026-09-14. The client area had two answers to "what
+shape is a control": the table search and its filters were `pill`, and every field beside them
+was `sm`. A 9999px radius reads as a chip, so nine screens opened with a control that looked
+like a tag. One radius for everything a person types or picks in — input, textarea, select,
+search, filter — settles it, and `md` is the step that reads as a field next to a `lg` card
+without reading as a chip. Buttons stayed at `sm`: a button is a filled affordance, not a
+frame you put something into, and the two are meant to be told apart.
 
 Motion: `fast 140ms · base 220ms · slow 340ms`, easing `cubic-bezier(0.22, 1, 0.36, 1)`
 standard and a faster exit curve. Every transition respects `prefers-reduced-motion`.

@@ -9,6 +9,7 @@ import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount, PLANS, type Cycle } from '../../lib/catalog';
 import { SERVICES } from '../../lib/account';
 import { prorate } from '../../lib/proration';
+import { Select } from '../../components/Select';
 
 /** The same fixed date the dashboard counts from, so both screens agree. */
 const TODAY = '2026-09-01';
@@ -417,8 +418,7 @@ export function CancelService() {
             <div className="form">
               <label className="field-label">
                 <span className="eyebrow">{t('cancel.reason')}</span>
-                <select
-                  className="field"
+                <Select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                 >
@@ -435,7 +435,7 @@ export function CancelService() {
                       {t(r as never)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field-label">
                 <span className="eyebrow">{t('cancel.more')}</span>

@@ -364,10 +364,15 @@ await p.waitForSelector('.perm-list');
   const before = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
   await p.click('.contact:first-child .btn--secondary');
   await p.waitForTimeout(150);
-  const boxes = await p.$$('.perm-edit__row input');
+  // `.perm-edit__row` was the bare-checkbox row. 822ab72 made each permission a .switch-row,
+  // the same switch the registrar lock and two-factor use, and left this selector behind it —
+  // so the gate stopped finding any permission to tick and threw on the next line.
+  const boxes = await p.$$('.perm-edit__grid .switch-row input');
   ok('a contact opens a permission list', boxes.length > 0, `${boxes.length} permissions`);
 
-  const unchecked = await p.$$eval('.perm-edit__row input', (n) => n.findIndex((b) => !b.checked));
+  const unchecked = await p.$$eval('.perm-edit__grid .switch-row input', (n) =>
+    n.findIndex((b) => !b.checked),
+  );
   await boxes[unchecked].click();
   await p.waitForTimeout(150);
   const after = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
@@ -969,8 +974,11 @@ await p.evaluate(() => (location.hash = '#/account/status?state=clear'));
 await p.waitForSelector('.card.empty');
 ok('a clear day is an empty state, not an empty list', (await p.$$('.incident')).length === 0);
 await p.evaluate(() => (location.hash = '#/account/status'));
-await p.waitForSelector('.bar select.field');
-await p.selectOption('.bar select.field', 'resolved');
+// The incident filter was a labelled `select.field` in a bar of its own. 76a5f7a put the
+// systems beside the incidents and made it a TableFilter at the end of the incidents' own
+// heading row, which is a .tfilter__select — this selector went with the old shape.
+await p.waitForSelector('.bar__end .tfilter__select');
+await p.selectOption('.bar__end .tfilter__select', 'resolved');
 await p.waitForTimeout(120);
 ok('the incident filter filters', (await p.$$eval('.incident', (n) => n.length)) === 2);
 

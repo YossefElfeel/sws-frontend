@@ -28,7 +28,13 @@ interface PagerProps {
  *
  * The count says two numbers only when they differ. "1–8 of 10" is the whole truth on an
  * unfiltered list; on a filtered one, 10 is not the number of services someone owns, so it says
- * what it was filtered from rather than letting the reader assume.
+ * what it was filtered from rather than letting the reader assume. An empty result drops the
+ * range and reads "0 of 10", which is `TableCount`'s own shape — the two say the same thing in
+ * the same words, and it wears `.tcount` so they are the same line on the screen as well.
+ *
+ * It renders at zero rather than unmounting, for `TableCount`'s reason: `role="status"`
+ * announces only while it is mounted, so a count that took itself off the page on an empty
+ * result would go silent at the one moment it has something to report.
  */
 export function TablePager({ page, onPage, matched, total }: PagerProps) {
   const { t } = useLocale();
@@ -38,17 +44,25 @@ export function TablePager({ page, onPage, matched, total }: PagerProps) {
 
   return (
     <nav className="pager" aria-label={t('page.label')}>
-      <p className="pager__count" role="status">
-        <span className="serial">
-          {from}–{to}
-        </span>{' '}
-        {t('dash.of')} <span className="serial">{matched}</span>
-        {matched !== total && (
+      <p className="tcount" role="status">
+        {matched === 0 ? (
           <>
-            {' '}
-            <span className="pager__from">
-              ({t('page.filteredFrom')} <span className="serial">{total}</span>)
-            </span>
+            <span className="serial">0</span> {t('dash.of')} <span className="serial">{total}</span>
+          </>
+        ) : (
+          <>
+            <span className="serial">
+              {from}–{to}
+            </span>{' '}
+            {t('dash.of')} <span className="serial">{matched}</span>
+            {matched !== total && (
+              <>
+                {' '}
+                <span className="pager__from">
+                  ({t('page.filteredFrom')} <span className="serial">{total}</span>)
+                </span>
+              </>
+            )}
           </>
         )}
       </p>
