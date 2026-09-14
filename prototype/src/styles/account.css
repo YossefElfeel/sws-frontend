@@ -300,8 +300,23 @@
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
 }
 
-/* The same for an empty result — `.empty--inset`, which lives beside `.empty` in app.css
-   because a rule in this file cannot outrank one there on equal specificity. */
+/*
+ * The same for an empty result: inside a card it is a row, not a whole screen — so it also
+ * drops the ground, hairline and lift that made it a card in its own right. It was drawing all
+ * three inside the card it sits in, which is a card inside a card on four screens.
+ *
+ * Doubled class rather than the bare modifier: `.empty` is declared in app.css, which main.tsx
+ * loads after this file, so at equal specificity the base won and the modifier silently did
+ * nothing. Two classes is the smallest thing that states "this modifies .empty" in a way the
+ * cascade agrees with.
+ */
+.empty.empty--inset {
+  padding-block: var(--sws-space-32);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
 
 /* The field is the only thing in the row that grows; 14rem is about a domain name, which is
    the shortest it can be and still show what was typed. */
@@ -1099,51 +1114,273 @@
   white-space: nowrap;
 }
 
-/* ── contact permissions — spec 9.7 ────────────────────────────────────────── */
-.contact {
-  display: grid;
-  gap: 0;
+/* ── the contacts frame — spec 9.7 ─────────────────────────────────────────── */
+
+/*
+ * A frame that names itself.
+ *
+ * `.card` is a container for one thing among several on a screen; a frame is the screen. This
+ * one is a single list, so its title, its controls and its rows belong inside one border
+ * rather than as a caption floating on the page ground with an unrelated box beneath it — the
+ * box then opens with no word for what it holds, and the title sits over a gap.
+ *
+ * It takes the card's ground, hairline and lift, because it is the same material; what it adds
+ * is a head that is part of the frame and content that runs to the frame's own edges.
+ *
+ * Not `.panel`: that name is taken by the marketing surface in screens.css, which account.css
+ * loads after — the two would have quietly merged into one rule with two jobs.
+ */
+.frame {
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-elevation-card);
+  /* The rows run edge to edge; without this the first and last would square off the corners. */
+  overflow: hidden;
 }
 
-/* The editor opens under the row it belongs to, on the sunken ground, so an open contact reads
-   as one block inside the list rather than as a second card. The list card clips, so no corner
-   handling is needed here. */
+.frame__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  padding: var(--sws-space-24);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/*
+ * The section's own glyph, on the tile tokens the system declares for exactly this. It is the
+ * mark the sidebar link carries, so arriving from the navigation lands on something
+ * recognisable rather than on a line of text that could belong to any screen.
+ */
+.frame__mark {
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  flex: none;
+  background: var(--sws-card-tile-bg);
+  color: var(--sws-card-tile-ink);
+  border-radius: var(--sws-radius-md);
+}
+
+/* 14rem is about as narrow as the Arabic lede gets before it breaks mid-phrase. Below that the
+   actions take a line of their own rather than squeezing the sentence. */
+.frame__text {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+/* The same size as the shell head it replaces: a title inside a frame is still a label for the
+   screen, not a headline, so the list under it stays the loudest thing here. */
+.frame__title {
+  font-size: var(--sws-font-size-h3);
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+  line-height: 1.2;
+}
+
+.frame__lede {
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.frame__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+}
+
+/*
+ * Inside the frame the toolbar is one band: the controls take the row and the count they answer
+ * sits at its end, rather than opening a second line under a field it belongs beside.
+ *
+ * The ground stays the frame's own. `surface-sunken` would read as a well in light and as a
+ * hole in dark, where it is the page colour and the frame is a step above it — the rule under
+ * the band says "controls here, data below" in both themes without that trade.
+ */
+.frame .tbar--inset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+}
+
+.frame .tbar--inset .tbar__row {
+  flex: 1 1 20rem;
+}
+
+.frame .tbar--inset .tbar__count {
+  margin-block-start: 0;
+}
+
+.contacts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * An open contact is marked on its reading edge rather than by a fill: the editor below it is
+ * already a change of shape, and two signals for one state is one too many. The rule is a
+ * logical border, so in Arabic it stands at the right; it is declared transparent on every row
+ * so opening one moves no text sideways.
+ */
+.contact {
+  border-inline-start: var(--sws-rule-heavy) solid transparent;
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+.contact:last-child {
+  border-block-end: 0;
+}
+
+.contact.is-open {
+  border-inline-start-color: var(--sws-action-primary);
+}
+
+.contact__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-16);
+  flex-wrap: wrap;
+  padding: var(--sws-space-16) var(--sws-space-24);
+}
+
+.contact__avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  flex: none;
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-quiet);
+  border-radius: var(--sws-radius-pill);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-bold);
+  line-height: var(--sws-leading-flat);
+}
+
+/* A fixed basis rather than a growing one, so the permissions begin at the same place on every
+   row. A list is read down a column; ragged starts make it a set of unrelated lines. */
+.contact__id {
+  display: grid;
+  flex: 0 1 16rem;
+  min-inline-size: 0;
+}
+
+.contact__name {
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+/* The address is what a row is identified by, so it keeps its own line under the name instead
+   of competing with it across the row. It is also the one field that can outrun its column, so
+   it ellipses rather than pushing the permissions off the end. */
+.contact__mail {
+  overflow: hidden;
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact__none {
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.contact__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex: none;
+  flex-wrap: wrap;
+}
+
+/*
+ * The editor opens under the row it belongs to and keeps the frame's ground, because the
+ * switches inside it are the sunken things — an editor that was sunken too would swallow them.
+ * The frame clips, so no corner handling is needed here.
+ */
 .perm-edit {
   margin: 0;
-  padding: var(--sws-space-16) var(--sws-space-16) var(--sws-space-24);
+  padding: 0 var(--sws-space-24) var(--sws-space-24);
   border: 0;
-  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  background: var(--sws-surface-sunken);
+  animation: perm-edit-in var(--sws-duration-base) var(--sws-ease-standard);
 }
 
-/* A row followed by its own editor drops the rule that would otherwise double up. */
-.contact:has(.perm-edit) .method-row {
-  border-block-end: 0;
+/* Durations collapse to zero under prefers-reduced-motion, so this resolves to an instant
+   appearance rather than needing its own media query. */
+@keyframes perm-edit-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--sws-space-4) * -1));
+  }
+}
+
+/* A <legend> carries its own inline padding from the UA sheet, which would push the label out
+   of line with the switches under it. */
+.perm-edit__legend {
+  padding: 0;
+  margin-block-end: var(--sws-space-12);
 }
 
 .perm-edit__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--sws-space-12);
-  margin-block: var(--sws-space-12);
-}
-
-.perm-edit__row {
-  display: flex;
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: var(--sws-space-8);
-  min-block-size: var(--sws-touch-target-min);
 }
 
-.perm-edit__label {
-  display: block;
-  font-weight: var(--sws-weight-semibold);
+.perm-edit__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  flex-wrap: wrap;
+  margin-block-start: var(--sws-space-16);
 }
 
-.perm-edit__note {
-  display: block;
-  font-size: var(--sws-font-size-caption);
-  color: var(--sws-text-secondary);
+/*
+ * On a phone the frame's 24px gutter is most of the room a permission tag has to sit in, so the
+ * head, the band and the rows all drop to 16 together — one gutter for the whole frame, not
+ * three that disagree.
+ */
+@media (max-width: 599px) {
+  .frame__head,
+  .contact__row,
+  .frame .tbar--inset {
+    padding-inline: var(--sws-space-16);
+  }
+
+  .perm-edit {
+    padding-inline: var(--sws-space-16);
+  }
+
+  .frame__head {
+    padding-block: var(--sws-space-16);
+  }
+
+  /* The screen's one act, at the width of the thumb that presses it. */
+  .frame__actions {
+    inline-size: 100%;
+  }
+
+  .frame__actions > * {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /*
+   * The fixed 16rem column exists to start every row's permissions at the same x. There is one
+   * column on a phone, so there is nothing to line up — and holding the basis there costs 310px
+   * of a 306px row, which wraps the monogram off its own name.
+   */
+  .contact__id {
+    flex: 1 1 auto;
+  }
 }
 
 /* ── 2026-09-07: the invoice document ───────────────────────────────────────── */

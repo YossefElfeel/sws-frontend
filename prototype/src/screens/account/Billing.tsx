@@ -572,23 +572,16 @@ export function AddFunds() {
             <header className="card__head">
               <h2 className="card__heading">{t('funds.amount')}</h2>
             </header>
+            {/*
+              The field leads; the presets follow it. The presets used to come first, which made
+              them the offer and left the field as the exception — it was labelled "another
+              amount" — when the amount an account actually wants is the ordinary case and the
+              four figures are the shortcut into it. The card heading labels the field, so the
+              field carries its own label for a screen reader only rather than saying it twice.
+            */}
             <div className="form">
-              <div className="chips" role="group" aria-label={t('funds.amount')}>
-                {presets.map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    className={`chip${amount === p ? ' is-active' : ''}`}
-                    aria-pressed={amount === p}
-                    onClick={() => setAmount(p)}
-                  >
-                    {money(p)}
-                  </button>
-                ))}
-              </div>
-
               <label className="field-label">
-                <span className="eyebrow">{t('funds.custom')}</span>
+                <span className="u-visually-hidden">{t('funds.amount')}</span>
                 <input
                   className="field serial"
                   type="number"
@@ -598,6 +591,23 @@ export function AddFunds() {
                   onChange={(e) => setAmount(Math.round(Number(e.target.value) * 100))}
                 />
               </label>
+
+              <div className="field-label">
+                <span className="eyebrow">{t('funds.quick')}</span>
+                <div className="chips" role="group" aria-label={t('funds.quick')}>
+                  {presets.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      className={`chip${amount === p ? ' is-active' : ''}`}
+                      aria-pressed={amount === p}
+                      onClick={() => setAmount(p)}
+                    >
+                      {money(p)}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
 

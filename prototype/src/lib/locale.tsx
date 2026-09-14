@@ -1479,7 +1479,7 @@ export const STRINGS = {
 
   'funds.lede': { ar: 'اشحن رصيد يتخصم منه أي فاتورة جاية تلقائيًا.', en: 'Top up a balance that later invoices draw on automatically.' },
   'funds.amount': { ar: 'المبلغ', en: 'Amount' },
-  'funds.custom': { ar: 'مبلغ آخر', en: 'Another amount' },
+  'funds.quick': { ar: 'مبالغ جاهزة', en: 'Quick amounts' },
   'funds.add': { ar: 'اشحن الرصيد', en: 'Add funds' },
   'funds.balance': { ar: 'الرصيد الحالي', en: 'Current balance' },
   'funds.balanceNote': { ar: 'الرصيد بيتخصم منه أول ما تتصدر فاتورة جديدة.', en: 'The balance is applied as soon as a new invoice is issued.' },
@@ -1811,7 +1811,7 @@ export const STRINGS = {
   'svc.addonsNone': { ar: 'مفيش إضافات مفعّلة على الخدمة دي.', en: 'No add-ons are active on this service.' },
   'svc.addonPick': { ar: 'اختار إضافة…', en: 'Choose an add-on…' },
   'svc.addonBuy': { ar: 'شراء وتفعيل', en: 'Buy and activate' },
-  'svc.tab.details': { ar: 'تفاصيل الفوترة', en: 'Billing details' },
+  'svc.related': { ar: 'الفواتير والدومين', en: 'Invoices and domain' },
   'svc.tab.invoices': { ar: 'الفواتير', en: 'Invoices' },
   'svc.tab.domain': { ar: 'الدومين', en: 'Domain' },
   'svc.noInvoices': { ar: 'مفيش فواتير على الخدمة دي لسه.', en: 'No invoices for this service yet.' },

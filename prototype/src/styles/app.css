@@ -173,18 +173,69 @@
 }
 
 .app__group + .app__group {
-  margin-block-start: var(--sws-space-24);
+  margin-block-start: var(--sws-space-4);
 }
 
-/* One size in both languages. It used to be 11px in Latin and caption in Arabic, so the nav's
+/* The group label is the control that opens the group, so it is a row with a real target
+   rather than a caption with a click handler on it.
+
+   One size in both languages. It used to be 11px in Latin and caption in Arabic, so the nav's
    group labels were a different size depending on which language you read the product in. */
 .app__group-label {
-  padding: 0 var(--sws-space-12) var(--sws-space-8);
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-8);
+  inline-size: 100%;
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-12);
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  font-family: inherit;
   font-size: var(--sws-font-size-caption);
   font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.app__group-label:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-primary);
+}
+
+.app__group-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Closed, a group still says that the page you are reading is inside it. */
+.app__group.is-here .app__group-label {
+  color: var(--sws-action-quiet);
+}
+
+.app__group-chev {
+  flex: none;
   color: var(--sws-text-secondary);
+  transition: transform var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.app__group.is-open .app__group-chev {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app__group-chev {
+    transition: none;
+  }
 }
 
 /* Arabic has no case and its letterforms join, so uppercase means nothing here and tracking
@@ -197,6 +248,13 @@
 .app__group ul {
   display: grid;
   gap: var(--sws-space-4);
+  padding-block: var(--sws-space-4) var(--sws-space-8);
+}
+
+/* A class selector outranks the browser's own [hidden] rule, so a closed group has to be
+   told to stay closed. */
+.app__group ul[hidden] {
+  display: none;
 }
 
 .app__link {
@@ -1485,27 +1543,6 @@
   text-align: center;
 }
 
-/*
- * The same block inside a card, where it is a region and not a screen.
- *
- * It lived in account.css until now, which is loaded before this file, so a single class
- * there was contesting a single class here and losing every time: the variant set out to
- * shorten the column of air and never shortened anything. Moved next to what it modifies.
- *
- * It also gives up the card chrome. `.empty` carries a ground, a hairline, a radius and a
- * lift because on its own it *is* the card; inside a flush one all four landed on top of the
- * card's own — a white plane on a white plane, a border doubling the head's rule a hair above
- * it, and a radius that `overflow: hidden` clipped back to square. What is left is what an
- * inset region needs: the card's own 24px gutter, and 32px of air rather than 48.
- */
-.empty--inset {
-  padding: var(--sws-space-32) var(--sws-space-24);
-  background: none;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-
 .empty svg {
   color: var(--sws-border-strong);
 }
@@ -1880,14 +1917,21 @@
   background: var(--sws-surface-raised);
   border: var(--sws-rule-hair) solid var(--sws-border-subtle);
   border-radius: var(--sws-radius-lg);
+  /* A framed fieldset is a card by every other measure — same ground, same hairline, same
+     radius — so it takes the card's rank too. Without it the ticket form's frames sat flat
+     beside the suggestions card in the very same row: two elevations for one kind of box. */
+  box-shadow: var(--sws-elevation-card);
 }
 
-.app__main .fieldset + .fieldset {
-  margin-block-start: var(--sws-space-16);
-}
-
-/* A form that is a column of card-sections rather than one card: the sections carry the frames
-   and the footer sits below them, on the ground. */
+/*
+ * A form that is a column of card-sections rather than one card: the sections carry the frames
+ * and the footer sits below them, on the ground.
+ *
+ * The seam between two frames is this gap and nothing else. `.app__main .fieldset + .fieldset`
+ * used to add a 16px top margin on top of it, and a margin on a grid item adds to the gap
+ * rather than collapsing into it — so every seam in the ticket form measured 32 while every
+ * other column of cards in the client area measured the 16 that `.cards` sets.
+ */
 .form-stack {
   display: grid;
   gap: var(--sws-space-16);
@@ -1899,9 +1943,57 @@
   border-block-start: 0;
 }
 
+/*
+ * The frame's title, inside the frame.
+ *
+ * A legend is the one element a browser lifts out of its own box: the rendered legend is
+ * painted ON the fieldset's block-start border, outside the padding, with the border cut away
+ * behind it. That is the look a bare fieldset is designed for — but these fieldsets are cards,
+ * and it left every group named from outside its own frame while the suggestions card in the
+ * very same row carried its heading within. Two ways of titling a box, side by side.
+ *
+ * Floating it is what takes it back: per the rendering spec only a legend with `float: none`
+ * is the rendered legend, so a floated one is laid out as an ordinary block — the border runs
+ * unbroken and the 24px padding applies above it. `inline-size: 100%` gives it a line of its
+ * own, so the float has no side to escape to and RTL needs no second rule.
+ *
+ * From there it is a card head: the size, weight and tracking of `.card__heading`, over the
+ * 16px that `.card__head` sets.
+ */
 .app__main .fieldset legend {
+  float: inline-start;
+  inline-size: 100%;
+  margin-block-end: var(--sws-space-16);
   font-size: var(--sws-font-size-body);
   font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+/* Only a box that establishes its own formatting context steps around a float, and a bare
+   input is not one. Clearing says it for all of them rather than resting on which is which. */
+.app__main .fieldset > *:not(legend) {
+  clear: both;
+}
+
+/*
+ * One rhythm inside a frame: 16 between blocks, the same figure the field grid keeps between
+ * its own columns and rows. The details frame stacked the subject field straight onto the
+ * editor's toolbar with nothing between them, so the two read as one control with a seam.
+ *
+ * A hint is the exception, and stays at the 12 it sets for itself: it is not a block beside
+ * the control above it, it is a line belonging to it.
+ */
+.app__main .fieldset > *:not(legend) + *:not(.hint) {
+  margin-block-start: var(--sws-space-16);
+}
+
+/*
+ * The chooser closes the group its label opens. The chooser and the form below it are two
+ * groups of cards with nothing between them, so the last choice tile and the first frame
+ * shared an edge — 0px, on a screen where every other seam is 16 or 24.
+ */
+.app__main .choices {
+  margin-block-end: var(--sws-space-24);
 }
 
 .app__main .choice,

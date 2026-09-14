@@ -463,12 +463,34 @@
   gap: var(--sws-space-8);
 }
 
+/*
+ * Stacked fields that are not in a .field-grid sat flush against one another, so the second
+ * field's eyebrow read as a caption hanging off the first field's input rather than the start of
+ * a new question. 12px separates the pair without loosening the 8px that ties a label to its own
+ * input.
+ */
+.transfer-form .field-label + .field-label {
+  margin-block-start: var(--sws-space-12);
+}
+
 .field-grid {
   display: grid;
   gap: var(--sws-space-16);
   /* 12rem, not 15: at 15 a pair needs 30rem plus the gap, which is a hair more than the auth
      card offers, so first/last name collapsed to one column on the widest screen there is. */
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+/*
+ * Four fields that pair two by two — a name with its address, a department with its priority.
+ * `auto-fit` counts what fits and nothing else, so in a frame this wide it seated three on the
+ * first line and left the fourth alone beside a hole two fields across. A count, not a fit:
+ * the pairs are the reason the four are in one group.
+ */
+@media (min-width: 640px) {
+  .field-grid--pairs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .fieldset {
