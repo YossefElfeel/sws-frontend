@@ -165,6 +165,12 @@ export const STRINGS = {
   'col.order': { ar: 'الطلب', en: 'Order' },
 
   'action.order': { ar: 'اطلب', en: 'Order' },
+  /*
+   * The dashboard's own button. "Order" alone names the verb and not the object, and the one
+   * place it appears is a screen already full of services, domains and invoices — so a button
+   * that only says "order" leaves the reader to guess which of the three it starts.
+   */
+  'action.orderService': { ar: 'اطلب خدمة', en: 'Order service' },
   'action.ordered': { ar: 'في الطلب', en: 'On order' },
   'action.counterfoil': { ar: 'الكعب', en: 'Counterfoil' },
   'action.back': { ar: 'رجوع', en: 'Back' },
@@ -312,6 +318,21 @@ export const STRINGS = {
   'plan.featured': { ar: 'الأكثر طلبًا', en: 'Featured' },
   'plan.additional': { ar: 'مزايا إضافية', en: 'Additional Features' },
   'plan.orderNow': { ar: 'اطلب الآن', en: 'Order Now' },
+
+  // The additional features open and close, so the card opens at the height of what a person
+  // is comparing — name, price and the specification — rather than at the height of a list
+  // most readers scroll past.
+  'plan.seeMore': { ar: 'اعرض المزايا', en: 'See more' },
+  'plan.seeLess': { ar: 'إخفاء المزايا', en: 'See less' },
+
+  /*
+   * A promotion, on the card. Read in one line: the old figure struck through, the payable one
+   * beside it, and what came off as a percentage — a strike with no percentage makes the
+   * reader do the arithmetic, and a percentage with no old figure asks them to take it on
+   * trust. "Save" carries the number in both languages without a placeholder.
+   */
+  'plan.save': { ar: 'وفّر', en: 'Save' },
+  'plan.was': { ar: 'السعر قبل الخصم', en: 'Price before discount' },
   'plan.websites': { ar: 'مواقع', en: 'Websites Hosting' },
   'plan.website': { ar: 'موقع واحد', en: '1 Website Hosting' },
   'plan.websitesDual': { ar: 'موقعان', en: '2 Websites Hosting' },
@@ -1439,6 +1460,43 @@ export const STRINGS = {
   'dash.settled': { ar: 'كله مدفوع', en: 'All paid' },
   'dash.awaiting': { ar: 'في انتظار الرد', en: 'Awaiting reply' },
   'dash.noneOpen': { ar: 'مفيش مفتوح', en: 'None open' },
+
+  // ── the house ads on the dashboard ────────────────────────────────────────
+  // Each one names a product and says what it starts at. None of them names a discount, a
+  // countdown or a "limited" anything: no such offer has been agreed (PRODUCT.md), and an
+  // invented one is the kind of claim that reaches a customer before anybody reviews it.
+  'promo.title': { ar: 'عروض', en: 'Offers' },
+  'promo.from': { ar: 'يبدأ من', en: 'From' },
+  'promo.cta': { ar: 'اطلب أو اعرف أكتر', en: 'Order or learn more' },
+  'promo.show': { ar: 'اعرض العرض', en: 'Show offer' },
+  'promo.ssl': {
+    ar: 'شهادة SSL تحطّ القفل جنب اسم موقعك',
+    en: 'An SSL certificate puts the padlock beside your name',
+  },
+  'promo.sslBody': {
+    ar: 'الزائر بيشوف إن الاتصال مشفّر قبل ما يكتب أي بيانات. الإصدار بيتم في دقايق.',
+    en: 'Visitors see the connection is encrypted before they type anything. Issued in minutes.',
+  },
+  'promo.mail': {
+    ar: 'بريد باسم دومينك، مش باسم شركة تانية',
+    en: 'Mail at your own domain, not somebody else’s',
+  },
+  'promo.mailBody': {
+    ar: 'صناديق بريد بفلترة سبام وفحص فيروسات، وتزامن على الموبايل.',
+    en: 'Mailboxes with spam filtering, antivirus scanning and mobile sync.',
+  },
+  'promo.builder': {
+    ar: 'ابني الموقع من غير ما تكتب سطر كود',
+    en: 'Build the site without writing a line of code',
+  },
+  'promo.builderBody': {
+    ar: 'محرّر سحب وإفلات وقوالب جاهزة للموبايل، وبيشتغل على دومينك.',
+    en: 'A drag-and-drop editor and mobile-ready templates, on your own domain.',
+  },
+
+  // ── who the account belongs to ────────────────────────────────────────────
+  'ident.title': { ar: 'بياناتك', en: 'Your details' },
+  'ident.update': { ar: 'تعديل البيانات', en: 'Update' },
 
   'status.active': { ar: 'يعمل', en: 'Active' },
   'status.pending': { ar: 'قيد التجهيز', en: 'Pending' },

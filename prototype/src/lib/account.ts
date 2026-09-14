@@ -766,6 +766,12 @@ export const CONTACTS: Contact[] = [
 ];
 
 export interface Account {
+  /**
+   * The number WHMCS assigns the client and every invoice, ticket and order then quotes back.
+   * It is the one thing support asks for first, so the client area has to show it somewhere a
+   * person can read it out without going hunting.
+   */
+  clientId: number;
   name: Bi;
   company?: Bi;
   email: string;
@@ -781,6 +787,7 @@ export interface Account {
 }
 
 export const ACCOUNT: Account = {
+  clientId: 4821,
   name: { ar: 'كمال عبدالرحمن', en: 'Kamal Abdelrahman' },
   company: { ar: 'أتيليه كمال', en: 'Atelier Kamal' },
   email: 'kamal@atelier-kamal.com',

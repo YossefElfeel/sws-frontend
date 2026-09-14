@@ -68,6 +68,11 @@
  * being split evenly either side of it — a heading that sits with its own list is read as that
  * list's label, where one standing equidistant between two is read as a member of whichever it
  * happens to touch.
+ *
+ * The ink is the fourth cue, and the one this rail had been carrying least: secondary grey at
+ * caption size reads as a faint label on a list rather than as the start of something. Brand
+ * ink says the two groups are different kinds of thing — the categories are where you are, the
+ * actions are what you can do.
  */
 .rail__head {
   margin-block-end: var(--sws-space-8);
@@ -77,7 +82,7 @@
   font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
-  color: var(--sws-text-secondary);
+  color: var(--sws-action-quiet);
 }
 
 :root[lang='ar'] .rail__head {
@@ -113,8 +118,11 @@
     color var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
+/* The actions carry a glyph and the categories do not, so the glyph is where the actions group
+   gets its colour — the link text stays the rail's own ink until it is hovered or current. */
 .rail__link svg {
   flex: none;
+  color: var(--sws-action-primary);
 }
 
 .rail__link:hover {

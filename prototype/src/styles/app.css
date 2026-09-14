@@ -2904,3 +2904,294 @@ button.stat {
   gap: var(--sws-space-8);
   white-space: nowrap;
 }
+
+
+/* ── 2026-09-14: the dashboard as one ruled grid ───────────────────────────── */
+/*
+ * `.dash` on its own is two independent stacks — a wide column and a narrow one, each flowing
+ * at its own pace. That is right for the screens whose two columns are unrelated, and wrong for
+ * an overview: eight cards in two columns agreed on the first top edge and never again, drifting
+ * about 160px apart by the fourth row. Nothing was broken. It just looked like nobody had lined
+ * it up, because nobody had.
+ *
+ * `--paired` drops the two wrapper divs and puts the cards in the grid itself, so both columns
+ * share row tracks. Every pair now starts on the same line and ends on the same line, and the
+ * page reads as ruled rather than merely stacked.
+ *
+ * The rule it depends on: both columns carry the same number of cards. A ninth card leaves the
+ * last row half empty, which is the honest failure — there is nowhere for it to hide, so the
+ * imbalance is visible in review rather than three rows further down at some other width.
+ */
+.dash--paired {
+  align-items: stretch;
+}
+
+/*
+ * A grid item's automatic minimum size is its content, which is how one long domain name in a
+ * service row widens the whole column instead of ellipsing inside it. The two wrapper divs used
+ * to carry this; the cards carry it now.
+ */
+.dash--paired > .card {
+  min-inline-size: 0;
+}
+
+/*
+ * What a stretched card does with the height it did not ask for.
+ *
+ * A row is as tall as the taller of its two cards, which is the point — but it left the amount
+ * owed pinned to the top of a 300px box with nothing under it, and a card with a third of
+ * itself empty reads as one that failed to load the rest. So the card is a column, and the one
+ * block that is the whole card takes the space: the debt centres in it, the calm state centres
+ * in it, and a list still starts at the top where a list belongs.
+ */
+.dash--paired > .card {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash--paired > .card > .due,
+.dash--paired > .card > .calm {
+  flex: 1 1 auto;
+  align-items: center;
+}
+
+/* ── 2026-09-14: the house ads ─────────────────────────────────────────────── */
+/*
+ * Below the counts, above everything that is owed. It is the one block on the screen that is
+ * selling rather than reporting, so it is dressed to be told apart from the cards around it —
+ * tinted ground, a drawing, and a close button that means it — and it is placed where a person
+ * meets it after the four figures they came for, not before. The one failure mode that matters
+ * here is somebody acting on an advertisement because they read it as a message from billing.
+ */
+.promo {
+  position: relative;
+  display: grid;
+  gap: var(--sws-space-16);
+  align-items: center;
+  padding: var(--sws-space-24);
+  margin-block-end: var(--sws-space-24);
+  background: var(--sws-action-subtle-bg);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+}
+
+/*
+ * The drawing is given a fixed share rather than its own width, so the headline beside it keeps
+ * one measure as the promo changes. Below 768 the art goes: a 220-wide drawing under a headline
+ * on a phone is decoration occupying the fold.
+ */
+@media (min-width: 768px) {
+  .promo {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 13rem);
+    gap: var(--sws-space-24);
+  }
+}
+
+.promo__text {
+  min-inline-size: 0;
+  /* The close button's 44px box overlaps the corner; the text stops short of it rather than
+     running under it. */
+  padding-inline-end: var(--sws-space-24);
+}
+
+.promo__art {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .promo__art {
+    display: block;
+    color: var(--sws-text-secondary);
+  }
+
+  .promo__art svg {
+    inline-size: 100%;
+    block-size: auto;
+    max-block-size: 8.5rem;
+  }
+}
+
+/*
+ * The slide indicator.
+ *
+ * Marks rather than dots, and that is the 44px rule showing through the design: this product
+ * holds the AAA target size (ADR-0004), and a control has to be 44 square whatever it draws
+ * inside itself. Three 8px dots inside three 44px boxes sit 44px apart and read as three
+ * unrelated dots; a 32x4 mark fills the box it was always going to occupy, so the row looks
+ * like the control it is. The first version drew 24px dots and the flow audit caught them.
+ *
+ * The container gives back what the targets take, so the row occupies the height it looks like
+ * rather than the height it measures.
+ */
+.promo__dots {
+  --promo-trim-block: calc((var(--sws-touch-target-min) - var(--sws-space-4)) / -2);
+  --promo-trim-inline: calc((var(--sws-touch-target-min) - var(--sws-space-32)) / -2);
+  display: flex;
+  margin-block: var(--promo-trim-block) calc(var(--promo-trim-block) + var(--sws-space-12));
+  margin-inline-start: var(--promo-trim-inline);
+}
+
+.promo__dot {
+  position: relative;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.promo__dot::before {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  inline-size: var(--sws-space-32);
+  block-size: var(--sws-space-4);
+  translate: -50% -50%;
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-text-secondary);
+  opacity: 0.3;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    opacity var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.promo__dot:hover::before {
+  opacity: 0.55;
+}
+
+.promo__dot--on::before {
+  background: var(--sws-action-primary);
+  opacity: 1;
+}
+
+.promo__title {
+  font-size: var(--sws-font-size-h3);
+  font-weight: var(--sws-weight-bold);
+  line-height: 1.25;
+  letter-spacing: var(--sws-tracking-tight);
+  text-wrap: balance;
+}
+
+.promo__body {
+  margin-block: var(--sws-space-8) var(--sws-space-16);
+  max-inline-size: 46ch;
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.promo__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sws-space-8) var(--sws-space-16);
+}
+
+.promo__price {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.promo__close {
+  position: absolute;
+  inset-block-start: var(--sws-space-8);
+  inset-inline-end: var(--sws-space-8);
+  display: grid;
+  place-items: center;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--sws-duration-fast) var(--sws-ease-standard),
+    color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.promo__close:hover {
+  background: var(--sws-surface-raised);
+  color: var(--sws-text-primary);
+}
+
+/* ── 2026-09-14: who the account belongs to ────────────────────────────────── */
+/*
+ * The identity card at the head of the side column. It is the app's own card — same ground,
+ * same hairline, same corners — rather than the tinted block this pattern usually gets, because
+ * the client area already declares that a card means one thing, and a second card language on
+ * the busiest screen is how that declaration stops being true. The brand colour is spent on one
+ * object instead: the avatar.
+ */
+.ident__who {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+  margin-block-end: var(--sws-space-16);
+}
+
+/*
+ * Initials, not a photograph. Nothing in this product uploads an avatar, and a stock silhouette
+ * standing in for a person is a placeholder that ships.
+ */
+.ident__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-card-tile-bg);
+  color: var(--sws-card-tile-ink);
+  font-size: var(--sws-font-size-body);
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+.ident__whom {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.ident__id {
+  font-size: var(--sws-font-size-body);
+  font-weight: var(--sws-weight-bold);
+  line-height: 1.3;
+}
+
+.ident__org {
+  font-size: var(--sws-font-size-body-sm);
+  color: var(--sws-text-secondary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* One block of text on four lines, the way an address is written on an envelope. */
+.ident__address {
+  display: grid;
+  gap: 2px;
+  font-size: var(--sws-font-size-body-sm);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.ident__address > span:first-child {
+  color: var(--sws-text-primary);
+  font-weight: var(--sws-weight-medium);
+}
+
+/*
+ * Two buttons, and the quiet one is the one that ends the session. Sign out is not destructive,
+ * but it is the only control on this screen that takes something away, so it does not get the
+ * same weight as the control that fixes an address.
+ */
+.ident__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-16);
+}

@@ -14,31 +14,47 @@
  * row from whatever width was left over, which in the family pages' 832px column put three
  * cards on a line and orphaned the fourth onto a row of its own. Same rule as .stat-row: a set
  * lines up or it breaks in half, never three and a stray.
+ *
+ * The frame exists to be measured, and that is the whole of its job.
+ *
+ * The column count used to come from `@media`, which asks how wide the WINDOW is. The cards on
+ * a family page are not in the window: they are in an 832px column beside a 240px rail inside a
+ * 1200px shell. At 1440 the window said "four across" and four across of 832 is 196px a card —
+ * a price list too narrow to read a plan name on one line, produced by a breakpoint that was
+ * measuring the wrong box. A container query asks the only question that was ever relevant:
+ * how wide is the space these cards are actually in.
  */
+.plans-frame {
+  container-type: inline-size;
+  container-name: plans;
+}
+
 .plans {
   display: grid;
-  gap: var(--sws-space-16);
+  /* Wider between rows than between columns: the Featured flag is hung half outside its card's
+     top edge, and in a 16px row gap it grazes the card above. */
+  gap: var(--sws-space-24) var(--sws-space-16);
   grid-template-columns: minmax(0, 1fr);
   /* stretch, not start: cards of a set are one height, so every Order button sits on one line
      instead of wherever that card's feature list happened to end. */
   align-items: stretch;
 }
 
-/* Three fit a line as soon as there is a line to fit. */
-@media (min-width: 720px) {
+/* Three fit a line as soon as the line can hold three at a width worth reading. */
+@container plans (min-width: 46rem) {
   .plans:has(> :nth-child(3):last-child) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 /* Four go two by two until the column is wide enough to hold all four at a readable width. */
-@media (min-width: 640px) {
+@container plans (min-width: 34rem) {
   .plans:has(> :nth-child(4):last-child) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 1140px) {
+@container plans (min-width: 68rem) {
   .plans:has(> :nth-child(4):last-child) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -95,10 +111,15 @@
  * name, price, cycle, features, separator, extras and button each land on one shared line
  * across the row; the extras row takes the slack that keeps the button at the bottom.
  *
- * Only while the cards are a single row. Two by two, every card would claim rows 1–7 and the
- * second pair would be dealt on top of the first. And only where the row really is plan cards:
- * the home page's feature strip is a .plans list of plain cards, and it was collecting the six
- * empty rows' worth of gutter — 96px of nothing — underneath it.
+ * Two by two it takes fourteen rows rather than seven, and each pair is placed by hand into
+ * its own seven. Left to auto-place, every card would claim rows 1–7 and the second pair would
+ * be dealt on top of the first. It is worth the two extra rules: two by two is now the shape
+ * this page is usually in, and a pair of cards whose separators sit at different heights is
+ * the same "assembled rather than designed" the single-row case was fixed for.
+ *
+ * Only where the row really is plan cards: the home page's feature strip is a .plans list of
+ * plain cards, and it was collecting the six empty rows' worth of gutter — 96px of nothing —
+ * underneath it.
  */
 @supports (grid-template-rows: subgrid) {
   .plan__name {
@@ -129,7 +150,7 @@
     grid-row: 7;
   }
 
-  @media (min-width: 720px) {
+  @container plans (min-width: 46rem) {
     .plans:has(> .plan:nth-child(3):last-child) {
       grid-template-rows: auto auto auto auto auto 1fr auto;
     }
@@ -142,12 +163,43 @@
     }
   }
 
-  @media (min-width: 1140px) {
+  /*
+   * Two by two: fourteen rows, and each pair placed into its own seven.
+   *
+   * Every row is `auto`, and the `1fr` the single-row case uses would be a bug here. Flexible
+   * tracks are sized together across the whole grid, so the two extras rows would be handed
+   * the same height — open one card's additional features and the pair on the row below grows
+   * a 150px hole to match it. There is no slack to absorb in an auto-height grid anyway: the
+   * card is the sum of its seven rows, which is what puts the two buttons on one line.
+   */
+  @container plans (min-width: 34rem) {
+    .plans:has(> .plan:nth-child(4):last-child) {
+      grid-template-rows: repeat(2, auto auto auto auto auto auto auto);
+    }
+
+    .plans:has(> .plan:nth-child(4):last-child) > .plan {
+      display: grid;
+      grid-template-rows: subgrid;
+      row-gap: var(--sws-space-12);
+    }
+
+    .plans:has(> .plan:nth-child(4):last-child) > .plan:nth-child(-n + 2) {
+      grid-row: 1 / 8;
+    }
+
+    .plans:has(> .plan:nth-child(4):last-child) > .plan:nth-child(n + 3) {
+      grid-row: 8 / 15;
+    }
+  }
+
+  @container plans (min-width: 68rem) {
     .plans:has(> .plan:nth-child(4):last-child) {
       grid-template-rows: auto auto auto auto auto 1fr auto;
     }
 
-    .plans:has(> .plan:nth-child(4):last-child) > .plan {
+    .plans:has(> .plan:nth-child(4):last-child) > .plan,
+    .plans:has(> .plan:nth-child(4):last-child) > .plan:nth-child(-n + 2),
+    .plans:has(> .plan:nth-child(4):last-child) > .plan:nth-child(n + 3) {
       display: grid;
       grid-row: 1 / -1;
       grid-template-rows: subgrid;
@@ -183,12 +235,47 @@
   gap: var(--sws-space-4);
 }
 
+/*
+ * A promotion is three facts on one line: what it was, what it is, and what came off. Any two
+ * of the three make the reader work — a strike with no percentage is arithmetic, a percentage
+ * with no old price is a claim. The gap widens because three things need to read as three
+ * things rather than as one long number.
+ */
+.plan__price--off {
+  gap: var(--sws-space-4) var(--sws-space-8);
+}
+
+.plan__was {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-medium);
+  color: var(--sws-text-secondary);
+  /* from-font, not a fixed width: the strike has to look drawn through the digits rather than
+     painted over them, and the serial face carries its own line metric for exactly this. */
+  text-decoration-thickness: from-font;
+}
+
 .plan__amount {
   font-size: var(--sws-font-size-h1);
   line-height: 1.1;
   font-weight: var(--sws-weight-bold);
   letter-spacing: var(--sws-tracking-tight);
   color: var(--sws-text-primary);
+}
+
+/* The payable figure carries the saving's colour, so the eye lands on the number being charged
+   rather than on the one that has a line through it. */
+.plan__price--off .plan__amount {
+  color: var(--sws-status-success);
+}
+
+.plan__save {
+  padding: 2px var(--sws-space-8);
+  background: var(--sws-banner-success-bg);
+  color: var(--sws-status-success);
+  border-radius: var(--sws-radius-pill);
+  font-size: var(--sws-font-size-caption);
+  font-weight: var(--sws-weight-semibold);
+  white-space: nowrap;
 }
 
 .plan__currency {

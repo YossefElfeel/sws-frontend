@@ -32,6 +32,53 @@
   background: var(--sws-border-subtle);
 }
 
+/*
+ * The separator is also the switch.
+ *
+ * The additional features were the tallest thing on a plan card and the least read: somebody
+ * comparing four plans compares the name, the price and the specification, and passes seven
+ * lines of "24/7 Support" four times over on the way to the button. Closed, the card opens at
+ * the height of the comparison.
+ *
+ * The control is the line that names the section rather than a second control underneath it —
+ * one row instead of two, and the thing you press is the thing it is labelled with. It takes
+ * the brand ink and the 44px height every other control here has, because a separator nobody
+ * can tell is pressable is a separator nobody presses.
+ */
+.plan__divider--button {
+  inline-size: 100%;
+  /* It brings its own 44px, so it does not also need the separator's margin: the two together
+     put 20px of nothing above and below a single line of text. */
+  margin-block: 0;
+  min-block-size: var(--sws-touch-target-min);
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  font-weight: var(--sws-weight-semibold);
+  color: var(--sws-action-quiet);
+  cursor: pointer;
+  transition: color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.plan__divider--button > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+}
+
+.plan__divider--button:hover {
+  color: var(--sws-action-primary);
+}
+
+.plan__chevron {
+  transition: rotate var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.plan__chevron--up {
+  rotate: 180deg;
+}
+
 .plan__extras {
   display: grid;
   /* This list sits in the row that absorbs a card's spare height. Left to stretch, a short
@@ -42,6 +89,15 @@
   margin-block-end: var(--sws-space-16);
   font-size: var(--sws-font-size-body-sm);
   color: var(--sws-text-secondary);
+}
+
+/*
+ * `display: grid` above outranks the user agent's `[hidden] { display: none }`, which is how a
+ * closed disclosure stays fully on the page while telling assistive technology it is shut. The
+ * rule has to be restated at the same weight or the `hidden` attribute is decorative.
+ */
+.plan__extras[hidden] {
+  display: none;
 }
 
 /* ── header controls ───────────────────────────────────────────────────────── */
