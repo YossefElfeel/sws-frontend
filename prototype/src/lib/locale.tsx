@@ -1528,7 +1528,7 @@ export const STRINGS = {
 
   'funds.lede': { ar: 'اشحن رصيد يتخصم منه أي فاتورة جاية تلقائيًا.', en: 'Top up a balance that later invoices draw on automatically.' },
   'funds.amount': { ar: 'المبلغ', en: 'Amount' },
-  'funds.custom': { ar: 'مبلغ آخر', en: 'Another amount' },
+  'funds.quick': { ar: 'مبالغ جاهزة', en: 'Quick amounts' },
   'funds.add': { ar: 'اشحن الرصيد', en: 'Add funds' },
   'funds.balance': { ar: 'الرصيد الحالي', en: 'Current balance' },
   'funds.balanceNote': { ar: 'الرصيد بيتخصم منه أول ما تتصدر فاتورة جديدة.', en: 'The balance is applied as soon as a new invoice is issued.' },
@@ -1882,7 +1882,7 @@ export const STRINGS = {
   'svc.addonsNone': { ar: 'مفيش إضافات مفعّلة على الخدمة دي.', en: 'No add-ons are active on this service.' },
   'svc.addonPick': { ar: 'اختار إضافة…', en: 'Choose an add-on…' },
   'svc.addonBuy': { ar: 'شراء وتفعيل', en: 'Buy and activate' },
-  'svc.tab.details': { ar: 'تفاصيل الفوترة', en: 'Billing details' },
+  'svc.related': { ar: 'الفواتير والدومين', en: 'Invoices and domain' },
   'svc.tab.invoices': { ar: 'الفواتير', en: 'Invoices' },
   'svc.tab.domain': { ar: 'الدومين', en: 'Domain' },
   'svc.noInvoices': { ar: 'مفيش فواتير على الخدمة دي لسه.', en: 'No invoices for this service yet.' },
@@ -1967,6 +1967,7 @@ export const STRINGS = {
 
   // Network status inside the client area — C-41.
   'acc.status': { ar: 'حالة الشبكة', en: 'Network status' },
+  'status.entries': { ar: 'الأحداث', en: 'Entries' },
   'status.filter': { ar: 'عرض', en: 'Show' },
   'status.filter.all': { ar: 'كل الأحداث', en: 'All entries' },
   'status.filter.open': { ar: 'الجارية بس', en: 'Open only' },
@@ -1974,6 +1975,9 @@ export const STRINGS = {
   'status.filter.maintenance': { ar: 'الصيانة', en: 'Maintenance' },
   'status.noneTitle': { ar: 'مفيش أعطال على الشبكة', en: 'No network issues' },
   'status.noneNote': { ar: 'كل الأنظمة شغّالة زي ما ينبغي، ومفيش أحداث مطابقة للفلتر ده.', en: 'Every system is running as it should, and nothing matches this filter.' },
+  // The clear day is not a filtered-to-nothing day, and saying "nothing matches this filter"
+  // when no filter is on screen sends someone looking for a control that was never there.
+  'status.noneClear': { ar: 'مفيش أي عطل ولا صيانة متسجّلة على الشبكة.', en: 'No outage or maintenance is recorded on the network.' },
   'status.updates': { ar: 'عايز تعرف أول بأول؟', en: 'Want to be told first?' },
   'status.updatesBody': { ar: 'فعّل إشعارات الخدمة وهنبلّغك بأي عطل أو صيانة قبل ما تلاحظها.', en: 'Turn on service notifications and we tell you about any outage or maintenance before you notice it.' },
 } as const;

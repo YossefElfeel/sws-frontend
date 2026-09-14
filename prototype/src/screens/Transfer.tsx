@@ -53,7 +53,7 @@ export function Transfer() {
     <HostingLayout title={t('transfer.title')} lede={t('transfer.lede')}>
       <div className="split">
         <form
-          className="panel panel--pad"
+          className="panel panel--pad transfer-form"
           onSubmit={(e) => {
             e.preventDefault();
             setStage('checking');
