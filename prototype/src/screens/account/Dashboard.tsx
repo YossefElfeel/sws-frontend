@@ -32,6 +32,7 @@ import {
   ANNOUNCEMENTS,
   ACCOUNT,
   renews,
+  NEEDS_ATTENTION,
 } from '../../lib/account';
 
 /**
@@ -132,6 +133,21 @@ export function Dashboard() {
   const openTickets = TICKETS.filter((x) => x.status !== 'closed');
   const dueTotal = unpaid.reduce((s, i) => s + i.totalUsdMinor, 0);
   const active = SERVICES.filter((s) => s.status === 'active').length;
+
+  /*
+   * A preview, not the list. Every other card on this screen is capped — five renewals, two
+   * announcements — and this one was not, so it rendered whatever the account happened to own.
+   * At three services that read as a summary; at ten it is the services page with a dashboard
+   * around it, and it left the card beside it stretched to match with 380px of nothing in it.
+   *
+   * What is wrong comes first. The screen is ordered by obligation, and a preview that shows
+   * the five alphabetically-first services on an account with a suspended one is a preview
+   * that hides the only row worth opening. "View all" is one press away for the rest.
+   */
+  const servicePreview = [
+    ...SERVICES.filter((s) => NEEDS_ATTENTION.includes(s.status)),
+    ...SERVICES.filter((s) => !NEEDS_ATTENTION.includes(s.status)),
+  ].slice(0, 5);
 
   // Nearest first, and only what is close enough to act on.
   const renewals = [
@@ -317,7 +333,7 @@ export function Dashboard() {
           }
         >
           <ul className="rows">
-            {SERVICES.map((s) => (
+            {servicePreview.map((s) => (
               <li key={s.id}>
                 <Link className="row" to={`/account/services/${s.id}`}>
                   <span className={`row__dot row__dot--${s.status === 'active' ? 'ok' : 'wait'}`} aria-hidden="true" />
