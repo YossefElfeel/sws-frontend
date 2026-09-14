@@ -176,9 +176,21 @@ for (const [gw, expect] of [
 // ── Spec 9, the client area ──────────────────────────────────────────────────
 
 await p.evaluate(() => (location.hash = '#/account'));
-await p.waitForSelector('.app__link');
+// The navigation groups start closed, so the links are in the document rather than on the
+// screen. Wait for the control that opens a group, count what the column can still reach,
+// and check that the closing is real and that one click undoes it.
+await p.waitForSelector('.app__group-label');
 const sections = await p.$$eval('.app__link', (n) => n.length);
 ok('sidebar reaches every section', sections === 13, `${sections} sections`);
+const shut = await p.$$eval('.app__group ul', (n) => n.filter((u) => u.hidden).length);
+ok('every navigation group starts closed', shut === 4, `${shut} of 4 closed`);
+await p.click('.app__group-label');
+await p.waitForTimeout(120);
+ok('…and opens on the one you ask for', await p.$eval('.app__group ul', (u) => !u.hidden));
+ok(
+  'a closed group still carries what is waiting in it',
+  (await p.$$eval('.app__group-label .app__link-badge', (n) => n.length)) === 2,
+);
 ok('dashboard shows the four counts', (await p.$$eval('.stat-row .stat', (n) => n.length)) === 4);
 
 // The client area is an application, not another page of the site: none of the marketing
@@ -923,9 +935,13 @@ const firstUpgrade = await p.$eval('a[href*="upgrade"]', (a) => a.getAttribute('
 ok('the first upgrade link is the plan change', firstUpgrade.endsWith('/upgrade'), firstUpgrade);
 ok('exactly one cancel link', (await p.$$('a[href*="cancel"]')).length === 1);
 ok('the auto-renew switch carries its developer note', (await p.$$('.dev-note')).length >= 1);
+// Billing details belong to the side column and are stated there once, so the chip strip
+// under the page is the two things the side column does not carry, and it opens on invoices.
+ok('the chip strip does not repeat the billing details', (await p.$$eval('.filters__btn', (n) => n.length)) === 2);
+ok('the invoices for this service are what it opens on', (await p.$$eval('.card .data tbody tr', (n) => n.length)) >= 2);
 await p.click('.card .filters__btn:nth-child(2)');
 await p.waitForTimeout(120);
-ok('the invoices tab lists this service’s invoices', (await p.$$eval('.card .data tbody tr', (n) => n.length)) >= 2);
+ok('…and the domain it is attached to is beside them', (await p.$$('.card a[href*="/account/domains/"]')).length === 1);
 
 // O-01 for a VPS: server settings gate Continue until they are real.
 await p.evaluate(() => (location.hash = '#/configure/vps-2'));

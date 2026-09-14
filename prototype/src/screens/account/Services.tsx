@@ -144,7 +144,7 @@ const APP_ICON: Record<string, ReactNode> = {
   awstats: <IconGauge size={17} />,
 };
 
-type BillingTab = 'details' | 'invoices' | 'domain';
+type RelatedTab = 'invoices' | 'domain';
 
 /**
  * Service details — spec 9.2, C-03: server information, a direct cPanel login, billing
@@ -152,6 +152,10 @@ type BillingTab = 'details' | 'invoices' | 'domain';
  * screenshots, the things a person opens this screen to do without leaving it: the ten
  * cPanel shortcuts, a mailbox created in two fields, an add-on bought from a list, and the
  * invoices and domain that belong to this one service under a chip strip.
+ *
+ * Billing details are stated once, in the side column, beside the renewal amount and the
+ * auto-renew switch that act on them. The same six rows were also printed at the foot of the
+ * page, which left a reader checking two places against each other to be sure they agreed.
  *
  * cPanel is the reason most people open this screen, so it is the header action rather than a
  * button at the bottom of a card. Usage reads as what is left rather than what is gone: the
@@ -170,7 +174,7 @@ export function ServiceDetail() {
   const svc = service(id ?? '');
   const { saved, mark, clear } = useSaved();
 
-  const [tab, setTab] = useState<BillingTab>('details');
+  const [tab, setTab] = useState<RelatedTab>('invoices');
   const [mailName, setMailName] = useState('');
   const [mailPw, setMailPw] = useState('');
   const [mailBad, setMailBad] = useState(false);
@@ -441,13 +445,16 @@ export function ServiceDetail() {
             </div>
           </section>
 
+          {/* Billing details belong to the side column, and they are stated there once. What
+              belongs here is what the side column does not carry: the invoices this one
+              service has produced, and the domain it is attached to. */}
           <section className="card">
             <header className="card__head">
-              <h2 className="card__heading">{t('svc.billing')}</h2>
+              <h2 className="card__heading">{t('svc.related')}</h2>
             </header>
             <div className="bar">
-              <div className="filters" role="group" aria-label={t('svc.billing')}>
-                {(['details', 'invoices', 'domain'] as BillingTab[]).map((k) => (
+              <div className="filters" role="group" aria-label={t('svc.related')}>
+                {(['invoices', 'domain'] as RelatedTab[]).map((k) => (
                   <button
                     key={k}
                     type="button"
@@ -460,17 +467,6 @@ export function ServiceDetail() {
                 ))}
               </div>
             </div>
-
-            {tab === 'details' && (
-              <dl className="kv">
-                <div><dt>{t('account.since')}</dt><dd className="serial"><bdi>{svc.since}</bdi></dd></div>
-                <div><dt>{t('col.amount')}</dt><dd className="serial">{money(svc.amountUsdMinor)}</dd></div>
-                <div><dt>{t('col.term')}</dt><dd>{t(`cycle.${svc.cycle}` as never)}</dd></div>
-                <div><dt>{t('account.nextdue')}</dt><dd className="serial"><bdi>{svc.nextDue}</bdi></dd></div>
-                <div><dt>{t('svc.paymentMethod')}</dt><dd className="serial"><bdi>{paymentLabel}</bdi></dd></div>
-                <div><dt>{t('svc.autoRenew')}</dt><dd>{t(svc.autoRenew ? 'dom.on' : 'dom.off')}</dd></div>
-              </dl>
-            )}
 
             {tab === 'invoices' &&
               (invoices.length > 0 ? (
