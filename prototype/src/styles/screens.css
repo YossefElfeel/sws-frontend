@@ -437,13 +437,20 @@
 
 /* ── fields ────────────────────────────────────────────────────────────────── */
 
+/*
+ * Every control a person types or picks in — input, textarea, select, file — is this one
+ * shape. `md` rather than `sm`: the client area's search and filters were pills and the rest
+ * of the forms were 8px, so the product had two answers to "what shape is a control" and
+ * neither matched the other. One radius settles it, and 12 is the step that reads as a field
+ * beside a 16px card without reading as a chip.
+ */
 .field {
   inline-size: 100%;
   min-block-size: var(--sws-input-height-md);
   padding-inline: var(--sws-space-16);
   background: var(--sws-input-bg);
   border: var(--sws-rule-hair) solid var(--sws-input-border);
-  border-radius: var(--sws-radius-sm);
+  border-radius: var(--sws-radius-md);
   color: var(--sws-text-primary);
   font-size: var(--sws-font-size-body);
   transition: border-color var(--sws-duration-fast) var(--sws-ease-standard);
@@ -471,6 +478,32 @@
  */
 .transfer-form .field-label + .field-label {
   margin-block-start: var(--sws-space-12);
+}
+
+/*
+ * A dropdown: the field, plus the chevron the browser would otherwise draw hard against the
+ * frame. See components/Select.tsx for why the wrapper has to exist at all.
+ */
+.select {
+  position: relative;
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+}
+
+.select > .field {
+  appearance: none;
+  /* 16 + 16 + 8: the margin the text keeps on the other side, the chevron, and the gap that
+     stops a long option name from touching it. */
+  padding-inline-end: calc(var(--sws-space-16) + 16px + var(--sws-space-8));
+  cursor: pointer;
+}
+
+.select__chev {
+  position: absolute;
+  inset-inline-end: var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  pointer-events: none;
 }
 
 .field-grid {
@@ -1000,10 +1033,6 @@
   display: flex;
   align-items: center;
   gap: var(--sws-space-12);
-}
-
-.bar__end .tbar__count {
-  margin-block-start: 0;
 }
 
 /* ── stands: three things a company page says — M-17 and M-19 ─────────────── */

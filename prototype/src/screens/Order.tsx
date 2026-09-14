@@ -17,6 +17,7 @@ import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { convert, formatAmount, gatewaysFor, GATEWAYS } from '../lib/catalog';
 import { INVOICES, ACCOUNT, invoiceBalanceUsdMinor } from '../lib/account';
+import { Select } from '../components/Select';
 
 /** A fixed reference so the screenshots of these screens do not change between runs. */
 const REF = 'SWS-26090114';
@@ -151,11 +152,11 @@ export function Registrant() {
               <div className="field-grid">
                 <label className="field-label">
                   <span className="eyebrow">{t('reg.idType')}</span>
-                  <select className="field">
+                  <Select>
                     <option>{t('reg.idPassport')}</option>
                     <option>{t('reg.idNational')}</option>
                     <option>{t('reg.idTrade')}</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="field-label">
                   <span className="eyebrow">{t('reg.idNumber')}</span>

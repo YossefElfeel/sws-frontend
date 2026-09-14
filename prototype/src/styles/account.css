@@ -291,9 +291,12 @@
  * The row above every dashboard table. The field takes whatever the filters leave, because
  * what gets typed in it is a domain or an invoice serial, and both are long.
  *
- * Pills rather than the 8px radius the rest of the forms use: this row sits above a table with
- * square corners, and the contrast between the two is what tells you the row is a control and
- * the thing below it is the data.
+ * The field and the filters were pills — a 9999px radius on a product whose every other
+ * control is a rectangle. The contrast was meant to say "this row is a control and the thing
+ * below it is data", but a shape borrowed from a chip reads as a chip first, and it read that
+ * way on nine screens. The row is already told apart from the table by sitting outside the
+ * card, which is what every other toolbar here relies on. So both take the control radius, and
+ * the search field finally looks like what it is: a field.
  */
 
 .tbar {
@@ -307,10 +310,21 @@
   flex-wrap: wrap;
 }
 
-.tbar__count {
-  margin-block-start: var(--sws-space-8);
+/*
+ * The count that answers the search sits under the table now, not under the field — see
+ * TableCount. Outside a card it is a line of its own; inside one it is the table's foot, so it
+ * takes the card's padding and a rule to separate it from the last row.
+ */
+.tcount {
+  margin-block-start: var(--sws-space-12);
   font-size: var(--sws-font-size-body-sm);
   color: var(--sws-text-secondary);
+}
+
+.tcount--inset {
+  margin-block-start: 0;
+  padding: var(--sws-space-12) var(--sws-space-24);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
 }
 
 /*
@@ -381,7 +395,7 @@
    * and it clears the bar in both themes — 4.7:1 light, 3.8:1 dark.
    */
   border: var(--sws-rule-hair) solid var(--sws-input-border);
-  border-radius: var(--sws-radius-pill);
+  border-radius: var(--sws-radius-md);
   color: var(--sws-text-primary);
   font: inherit;
   font-size: var(--sws-font-size-body);
@@ -403,16 +417,16 @@
 }
 
 /* Chrome draws its own clear button inside a search input. It is worth keeping — it is the
-   only one-click way back to the full list — but it sits against the pill's edge without a
+   only one-click way back to the full list — but it sits against the frame's edge without a
    little room of its own. */
 .tsearch__input::-webkit-search-cancel-button {
   margin-inline-start: var(--sws-space-8);
 }
 
 /*
- * A filter is a pill with the chosen option written on it. The select is the whole control
- * rather than a control inside a box: one element to focus, one to click, and no gap where a
- * click lands on the wrapper and nothing opens.
+ * A filter carries the chosen option as its own label. The select is the whole control rather
+ * than a control inside a box: one element to focus, one to click, and no gap where a click
+ * lands on the wrapper and nothing opens.
  */
 .tfilter {
   position: relative;
@@ -428,7 +442,7 @@
   padding-inline: var(--sws-space-16) calc(var(--sws-space-16) + 16px + var(--sws-space-8));
   background: var(--sws-select-bg);
   border: var(--sws-rule-hair) solid var(--sws-select-border);
-  border-radius: var(--sws-radius-pill);
+  border-radius: var(--sws-radius-md);
   color: var(--sws-text-primary);
   font: inherit;
   font-size: var(--sws-font-size-body-sm);
@@ -1217,28 +1231,15 @@
 }
 
 /*
- * Inside the frame the toolbar is one band: the controls take the row and the count they answer
- * sits at its end, rather than opening a second line under a field it belongs beside.
+ * Inside the frame the toolbar is one band of controls and nothing else. It used to carry the
+ * count at its end, which is why it had to be a flex row at all; the count now sits under the
+ * list it answers, so the band is the search and the filters, full width, and the plain
+ * `.tbar--inset` rule is the whole of it.
  *
  * The ground stays the frame's own. `surface-sunken` would read as a well in light and as a
  * hole in dark, where it is the page colour and the frame is a step above it — the rule under
  * the band says "controls here, data below" in both themes without that trade.
  */
-.frame .tbar--inset {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sws-space-16);
-  flex-wrap: wrap;
-}
-
-.frame .tbar--inset .tbar__row {
-  flex: 1 1 20rem;
-}
-
-.frame .tbar--inset .tbar__count {
-  margin-block-start: 0;
-}
 
 .contacts {
   list-style: none;

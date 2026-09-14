@@ -22,7 +22,7 @@ import {
   IconCode,
   IconQuote,
 } from '../../components/icons';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import {
@@ -35,6 +35,7 @@ import {
   type TicketStatus,
 } from '../../lib/account';
 import { SYSTEMS, INCIDENTS } from '../../lib/marketing';
+import { Select } from '../../components/Select';
 
 const STATUSES: (TicketStatus | 'all')[] = ['all', 'open', 'answered', 'closed'];
 
@@ -88,8 +89,6 @@ export function Tickets() {
         value={q}
         onChange={setQ}
         label={t('search.tickets')}
-        shown={rows.length}
-        total={TICKETS.length}
       >
         <TableFilter
           label={t('account.status')}
@@ -178,6 +177,8 @@ export function Tickets() {
           </table>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={TICKETS.length} />
     </AccountLayout>
   );
 }
@@ -271,23 +272,23 @@ export function TicketNew() {
               </label>
               <label className="field-label">
                 <span className="eyebrow">{t('tkt.department')}</span>
-                <select className="field" value={dept} onChange={(e) => setDept(e.target.value)}>
+                <Select value={dept} onChange={(e) => setDept(e.target.value)}>
                   {DEPARTMENTS.map((d) => (
                     <option key={d.id} value={d.id}>
                       {t(d.nameKey as never)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label className="field-label">
                 <span className="eyebrow">{t('tkt.priority')}</span>
-                <select className="field" defaultValue="medium">
+                <Select defaultValue="medium">
                   {PRIORITIES.map((p) => (
                     <option key={p} value={p}>
                       {t(`prio.${p}` as never)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
           </fieldset>
@@ -565,8 +566,6 @@ export function Knowledgebase() {
         value={q}
         onChange={setQ}
         label={t('kb.search')}
-        shown={rows.length}
-        total={ARTICLES.length}
       >
         <TableFilter
           label={t('kb.categories')}
@@ -606,6 +605,8 @@ export function Knowledgebase() {
           </Link>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={ARTICLES.length} />
     </AccountLayout>
   );
 }
@@ -729,10 +730,6 @@ export function NetworkStatus() {
                 network is clear it is not offered — and neither is a count of nought. */}
             {incidents.length > 0 && (
               <div className="bar__end">
-                <p className="tbar__count" role="status">
-                  <span className="serial">{shown.length}</span> {t('dash.of')}{' '}
-                  <span className="serial">{incidents.length}</span>
-                </p>
                 <TableFilter
                   label={t('status.filter')}
                   value={filter}
@@ -756,6 +753,10 @@ export function NetworkStatus() {
               </p>
             </div>
           )}
+
+          {/* Under the list it counts, the way every other list in the client area counts
+              itself — and not at all on a clear day, when there is nothing to count. */}
+          {incidents.length > 0 && <TableCount shown={shown.length} total={incidents.length} />}
         </div>
       </div>
 

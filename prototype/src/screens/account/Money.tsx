@@ -11,7 +11,7 @@ import {
   IconInvoice,
   IconCalendar,
 } from '../../components/icons';
-import { TableToolbar, TableFilter, matches } from '../../components/TableToolbar';
+import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
 import {
@@ -220,8 +220,6 @@ export function Transactions() {
         value={q}
         onChange={setQ}
         label={t('search.txns')}
-        shown={rows.length}
-        total={TRANSACTIONS.length}
       >
         <TableFilter
           label={t('txn.kind')}
@@ -281,6 +279,8 @@ export function Transactions() {
           <p className="empty__note">{t(q.trim() ? 'empty.searchNote' : 'empty.filter')}</p>
         </div>
       )}
+
+      <TableCount shown={rows.length} total={TRANSACTIONS.length} />
     </AccountLayout>
   );
 }
