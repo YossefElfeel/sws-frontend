@@ -300,10 +300,8 @@
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
 }
 
-/* The same for an empty result: inside a card it is a row, not a whole screen. */
-.empty--inset {
-  padding-block: var(--sws-space-32);
-}
+/* The same for an empty result — `.empty--inset`, which lives beside `.empty` in app.css
+   because a rule in this file cannot outrank one there on equal specificity. */
 
 /* The field is the only thing in the row that grows; 14rem is about a domain name, which is
    the shortest it can be and still show what was typed. */
@@ -849,8 +847,15 @@
 }
 
 
+/*
+ * The document's rhythm is a rule, 16px above it, 16px below, then the next section — the
+ * invoice head and the parties block both set it. The table then added 16 of its own on top
+ * of the parties' margin, so the one section change in the document that paid for the gap
+ * twice was the one before the line items: 48px of air where every other change is 16. The
+ * wrapper around the table scrolls, and having nothing in it but the table is the point of it.
+ */
 .data--flush {
-  margin-block: var(--sws-space-16);
+  margin-block: 0;
 }
 
 /* An invoice is a document before it is a screen, so it holds a printable measure. */
@@ -1177,8 +1182,15 @@
   }
 }
 
-/* An add-on is a line of its own, indented under the thing it belongs to. */
-.data tr.is-sub td:first-child {
+/*
+ * An add-on is a line of its own, indented under the thing it belongs to — and on the invoice
+ * it was not indented at all. The document table zeroes the inline padding on its outer cells
+ * (four classes) and this rule asked for the indent with three, so on the one table where
+ * add-ons actually appear the sub-line sat on the same edge as its parent and the nesting was
+ * carried by the grey alone. Stated at the weight it needs to land.
+ */
+.data tr.is-sub td:first-child,
+.app__main .invoice .data--flush tr.is-sub td:first-child {
   padding-inline-start: var(--sws-space-32);
   color: var(--sws-text-secondary);
 }
@@ -1188,9 +1200,33 @@
   color: var(--sws-text-secondary);
 }
 
+/*
+ * The asterisk belongs to the line it marks, not to the sum underneath it. It sat 16px below
+ * the last row and nothing at all above the subtotal, so the footnote folded into the totals
+ * and read as a fourth figure that had lost its number. Close to what it annotates, clear of
+ * what it does not.
+ */
+.invoice .form__note {
+  margin-block: var(--sws-space-8) var(--sws-space-24);
+}
+
+/*
+ * The balance is the payment record's footer, so it is built like one: the rule above it runs
+ * the full width the way the head's rule does, and the figure sits on the card's own 24px
+ * gutter. It used to float on a 16px margin, which gave the card three different edges to
+ * read down — a head at 24, a table at 16, and a rule here that stopped short of both.
+ */
 .invoice__balance {
-  margin: var(--sws-space-16);
+  margin: 0;
+  padding: var(--sws-space-16) var(--sws-space-24);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/* The band carries the separation now, so the row inside it stops drawing a second one. */
+.invoice__balance .totals__row--grand {
   margin-block-start: 0;
+  padding-block: 0;
+  border-block-start: 0;
 }
 
 /* The taxable mark is small by convention; here it stays a legible 12.5px caption. */

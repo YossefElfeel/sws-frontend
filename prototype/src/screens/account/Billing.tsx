@@ -418,7 +418,7 @@ export function InvoiceDetail() {
                 </table>
               </div>
             ) : (
-              <div className="empty">
+              <div className="empty empty--inset">
                 <IconWallet size={28} />
                 <p className="empty__title">{t('inv.noPayments')}</p>
                 <p className="empty__note">{t('inv.noPaymentsNote')}</p>
