@@ -628,15 +628,46 @@
 
 /* ── domain search ─────────────────────────────────────────────────────────── */
 
+/*
+ * The row fills the measure it is given. It used to stop at 36rem, which put a domain field —
+ * the one control this whole page exists for — at half the width of the table answering it,
+ * with the rest of the line empty. A search box narrower than its own results reads as a
+ * secondary control on a page where it is the primary one.
+ */
 .domain-search {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--sws-space-8);
   margin-block: var(--sws-space-24);
-  max-width: 36rem;
 }
 
 .domain-search__input {
-  flex: 1 1 auto;
+  flex: 1 1 20rem;
+  min-inline-size: 0;
+  min-block-size: var(--sws-button-height-lg);
+}
+
+/*
+ * Narrow, beside the name, so the name keeps the room — the same share the funnel's own
+ * extension picker takes. A select is wrapped, so the frame is what the row sizes.
+ *
+ * It grows on the line it wraps onto. On a phone the three controls do not fit across, so the
+ * name takes the first line and the extension and the button take the second; left at its
+ * desktop basis the extension would sit as a 9rem stub against a full-width field above it.
+ */
+.domain-search__tld {
+  flex: 1 1 9rem;
+  min-inline-size: 7rem;
+  max-inline-size: 12rem;
+}
+
+@media (min-width: 768px) {
+  .domain-search__tld {
+    flex: 0 1 9rem;
+  }
+}
+
+.domain-search__tld > .field {
   min-block-size: var(--sws-button-height-lg);
 }
 
@@ -1422,4 +1453,99 @@
     animation: none;
     border-block-start-color: var(--sws-action-primary);
   }
+}
+
+/* ── 2026-09-14: the three doors and the extension shortlist ───────────────── */
+
+/*
+ * The doors reuse `.choice` from the funnel's domain step, because they are the same three
+ * cards saying the same three things — one object, two screens. What differs is what they are:
+ * radios there, a link and a button here. So the anatomy stays and the element resets, rather
+ * than a second card being drawn to look like the first.
+ */
+.choice--door {
+  display: grid;
+  inline-size: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+
+/*
+ * The selected door on this page means "you are already here", not "you picked this". It keeps
+ * the funnel's tick, because the tick reads as the current one in both senses.
+ */
+.choices--doors {
+  margin-block-start: var(--sws-space-24);
+}
+
+/* ── the extension shortlist ───────────────────────────────────────────────── */
+
+/*
+ * Four extensions, each with what it costs to register and what it costs to renew. Two figures
+ * on a card rather than one is the whole argument this page is making: an advertised first year
+ * with the renewal in the terms is the surprise the product claims not to spring, and a card
+ * that shows only the register price would be making that surprise on the landing screen.
+ */
+.tld-cards {
+  display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-block-end: var(--sws-space-32);
+}
+
+@media (min-width: 768px) {
+  .tld-cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tld-card {
+  display: grid;
+  /* The button is docked to the bottom edge, so four cards whose renewal lines wrap differently
+     still put their four buttons on one line. */
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--sws-space-4);
+  padding: var(--sws-space-24);
+  background: var(--sws-card-bg);
+  border-radius: var(--sws-radius-xl);
+  box-shadow: var(--sws-shadow-card);
+  text-align: center;
+}
+
+.tld-card__name {
+  font-size: var(--sws-font-size-h2);
+  font-weight: var(--sws-weight-bold);
+  line-height: 1.1;
+  letter-spacing: var(--sws-tracking-tight);
+  color: var(--sws-action-primary);
+}
+
+.tld-card__price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--sws-space-4);
+  margin-block-start: var(--sws-space-8);
+  font-size: var(--sws-font-size-body-lg);
+  font-weight: var(--sws-weight-bold);
+}
+
+.tld-card__per {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-medium);
+  color: var(--sws-text-secondary);
+}
+
+.tld-card__renew {
+  margin-block-end: var(--sws-space-16);
+  font-size: var(--sws-font-size-caption);
+  line-height: var(--sws-line-height-body-sm);
+  color: var(--sws-text-secondary);
+}
+
+.tld-card .btn {
+  inline-size: 100%;
 }
