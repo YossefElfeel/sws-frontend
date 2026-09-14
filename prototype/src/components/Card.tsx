@@ -13,9 +13,15 @@ import type { ReactNode } from 'react';
  * Passing the heading as a prop is what makes that unrepresentable: a card with a heading has a
  * head, and the head is the only thing that can render one.
  *
- * `tone` carries the two states a card can be in beyond neutral, and both are marked by more
- * than colour — `urgent` reddens the border AND the heading with its glyph, `calm` greens the
- * border and tints the ground.
+ * `tone` carries the states a card can be in beyond neutral, and the two that report one are
+ * marked by more than colour — `urgent` reddens the border AND the heading with its glyph,
+ * `calm` greens the border and tints the ground.
+ *
+ * `brand` is the odd one and is deliberately not a state. It says "this card is about you"
+ * rather than "something has happened", and it is the only card on a screen entitled to it:
+ * a second brand-ground card would make the colour mean "card" again instead of meaning that.
+ * It is a tone rather than a class on one screen so the ink inside it — text, glyph, avatar,
+ * both buttons — is settled in one place, which is the whole difficulty with a coloured card.
  */
 export function Card({
   heading,
@@ -33,7 +39,7 @@ export function Card({
   icon?: ReactNode;
   /** The "view all" or equivalent, at the far end of the head. */
   action?: ReactNode;
-  tone?: 'urgent' | 'calm';
+  tone?: 'urgent' | 'calm' | 'brand';
   /** Content runs to the card's own edges — a table, a list of ruled rows. */
   flush?: boolean;
   headingId?: string;
@@ -44,6 +50,7 @@ export function Card({
     'card',
     tone === 'urgent' ? 'card--urgent' : '',
     tone === 'calm' ? 'card--calm' : '',
+    tone === 'brand' ? 'card--brand' : '',
     flush ? 'card--flush' : '',
     className,
   ]

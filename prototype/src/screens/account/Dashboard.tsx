@@ -82,7 +82,7 @@ function IdentityCard() {
     .join('');
 
   return (
-    <Card className="ident" heading={t('ident.title')} icon={<IconUsers size={17} />}>
+    <Card className="ident" tone="brand" heading={t('ident.title')} icon={<IconUsers size={17} />}>
       <div className="ident__who">
         <span className="ident__avatar" aria-hidden="true">
           {initials}

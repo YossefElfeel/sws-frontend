@@ -3119,11 +3119,10 @@ button.stat {
 
 /* ── 2026-09-14: who the account belongs to ────────────────────────────────── */
 /*
- * The identity card at the head of the side column. It is the app's own card — same ground,
- * same hairline, same corners — rather than the tinted block this pattern usually gets, because
- * the client area already declares that a card means one thing, and a second card language on
- * the busiest screen is how that declaration stops being true. The brand colour is spent on one
- * object instead: the avatar.
+ * The identity card at the head of the side column. It is the app's own card — same corners,
+ * same padding, same place in the grid — on the brand ground, which is the one card on this
+ * screen entitled to it. What that costs is every piece of ink inside it: see `.card--brand`
+ * below, where all of it is settled.
  */
 .ident__who {
   display: flex;
@@ -3194,4 +3193,111 @@ button.stat {
   flex-wrap: wrap;
   gap: var(--sws-space-8);
   margin-block-start: var(--sws-space-16);
+}
+
+/* ── 2026-09-14: the card that is about you ────────────────────────────────── */
+/*
+ * A card on the brand ground.
+ *
+ * The client area declares that a card means one thing, and a second card language is how that
+ * declaration stops being true — so this is not a new shape. Same corners, same padding, same
+ * place in the grid. Only the ground changes, and only for the one card on the screen that is
+ * about the reader rather than about their account: who you are, not what you owe.
+ *
+ * That "only one" is the rule the colour depends on. A second brand-ground card and the ground
+ * goes back to meaning "card" instead of meaning "you".
+ *
+ * The difficulty with a coloured card is never the colour, it is everything sitting on it, and
+ * all of it is below: heading, glyph, both text ranks, the avatar and two buttons. It is
+ * `--sws-action-primary` + `--sws-text-on-action` throughout, which is the pair the a11y gate
+ * already holds to AA in both themes — 5.7:1 in light, 7.7:1 in dark — rather than a new pair
+ * nothing checks.
+ */
+.card--brand {
+  background: var(--sws-action-primary);
+  border-color: transparent;
+  color: var(--sws-text-on-action);
+}
+
+.card--brand .card__heading,
+.card--brand .card__heading svg {
+  color: var(--sws-text-on-action);
+}
+
+/*
+ * The second text rank, which on a white card is a grey and here cannot be: a grey on brand is
+ * either invisible or dirty. It is the same ink stepped back instead — 0.85, which measures
+ * 4.6:1 on the light ground and 6.6:1 on the dark one, so the quieter rank is still AA rather
+ * than decoratively quiet.
+ */
+.card--brand .ident__org,
+.card--brand .ident__address {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.card--brand .ident__address > span:first-child {
+  color: inherit;
+}
+
+/* The avatar inverts: the ground's ink becomes its ground, and the brand becomes its ink. Same
+   two colours as everything else here, the other way round, which is what makes it the one
+   object on the card that reads as lifted off it. */
+.card--brand .ident__avatar {
+  background: var(--sws-text-on-action);
+  color: var(--sws-action-primary);
+}
+
+/*
+ * Two buttons on a coloured ground, and neither of the app's own variants survives it: the
+ * secondary is a brand outline with brand text, which on brand is a rectangle of nothing, and
+ * the quiet one is brand text on transparent. So they are restated here rather than left to
+ * degrade — the same inversion the avatar makes for the one that acts, and an outline in the
+ * ground's own ink for the one that leaves.
+ *
+ * The ranking is unchanged from the white card: Update is the control that fixes a wrong
+ * address and carries the weight; Sign out is the only control on this screen that takes
+ * something away, so it does not get the same.
+ */
+.card--brand .btn--secondary {
+  background: var(--sws-text-on-action);
+  border-color: var(--sws-text-on-action);
+  color: var(--sws-action-primary);
+}
+
+.card--brand .btn--secondary:hover:not(:disabled) {
+  background: var(--sws-text-on-action);
+  color: var(--sws-action-primary-hover);
+}
+
+/*
+ * The quiet button draws its boundary as an inset shadow rather than a border, so this replaces
+ * that shadow. A `border` here would have added a second edge on top of a subtle grey one the
+ * brand ground swallows — two boundaries, one of them invisible.
+ *
+ * 80%, and the number was measured rather than chosen: the boundary of a control is a non-text
+ * contrast with a 3:1 floor (SC 1.4.11), and the third this started at came out at 1.7:1 against
+ * the ground. It still reads a step below the filled button beside it, which is the ranking that
+ * matters — Update is the control that fixes a wrong address, Sign out is the only control on
+ * this screen that takes something away.
+ */
+.card--brand .btn--quiet {
+  background: transparent;
+  box-shadow: inset 0 0 0 var(--sws-rule-hair)
+    color-mix(in srgb, var(--sws-text-on-action) 80%, transparent);
+  color: var(--sws-text-on-action);
+}
+
+/* The stock hover turns this control red, which is the right warning on a white card and an
+   unreadable one on brand. It brightens instead. */
+.card--brand .btn--quiet:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sws-text-on-action) 14%, transparent);
+  box-shadow: inset 0 0 0 var(--sws-rule-hair) var(--sws-text-on-action);
+  color: var(--sws-text-on-action);
+}
+
+/* The focus ring is drawn in a colour chosen against the page, not against this card, so on the
+   brand ground it has to be restated in the one ink that is guaranteed to contrast with it. */
+.card--brand :focus-visible {
+  outline-color: var(--sws-text-on-action);
 }
