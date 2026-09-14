@@ -463,6 +463,16 @@
   gap: var(--sws-space-8);
 }
 
+/*
+ * Stacked fields that are not in a .field-grid sat flush against one another, so the second
+ * field's eyebrow read as a caption hanging off the first field's input rather than the start of
+ * a new question. 12px separates the pair without loosening the 8px that ties a label to its own
+ * input.
+ */
+.transfer-form .field-label + .field-label {
+  margin-block-start: var(--sws-space-12);
+}
+
 .field-grid {
   display: grid;
   gap: var(--sws-space-16);
