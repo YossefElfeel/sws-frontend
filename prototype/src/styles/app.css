@@ -1476,6 +1476,32 @@
 }
 
 /*
+ * The two outer cells sit on the card's gutter, not 8px inside it.
+ *
+ * Every table in the client area is flush inside a card, under a head or a toolbar that
+ * starts at 24px. At 16px the first column label reached past the heading above it by exactly
+ * enough to read as a slip rather than as a margin, and the last column's figures did the
+ * same on the other edge. Between the columns 16px is still the right measure — density is
+ * what the client area is for — so only the two edges move.
+ *
+ * Above the phone breakpoint only. Below it the table already scrolls, the first column is
+ * sticky and 9rem wide, and spending another 16px of a 342px card on its two outer edges buys
+ * an alignment nobody can see next to a column that has left the viewport. The edges stay at
+ * 16 there, which is where they already were.
+ */
+@media (min-width: 600px) {
+  .app__main .data th:first-child,
+  .app__main .data td:first-child {
+    padding-inline-start: var(--sws-space-24);
+  }
+
+  .app__main .data th:last-child,
+  .app__main .data td:last-child {
+    padding-inline-end: var(--sws-space-24);
+  }
+}
+
+/*
  * No sticky table head. These tables run three to five rows, so a head that follows the scroll
  * has nothing to follow — and under a full-page screenshot a sticky head resolves against the
  * expanded viewport and leaves a phantom band above itself, which puts a defect into the
@@ -2068,6 +2094,32 @@
 
 .app__main .invoice {
   max-width: 46rem;
+}
+
+/*
+ * The document table's head carries no fill.
+ *
+ * Its outer cells have no inline padding, because the line items have to sit on the same
+ * column as the parties block, the note and the totals — that shared edge is what makes this
+ * card read as a document rather than as a screen. A fill behind labels that begin at its own
+ * edge has no inset left to show, and the first column label ended up touching the band it
+ * sat in. The rule the first row draws under the head says what the band was saying, at the
+ * inset every other rule in this document already uses.
+ */
+.app__main .invoice .data--flush th {
+  background: none;
+}
+
+/*
+ * Except on a phone, where the first column is sticky and the other three scroll under it. It
+ * was the head band that made that cell opaque; with the band gone it takes the card's own
+ * ground, which is what the body cells beneath it already use. Without this the dates scroll
+ * straight through "Description".
+ */
+@media (max-width: 599px) {
+  .app__main .invoice .table-scroll .data--flush th:first-child {
+    background: var(--sws-surface-raised);
+  }
 }
 
 .app__main .invoice .data--flush th:first-child,
