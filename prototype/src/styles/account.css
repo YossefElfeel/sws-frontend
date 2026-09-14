@@ -1,9 +1,9 @@
 /*
  * SWS — client area and the remaining marketing surfaces.
  *
- * Covers spec 6.2 (category rail), 6.3 (VPS table, builder preview), 8 (auth) and 9 (every
- * client-area section). Layout uses logical properties throughout, so the rail sits on the
- * correct side in both directions without a mirrored rule.
+ * Covers spec 6.2 (category rail), 6.3 (VPS table), 8 (auth) and 9 (every client-area section).
+ * Layout uses logical properties throughout, so the rail sits on the correct side in both
+ * directions without a mirrored rule.
  */
 
 /* ── rail layout ───────────────────────────────────────────────────────────── */
@@ -1092,83 +1092,6 @@
   font-size: var(--sws-font-size-h2);
   letter-spacing: var(--sws-tracking-widest);
   text-align: center;
-}
-
-/* ── website builder preview ───────────────────────────────────────────────── */
-
-.builder {
-  display: grid;
-  gap: var(--sws-space-24);
-  /* The tier cards sit under the preview, so the preview needs to end before they start. */
-  margin-block-end: var(--sws-space-48);
-  align-items: start;
-}
-
-@media (min-width: 1024px) {
-  .builder {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  }
-}
-
-.builder__frame {
-  padding: var(--sws-space-12);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-xl);
-  box-shadow: var(--sws-shadow-card);
-}
-
-.builder__bar {
-  display: flex;
-  gap: var(--sws-space-8);
-  padding-block-end: var(--sws-space-12);
-}
-
-.builder__bar i {
-  inline-size: 10px;
-  block-size: 10px;
-  border-radius: var(--sws-radius-pill);
-  background: var(--sws-border-subtle);
-}
-
-.builder__canvas {
-  display: grid;
-  gap: var(--sws-space-8);
-  padding: var(--sws-space-12);
-  background: var(--sws-surface-sunken);
-  border-radius: var(--sws-radius-lg);
-}
-
-.builder__block {
-  display: block;
-  block-size: 42px;
-  background: var(--sws-border-subtle);
-  border-radius: var(--sws-radius-sm);
-}
-
-.builder__block--hero {
-  block-size: 108px;
-  background: var(--sws-action-subtle-bg);
-}
-
-.builder__block--wide {
-  block-size: 64px;
-}
-
-.builder__row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--sws-space-8);
-}
-
-.builder__side {
-  padding: var(--sws-space-24);
-  background: var(--sws-card-bg);
-  border-radius: var(--sws-radius-xl);
-  box-shadow: var(--sws-shadow-card);
-}
-
-.builder__side .btn {
-  margin-block-start: var(--sws-space-16);
 }
 
 .os-choice {
