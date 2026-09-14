@@ -8,6 +8,8 @@
  * review rather than shipped as a claim nobody can stand behind.
  */
 
+import { SSL, EMAIL, BUILDER, type Offer } from './products';
+
 /** Something the client has to supply before the page can make the claim. */
 export const NEEDS_FACT = '—' as const;
 
@@ -193,3 +195,62 @@ export const CONTACT_SUBJECTS = [
 /* ── migration request: M-15 ────────────────────────────────────────────────── */
 
 export const MIGRATION_PANELS = ['cPanel', 'Plesk', 'DirectAdmin', 'WordPress', 'other'];
+
+/* ── house ads in the client area: the dashboard promo rail ─────────────────── */
+/*
+ * The one place the product advertises to people who have already bought. The same standing
+ * constraint governs it as governs the public pages: no discount, no deadline, no "limited"
+ * anything, because no such offer has been agreed and an invented one reaches a customer
+ * before anybody reviews it.
+ *
+ * What an ad may say is what the thing is and what it costs, and the cost is read from the
+ * catalogue rather than written into the copy — so a promo can never quote a price the product
+ * page contradicts, and a price change lands in both places at once.
+ */
+
+
+export interface Promo {
+  id: string;
+  titleKey: string;
+  bodyKey: string;
+  /** Where the ad goes. A promo with nowhere to send the reader is not a promo. */
+  to: string;
+  /** Monthly price of the cheapest tier anyone actually pays for, in USD minor units. */
+  fromUsdMinor: number;
+  /** Which drawing rides beside it. */
+  art: 'ssl' | 'mail' | 'builder';
+}
+
+/**
+ * A family with a free tier advertises its first paid step. "From 0.00" is true of Website
+ * Builder and tells a reader nothing about what the thing costs them.
+ */
+const cheapestPaid = (offers: Offer[]) =>
+  Math.min(...offers.filter((o) => o.monthlyUsdMinor > 0).map((o) => o.monthlyUsdMinor));
+
+export const PROMOS: Promo[] = [
+  {
+    id: 'ssl',
+    titleKey: 'promo.ssl',
+    bodyKey: 'promo.sslBody',
+    to: '/ssl',
+    fromUsdMinor: cheapestPaid(SSL),
+    art: 'ssl',
+  },
+  {
+    id: 'mail',
+    titleKey: 'promo.mail',
+    bodyKey: 'promo.mailBody',
+    to: '/hosting/email',
+    fromUsdMinor: cheapestPaid(EMAIL),
+    art: 'mail',
+  },
+  {
+    id: 'builder',
+    titleKey: 'promo.builder',
+    bodyKey: 'promo.builderBody',
+    to: '/builder',
+    fromUsdMinor: cheapestPaid(BUILDER),
+    art: 'builder',
+  },
+];

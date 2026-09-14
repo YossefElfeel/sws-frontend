@@ -56,6 +56,17 @@ export interface Plan {
   freeDomainFirstYear: boolean;
   /** Monthly price in USD minor units, exactly as the spec states it. */
   monthlyUsdMinor: number;
+  /**
+   * What the plan costs when nothing is taken off, in the same units as the price beside it.
+   * Set it only while a promotion is running: the card then strikes this through, states the
+   * payable price and says what percent came off. Leave it undefined and the card shows one
+   * price, which is the normal case.
+   *
+   * The payable price stays `monthlyUsdMinor`, so the cart, the proration and every total
+   * downstream keep reading the one field they already read. A promotion is a thing the card
+   * says, not a second price the checkout has to know about.
+   */
+  listUsdMinor?: number;
   /** Spec 6.2 "Additional Features", below the separator on the card. */
   additional: string[];
 }
@@ -128,6 +139,12 @@ export const PLANS: Plan[] = [
     mailboxes: 'unlimited',
     freeDomainFirstYear: true,
     monthlyUsdMinor: 2000,
+    /*
+     * A FIXTURE, like every price in this file. No promotion has been agreed for Unlimited or
+     * for anything else — this exists so the discounted state of the card can be reviewed, and
+     * it is one line to delete when the real answer arrives. 25.00 down to 20.00 is 20% off.
+     */
+    listUsdMinor: 2500,
     additional: ['3 GB RAM', 'CDN', 'LiteSpeed Cache', '24/7 Support'],
   },
 ];
@@ -147,6 +164,8 @@ export interface Priced {
    * its yearly price, not twelve monthly twelfths with the annual discount taken off.
    */
   fixedUsdMinor?: number;
+  /** The price before a promotion, in the same units as whichever price this thing quotes. */
+  listUsdMinor?: number;
 }
 
 export function planPrice(plan: Priced, cycle: Cycle, currency: Currency): number {
@@ -155,6 +174,36 @@ export function planPrice(plan: Priced, cycle: Cycle, currency: Currency): numbe
   const gross = plan.monthlyUsdMinor * months;
   const net = Math.round(gross * (1 - save / 100));
   return Math.round(net * RATE[currency]);
+}
+
+/**
+ * The same figure before the promotion, or null where there is no promotion to show. It runs
+ * through `planPrice` rather than beside it so the struck price and the payable one are the
+ * same arithmetic — the term discount and the currency conversion apply to both, and a card
+ * can never strike a number that was worked out a different way from the one under it.
+ */
+export function planListPrice(plan: Priced, cycle: Cycle, currency: Currency): number | null {
+  if (plan.listUsdMinor === undefined) return null;
+  const before = planPrice(
+    plan.fixedUsdMinor !== undefined
+      ? { ...plan, fixedUsdMinor: plan.listUsdMinor }
+      : { ...plan, monthlyUsdMinor: plan.listUsdMinor },
+    cycle,
+    currency,
+  );
+  return before > planPrice(plan, cycle, currency) ? before : null;
+}
+
+/**
+ * Whole percent off, or null where nothing is off. Taken from the USD figures rather than the
+ * converted ones so the badge reads the same in all eight currencies: a discount is a ratio,
+ * and rounding it once per currency is how "20%" becomes "19%" for the reader in Kuwait.
+ */
+export function discountPercent(plan: Priced): number | null {
+  const list = plan.listUsdMinor;
+  const now = plan.fixedUsdMinor ?? plan.monthlyUsdMinor;
+  if (list === undefined || list <= now) return null;
+  return Math.round(((list - now) / list) * 100);
 }
 
 /** Spec 7.2. Add-ons offered during Configure Product. */

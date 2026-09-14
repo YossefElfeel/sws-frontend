@@ -43,6 +43,12 @@ export interface Offer {
   id: string;
   name: string;
   monthlyUsdMinor: number;
+  /**
+   * The price before a promotion. Set it only while one is running: the card strikes it
+   * through, states the payable price and says what percent came off. `monthlyUsdMinor` stays
+   * what is actually charged, so nothing downstream of the card has to know about promotions.
+   */
+  listUsdMinor?: number;
   featured?: boolean;
   /** Badge key, e.g. the spec's "most ordered" on SSL. */
   badgeKey?: string;
@@ -78,11 +84,17 @@ export const MONITORING: Offer[] = [
   { id: 'mon-plus', name: 'Plus', monthlyUsdMinor: 299, specs: ['100 monitors', '30 second checks', 'Email, SMS and webhook alerts'], extras: ['1 year history', 'Status page', 'Server metrics'] },
 ];
 
-/** SSL — spec 6.3: grouped by certificate type, with a most-ordered badge. */
+/**
+ * SSL — spec 6.3: grouped by certificate type, with a most-ordered badge.
+ *
+ * The wildcard carries a `listUsdMinor`, which is a FIXTURE in the same way the prices around
+ * it are: no promotion has been agreed on any product. It is here so the discounted card can
+ * be reviewed on a second family as well as on shared hosting, and it is one line to delete.
+ */
 export const SSL: Offer[] = [
   { id: 'ssl-dv', name: 'RapidSSL (DV)', monthlyUsdMinor: 316, badgeKey: 'ssl.mostOrdered', specs: ['Domain Validated', 'Issued in minutes', 'Single domain'], extras: ['256-bit encryption', 'Browser padlock', 'Reissues included'] },
   { id: 'ssl-ov', name: 'GeoTrust QuickSSL Premium (OV)', monthlyUsdMinor: 658, specs: ['Organisation Validated', 'Issued in 1–3 days', 'Single domain'], extras: ['256-bit encryption', 'Site seal', 'Company vetted'] },
-  { id: 'ssl-wild', name: 'RapidSSL Wildcard', monthlyUsdMinor: 1248, featured: true, specs: ['Domain Validated', 'Unlimited subdomains', 'Issued in minutes'], extras: ['256-bit encryption', 'Browser padlock', 'Reissues included'] },
+  { id: 'ssl-wild', name: 'RapidSSL Wildcard', monthlyUsdMinor: 1248, listUsdMinor: 1560, featured: true, specs: ['Domain Validated', 'Unlimited subdomains', 'Issued in minutes'], extras: ['256-bit encryption', 'Browser padlock', 'Reissues included'] },
 ];
 
 /**

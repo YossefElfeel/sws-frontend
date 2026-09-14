@@ -1,12 +1,12 @@
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { HostingLayout } from '../components/HostingLayout';
-import { PlanCards } from '../components/PlanCards';
+import { PlanCards, PlanPrice, PlanExtras } from '../components/PlanCards';
 import { Button } from '../components/Button';
 import { IconCheck, IconServer } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
-import { convert, formatAmount } from '../lib/catalog';
+import { convert, formatAmount, discountPercent } from '../lib/catalog';
 import { specText } from '../lib/specs';
 import { FAMILIES, OFFERS, VPS, type Offer } from '../lib/products';
 
@@ -67,57 +67,47 @@ function OfferCards({ offers }: { offers: Offer[] }) {
   };
 
   return (
-    <ul className="plans">
-      {offers.map((o) => (
-        <li key={o.id} className={`plan${o.featured ? ' plan--featured' : ''}`}>
-          {(o.featured || o.badgeKey) && (
-            <span className="plan__flag">{t((o.badgeKey ?? 'plan.featured') as never)}</span>
-          )}
+    <div className="plans-frame">
+      <ul className="plans">
+        {offers.map((o) => (
+          <li key={o.id} className={`plan${o.featured ? ' plan--featured' : ''}`}>
+            {(o.featured || o.badgeKey) && (
+              <span className="plan__flag">{t((o.badgeKey ?? 'plan.featured') as never)}</span>
+            )}
 
-          <h3 className="plan__name">{o.name}</h3>
+            <h3 className="plan__name">{o.name}</h3>
 
-          <p className="plan__price">
-            <span className="plan__amount serial">
-              {o.monthlyUsdMinor === 0
-                ? t('configure.free')
-                : formatAmount(convert(o.monthlyUsdMinor, currency), locale)}
-            </span>
-            {o.monthlyUsdMinor > 0 && <span className="plan__currency">{currency}</span>}
-          </p>
-          <p className="plan__cycle">{t('cycle.monthly')}</p>
+            <PlanPrice
+              amount={convert(o.monthlyUsdMinor, currency)}
+              was={o.listUsdMinor === undefined ? null : convert(o.listUsdMinor, currency)}
+              percent={discountPercent(o)}
+              currency={currency}
+              freeLabel={o.monthlyUsdMinor === 0 ? t('configure.free') : undefined}
+            />
+            <p className="plan__cycle">{t('cycle.monthly')}</p>
 
-          <ul className="plan__specs">
-            {o.specs.map((sp) => (
-              <li key={sp}>
-                <IconCheck size={16} />
-                {specText(sp, locale)}
-              </li>
-            ))}
-          </ul>
+            <ul className="plan__specs">
+              {o.specs.map((sp) => (
+                <li key={sp}>
+                  <IconCheck size={16} />
+                  {specText(sp, locale)}
+                </li>
+              ))}
+            </ul>
 
-          {o.extras && o.extras.length > 0 && (
-            <>
-              <p className="plan__divider">
-                <span>{t('plan.additional')}</span>
-              </p>
-              <ul className="plan__extras">
-                {o.extras.map((e) => (
-                  <li key={e}>{specText(e, locale)}</li>
-                ))}
-              </ul>
-            </>
-          )}
+            <PlanExtras items={o.extras ?? []} />
 
-          <Button
-            size="lg"
-            variant={o.featured ? 'primary' : 'secondary'}
-            onClick={() => order(o)}
-          >
-            {t('plan.orderNow')}
-          </Button>
-        </li>
-      ))}
-    </ul>
+            <Button
+              size="lg"
+              variant={o.featured ? 'primary' : 'secondary'}
+              onClick={() => order(o)}
+            >
+              {t('plan.orderNow')}
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

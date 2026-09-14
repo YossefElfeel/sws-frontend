@@ -62,18 +62,25 @@
  * this one drops both for Arabic, where neither means anything, and left the heading with
  * nothing.
  *
- * So it is given four cues that survive the translation. The full weight step to bold. A
+ * So it is given five cues that survive the translation. The full weight step to bold. A
  * hairline under it, which no link has and no link can be mistaken for. Position: it hugs the
  * list it names, with the air between two groups belonging to the heading rather than being
  * split evenly either side of it — a heading that sits with its own list is read as that
  * list's label, where one standing equidistant between two is read as a member of whichever it
- * happens to touch. And now the chevron, which says what the heading does.
+ * happens to touch.
  *
- * It is a button, because it opens the group it names — the same control the sidebar's group
- * labels are, doing the same job on the same furniture. What it is not given is a filled hover
- * pill: that is the links' own affordance, and borrowing it would undo everything above. The
- * colour lifts and the chevron turns, which is enough to say "press me" without saying "I am
- * one of the twelve things under me".
+ * The ink, which is the one this rail had been carrying least: secondary grey at caption size
+ * reads as a faint label on a list rather than as the start of something. Brand ink says the
+ * two groups are different kinds of thing — the categories are where you are, the actions are
+ * what you can do.
+ *
+ * And the chevron, which says what the heading does. It is a button, because it opens the
+ * group it names — the same control the sidebar's group labels are, doing the same job on the
+ * same furniture. What it is not given is a filled hover pill: that is the links' own
+ * affordance, and borrowing it would undo everything above. The hover goes to the plain text
+ * ink, which is the far end of the contrast range in both themes and the same move the
+ * sidebar's group labels make, and the chevron turns. That is enough to say "press me" without
+ * saying "I am one of the twelve things under me".
  */
 .rail__head {
   display: flex;
@@ -93,7 +100,7 @@
   letter-spacing: var(--sws-tracking-wide);
   text-transform: uppercase;
   text-align: start;
-  color: var(--sws-text-secondary);
+  color: var(--sws-action-quiet);
   cursor: pointer;
   transition: color var(--sws-duration-fast) var(--sws-ease-standard);
 }
@@ -165,8 +172,11 @@
     color var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
+/* The actions carry a glyph and the categories do not, so the glyph is where the actions group
+   gets its colour — the link text stays the rail's own ink until it is hovered or current. */
 .rail__link svg {
   flex: none;
+  color: var(--sws-action-primary);
 }
 
 .rail__link:hover {
