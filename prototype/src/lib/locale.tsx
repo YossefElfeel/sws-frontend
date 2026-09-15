@@ -2357,7 +2357,30 @@ export const STRINGS = {
   'cp.awstats': { ar: 'إحصائيات AWStats', en: 'AWStats' },
   'cp.webmail': { ar: 'Webmail', en: 'Webmail' },
   'cp.builder': { ar: 'منشئ المواقع', en: 'Site builder' },
-  'sso.opening': { ar: 'هنفتح لك', en: 'Opening' },
+  // What each tool is for — one line, shown on the tool’s own page on the way into cPanel.
+  'cp.emailNote': { ar: 'اعمل وامسح صناديق بريد على الدومين، وظبّط مساحة كل واحد.', en: 'Create and remove mailboxes on the domain, and set how much room each one gets.' },
+  'cp.forwardersNote': { ar: 'خلّي الرسايل الجاية على عنوان تروح لعنوان تاني، من غير ما تفتح صندوقين.', en: 'Send mail arriving at one address on to another, without keeping two mailboxes.' },
+  'cp.autorespondersNote': { ar: 'رد تلقائي يتبعت على أي رسالة توصل — رسالة إجازة، أو تأكيد استلام.', en: 'An automatic reply to anything that arrives — a holiday note, or an acknowledgement.' },
+  'cp.filesNote': { ar: 'اتصفّح ملفات الموقع، وارفع وامسح وعدّل الصلاحيات من غير FTP.', en: 'Browse the site’s files, and upload, delete and set permissions without FTP.' },
+  'cp.backupsNote': { ar: 'نزّل نسخة كاملة من الموقع وقواعد بياناته، أو رجّع نسخة قديمة.', en: 'Download a full copy of the site and its databases, or restore an older one.' },
+  'cp.domainsNote': { ar: 'الدومينات الفرعية والإضافية اللي بتشاور على الاستضافة دي.', en: 'The subdomains and addon domains pointed at this hosting account.' },
+  'cp.cronNote': { ar: 'شغّل سكريبت على مواعيد ثابتة — كل ساعة، كل يوم، كل شهر.', en: 'Run a script on a fixed schedule — hourly, daily, monthly.' },
+  'cp.mysqlNote': { ar: 'اعمل قواعد بيانات ومستخدمين ليها، وحدّد كل مستخدم يقدر يعمل إيه.', en: 'Create databases and the users for them, and set what each user may do.' },
+  'cp.phpmyadminNote': { ar: 'افتح جداول قواعد البيانات على طول وشغّل استعلامات عليها.', en: 'Open the database tables directly and run queries against them.' },
+  'cp.awstatsNote': { ar: 'زيارات الموقع — جت منين، وفتحت أنهي صفحات.', en: 'The site’s visits — where they came from, and which pages they opened.' },
+  'cp.webmailNote': { ar: 'افتح صندوق بريد على الدومين من المتصفح من غير برنامج بريد.', en: 'Open a mailbox on the domain from the browser, with no mail client.' },
+  'cp.builderNote': { ar: 'ابني الموقع بالسحب والإفلات، من غير كود.', en: 'Build the site by dragging and dropping, with no code.' },
+
+  // The client area has a list called Domains too, and it is a different list. Saying so on the
+  // way in costs one line and saves the reader a trip into the wrong panel.
+  'cp.domainsElse': { ar: 'دي مش دومينات حسابك اللي سجّلتها عندنا.', en: 'These are not the domains you registered with us.' },
+  'cp.domainsElseLink': { ar: 'افتح دومينات حسابك', en: 'Open your domains' },
+
+  'sso.handoff': {
+    ar: 'الأداة دي بتتفتح في cPanel — برنامج تاني بندخّلك عليه من غير ما تكتب باسورد، وشكله مختلف عن هنا.',
+    en: 'This tool opens in cPanel — a different program we sign you into without a password, and it looks different from here.',
+  },
+
 
   // Domain management sub-pages — C-10 to C-13, C-37 to C-40.
   'dom.on': { ar: 'شغّال', en: 'On' },

@@ -258,7 +258,9 @@ export function App() {
 
               {/* System — spec 5.5 */}
               <Route path="/error/:kind" element={<ErrorPage />} />
+              {/* The panel itself, and a page per tool: /cpanel/files is the File Manager’s. */}
               <Route path="/cpanel" element={<CpanelTransition />} />
+              <Route path="/cpanel/:app" element={<CpanelTransition />} />
               <Route path="/system/banners" element={<BannerGallery />} />
 
               {/*

@@ -13,18 +13,23 @@ import {
 import { useLocale } from '../lib/locale';
 import { CPANEL_APPS, type Service } from '../lib/account';
 
-/** One glyph per cPanel tool, so a shortcut is recognised before it is read. */
-export const APP_ICON: Record<string, ReactNode> = {
-  email: <IconMail size={17} />,
-  forwarders: <IconArrow size={17} />,
-  autoresponders: <IconMail size={17} />,
-  files: <IconFolder size={17} />,
-  backups: <IconArchive size={17} />,
-  domains: <IconGlobe size={17} />,
-  cron: <IconClock size={17} />,
-  mysql: <IconDatabase size={17} />,
-  phpmyadmin: <IconDatabase size={17} />,
-  awstats: <IconGauge size={17} />,
+/**
+ * One glyph per cPanel tool, so a shortcut is recognised before it is read.
+ *
+ * A function of a size rather than a fixed element: the same glyph marks the tool in a list of
+ * ten and again, four times larger, at the head of that tool’s own page.
+ */
+export const APP_ICON: Record<string, (size: number) => ReactNode> = {
+  email: (size) => <IconMail size={size} />,
+  forwarders: (size) => <IconArrow size={size} />,
+  autoresponders: (size) => <IconMail size={size} />,
+  files: (size) => <IconFolder size={size} />,
+  backups: (size) => <IconArchive size={size} />,
+  domains: (size) => <IconGlobe size={size} />,
+  cron: (size) => <IconClock size={size} />,
+  mysql: (size) => <IconDatabase size={size} />,
+  phpmyadmin: (size) => <IconDatabase size={size} />,
+  awstats: (size) => <IconGauge size={size} />,
 };
 
 /**
@@ -102,8 +107,8 @@ export function ServiceShortcuts({ domain, limit = 10 }: { domain: string; limit
     <ul className="shortcuts">
       {apps.map((a) => (
         <li key={a.id}>
-          <Link className="quick__item" to={`/cpanel?domain=${domain}&app=${a.id}`}>
-            {APP_ICON[a.id]}
+          <Link className="quick__item" to={`/cpanel/${a.id}?domain=${domain}`}>
+            {APP_ICON[a.id]?.(17)}
             {t(a.labelKey as never)}
           </Link>
         </li>
