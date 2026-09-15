@@ -410,7 +410,15 @@ export const STRINGS = {
   'domainstep.available': { ar: 'متاح', en: 'is available' },
   'domainstep.unavailable': { ar: 'غير متاح', en: 'is not available' },
   'domainstep.popular': { ar: 'الأكثر شيوعًا', en: 'Most Popular' },
-  'domainstep.selectedCount': { ar: 'دومين مختار', en: 'domain(s) selected' },
+  // Was one key doing two jobs: the domain step counted a local toggle with it and the
+  // add-ons step counted add-ons with it, so that screen read "0 domains selected" while
+  // three add-ons sat above it. Each now says what it is actually counting.
+  'domainstep.chosen': { ar: 'هيتربط بالباقة', en: 'will be linked to the plan' },
+  'domainstep.addonCount': { ar: 'إضافة مختارة', en: 'add-on(s) selected' },
+  // A table row on this step chooses the one domain the hosting line carries; it does not
+  // buy a second one, so it does not say Add.
+  'domainstep.pickRow': { ar: 'اختار ده', en: 'Choose' },
+  'domainstep.pickedRow': { ar: 'مختار', en: 'Chosen' },
   'domainstep.use': { ar: 'استخدم', en: 'Use' },
 
   'domainsconf.title': { ar: 'إعدادات الدومين', en: 'Domains Configuration' },
