@@ -211,7 +211,7 @@ await journey('Reset a password', [
 await journey('Pay an overdue invoice', [
   ['dashboard', () => start('#/account')],
   ['what is owed', () => click(['.card--urgent .btn--primary'])],
-  ['pay', () => click(['.app__head-actions .btn--primary', '.app__head-actions a.btn'])],
+  ['pay', () => click(['.dash__side .acts .btn--primary'])],
 ]);
 
 /* ── I. change plan, all three steps ────────────────────────────────────────── */

@@ -70,6 +70,20 @@ export const TICKET_TONE = {
   closed: 'neutral',
 } as const satisfies Record<string, TagTone>;
 
+/**
+ * A refund read from the customer's side, and the ladder is not the invoice's. Asked for,
+ * agreed, sent — none of those is money in their account yet, so all three are `warn`: a queue
+ * they are in, not a fault and not a finish. Only `completed` has the money where they can
+ * spend it, and only `declined` is the answer nobody wanted.
+ */
+export const REFUND_TONE = {
+  requested: 'warn',
+  approved: 'warn',
+  sent: 'warn',
+  completed: 'ok',
+  declined: 'bad',
+} as const satisfies Record<string, TagTone>;
+
 /** Priority is a queue position, not a fault. Only "high" is worth a colour. */
 export const PRIORITY_TONE = {
   high: 'warn',

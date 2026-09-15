@@ -1936,6 +1936,75 @@ export const STRINGS = {
   'inv.line.domainRegistration': { ar: 'تسجيل دومين', en: 'Domain registration' },
   'inv.forInvoice': { ar: 'للفاتورة', en: 'For invoice' },
 
+  /*
+   * The refund, said as a state rather than as a row in a ledger. Every note answers the one
+   * question the state raises — "so where is my money right now" — and the sent one refuses to
+   * promise a day we do not control.
+   */
+  'inv.refund': { ar: 'حالة الاسترداد', en: 'Refund status' },
+  'inv.refundAmount': { ar: 'المبلغ المسترد', en: 'Refund amount' },
+  'inv.refundTo': { ar: 'راجع على', en: 'Back to' },
+  'inv.refundReason': { ar: 'السبب', en: 'Reason' },
+  'inv.refundReason.duplicate': {
+    ar: 'اتخصم منك مرتين على نفس الفاتورة',
+    en: 'The same invoice was charged twice',
+  },
+  'inv.refundTicket': { ar: 'التذكرة اللي اتكلمنا فيها', en: 'The ticket it came from' },
+  'inv.refundOpenTicket': { ar: 'افتح التذكرة', en: 'Open the ticket' },
+
+  'inv.refund.requested': { ar: 'اتطلب', en: 'Requested' },
+  'inv.refund.approved': { ar: 'اتوافق عليه', en: 'Approved' },
+  'inv.refund.sent': { ar: 'في الطريق', en: 'On its way' },
+  'inv.refund.completed': { ar: 'وصل', en: 'Back with you' },
+  'inv.refund.declined': { ar: 'اترفض', en: 'Declined' },
+
+  'inv.refundNote.requested': {
+    ar: 'الطلب وصلنا وبنراجعه. لسه مفيش فلوس اتحركت.',
+    en: 'We have the request and are looking at it. No money has moved yet.',
+  },
+  'inv.refundNote.approved': {
+    ar: 'وافقنا على الاسترداد. المبلغ هيرجع على نفس طريقة الدفع، ولسه ما اتبعتش.',
+    en: 'The refund is agreed. It goes back to the method you paid with and has not left us yet.',
+  },
+  'inv.refundNote.sent': {
+    ar: 'المبلغ ساب عندنا وراح للبنك. الوقت اللي بياخده بعد كده على البنك، مش علينا.',
+    en: 'The money has left us and is with your bank. How long it takes from here is the bank’s, not ours.',
+  },
+  'inv.refundNote.completed': {
+    ar: 'المبلغ رجع على نفس طريقة الدفع اللي دفعت بيها.',
+    en: 'The money is back on the method you paid with.',
+  },
+  'inv.refundNote.declined': {
+    ar: 'ما عملناش الاسترداد ده. لو شايف إن لازم يتراجع تاني، افتح تذكرة.',
+    en: 'We did not make this refund. If it needs another look, open a ticket.',
+  },
+
+  'inv.refundStep.requested': { ar: 'الطلب اتسجّل', en: 'The refund was raised' },
+  'inv.refundStep.approved': { ar: 'وافقنا عليه', en: 'We agreed to it' },
+  'inv.refundStep.declined': { ar: 'ما وافقناش عليه', en: 'We did not agree to it' },
+  'inv.refundStep.sent': { ar: 'اتبعت لطريقة الدفع بتاعتك', en: 'Sent back to your payment method' },
+  'inv.refundStep.expected': { ar: 'المفروض يبان في كشف حسابك', en: 'It should show on your statement' },
+  'inv.refundStep.expectedNote': { ar: 'التاريخ ده من البنك، مش مننا', en: 'That date is the bank’s, not ours' },
+  'inv.refundTag': { ar: 'فيها استرداد', en: 'Has a refund' },
+
+  /*
+   * A payment that goes wrong is the one moment the client area can leave someone with money
+   * gone and nothing to press. The way out sits on the invoice itself, next to the paying, and
+   * carries the invoice number with it so nobody has to retype what this screen already knows.
+   */
+  'inv.trouble': { ar: 'مشكلة في الدفع؟', en: 'Trouble paying?' },
+  'inv.troubleNote': {
+    ar: 'لو الدفع ما نجحش، أو اتخصم منك والفاتورة لسه مفتوحة، قول لنا وإحنا نتابعها. رقم الفاتورة بيروح مع التذكرة.',
+    en: 'If a payment fails, or money leaves your account while this invoice stays open, tell us and we will chase it. The invoice number travels with the ticket.',
+  },
+  'inv.troubleSettled': { ar: 'في حاجة غلط في الفاتورة دي؟', en: 'Something wrong with this invoice?' },
+  'inv.troubleSettledNote': {
+    ar: 'مبلغ مش مظبوط، خصم اتكرر، أو استرداد مجاش؟ افتح تذكرة على الفاتورة دي وهنراجعها معاك.',
+    en: 'An amount that looks wrong, a charge taken twice, a refund that never arrived — open a ticket on this invoice and we will go through it with you.',
+  },
+  'inv.troubleAsk': { ar: 'افتح تذكرة', en: 'Open a ticket' },
+  'inv.troubleFailed': { ar: 'شوف آخر محاولة دفع', en: 'See the failed attempt' },
+
   // What WHMCS cannot do natively is said, not hidden — PRODUCT.md principle 4.
   'dev.confirm': { ar: 'محتاج تأكيد المطوّر', en: 'Needs developer confirmation' },
   'dev.autoRenew': {

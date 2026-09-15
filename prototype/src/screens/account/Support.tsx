@@ -32,6 +32,7 @@ import {
   ARTICLES,
   KB_CATEGORIES,
   SERVICES,
+  INVOICES,
   type TicketStatus,
 } from '../../lib/account';
 import { SYSTEMS, INCIDENTS } from '../../lib/marketing';
@@ -206,8 +207,22 @@ export function TicketNew() {
    */
   const from = SERVICES.find((s) => s.id === params.get('service'));
 
-  const [dept, setDept] = useState('tech');
-  const [subject, setSubject] = useState(from ? `${from.product} — ${from.domain}: ` : '');
+  /*
+   * The same courtesy for money. A payment that went wrong is the worst moment to ask someone
+   * to go and find their invoice number, so the invoice screen sends it, and the department
+   * opens on Sales and Billing rather than on Technical Support — the queue that can actually
+   * look at a charge.
+   */
+  const invoice = INVOICES.find((i) => i.id === params.get('invoice'));
+
+  const [dept, setDept] = useState(invoice ? 'sales' : 'tech');
+  const [subject, setSubject] = useState(
+    invoice
+      ? `${invoice.number}: `
+      : from
+        ? `${from.product} — ${from.domain}: `
+        : '',
+  );
   const [body, setBody] = useState('');
 
   const suggestions = useMemo(() => {

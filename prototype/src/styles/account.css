@@ -1511,6 +1511,19 @@
   min-width: 0;
 }
 
+/*
+ * One screen wants its side column first on a phone. Below the two-column width the payment
+ * card falls to the foot of the document it settles — past the lines, the totals and the whole
+ * ledger — which was survivable while the page head carried a second Pay now and is not now
+ * that paying happens in one place. The amount and the button go first; the document they are
+ * about reads under them, which is the order a phone wants anyway.
+ */
+@media (max-width: 1023px) {
+  .with-side--act-first > .dash__side {
+    order: -1;
+  }
+}
+
 @media (min-width: 1024px) {
   .with-side {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);

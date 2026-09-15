@@ -475,6 +475,21 @@ you read, print and file; a full-bleed one reads as a report. Beside it sits the
 document cannot do — take the payment — and under it the ledger of what actually moved, so a
 "paid" invoice with a balance is a fixture error that shows rather than hides.
 
+**Pay now is offered once.** The page head carried a second one, with the same words, a screen
+away from the first — and only the card's button is the real one: it sends the method, the
+credit switch and the figure those two produce, where the head's sent whatever the defaults
+happened to be. One label with two consequences is a worse fault than a button placed low, so
+the head keeps the PDF and paying stays where the amount is. Below 1024px the payment card then
+leads the page (`.with-side--act-first`) rather than falling to the foot of the document it
+settles.
+
+**A refund is a state, not a row.** The ledger says a refund happened, on the day it happened;
+somebody owed money is asking where it is now, which is a state, an amount and a date the bank
+controls rather than us. So it gets its own section above the ledger, with the step it has
+reached, and the arrival date named as the bank's. Beside it, on every invoice paid or not, the
+way to a human: a failed charge and a charge that left the account while the invoice stayed
+open are the two moments the client area can otherwise leave someone with nothing to press.
+
 ---
 
 ## 7. What is not designed here
