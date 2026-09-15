@@ -13,6 +13,7 @@ export const ROUTES = [
   { name: 'hosting-vps', path: '#/hosting/vps' },
   { name: 'hosting-email', path: '#/hosting/email' },
   { name: 'hosting-monitoring', path: '#/hosting/monitoring' },
+  { name: 'hosting-addons', path: '#/hosting/addons' },
   { name: 'ssl', path: '#/ssl' },
   { name: 'builder', path: '#/builder' },
   { name: 'domains', path: '#/domains' },

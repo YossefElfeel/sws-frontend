@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Layout } from './Layout';
 import { RailGroup } from './RailGroup';
-import { IconCart, IconArrow } from './icons';
+import { IconCart, IconArrow, IconPlus } from './icons';
 import { useLocale } from '../lib/locale';
 import { FAMILIES } from '../lib/products';
 
@@ -79,6 +79,18 @@ export function HostingLayout({
 
             <aside className="rail" aria-label={t('rail.actions')}>
               <RailGroup id="hosting-actions" label={t('rail.actions')}>
+                {/*
+                  First, and a NavLink rather than a Link. It is the one action that stays in
+                  this section — the other three leave it — so it is the one the rail can mark
+                  as where you are, and a reader who followed it should not have to guess which
+                  of the twelve links they are standing on.
+                */}
+                <li>
+                  <NavLink className="rail__link" to="/hosting/addons">
+                    <IconPlus size={15} />
+                    {t('rail.addons')}
+                  </NavLink>
+                </li>
                 <li>
                   <Link className="rail__link" to="/domains/pricing">
                     <IconArrow size={15} />

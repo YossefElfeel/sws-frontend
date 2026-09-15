@@ -1182,6 +1182,127 @@ await p.selectOption('.bar__end .tfilter__select', 'resolved');
 await p.waitForTimeout(120);
 ok('the incident filter filters', (await p.$$eval('.incident', (n) => n.length)) === 2);
 
+/*
+ * The add-ons tab — the three extra services a domain carries, on a page of its own.
+ *
+ * The same three cards a domain shows on its own Add-ons tab, from the same component, with a
+ * picker in front of them. Four things are worth holding: that the rail carries the page, that
+ * each card offers the acts it should and no others, that switching one off asks before it
+ * happens rather than after, and that a switch thrown here is thrown on the domain’s own tab
+ * too — which is the whole reason the two pages share a component rather than a resemblance.
+ */
+await p.evaluate(() => (location.hash = '#/hosting/shared'));
+await p.waitForSelector('.rail-stack');
+ok('the hosting rail carries the add-ons tab', (await p.$$('a[href="#/hosting/addons"]')).length === 1);
+await p.evaluate(() => (location.hash = '#/hosting/addons'));
+await p.waitForSelector('.addon-card');
+{
+  const cards = await p.$$eval('.addon-card', (n) => n.length);
+  ok('three add-on cards', cards === 3, `${cards} card(s)`);
+
+  /* The picker governs the row, so it is ruled to the row: both its ends line up with the ends
+     of the three cards under it, which is a thing only measuring can tell you. */
+  ok(
+    'the picker is ruled to the row of cards',
+    await p.$$eval('.addon-pick, .addon-cards', ([pick, grid]) => {
+      const a = pick.getBoundingClientRect();
+      const b = grid.getBoundingClientRect();
+      return Math.abs(a.left - b.left) < 1 && Math.abs(a.right - b.right) < 1;
+    }),
+  );
+
+  /*
+   * One act on privacy, two on the pair that have a screen behind them. A Manage button on
+   * privacy would have to lead somewhere and there is nowhere to lead: it is a yes or a no,
+   * and the switch on the card is the whole of it.
+   */
+  const acts = await p.$$eval('.addon-card', (n) =>
+    n.map((c) => c.querySelectorAll('.addon-card__acts .btn').length),
+  );
+  ok('one act on privacy, two on the others', acts.join(',') === '1,2,2', acts.join(','));
+
+  ok(
+    'the cards stand level',
+    await p.$$eval('.addon-card', (n) => {
+      const feet = n.map((c) => Math.round(c.getBoundingClientRect().bottom));
+      const rows = n.map((c) =>
+        Math.round(c.querySelector('.addon-card__acts').getBoundingClientRect().top),
+      );
+      return new Set(feet).size === 1 && new Set(rows).size === 1;
+    }),
+  );
+
+  /* Manage goes to the screen that manages the thing, under the domain the page is pointing at. */
+  const manage = await p.$$eval('.addon-card__acts a.btn', (n) => n.map((a) => a.getAttribute('href')));
+  ok(
+    'manage leads to the domain’s own screens',
+    manage.join(' ') === '#/account/domains/dom-1/dns #/account/domains/dom-1/forwarding',
+    manage.join(' '),
+  );
+
+  /*
+   * Switching one off asks first. Off is the direction that costs something — a published home
+   * address, a zone that stops answering, mail that stops being delivered — so the dialog says
+   * which of those it is, and on which domain, before anybody agrees to it.
+   */
+  const dns = '.addon-card:nth-of-type(2)';
+  await p.click(`${dns} .addon-card__acts button.btn`);
+  await p.waitForSelector('.modal__panel');
+  ok('the switch-off asks first', (await p.$$('.modal__panel')).length === 1);
+  ok(
+    '  and the dialog names the domain',
+    (await p.$eval('.modal__body', (e) => e.textContent)).includes('atelier-kamal.com'),
+  );
+
+  await p.click('.modal__foot .btn--quiet');
+  await p.waitForTimeout(150);
+  ok(
+    '  cancelling leaves it on',
+    (await p.$eval(`${dns} .tag`, (e) => e.className)).includes('tag--ok'),
+  );
+
+  await p.click(`${dns} .addon-card__acts button.btn`);
+  await p.waitForSelector('.modal__panel');
+  await p.click('.modal__foot .btn--danger');
+  await p.waitForTimeout(150);
+  ok(
+    'confirming switches it off',
+    (await p.$eval(`${dns} .tag`, (e) => e.className)).includes('tag--neutral'),
+  );
+  ok(
+    '  and the note says which add-on, on which domain',
+    (await p.$eval('.banner', (e) => e.textContent)).includes('atelier-kamal.com'),
+  );
+
+  /* The same record, so the domain’s own tab reads the same a route change later. */
+  await p.evaluate(() => (location.hash = '#/account/domains/dom-1/addons'));
+  await p.waitForSelector('.addon-card');
+  ok(
+    'the domain’s own tab reads the same switch',
+    (await p.$eval(`${dns} .tag`, (e) => e.className)).includes('tag--neutral'),
+  );
+
+  /* On does not ask. A confirmation in front of a harmless act is how the one that matters
+     gets pressed through without being read. */
+  await p.click(`${dns} .addon-card__acts button.btn`);
+  await p.waitForTimeout(150);
+  ok(
+    'switching one back on does not ask',
+    (await p.$$('.modal__panel')).length === 0 &&
+      (await p.$eval(`${dns} .tag`, (e) => e.className)).includes('tag--ok'),
+  );
+
+  /* And the picker is what makes the page worth having: three domains, one place to read them. */
+  await p.evaluate(() => (location.hash = '#/hosting/addons'));
+  await p.waitForSelector('.addon-pick select');
+  await p.selectOption('.addon-pick select', 'dom-3');
+  await p.waitForTimeout(150);
+  ok(
+    'the picker changes which domain the cards are about',
+    await p.$$eval('.addon-card .tag', (n) => n.length === 3 && n.every((x) => x.className.includes('tag--neutral'))),
+  );
+}
+
 // ADR-0003: Latin numerals everywhere, including inside Arabic copy.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
 await p.waitForSelector('.invoice');

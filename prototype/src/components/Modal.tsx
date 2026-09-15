@@ -54,8 +54,14 @@ export function Modal({ open, onClose, title, lede, children, footer, size = 'sm
 
     // The first field, or the first button. Not the close button: opening a dialog onto its own
     // dismiss reads as "are you sure you want to be here".
+    //
+    // It has to skip it by name rather than by order: the close button is the first focusable
+    // element in the panel's markup, so the plain "first focusable" this used to be landed on
+    // it every time and the comment above described an intention the code did not carry out.
+    // The fallback is the close button, for a dialog that holds nothing else to focus.
     const panel = panelRef.current;
-    const first = panel?.querySelector<HTMLElement>(FOCUSABLE);
+    const stops = Array.from(panel?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []);
+    const first = stops.find((n) => !n.classList.contains('modal__close')) ?? stops[0];
     (first ?? panel)?.focus();
 
     const onKey = (e: KeyboardEvent) => {

@@ -1622,6 +1622,13 @@
  * to the bottom by an auto margin. Descriptions are a different length in every card, so
  * without that the button rows would sit at three different heights across one row of cards.
  */
+/* The picker sits over the cards it governs, so it is ruled to the same width as the row of
+   them — its end and the end of the last card are one line, at every width the grid takes. */
+.addon-pick {
+  inline-size: 100%;
+  margin-block-end: var(--sws-space-16);
+}
+
 .addon-cards {
   display: grid;
   gap: var(--sws-space-16);
@@ -1629,9 +1636,17 @@
   align-items: stretch;
 }
 
+/*
+ * Flex, not grid, for one reason: the auto margin below has to be able to claim the leftover
+ * height. In a grid with align-content:start the free space belongs to the container and sits
+ * after the last row, where no item margin can reach it — so the button row only looked pinned
+ * while every card happened to hold the same content. The first card without a state chip put
+ * its buttons 24px above its neighbours' and proved it.
+ */
 .addon-card {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--sws-space-8);
   block-size: 100%;
 }
