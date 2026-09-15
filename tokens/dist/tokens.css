@@ -239,6 +239,7 @@
   --sws-layer-drawer: 70;
   --sws-layer-popover: 80;
   --sws-layer-consent: 90;
+  --sws-layer-modal: 95;
   --sws-layer-toast: 100;
 
   /* ── radius — documents do not have rounded corners ────────────────────── */

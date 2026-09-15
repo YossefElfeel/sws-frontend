@@ -10,6 +10,7 @@ import { TableToolbar, TableFilter, TableSort, matches } from '../../components/
 import { TablePager, PAGE_SIZE } from '../../components/TablePager';
 import { RowMenu, type RowMenuItem } from '../../components/RowMenu';
 import { UsageChart } from '../../components/UsageChart';
+import { ServerControls } from '../../components/ServerControls';
 import { VPS_METRICS, SAMPLED_AT } from '../../lib/telemetry';
 import {
   IconArrow,
@@ -584,6 +585,16 @@ export function ServiceDetail() {
 
       <div className="with-side">
         <div className="dash__main">
+          {/*
+            The controls come before the readings. Somebody who opens a server page because the
+            server is not answering needs the switch, not the graph of it not answering; the
+            graphs are what you read once you have decided to look rather than to act.
+
+            Gated the same way the graphs are — a suspended or cancelled machine is not one the
+            client area should offer to restart.
+          */}
+          {live && svc.kind === 'vps' && <ServerControls svc={svc} onDone={mark} />}
+
           <section className="card">
             <header className="card__head">
               <h2 className="card__heading">{t('svc.usage')}</h2>
