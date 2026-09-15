@@ -1046,6 +1046,19 @@ button.stat {
   color: var(--sws-text-secondary);
 }
 
+/*
+ * A card that reports on one thing names it under the heading.
+ *
+ * The usage bars and the shortcut grid on the dashboard are about a single hosting account,
+ * not about the account as a whole, and a meter with no subject is a meter somebody will read
+ * as a total. The domain is the subject, so it sits between the heading and the content in
+ * the quiet ink a subtitle takes.
+ */
+.card__lede {
+  margin: calc(var(--sws-space-8) * -1) 0 var(--sws-space-16);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+}
 .card__more {
   display: inline-flex;
   align-items: center;
