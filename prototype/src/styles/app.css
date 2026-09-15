@@ -2806,19 +2806,24 @@ button.stat {
 
 /* ── 2026-09-07: the locked currency, the developer note ─────────────────────── */
 
-/* The lock is a button in the select's clothes. It has to clear the 44px target on its own,
-   because the select it replaces was measured through its label. */
-.cur__lock {
+/* A button in the select's clothes — the whole currency control, locked or not. It has to
+   clear the 44px target on its own, because the select it replaced was measured through the
+   label wrapped around it, and there is no label now. */
+.cur__trigger {
   background: none;
   border: 0;
-  font: inherit;
-  color: inherit;
   cursor: pointer;
   min-inline-size: var(--sws-touch-target-min);
   min-block-size: var(--sws-touch-target-min);
+  /* Only what the UA button stylesheet breaks. Size, weight and colour stay with the two
+     dressing classes, which already own them for every other control on their bar; a blanket
+     `font: inherit` here would quietly out-rank both and size the control off the bar's own
+     type instead. */
+  font-family: inherit;
+  line-height: inherit;
 }
 
-.cur__lock:focus-visible {
+.cur__trigger:focus-visible {
   outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
   outline-offset: 2px;
   border-radius: var(--sws-radius-sm);

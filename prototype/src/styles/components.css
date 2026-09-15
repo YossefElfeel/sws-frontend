@@ -815,6 +815,84 @@ label.consent__row {
   display: inline-flex;
 }
 
+/* The masthead's copy of this control kept its type on the <select> nested inside it. The
+   button that replaced the select is the control itself, so it is told the same thing here. */
+.masthead__select.cur__trigger {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-medium);
+  color: var(--sws-text-primary);
+}
+
+/*
+ * The seven options — spec 4.2 — drawn in the same panel as the question and the lock, at the
+ * same offset off the same trigger. Whatever this control has to say, it says it in one place.
+ */
+.cur__menu {
+  position: absolute;
+  inset-block-start: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: var(--sws-layer-popover);
+  min-inline-size: 13.5rem;
+  max-inline-size: calc(100vw - var(--sws-space-32));
+  padding: var(--sws-space-4);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-strong);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-shadow-lift);
+  text-align: start;
+}
+
+/* Three columns, and the first is empty on six of the seven rows: the tick needs a lane of
+   its own or the row it marks is the only one that starts in a different place. */
+.cur__opt {
+  display: grid;
+  grid-template-columns: 1.25rem auto 1fr;
+  align-items: center;
+  gap: var(--sws-space-8);
+  inline-size: 100%;
+  min-block-size: var(--sws-touch-target-min);
+  padding-inline: var(--sws-space-8);
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  background: none;
+  color: var(--sws-text-primary);
+  font-family: inherit;
+  font-size: var(--sws-font-size-body-sm);
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.cur__opt:hover {
+  background: var(--sws-surface-sunken);
+}
+
+.cur__opt:focus-visible {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  /* Inward, so the ring is not clipped by the panel's own padding on the end rows. */
+  outline-offset: -2px;
+}
+
+.cur__tick {
+  display: grid;
+  place-items: center;
+  color: var(--sws-action-primary);
+}
+
+.cur__code {
+  font-weight: var(--sws-weight-bold);
+}
+
+/* The name is what most people read; the code is what they confirm against. So the code is
+   the heavier of the two and the name is the quieter — until it is the one in force. */
+.cur__name {
+  color: var(--sws-text-secondary);
+}
+
+.cur__opt[aria-checked='true'] .cur__name {
+  color: var(--sws-text-primary);
+}
+
 .cur__ask {
   position: absolute;
   inset-block-start: calc(100% + 8px);
