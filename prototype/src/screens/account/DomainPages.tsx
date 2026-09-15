@@ -24,6 +24,7 @@ import {
   ACCOUNT,
   DEFAULT_NS,
   DNS_TYPES,
+  isDnsRedirect,
   type DomainRecord,
   type DomainContact,
   type ContactRole,
@@ -41,6 +42,9 @@ import { Select } from '../../components/Select';
 
 const ROLES: ContactRole[] = ['registrant', 'admin', 'tech', 'billing'];
 const IPV4 = /^(\d{1,3})(\.\d{1,3}){3}$/;
+/* A redirect's value is a destination, not a hostname: without a scheme the browser has
+   nowhere to send anybody. */
+const HTTP_URL = /^https?:\/\/\S+$/i;
 
 /** The one thing every page starts with: the domain from the route, and a way to say "saved". */
 function useDomainPage() {
@@ -315,6 +319,21 @@ export function DomainNameservers() {
 
 /* ── DNS records — C-12 ─────────────────────────────────────────────────────── */
 
+/*
+ * What Value holds changes with the type — an address, a hostname, a line of text, a URL —
+ * and an empty box asks a question it does not answer. An example, not a default: it is a
+ * placeholder, so it leaves the moment anything is typed.
+ */
+const DNS_VALUE_HINT: Record<DnsType, string> = {
+  A: '185.42.118.203',
+  AAAA: '2a02:1788:4fd::1',
+  CNAME: 'cdn.example.com',
+  URL: 'https://example.com/shop',
+  TXT: 'v=spf1 include:example.com ~all',
+  MX: 'mail.example.com',
+  FRAME: 'https://example.com/shop',
+};
+
 export function DomainDns() {
   const { t } = useLocale();
   const { dom, dns, setDns, saved, mark, clear } = useDomainPage();
@@ -322,8 +341,11 @@ export function DomainDns() {
   const [host, setHost] = useState('');
   const [value, setValue] = useState('');
   const [ttl, setTtl] = useState(3600);
+  const [bad, setBad] = useState(false);
   const [dnsQ, setDnsQ] = useState('');
   const [dnsType, setDnsType] = useState('all');
+  /* A record code is read as written; a redirect is a word, and a word has an Arabic. */
+  const dnsLabel = (ty: DnsType) => t(`dns.${ty}` as never);
 
   if (!dom) return <Navigate to="/account/domains" replace />;
   const rows = dns[dom.id] ?? [];
@@ -332,7 +354,11 @@ export function DomainDns() {
   // zone with no SRV record is four clicks to an empty table.
   const dnsTypes = ['all', ...new Set(rows.map((r) => r.type))];
   const dnsRows = rows.filter(
-    (r) => (dnsType === 'all' || r.type === dnsType) && matches(dnsQ, r.type, r.host, r.value),
+    (r) =>
+      (dnsType === 'all' || r.type === dnsType) &&
+      // The code and its label both: the table says "تحويل", and whoever knows DNS searches
+      // for URL.
+      matches(dnsQ, r.type, dnsLabel(r.type), r.host, r.value),
   );
 
   return (
@@ -358,6 +384,12 @@ export function DomainDns() {
         onSubmit={(e) => {
           e.preventDefault();
           if (!host.trim() || !value.trim()) return;
+          // Only the redirects are checked. An A record's value is an address, a TXT record's
+          // is whatever the service that asked for it wrote, and neither has a shape this form
+          // is entitled to refuse.
+          const ok = !isDnsRedirect(type) || HTTP_URL.test(value.trim());
+          setBad(!ok);
+          if (!ok) return;
           // The toolbar resets with the new row, or a zone filtered to MX would answer Add
           // Record by appending an A record you cannot see.
           setDnsQ('');
@@ -381,7 +413,7 @@ export function DomainDns() {
               <Select value={type} onChange={(e) => setType(e.target.value as DnsType)}>
                 {DNS_TYPES.map((x) => (
                   <option key={x} value={x}>
-                    {x}
+                    {dnsLabel(x)}
                   </option>
                 ))}
               </Select>
@@ -402,6 +434,7 @@ export function DomainDns() {
               <input
                 className="field serial"
                 dir="ltr"
+                placeholder={DNS_VALUE_HINT[type]}
                 required
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
@@ -420,6 +453,13 @@ export function DomainDns() {
               />
             </label>
           </div>
+          {/* One line in one place: what the type does, until it is what the value is missing. */}
+          {isDnsRedirect(type) &&
+            (bad ? (
+              <p className="hint hint--bad">{t('dom.forwardBad')}</p>
+            ) : (
+              <p className="form__note">{t(type === 'URL' ? 'dom.forwardNote' : 'dom.frameNote')}</p>
+            ))}
           <div className="form__foot">
             <Button type="submit" size="md" variant="secondary">
               <IconPlus size={15} />
@@ -446,7 +486,7 @@ export function DomainDns() {
               onChange={setDnsType}
               options={dnsTypes.map((ty) => ({
                 value: ty,
-                label: ty === 'all' ? t('filter.allTypes') : ty,
+                label: ty === 'all' ? t('filter.allTypes') : dnsLabel(ty as DnsType),
               }))}
             />
           </TableToolbar>
@@ -464,13 +504,18 @@ export function DomainDns() {
               <tbody>
                 {dnsRows.map((r) => (
                   <tr key={r.id}>
-                    <td><span className="lead serial">{r.type}</span></td>
+                    <td>
+                      {/* serial sets a code LTR in the mono face; a translated word is neither. */}
+                      <span className={isDnsRedirect(r.type) ? 'lead' : 'lead serial'}>
+                        {dnsLabel(r.type)}
+                      </span>
+                    </td>
                     <td className="serial"><bdi>{r.host}</bdi></td>
                     <td className="serial"><bdi>{r.value}</bdi></td>
                     <td className="num">{r.ttl}</td>
                     <td className="num">
                       <ConfirmButton
-                        label={`${t('action.remove')} ${r.type} ${r.host}`}
+                        label={`${t('action.remove')} ${dnsLabel(r.type)} ${r.host}`}
                         onConfirm={() => {
                           setDns(dom.id, rows.filter((x) => x.id !== r.id));
                           mark();
