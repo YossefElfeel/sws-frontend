@@ -20,6 +20,7 @@ import {
   IconClose,
   IconPencil,
   IconTrash,
+  IconEye,
 } from '../../components/icons';
 import { RowMenu, type RowMenuItem } from '../../components/RowMenu';
 import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
@@ -184,7 +185,6 @@ export function Invoices() {
                 <th scope="col">{t('inv.due')}</th>
                 <th scope="col" className="num">{t('col.amount')}</th>
                 <th scope="col">{t('account.status')}</th>
-                <th scope="col" />
                 {/* Named for a screen reader, and `data__own` so the hidden label has a
                     positioned ancestor to resolve against — see `.data__own`. */}
                 <th scope="col" className="data__own">
@@ -197,7 +197,15 @@ export function Invoices() {
                 const balance = invoiceBalanceUsdMinor(inv);
                 return (
                   <tr key={inv.id}>
-                    <td><span className="lead serial"><bdi>{inv.number}</bdi></span></td>
+                    <td className="data__own">
+                      {/* The row's own button is in the menu now, so the number carries the
+                          link — and `.data__link::after` stretches it over the whole cell, so
+                          the target is the cell rather than the serial alone. The services
+                          list reads the same way. */}
+                      <Link className="lead serial data__link" to={`/account/invoices/${inv.id}`}>
+                        <bdi>{inv.number}</bdi>
+                      </Link>
+                    </td>
                     <td className="serial"><bdi>{inv.date}</bdi></td>
                     <td className="serial"><bdi>{inv.due}</bdi></td>
                     <td className="num">
@@ -216,12 +224,6 @@ export function Invoices() {
                         <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
                         <RefundTag inv={inv} />
                       </p>
-                    </td>
-                    <td className="num">
-                      <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
-                        {t('inv.view')}
-                        <IconArrow size={14} />
-                      </Link>
                     </td>
                     <td className="data__own">
                       <RowMenu
@@ -412,13 +414,19 @@ function PaymentHelp({ inv, unpaid }: { inv: Invoice; unpaid: boolean }) {
 }
 
 /**
- * Edit, cancel, remove — and the PDF the list could not reach before.
+ * View, the PDF, edit, cancel, remove — the row's own five.
  *
- * What an invoice offers depends on what it is. A settled one has nothing to edit and nothing
- * to cancel, and offering either would be handing a dead end to someone who came for the
- * record. A withdrawn one has nothing to pay and nothing to change, and is the only kind the
- * account may take off its own list — an invoice that is still owed cannot be tidied away, or
- * the list stops being the answer to "what do I owe".
+ * Opening the invoice used to be a button of its own beside the menu, and a column of them
+ * is a column the table pays for on every row — including the settled ones, where reading it
+ * is the only thing left to do. The services list already answers this by leading its menu
+ * with View and keeping one handle per row; the invoices list now reads the same way, and the
+ * number cell carries the one-press route so opening an invoice is still one press.
+ *
+ * What an invoice offers below that depends on what it is. A settled one has nothing to edit
+ * and nothing to cancel, and offering either would be handing a dead end to someone who came
+ * for the record. A withdrawn one has nothing to pay and nothing to change, and is the only
+ * kind the account may take off its own list — an invoice that is still owed cannot be tidied
+ * away, or the list stops being the answer to "what do I owe".
  *
  * Neither of the two that take something away happens on one press: `confirmLabel` makes the
  * menu ask again, in place.
@@ -429,6 +437,12 @@ function invoiceRowItems(
   act: { pdf: () => void; cancel: () => void; remove: () => void },
 ): RowMenuItem[] {
   const items: RowMenuItem[] = [
+    {
+      id: 'view',
+      label: t('inv.view' as never),
+      icon: <IconEye size={16} />,
+      to: `/account/invoices/${inv.id}`,
+    },
     {
       id: 'pdf',
       label: t('inv.pdf' as never),
