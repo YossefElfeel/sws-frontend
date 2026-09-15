@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, type RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
@@ -433,12 +433,133 @@ function initials(name: string) {
 }
 
 /**
+ * What a contact is, while it is being written: a name, the address it signs in with, and what
+ * it is allowed to do.
+ *
+ * Held as a draft rather than written straight into the list, because both the add form and the
+ * row editor need somewhere to keep a half-typed address — somewhere it can be abandoned. An
+ * editor that writes through on every keystroke has no cancel; an Add that writes through on
+ * the first click puts a person in the list who does not exist yet.
+ */
+interface Draft {
+  name: string;
+  email: string;
+  permissions: string[];
+}
+
+const BLANK: Draft = { name: '', email: '', permissions: [] };
+
+/**
+ * A name, an @, and a dot in what comes after it.
+ *
+ * `type="email"` alone accepts `mona@atelier`, which is a real address on an office network
+ * and is never the one someone meant to type here. The browser's own check is kept as well,
+ * for the empty field and for the keyboard it raises on a phone.
+ */
+const emailOk = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+/** What is wrong with the address — the one field whose answer is not simply "blank". */
+type Wrong = 'shape' | 'taken' | null;
+
+/**
+ * The questions a contact is made of, asked the same way whether one is being created or
+ * changed.
+ *
+ * Two copies of this form would be two places for "Invoices" to drift apart, and the
+ * permission switches are the screen's whole subject — spec 9.7 is "sub-accounts with specific
+ * permissions", so choosing them is not a second step that happens after the person exists.
+ */
+function ContactFields({
+  draft,
+  onChange,
+  wrong,
+  nameRef,
+}: {
+  draft: Draft;
+  onChange: (d: Draft) => void;
+  wrong: Wrong;
+  nameRef?: RefObject<HTMLInputElement>;
+}) {
+  const { t } = useLocale();
+
+  return (
+    <>
+      <div className="field-grid">
+        <label className="field-label">
+          <span className="eyebrow">{t('checkout.name')}</span>
+          <input
+            ref={nameRef}
+            className="field"
+            required
+            autoComplete="off"
+            value={draft.name}
+            onChange={(e) => onChange({ ...draft, name: e.target.value })}
+          />
+        </label>
+        <label className="field-label">
+          <span className="eyebrow">{t('checkout.email')}</span>
+          {/* `dir="ltr"`: an address is Latin whichever language the page is in, and left to
+              the paragraph's direction its dot and its @ land at the wrong end as it is typed. */}
+          <input
+            className="field"
+            type="email"
+            dir="ltr"
+            required
+            autoComplete="off"
+            aria-invalid={wrong ? true : undefined}
+            value={draft.email}
+            onChange={(e) => onChange({ ...draft, email: e.target.value })}
+          />
+        </label>
+      </div>
+
+      <fieldset className="perm-edit">
+        <legend className="eyebrow perm-edit__legend">{t('con.perms')}</legend>
+        {/* Switches, not bare platform checkboxes. Granting a permission is the same act as
+            the registrar lock, auto-renew and two-factor switches elsewhere in the account —
+            one label, one note, one thing turned on — and this was the only one of them still
+            drawing the browser's box. */}
+        <div className="perm-edit__grid">
+          {PERMISSIONS.map((p) => (
+            <label className="switch-row" key={p}>
+              <span>
+                <span className="switch-row__label">{t(`perm.${p}` as never)}</span>
+                <span className="switch-row__note">{t(`perm.${p}.note` as never)}</span>
+              </span>
+              <input
+                type="checkbox"
+                checked={draft.permissions.includes(p)}
+                onChange={() =>
+                  onChange({
+                    ...draft,
+                    permissions: draft.permissions.includes(p)
+                      ? draft.permissions.filter((x) => x !== p)
+                      : [...draft.permissions, p],
+                  })
+                }
+              />
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </>
+  );
+}
+
+/**
  * Contacts and sub-accounts — spec 9.7: each with specific permissions.
  *
- * "With specific permissions" is the whole feature, so the permissions have to be settable.
- * They were read-only tags with an Edit button that only raised a saved toast, and Add minted
- * a contact holding a permission that does not exist in the permission list at all — so the
- * one row a reviewer would create was the one row that rendered a raw key.
+ * "With specific permissions" is the whole feature, so the permissions have to be settable —
+ * and a contact is a person, so the person has to be settable too. Add used to mint a row
+ * called "New contact" at new@atelier-kamal.com the instant it was pressed, and then offered
+ * no way to say who that was: the name and the address were the two things on the row that
+ * nothing on the screen could change. A reviewer who added a contact got a placeholder wearing
+ * permissions they had chosen for someone else.
+ *
+ * So Add opens a form, and the list takes a row when that form is submitted. The editor holds
+ * the name and the address beside the switches, and both are drafts — Save commits, Cancel
+ * leaves the row as it was. The address is what a sub-account signs in with, so it is checked
+ * for shape and for being free before either one is accepted.
  *
  * Editing happens in the row rather than in a dialog, matching how cancellation and the
  * currency switch decide things here: the surrounding rows stay readable while one is being
@@ -450,49 +571,132 @@ export function Contacts() {
   const [q, setQ] = useState('');
   const [permFilter, setPermFilter] = useState('all');
   const [editing, setEditing] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState<Draft>(BLANK);
+  const [wrong, setWrong] = useState<Wrong>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  /*
+   * Ids are React's keys here, so they have to be issued once and never again. `rows.length`
+   * handed the same one out twice — add, remove, add, and the third row arrives wearing the
+   * removed row's identity, which React reads as the row that was already there.
+   */
+  const made = useRef(0);
   const { saved, mark, clear } = useSaved();
+
+  /* The form opens focused: it opened because someone asked for it, and the first thing it
+     wants is the name they pressed the button to type. */
+  useEffect(() => {
+    if (adding) nameRef.current?.focus();
+  }, [adding]);
 
   // "Who can see my invoices" is the question this screen exists to answer, so the permission
   // is the filter — a list narrowed to one permission is that question, answered.
+  //
+  // The row being edited stays in the list whatever the filter says. Its own editor is what
+  // changes the permission the filter reads, so turning a switch off would otherwise close the
+  // editor over it and take the unsaved name and address down with it.
   const shown = rows.filter(
     (c) =>
-      (permFilter === 'all' || c.permissions.includes(permFilter)) &&
-      matches(q, c.name.ar, c.name.en, c.email),
+      c.id === editing ||
+      ((permFilter === 'all' || c.permissions.includes(permFilter)) &&
+        matches(q, c.name.ar, c.name.en, c.email)),
   );
 
-  const toggle = (id: string, perm: string) =>
-    setRows((all) =>
-      all.map((c) =>
-        c.id === id
-          ? {
-              ...c,
-              permissions: c.permissions.includes(perm)
-                ? c.permissions.filter((p) => p !== perm)
-                : [...c.permissions, perm],
-            }
-          : c,
-      ),
-    );
+  /**
+   * The two ways an address can be refused. `self` is the row being edited, which is allowed
+   * to keep the address it already holds — a contact is identified by its address, so every
+   * other row's is taken.
+   */
+  const wrongWith = (d: Draft, self?: string): Wrong => {
+    if (!emailOk(d.email)) return 'shape';
+    const mail = d.email.trim().toLowerCase();
+    return rows.some((c) => c.id !== self && c.email.toLowerCase() === mail) ? 'taken' : null;
+  };
 
-  const add = () => {
-    // A new contact starts with nothing granted and opens straight into its own permission
-    // list, because choosing them is the reason for adding one. The toolbar is reset with it:
-    // a contact holding no permissions is invisible under any permission filter, so adding one
-    // while filtered would add nothing you could see.
+  /*
+   * A name typed once is the same string in both languages, because a person's name is not
+   * translated — the same reasoning a ticket reply is stored under.
+   *
+   * The seeded rows do carry a real pair, though: منى عبدالرحمن and Mona Abdelrahman. Saving an
+   * editor that was opened in Arabic and left the name alone must not flatten the English half
+   * that a reviewer cannot see from there, so an untouched name is kept rather than rewritten.
+   */
+  const named = (d: Draft, from?: Contact) =>
+    from && d.name.trim() === bi(from.name)
+      ? from.name
+      : { ar: d.name.trim(), en: d.name.trim() };
+
+  const openAdd = () => {
+    setEditing(null);
+    setWrong(null);
+    setDraft(BLANK);
+    setAdding(true);
+    nameRef.current?.focus();
+  };
+
+  const openEdit = (c: Contact) => {
+    setAdding(false);
+    setWrong(null);
+    setEditing(c.id);
+    setDraft({ name: bi(c.name), email: c.email, permissions: [...c.permissions] });
+  };
+
+  const create = () => {
+    const bad = wrongWith(draft);
+    if (bad) {
+      setWrong(bad);
+      return;
+    }
+    // The toolbar is cleared with the row: a contact added while the list is narrowed to
+    // "invoices", or to a search, would be added where it cannot be seen.
     setQ('');
     setPermFilter('all');
-    const id = `ct-new-${rows.length}`;
     setRows((all) => [
       ...all,
       {
-        id,
-        name: { ar: 'جهة جديدة', en: 'New contact' },
-        email: 'new@atelier-kamal.com',
-        permissions: [],
+        id: `ct-${made.current++}`,
+        name: named(draft),
+        email: draft.email.trim(),
+        permissions: draft.permissions,
       },
     ]);
-    setEditing(id);
+    setAdding(false);
+    setDraft(BLANK);
+    mark(t('con.added'));
   };
+
+  const save = (c: Contact) => {
+    const bad = wrongWith(draft, c.id);
+    if (bad) {
+      setWrong(bad);
+      return;
+    }
+    setRows((all) =>
+      all.map((x) =>
+        x.id === c.id
+          ? {
+              ...x,
+              name: named(draft, c),
+              email: draft.email.trim(),
+              permissions: draft.permissions,
+            }
+          : x,
+      ),
+    );
+    setEditing(null);
+    mark(t('con.edited'));
+  };
+
+  /* One draft and one message between the two forms: they are never open at the same time. A
+     keystroke clears the complaint, because the complaint was about what was there before it. */
+  const edit = (d: Draft) => {
+    setDraft(d);
+    setWrong(null);
+  };
+
+  const badNote = wrong && (
+    <p className="hint hint--bad">{t(wrong === 'taken' ? 'con.mailTaken' : 'con.mailBad')}</p>
+  );
 
   return (
     /*
@@ -519,7 +723,7 @@ export function Contacts() {
             <p className="frame__lede">{t('con.lede')}</p>
           </div>
           <div className="frame__actions">
-            <Button size="md" onClick={add}>
+            <Button size="md" onClick={openAdd}>
               <IconPlus size={15} />
               {t('con.add')}
             </Button>
@@ -547,9 +751,43 @@ export function Contacts() {
           </TableToolbar>
         )}
 
+        {/* The contact takes shape where it is going to live — above the list it is joining,
+            inside the frame, rather than in a dialog laid over the list you are adding to. */}
+        {adding && (
+          <form
+            className="contact-new"
+            aria-label={t('con.new')}
+            onSubmit={(e) => {
+              e.preventDefault();
+              create();
+            }}
+          >
+            <h2 className="contact-new__title">{t('con.new')}</h2>
+            <p className="contact-new__note">{t('con.newNote')}</p>
+            <ContactFields draft={draft} onChange={edit} wrong={wrong} nameRef={nameRef} />
+            {badNote}
+            <div className="contact-edit__foot">
+              <Button type="submit" size="md">
+                {t('con.create')}
+              </Button>
+              <Button
+                type="button"
+                size="md"
+                variant="quiet"
+                onClick={() => {
+                  setAdding(false);
+                  setWrong(null);
+                }}
+              >
+                {t('action.cancel')}
+              </Button>
+            </div>
+          </form>
+        )}
+
         {/* A list of people is a list, so it is a <ul>: its length is announced, and the rows
             are items rather than a run of anonymous divs. */}
-        {shown.length > 0 ? (
+        {shown.length > 0 && (
           <ul className="contacts">
             {shown.map((c) => (
               <li className={`contact${editing === c.id ? ' is-open' : ''}`} key={c.id}>
@@ -579,13 +817,16 @@ export function Contacts() {
                     )}
                   </span>
                   <span className="contact__acts">
+                    {/* Cancel, not Done: the editor under this button holds a draft now, and
+                        leaving by the button that opened it throws that draft away. "Done" is
+                        the word for keeping it. */}
                     <Button
                       size="sm"
                       variant="secondary"
                       aria-expanded={editing === c.id}
-                      onClick={() => setEditing(editing === c.id ? null : c.id)}
+                      onClick={() => (editing === c.id ? setEditing(null) : openEdit(c))}
                     >
-                      {t(editing === c.id ? 'con.done' : 'con.edit')}
+                      {t(editing === c.id ? 'action.cancel' : 'con.edit')}
                     </Button>
                     {/* `c.name` is a two-language pair, so this label read "Remove
                         [object Object]" — on the one control in the client area where knowing
@@ -603,48 +844,31 @@ export function Contacts() {
                 </div>
 
                 {editing === c.id && (
-                  <fieldset className="perm-edit">
-                    <legend className="eyebrow perm-edit__legend">{t('con.perms')}</legend>
-                    {/* Switches, not bare platform checkboxes. Granting a permission is the
-                        same act as the registrar lock, auto-renew and two-factor switches
-                        elsewhere in the account — one label, one note, one thing turned on —
-                        and this was the only one of them still drawing the browser's box. */}
-                    <div className="perm-edit__grid">
-                      {PERMISSIONS.map((p) => (
-                        <label className="switch-row" key={p}>
-                          <span>
-                            <span className="switch-row__label">{t(`perm.${p}` as never)}</span>
-                            <span className="switch-row__note">
-                              {t(`perm.${p}.note` as never)}
-                            </span>
-                          </span>
-                          <input
-                            type="checkbox"
-                            checked={c.permissions.includes(p)}
-                            onChange={() => toggle(c.id, p)}
-                          />
-                        </label>
-                      ))}
-                    </div>
-                    <div className="perm-edit__foot">
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setEditing(null);
-                          mark(t('con.edited'));
-                        }}
-                      >
+                  <form
+                    className="contact-edit"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      save(c);
+                    }}
+                  >
+                    <ContactFields draft={draft} onChange={edit} wrong={wrong} />
+                    {badNote}
+                    <div className="contact-edit__foot">
+                      <Button type="submit" size="sm">
                         {t('sec.save')}
                       </Button>
                     </div>
-                  </fieldset>
+                  </form>
                 )}
               </li>
             ))}
           </ul>
-        ) : (
-          /* Inside the frame rather than instead of it, so the head that names what is missing
-             and the button that fixes it stay on screen with the notice. */
+        )}
+
+        {/* Inside the frame rather than instead of it, so the head that names what is missing
+            and the button that fixes it stay on screen with the notice. It steps aside for the
+            add form: a frame holding a half-written contact is not an empty one. */}
+        {shown.length === 0 && !adding && (
           <div className="empty empty--inset">
             <IconUsers size={28} />
             <p className="empty__title">
