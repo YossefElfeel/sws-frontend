@@ -739,6 +739,21 @@ export const STRINGS = {
   'cur.switch': { ar: 'غيّر العملة', en: 'Change it' },
   'cur.keep': { ar: 'سيبها زي ما هي', en: 'Leave it' },
 
+  /*
+   * The seven currencies, each named as well as coded. A three-letter code is a label for
+   * someone who already knows which one is theirs; the name is what tells everyone else.
+   * KWD and SAR sit two rows apart in the list and read alike at a glance — the names are
+   * what stop the choice being a coin toss.
+   */
+  'cur.menu': { ar: 'اختار العملة', en: 'Choose a currency' },
+  'cur.name.USD': { ar: 'دولار أمريكي', en: 'US Dollar' },
+  'cur.name.AED': { ar: 'درهم إماراتي', en: 'UAE Dirham' },
+  'cur.name.CHF': { ar: 'فرنك سويسري', en: 'Swiss Franc' },
+  'cur.name.EGP': { ar: 'جنيه مصري', en: 'Egyptian Pound' },
+  'cur.name.EUR': { ar: 'يورو', en: 'Euro' },
+  'cur.name.KWD': { ar: 'دينار كويتي', en: 'Kuwaiti Dinar' },
+  'cur.name.SAR': { ar: 'ريال سعودي', en: 'Saudi Riyal' },
+
   'reg.title': { ar: 'بيانات مالك الدومين', en: 'Domain registrant' },
   'reg.lede': {
     ar: 'الجهة المسجِّلة بتطلب البيانات دي وبتتسجّل باسمك.',

@@ -17,6 +17,21 @@ p.on('console', (m) => m.type() === 'error' && errs.push(m.text().slice(0, 160))
 const ok = (label, cond, detail = '') =>
   console.log(`${cond ? 'pass' : 'FAIL'}  ${label.padEnd(46)} ${detail}`);
 
+/**
+ * The currency control is a menu of named options rather than a <select> — see
+ * CurrencySelect — so the flow picks from it the way a person does: open it, click the row.
+ */
+const pickCurrency = async (code) => {
+  await p.click('.cur__trigger');
+  await p.waitForSelector('.cur__menu');
+  const i = await p.$$eval(
+    '.cur__opt .cur__code',
+    (n, c) => n.findIndex((x) => x.textContent.trim() === c),
+    code,
+  );
+  await p.click(`.cur__opt:nth-child(${i + 1})`);
+};
+
 await p.goto(`${BASE}#/`, { waitUntil: 'networkidle' });
 await p.waitForSelector('.plan');
 
@@ -35,8 +50,29 @@ const stored = await p.evaluate(() => localStorage.getItem('sws.theme'));
 ok('dark mode toggles and persists', theme === 'dark' && stored === 'dark', `${theme}/${stored}`);
 await p.click('.masthead__icon-btn');
 
-// Spec 4.2 currency
-await p.selectOption('.cur select', 'EGP');
+// Spec 4.2 currency — seven of them, each named, with the one in force marked.
+await p.click('.cur__trigger');
+await p.waitForSelector('.cur__menu');
+const curOpts = await p.$$eval('.cur__opt', (n) =>
+  n.map((x) => [
+    x.querySelector('.cur__code').textContent.trim(),
+    x.querySelector('.cur__name').textContent.trim(),
+  ]),
+);
+ok(
+  'seven currencies, each under its own name',
+  curOpts.length === 7 && curOpts.every(([c, name]) => c.length === 3 && name.length > 0),
+  curOpts.map(([c, name]) => `${c} ${name}`).join(', '),
+);
+ok(
+  'the one in force is the one ticked',
+  (await p.$$eval('.cur__opt[aria-checked="true"] .cur__code', (n) =>
+    n.map((x) => x.textContent.trim()),
+  )).join(',') === 'USD',
+);
+await p.keyboard.press('Escape');
+await p.waitForTimeout(120);
+await pickCurrency('EGP');
 const egp = await p.$eval('.plan .plan__currency', (e) => e.textContent.trim());
 ok('currency switches in place', egp === 'EGP', egp);
 
@@ -120,10 +156,20 @@ const egpGw = await p.$$eval('.method__label', (n) => n.map((x) => x.textContent
 ok('five gateways on EGP', egpGw.length === 5, String(egpGw.length));
 // S-04 / I15: with items in the cart the switch asks before it re-prices, so the flow has to
 // answer it. That the dialog appears at all is the assertion.
-await p.selectOption('.cur select', 'CHF');
+await pickCurrency('CHF');
 await p.waitForSelector('.cur__ask');
 const bothTotals = await p.$$eval('.cur__amount', (n) => n.map((x) => x.textContent.trim()));
 ok('changing currency with a full cart shows both totals', bothTotals.length === 2, bothTotals.join(' -> '));
+// Escape says the same thing the quiet button says: the question goes, the price does not move.
+await p.keyboard.press('Escape');
+await p.waitForTimeout(120);
+ok(
+  'Escape answers the question with "leave it"',
+  (await p.$$('.cur__ask')).length === 0 &&
+    (await p.$eval('.cur__trigger .serial', (e) => e.textContent.trim())) === 'EGP',
+);
+await pickCurrency('CHF');
+await p.waitForSelector('.cur__ask');
 await p.click('.cur__acts .btn--primary');
 await p.waitForTimeout(200);
 await p.waitForTimeout(150);
@@ -943,10 +989,13 @@ await p.setViewportSize({ width: 1440, height: 900 });
 
 // S-04 after the first payment: the currency is a lock, not a menu, and it says where to ask.
 await p.evaluate(() => (location.hash = '#/account'));
-await p.waitForSelector('.cur__lock');
-ok('the account currency is locked once a payment exists', (await p.$$('.cur__lock')).length === 1);
-ok('…and there is no select to change it', (await p.$$('.app__select--currency select')).length === 0);
-await p.click('.cur__lock');
+await p.waitForSelector('.cur__trigger[aria-haspopup="dialog"]');
+ok(
+  'the account currency is locked once a payment exists',
+  (await p.$$('.cur__trigger[aria-haspopup="dialog"]')).length === 1,
+);
+ok('…and there is no menu to change it', (await p.$$('.cur__trigger[aria-haspopup="menu"]')).length === 0);
+await p.click('.cur__trigger[aria-haspopup="dialog"]');
 await p.waitForSelector('.cur__ask a[href*="tickets/new"]');
 ok('the lock explains and points at Sales', true);
 await p.keyboard.press('Escape');
