@@ -4,6 +4,7 @@ import { Card } from '../../components/Card';
 import { PromoRail } from '../../components/PromoRail';
 import { StatRow, type StatItem } from '../../components/Stat';
 import { Tag, SERVICE_TONE, TICKET_TONE } from '../../components/Tag';
+import { ServiceMeters, ServiceShortcuts } from '../../components/ServiceUsage';
 import {
   IconServer,
   IconGlobe,
@@ -18,6 +19,7 @@ import {
   IconBook,
   IconMegaphone,
   IconSpark,
+  IconGauge,
   IconUsers,
   IconSignOut,
 } from '../../components/icons';
@@ -150,6 +152,16 @@ export function Dashboard() {
    * the five alphabetically-first services on an account with a suspended one is a preview
    * that hides the only row worth opening. "View all" is one press away for the rest.
    */
+  /*
+   * The primary hosting account — the one the usage card and the shortcuts report on.
+   *
+   * "Primary" is the first live cPanel product the account holds, in the order the fixtures
+   * list them. It is not a field WHMCS stores, and the day an account holds two it is a guess
+   * dressed as a fact — which is why both cards print the domain they are about rather than
+   * leaving the reader to assume. A VPS is excluded: it has no cPanel behind it, so the ten
+   * shortcuts would all lead somewhere that is not there.
+   */
+  const primary = SERVICES.find((s) => s.status === 'active' && s.kind === 'cpanel');
   const servicePreview = [
     ...SERVICES.filter((s) => NEEDS_ATTENTION.includes(s.status)),
     ...SERVICES.filter((s) => !NEEDS_ATTENTION.includes(s.status)),
@@ -371,7 +383,57 @@ export function Dashboard() {
           </Link>
         </Card>
 
-        {/* Pair 3 — the two long reads: what has been announced, and what falls due. */}
+        {/*
+         * Pair 3 — the site itself: how much room is left on it, and the tools you open on it.
+         *
+         * Both belonged only to the service page, which is one click past the card above that
+         * names the service. "Have I run out of space" and "where is the file manager" are the
+         * two questions this screen was sending people away to answer, and both are answerable
+         * here in the room a pair of cards already had.
+         *
+         * They report ONE service — the primary hosting account, named on both cards — rather
+         * than a total across the account. A disk bar summed over three products is a number
+         * with no action attached to it: you cannot clear space on "72% of everything". The
+         * shortcuts have to belong to one domain anyway, because each carries that domain in
+         * its link.
+         *
+         * Absent when there is no live cPanel service to report on. A meter at zero over a
+         * product the account does not have reads as a broken card, not as an empty one.
+         */}
+        {primary && (
+          <>
+            <Card
+              heading={t('svc.usage')}
+              icon={<IconGauge size={17} />}
+              action={
+                <Link className="card__more" to={`/account/services/${primary.id}`}>
+                  {t('svc.manage')}
+                  <IconArrow size={14} />
+                </Link>
+              }
+            >
+              <p className="card__lede">
+                <bdi>{primary.domain}</bdi>
+              </p>
+              <ServiceMeters svc={primary} />
+              <p className="form__note">
+                {t('svc.usageAt')}{' '}
+                <span className="serial">
+                  <bdi>{primary.usageAt}</bdi>
+                </span>
+              </p>
+            </Card>
+
+            <Card heading={t('svc.shortcuts')} icon={<IconSpark size={17} />}>
+              <p className="card__lede">
+                <bdi>{primary.domain}</bdi>
+              </p>
+              <ServiceShortcuts domain={primary.domain} />
+            </Card>
+          </>
+        )}
+
+        {/* Pair 4 — the two long reads: what has been announced, and what falls due. */}
         <Card
           heading={t('acc.news')}
           icon={<IconMegaphone size={17} />}
@@ -415,7 +477,7 @@ export function Dashboard() {
           )}
         </Card>
 
-        {/* Pair 4 — the screen ends on support: what is already open with us, beside the
+        {/* Pair 5 — the screen ends on support: what is already open with us, beside the
             door that opens the next one. */}
         <Card
           heading={t('acc.tickets')}
