@@ -321,6 +321,55 @@ await p.waitForSelector('.meters');
   ok('a service raises a ticket that names it', Boolean(href) && Boolean(seeded), seeded ?? 'not seeded');
 }
 
+/*
+ * 9.3 the server controls. A cPanel account has no machine to switch on and off, so the card
+ * has to be absent there and present on the VPS — a power row on a shared-hosting page would
+ * be nine buttons that cannot do anything.
+ *
+ * The rest is the contract a dialog owes: it is announced as one, focus goes in and comes
+ * back, Escape closes, and the power row changes hands when the machine does.
+ */
+await p.evaluate(() => (location.hash = '#/account/services/svc-8841'));
+await p.waitForSelector('.meters');
+ok('a cPanel account is offered no power switch', (await p.$$('.ctl')).length === 0);
+await p.evaluate(() => (location.hash = '#/account/services/svc-2470'));
+await p.waitForSelector('.ctl');
+{
+  const rows = await p.$$eval('.ctl', (n) => n.length);
+  const buttons = await p.$$eval('.ctl button', (n) => n.length);
+  ok('a VPS gets two rows and nine controls', rows === 2 && buttons === 9, `${rows} row(s), ${buttons} button(s)`);
+  ok(
+    'start is the one that is off while the machine is on',
+    await p.$$eval('.ctl:first-of-type button', (n) => n[0].disabled && n.slice(1).every((b) => !b.disabled)),
+  );
+
+  await p.click('.ctl:last-of-type button:nth-of-type(1)');
+  await p.waitForSelector('.modal__panel');
+  const named = await p.$eval('.modal__panel', (n) => {
+    const id = n.getAttribute('aria-labelledby');
+    return n.getAttribute('role') === 'dialog' && n.getAttribute('aria-modal') === 'true' && !!document.getElementById(id);
+  });
+  ok('reinstall asks in a named dialog before it erases anything', named);
+  ok('opening it moves focus inside it', await p.evaluate(() => !!document.activeElement?.closest('.modal__panel')));
+  await p.keyboard.press('Escape');
+  await p.waitForTimeout(120);
+  ok(
+    'Escape closes it and hands focus back to the button that opened it',
+    (await p.$$('.modal__panel')).length === 0 &&
+      (await p.evaluate(() => !!document.activeElement?.closest('.ctl'))),
+  );
+
+  // Stopping the machine is what turns the first row around: it is the row's job to say so.
+  await p.click('.ctl:first-of-type button:nth-of-type(2)');
+  await p.waitForSelector('.modal__panel');
+  await p.click('.modal__foot button:nth-of-type(1)');
+  await p.waitForTimeout(150);
+  ok(
+    'stopping it leaves start as the only live control',
+    await p.$$eval('.ctl:first-of-type button', (n) => !n[0].disabled && n.slice(1).every((b) => b.disabled)),
+  );
+}
+
 // 9.5.4 knowledgebase search narrows the list
 await p.evaluate(() => (location.hash = '#/account/knowledgebase'));
 await p.waitForSelector('.kb-item');
