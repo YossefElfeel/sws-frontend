@@ -498,8 +498,21 @@ await p.waitForSelector('.perm-list');
   );
   await boxes[unchecked].click();
   await p.waitForTimeout(150);
+  /*
+   * The switch stages the change; the row takes it when the form is submitted.
+   *
+   * That is the whole of "a contact is written, not minted" — the editor holds the name, the
+   * address and the permissions as drafts, Save commits them and Cancel leaves the row as it
+   * was. This gate ticked a switch and read the row on the next line, which was asserting the
+   * behaviour the screen deliberately stopped having, so it failed on a screen that works.
+   * Both halves are checked now: that the tick alone does not move the row, and that saving does.
+   */
+  const staged = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
+  ok('a ticked permission is a draft until it is saved', staged === before, `${before} -> ${staged}`);
+  await p.click('.contact-edit button[type="submit"]');
+  await p.waitForTimeout(200);
   const after = await p.$$eval('.contact:first-child .perm-list .tag', (n) => n.length);
-  ok('granting one shows it on the contact', after === before + 1, `${before} -> ${after}`);
+  ok('granting one shows it on the contact once saved', after === before + 1, `${before} -> ${after}`);
 }
 
 // Wiring. Every one of these resolved to a real route before and still went to the wrong
