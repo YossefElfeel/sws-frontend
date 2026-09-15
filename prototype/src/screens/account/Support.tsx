@@ -208,12 +208,17 @@ export function TicketNew() {
   const from = SERVICES.find((s) => s.id === params.get('service'));
 
   /*
-   * The same courtesy for an invoice, and for the same reason.
+   * The same courtesy for an invoice, and now for two reasons.
    *
-   * The invoices list has an Edit item that arrives here, because an invoice's own lines are
-   * not the client's to change — see `dev.invoiceActions`. So the subject opens naming the
-   * invoice, and the department opens on Sales and Billing rather than on Technical Support,
-   * which is where a question about a charge would otherwise have to be re-routed by hand.
+   * A payment that went wrong is the worst moment to ask somebody to go and find their
+   * invoice number, so the invoice screen sends it. And the invoices list has an Edit item
+   * that arrives here too, because an invoice s own lines are not the client s to change —
+   * see `dev.invoiceActions`. Either way the subject opens naming the invoice and the
+   * department opens on Sales and Billing rather than Technical Support, which is the queue
+   * that can actually look at a charge.
+   *
+   * The lookup goes through account state rather than the INVOICES fixture: an invoice the
+   * account has cancelled or taken off its list must not come back here as a live subject.
    */
   const invoiceId = params.get('invoice');
   const { invoice } = useAccountState();

@@ -1049,6 +1049,81 @@ export function invoiceBalanceUsdMinor(inv: Invoice): number {
  */
 export const BILLING_LOCKED = TRANSACTIONS.some((x) => x.kind === 'payment');
 
+/* ── money going back — the refund and where it has got to ──────────────────── */
+
+/**
+ * A refund is not a transaction. It is a promise that becomes one, and the days in between are
+ * the whole problem: between the day it is agreed and the day it lands on a statement the
+ * client area says nothing at all, which is when someone opens a second ticket asking where
+ * their money is. So the state is carried, and it is the state the customer is in, not ours:
+ *
+ *   requested — they asked, or we spotted it. Nothing has moved.
+ *   approved  — we agreed. Still nothing has moved, and saying so is the point.
+ *   sent      — it left us. This is the day a ledger row appears, and the last day we know
+ *               anything for certain: what a bank does with it afterwards is the bank's.
+ *   completed — it is on the method it came from.
+ *   declined  — we said no, and the reason has to be readable without opening a ticket.
+ *
+ * `expectedBy` is the bank's window, not ours, and the screen says so. Naming a date we do not
+ * control as though we did is how a support queue fills up on the fourth day.
+ */
+export type RefundStatus = 'requested' | 'approved' | 'sent' | 'completed' | 'declined';
+
+export interface Refund {
+  id: string;
+  /** The invoice it reverses, named the way a ledger row names one. */
+  invoice: string;
+  status: RefundStatus;
+  /** Positive. The direction is carried by the word "refund", not by a minus sign. */
+  amountUsdMinor: number;
+  /** Why, as a key: the reason is read by the customer, so it is not free text. */
+  reasonKey: string;
+  requestedOn: string;
+  /** The day it was agreed or refused. */
+  decidedOn?: string;
+  /** The day it left us — the day the ledger row exists. */
+  sentOn?: string;
+  /** A refund goes back the way the money came, so the gateway is the paying one. */
+  gateway: string;
+  last4?: string;
+  /** The gateway's own reference, so a bank can be asked about it by name. */
+  reference?: string;
+  /** The bank's window. Stated as theirs. */
+  expectedBy?: string;
+  /** The conversation it came out of, when there was one. */
+  ticketId?: string;
+}
+
+/**
+ * One refund, and it is the one the rest of the account already describes: the duplicate charge
+ * on 4310 that ticket #7688 is about and that txn-5520 carries. A second one would have to
+ * invent a reason no other fixture supports — a plan nobody cancelled, a charge nobody
+ * disputed — and a prototype that invents reasons is how a reviewer approves a flow that does
+ * not exist. The other four states are built and reachable the moment a real one turns up.
+ */
+export const REFUNDS: Refund[] = [
+  {
+    id: 'ref-5520',
+    invoice: 'INV-20260801-4310',
+    status: 'completed',
+    amountUsdMinor: 1367,
+    reasonKey: 'inv.refundReason.duplicate',
+    requestedOn: '2026-08-11',
+    decidedOn: '2026-08-12',
+    sentOn: '2026-08-12',
+    gateway: 'stripe-card',
+    last4: '4242',
+    reference: 're_3PmE1KD7pM',
+    expectedBy: '2026-08-17',
+    ticketId: 'tkt-7688',
+  },
+];
+
+/** The refund raised against one invoice, when there is one. */
+export function refundFor(inv: Invoice): Refund | undefined {
+  return REFUNDS.find((r) => r.invoice === inv.number);
+}
+
 /* ── a failed charge — spec 9.4, C-21 ───────────────────────────────────────── */
 
 /**

@@ -4,7 +4,7 @@ import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
 import { Card } from '../../components/Card';
-import { Tag, INVOICE_TONE } from '../../components/Tag';
+import { Tag, INVOICE_TONE, REFUND_TONE } from '../../components/Tag';
 import { DevNote } from '../../components/DevNote';
 import { GatewayDetails } from '../../components/GatewayDetails';
 import {
@@ -15,6 +15,8 @@ import {
   IconWallet,
   IconAlert,
   IconShield,
+  IconCoin,
+  IconSupport,
   IconClose,
   IconPencil,
   IconTrash,
@@ -39,14 +41,29 @@ import {
   COMPANY,
   invoiceLedger,
   invoiceBalanceUsdMinor,
+  refundFor,
+  FAILED_PAYMENT,
   type Invoice,
   type InvoiceStatus,
   type InvoiceLine,
+  type Refund,
 } from '../../lib/account';
 import { gatewayDestination } from '../Order';
 import { Select } from '../../components/Select';
 
 const FILTERS: (InvoiceStatus | 'all')[] = ['all', 'unpaid', 'paid', 'overdue', 'cancelled'];
+
+/**
+ * "Paid" and "paid, and then some of it came back" are two different things wearing one word in
+ * a list. The chip is also how the refund section gets found: a state nobody can reach from the
+ * screen above it is a state nobody reviews.
+ */
+function RefundTag({ inv }: { inv: Invoice }) {
+  const { t } = useLocale();
+  const refund = refundFor(inv);
+  if (!refund) return null;
+  return <Tag tone={REFUND_TONE[refund.status]}>{t('inv.refundTag')}</Tag>;
+}
 
 /** Invoices — spec 9.4: number, date, status, amount, filtered by status. */
 export function Invoices() {
@@ -195,7 +212,10 @@ export function Invoices() {
                       )}
                     </td>
                     <td>
-                      <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
+                      <p className="tags">
+                        <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
+                        <RefundTag inv={inv} />
+                      </p>
                     </td>
                     <td className="num">
                       <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
@@ -231,6 +251,163 @@ export function Invoices() {
 
       {rows.length > 0 && <DevNote>{t('dev.invoiceActions')}</DevNote>}
     </AccountLayout>
+  );
+}
+
+/**
+ * Where the money got to — C-15 extended.
+ *
+ * The ledger already carries the refund: a row, on the day it moved, the same width as every
+ * other row. That is bookkeeping, and bookkeeping answers "was it done". Somebody who is owed
+ * money is asking a different question — "where is it now" — and the answer to that one is a
+ * state, an amount and a date somebody else controls. A row cannot hold those, so the refund
+ * gets a section of its own above the ledger it is also a line in.
+ *
+ * The last step is deliberately not a promise. We know the day it left us; the day it lands is
+ * the bank's, and the step says whose date it is rather than quietly adopting it as ours.
+ */
+function RefundStatus({ refund }: { refund: Refund }) {
+  const { t, locale } = useLocale();
+  const { currency } = usePrefs();
+  const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
+  const gateway = GATEWAYS.find((g) => g.id === refund.gateway);
+  const declined = refund.status === 'declined';
+  const done = refund.status === 'completed';
+
+  return (
+    <section className="card">
+      <header className="card__head">
+        <h2 className="card__heading">
+          <IconCoin size={17} />
+          {t('inv.refund')}
+        </h2>
+        <Tag tone={REFUND_TONE[refund.status]}>{t(`inv.refund.${refund.status}` as never)}</Tag>
+      </header>
+
+      {/* The amount is what the section is for, so it is set in the one figure size this client
+          area gives money — the same as a balance, because it is the same kind of number. */}
+      <p className="figure">
+        <span className="figure__n serial">{money(refund.amountUsdMinor)}</span>
+        <span className="figure__unit">{t('inv.refundAmount')}</span>
+      </p>
+      <p className="credit__note">{t(`inv.refundNote.${refund.status}` as never)}</p>
+
+      <ol className="steps">
+        <li className="steps__item steps__item--done">
+          <span className="steps__when serial">
+            <bdi>{refund.requestedOn}</bdi>
+          </span>
+          <span className="steps__what">{t('inv.refundStep.requested')}</span>
+        </li>
+        {refund.decidedOn && (
+          <li className={`steps__item ${declined ? 'steps__item--bad' : 'steps__item--done'}`}>
+            <span className="steps__when serial">
+              <bdi>{refund.decidedOn}</bdi>
+            </span>
+            <span className="steps__what">
+              {t(declined ? 'inv.refundStep.declined' : 'inv.refundStep.approved')}
+            </span>
+          </li>
+        )}
+        {refund.sentOn && (
+          <li className="steps__item steps__item--done">
+            <span className="steps__when serial">
+              <bdi>{refund.sentOn}</bdi>
+            </span>
+            <span className="steps__what">{t('inv.refundStep.sent')}</span>
+          </li>
+        )}
+        {refund.expectedBy && !declined && (
+          <li className={`steps__item${done ? ' steps__item--done' : ''}`}>
+            <span className="steps__when serial">
+              <bdi>{refund.expectedBy}</bdi>
+            </span>
+            <span className="steps__what">{t('inv.refundStep.expected')}</span>
+          </li>
+        )}
+      </ol>
+      {refund.expectedBy && !declined && (
+        <p className="form__note">{t('inv.refundStep.expectedNote')}</p>
+      )}
+
+      <dl className="kv">
+        <div>
+          <dt>{t('inv.refundReason')}</dt>
+          <dd>{t(refund.reasonKey as never)}</dd>
+        </div>
+        <div>
+          <dt>{t('inv.refundTo')}</dt>
+          <dd>
+            {gateway ? t(gateway.labelKey as never) : refund.gateway}
+            {refund.last4 && (
+              <>
+                {' '}···· <span className="serial">{refund.last4}</span>
+              </>
+            )}
+          </dd>
+        </div>
+        {refund.reference && (
+          <div>
+            <dt>{t('txn.reference')}</dt>
+            <dd className="serial">
+              <bdi>{refund.reference}</bdi>
+            </dd>
+          </div>
+        )}
+      </dl>
+
+      {/* A refund almost always came out of a conversation, and the conversation is where the
+          rest of the explanation is. Sending someone to search the ticket list for it again is
+          how a settled matter gets opened twice. */}
+      {refund.ticketId && (
+        <div className="form__foot">
+          <Link className="btn btn--md btn--secondary" to={`/account/tickets/${refund.ticketId}`}>
+            {t('inv.refundOpenTicket')}
+            <IconArrow size={15} />
+          </Link>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/**
+ * The way out when the money does not behave — spec 9.4, C-21.
+ *
+ * A payment page that only knows how to succeed leaves the one person who most needs help with
+ * nothing to press: the charge failed, or it left their account and the invoice still says
+ * unpaid, and the screen carries on offering them the button that just did not work. The route
+ * to a human sits on the invoice, beside the paying, and takes the invoice number with it —
+ * nobody should have to retype a number the screen they came from already knew.
+ *
+ * Where this invoice is the one that actually failed, the recovery screen is offered first: it
+ * knows what the gateway said and when we try again, which is the answer before a ticket is.
+ */
+function PaymentHelp({ inv, unpaid }: { inv: Invoice; unpaid: boolean }) {
+  const { t } = useLocale();
+  const failed = FAILED_PAYMENT.invoiceId === inv.id;
+
+  return (
+    <section className="card">
+      <header className="card__head">
+        <h2 className="card__heading">
+          <IconSupport size={17} />
+          {t(unpaid ? 'inv.trouble' : 'inv.troubleSettled')}
+        </h2>
+      </header>
+      <p className="credit__note">{t(unpaid ? 'inv.troubleNote' : 'inv.troubleSettledNote')}</p>
+      <div className="acts">
+        {unpaid && failed && (
+          <Link className="btn btn--md btn--secondary" to="/account/payment-failed">
+            {t('inv.troubleFailed')}
+          </Link>
+        )}
+        <Link className="btn btn--md btn--quiet" to={`/account/tickets/new?invoice=${inv.id}`}>
+          {t('inv.troubleAsk')}
+          <IconArrow size={15} />
+        </Link>
+      </div>
+    </section>
   );
 }
 
@@ -345,6 +522,7 @@ export function InvoiceDetail() {
   const voided = inv.status === 'cancelled';
   const unpaid = !voided && inv.status !== 'paid';
   const ledger = invoiceLedger(inv);
+  const refund = refundFor(inv);
   const balance = invoiceBalanceUsdMinor(inv);
   const creditUsable = Math.min(ACCOUNT.creditUsdMinor, balance);
   const balanceShown = useCredit ? balance - creditUsable : balance;
@@ -381,26 +559,20 @@ export function InvoiceDetail() {
         { label: inv.number },
       ]}
       actions={
-        <>
-          {/* C-16 is blocked on I12 and the PDF is generated server-side, so the button
-              reports why rather than doing nothing at all. */}
-          <Button size="md" variant="secondary" onClick={() => mark(t('inv.pdfPending'))}>
-            <IconInvoice size={15} />
-            {t('inv.pdf')}
-          </Button>
-          {unpaid && (
-            <Link className="btn btn--md btn--primary" to={payHref}>
-              {t('account.pay')}
-            </Link>
-          )}
-        </>
+        /* C-16 is blocked on I12 and the PDF is generated server-side, so the button reports
+           why rather than doing nothing at all. Paying is not up here beside it: the payment
+           card owns that, and one Pay now is the whole point of it being there. */
+        <Button size="md" variant="secondary" onClick={() => mark(t('inv.pdfPending'))}>
+          <IconInvoice size={15} />
+          {t('inv.pdf')}
+        </Button>
       }
     >
       <SavedNote saved={saved} onDismiss={clear}>
         {t('inv.pdfPendingNote')}
       </SavedNote>
 
-      <div className="invoice-detail">
+      <div className="invoice-detail invoice-detail--act-first">
         <article className="card invoice">
           <div className="invoice__head">
             <p className="eyebrow">{t('account.invoice')}</p>
@@ -515,6 +687,8 @@ export function InvoiceDetail() {
           </dl>
         </article>
 
+        {refund && <RefundStatus refund={refund} />}
+
         <section className="card card--flush">
           <header className="card__head card__head--flush">
             <h2 className="card__heading">{t('inv.ledger')}</h2>
@@ -557,12 +731,14 @@ export function InvoiceDetail() {
               </table>
             </div>
           ) : (
-            /* "No payments yet" and "once you pay, the transaction appears here" are both
-               about a payment that is still coming. On a withdrawn invoice none is, and the
-               wait is the wrong thing to describe. */
             <div className="empty empty--inset">
               <IconWallet size={28} />
-              <p className="empty__title">{t(voided ? 'inv.noPaymentsVoid' : 'inv.noPayments')}</p>
+              {/* "No payments yet" and "once you pay, the transaction appears here" are both
+                  about a payment that is still coming. On a withdrawn invoice none is, and the
+                  wait is the wrong thing to describe. */}
+              <p className="empty__title">
+                {t(voided ? 'inv.noPaymentsVoid' : 'inv.noPayments')}
+              </p>
               <p className="empty__note">
                 {t(voided ? 'inv.noPaymentsVoidNote' : 'inv.noPaymentsNote')}
               </p>
@@ -687,6 +863,8 @@ export function InvoiceDetail() {
               </div>
             </section>
           )}
+
+          <PaymentHelp inv={inv} unpaid={unpaid} />
         </div>
       </div>
     </AccountLayout>
