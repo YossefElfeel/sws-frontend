@@ -114,4 +114,12 @@ export const ROUTES = [
   { name: 'acc-invoice-paid', path: '#/account/invoices/inv-3950' },
   { name: 'acc-status', path: '#/account/status' },
   { name: 'acc-status-clear', path: '#/account/status?state=clear' },
+  // 2026-09-15 — saving a card is its own screen rather than the checkout's payment screen
+  // (C-19's `add` state). Both variants of it, the card list as it looks on the way back, and
+  // the two bank moments in setup mode, where nothing is being paid.
+  { name: 'acc-add-card', path: '#/account/payment-methods/new' },
+  { name: 'acc-add-card-first', path: '#/account/payment-methods/new?first=1' },
+  { name: 'acc-payment-methods-added', path: '#/account/payment-methods?added=1&primary=1' },
+  { name: '3ds-setup-go', path: '#/checkout/3ds?setup=card' },
+  { name: '3ds-setup-back', path: '#/checkout/3ds?setup=card&state=return' },
 ];
