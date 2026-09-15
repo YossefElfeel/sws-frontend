@@ -989,9 +989,33 @@
   margin-block: 0;
 }
 
-/* An invoice is a document before it is a screen, so it holds a printable measure. */
-.invoice {
-  max-width: 52rem;
+/*
+ * An invoice is a document before it is a screen, and the document runs the width of the page
+ * it is on — see the note on .app__main .invoice in app.css for what the measure was costing.
+ *
+ * The pay panel used to hold the second column for the whole height of the layout; it now
+ * takes that column beside the ledger, one row down, so the document has the content area to
+ * itself and the ground under the panel is the ledger rather than nothing.
+ */
+.invoice-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sws-space-24);
+  align-items: start;
+}
+
+.invoice-detail > * {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .invoice-detail {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  }
+
+  .invoice-detail > .invoice {
+    grid-column: 1 / -1;
+  }
 }
 
 .invoice__head {
