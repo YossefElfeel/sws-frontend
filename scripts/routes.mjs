@@ -100,6 +100,7 @@ export const ROUTES = [
   { name: 'wallet-transfer-invoice', path: '#/order/wallet?invoice=inv-4417' },
   { name: 'card-entry-invoice', path: '#/checkout/card?invoice=inv-4417' },
   { name: 'acc-service-email', path: '#/account/services/svc-9033' },
+  { name: 'acc-service-vps', path: '#/account/services/svc-2470' },
   { name: 'acc-service-password', path: '#/account/services/svc-8841/password' },
   { name: 'acc-domain-nameservers', path: '#/account/domains/dom-1/nameservers' },
   { name: 'acc-domain-ns-custom', path: '#/account/domains/dom-3/nameservers' },

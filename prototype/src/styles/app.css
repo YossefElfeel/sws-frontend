@@ -3222,3 +3222,168 @@ button.stat {
 .app__main .rail-stack {
   gap: 0;
 }
+
+/* ── 2026-09-15: the VPS usage graphs — spec 9.3 ───────────────────────────── */
+/*
+ * Four charts on a server page, drawn on the client area's own terms: the card's ground, the
+ * card's corners, the brand ink for the first series and a second ink beside it.
+ *
+ * The plot is the only SVG. Every number around it is HTML, because axis text inside an SVG
+ * scales with the viewBox — a chart sized for a 1440px column would render its own labels at
+ * seven or eight pixels on a phone, under the readable floor and a finding in the mobile audit.
+ * Out here they stay at caption size wherever the chart lands.
+ */
+.charts {
+  display: grid;
+  gap: var(--sws-space-16);
+}
+
+@media (min-width: 900px) {
+  .charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.chart {
+  padding: var(--sws-space-16);
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+}
+
+.chart__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin-block-end: var(--sws-space-16);
+}
+
+.chart__title {
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+.chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-12);
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
+}
+
+.chart__legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+}
+
+/* A swatch, not a dot: two series are told apart by a shape a colour-blind eye can still pair
+   with the band under the line. */
+.chart__key {
+  inline-size: 12px;
+  block-size: 3px;
+  border-radius: var(--sws-radius-pill);
+}
+
+.chart__key--a {
+  background: var(--sws-action-primary);
+}
+
+.chart__key--b {
+  background: var(--sws-status-success);
+}
+
+/*
+ * The frame: y labels in the first column, the plot in the second, x labels underneath it. The
+ * plot is `dir="ltr"` in the markup — a time axis runs left to right in both languages, because
+ * later is to the right of earlier whatever direction the prose reads.
+ */
+.chart__frame {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: var(--sws-space-8);
+}
+
+.chart__y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Half a line above and below, so the first and last numbers sit ON the gridlines they name
+     rather than inside the box they bound. */
+  margin-block: -0.5em;
+  font-size: var(--sws-font-size-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--sws-text-secondary);
+  text-align: end;
+}
+
+.chart__plot {
+  inline-size: 100%;
+  /* Short and wide. A usage graph is read for its shape over time, and a tall one exaggerates
+     every sample into an event. */
+  block-size: 7.5rem;
+  overflow: visible;
+}
+
+.chart__grid line {
+  stroke: var(--sws-border-subtle);
+  stroke-width: var(--sws-rule-hair);
+}
+
+.chart__stroke {
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart__line--a .chart__stroke {
+  stroke: var(--sws-action-primary);
+}
+
+.chart__line--a .chart__area {
+  fill: var(--sws-action-primary);
+  opacity: 0.16;
+}
+
+.chart__line--b .chart__stroke {
+  stroke: var(--sws-status-success);
+}
+
+.chart__line--b .chart__area {
+  fill: var(--sws-status-success);
+  opacity: 0.16;
+}
+
+/*
+ * The clock. Each label is hung from its own sample rather than spaced evenly, so a tick sits
+ * under the point it names; the translate centres it on that point, and the two ends pull back
+ * inside the frame so neither overhangs the card.
+ */
+.chart__x {
+  position: relative;
+  grid-column: 2;
+  block-size: 1.25rem;
+  margin-block-start: var(--sws-space-4);
+  font-size: var(--sws-font-size-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--sws-text-secondary);
+}
+
+.chart__x li {
+  position: absolute;
+  translate: -50%;
+  white-space: nowrap;
+}
+
+.chart__x li:first-child {
+  translate: 0;
+}
+
+.chart__x li:last-child {
+  translate: -100%;
+}
+
