@@ -1855,6 +1855,13 @@ button.stat {
 }
 
 /* ── knowledgebase ─────────────────────────────────────────────────────────── */
+/*
+ * The base dress in account.css is a stack of lifted cards. In here the list is ruled rows
+ * inside one card, like every other list on these screens: the card carries the frame and its
+ * radius, the rows carry nothing but the hairline between them. A row with a radius of its own
+ * inside a rounded frame is two frames for one list — it showed on hover, where the sunken
+ * ground rounded off corners the row does not own.
+ */
 
 .app__main .kb-list {
   gap: 0;
@@ -2040,19 +2047,10 @@ button.stat {
 }
 
 /*
- * The knowledgebase list is shared with the marketing surfaces, where it is a stack of lifted
- * cards. In here it is ruled rows inside one card, like every other list on these screens.
- */
-.app__main .kb-item {
-  border-radius: var(--sws-radius-lg);
-  box-shadow: none;
-}
-
-/*
  * The status board is shared with the public status page (M-16), where its blocks are lifted
  * marketing cards at the xl radius. In here xl does not exist, so the headline takes the
- * client-area radius and the incidents become bordered blocks on the flat ground — the same
- * move the knowledgebase list makes above, for the same reason.
+ * client-area radius and the incidents become bordered blocks on the flat ground, so one
+ * screen does not read as two.
  *
  * The systems list gives up its frame entirely. It is already inside a card that names it, and
  * a shadowed 24px card inset 24px into a bordered 16px one is the double frame this file spent
