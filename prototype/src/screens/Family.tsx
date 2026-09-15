@@ -1,7 +1,6 @@
 import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { HostingLayout } from '../components/HostingLayout';
 import { PlanCards, PlanPrice, PlanExtras } from '../components/PlanCards';
-import { DomainDoors } from '../components/DomainDoors';
 import { Button } from '../components/Button';
 import { IconCheck, IconServer } from '../components/icons';
 import { useLocale } from '../lib/locale';
@@ -40,12 +39,6 @@ export function Family() {
 
   return (
     <HostingLayout title={title} lede={lede}>
-      {/*
-        Shared hosting is the third door's destination — "I already own a domain" is answered by
-        buying hosting and pointing the nameservers here — so it carries the strip too, with
-        itself marked. The other two families do not: they are not answers to that question.
-      */}
-      {meta.id === 'shared' && <DomainDoors />}
       {meta.id === 'shared' && <PlanCards />}
       {meta.layout === 'cards' && meta.id !== 'shared' && <OfferCards offers={OFFERS[meta.id] ?? []} />}
       {meta.id === 'vps' && <VpsTable />}
