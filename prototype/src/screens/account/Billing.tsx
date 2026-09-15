@@ -261,178 +261,176 @@ export function InvoiceDetail() {
         {t('inv.pdfPendingNote')}
       </SavedNote>
 
-      <div className="with-side">
-        <div className="dash__main">
-          <article className="card invoice">
-            <div className="invoice__head">
-              <p className="eyebrow">{t('account.invoice')}</p>
-              <p className="invoice__number">
-                <span className="serial">
-                  <bdi>{inv.number}</bdi>
-                </span>{' '}
-                <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
+      <div className="invoice-detail">
+        <article className="card invoice">
+          <div className="invoice__head">
+            <p className="eyebrow">{t('account.invoice')}</p>
+            <p className="invoice__number">
+              <span className="serial">
+                <bdi>{inv.number}</bdi>
+              </span>{' '}
+              <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
+            </p>
+            <dl className="kv">
+              <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
+              <div><dt>{t('inv.due')}</dt><dd className="serial"><bdi>{inv.due}</bdi></dd></div>
+              {inv.paidOn && (
+                <div><dt>{t('inv.paidOn')}</dt><dd className="serial"><bdi>{inv.paidOn}</bdi></dd></div>
+              )}
+              {paidWith && (
+                <div>
+                  <dt>{t('checkout.method')}</dt>
+                  <dd>{t(paidWith.labelKey as never)}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          {/* Who owes and who is owed. The issuer carries only what has been confirmed. */}
+          <div className="parties">
+            <div>
+              <p className="eyebrow">{t('inv.invoicedTo')}</p>
+              <p className="lead">{bi(ACCOUNT.name)}</p>
+              {ACCOUNT.company && <p>{bi(ACCOUNT.company)}</p>}
+              <p>{bi(ACCOUNT.address)}</p>
+              <p>
+                {bi(ACCOUNT.city)} <span className="serial">{ACCOUNT.postcode}</span>
               </p>
-              <dl className="kv">
-                <div><dt>{t('account.date')}</dt><dd className="serial"><bdi>{inv.date}</bdi></dd></div>
-                <div><dt>{t('inv.due')}</dt><dd className="serial"><bdi>{inv.due}</bdi></dd></div>
-                {inv.paidOn && (
-                  <div><dt>{t('inv.paidOn')}</dt><dd className="serial"><bdi>{inv.paidOn}</bdi></dd></div>
-                )}
-                {paidWith && (
-                  <div>
-                    <dt>{t('checkout.method')}</dt>
-                    <dd>{t(paidWith.labelKey as never)}</dd>
-                  </div>
-                )}
-              </dl>
+              <p>{country}</p>
+              <p className="serial">
+                <bdi>{ACCOUNT.email}</bdi>
+              </p>
             </div>
-
-            {/* Who owes and who is owed. The issuer carries only what has been confirmed. */}
-            <div className="parties">
-              <div>
-                <p className="eyebrow">{t('inv.invoicedTo')}</p>
-                <p className="lead">{bi(ACCOUNT.name)}</p>
-                {ACCOUNT.company && <p>{bi(ACCOUNT.company)}</p>}
-                <p>{bi(ACCOUNT.address)}</p>
-                <p>
-                  {bi(ACCOUNT.city)} <span className="serial">{ACCOUNT.postcode}</span>
-                </p>
-                <p>{country}</p>
+            <div>
+              <p className="eyebrow">{t('inv.issuedBy')}</p>
+              <p className="lead">
+                <bdi>{COMPANY.name}</bdi>
+              </p>
+              <p>{t(COMPANY.countryKey as never)}</p>
+              {COMPANY.taxId ? (
                 <p className="serial">
-                  <bdi>{ACCOUNT.email}</bdi>
+                  <bdi>{COMPANY.taxId}</bdi>
                 </p>
-              </div>
-              <div>
-                <p className="eyebrow">{t('inv.issuedBy')}</p>
-                <p className="lead">
-                  <bdi>{COMPANY.name}</bdi>
-                </p>
-                <p>{t(COMPANY.countryKey as never)}</p>
-                {COMPANY.taxId ? (
-                  <p className="serial">
-                    <bdi>{COMPANY.taxId}</bdi>
-                  </p>
-                ) : (
-                  <DevNote>{t('dev.taxId')}</DevNote>
-                )}
-              </div>
+              ) : (
+                <DevNote>{t('dev.taxId')}</DevNote>
+              )}
             </div>
+          </div>
 
-            {/* Three columns and a date range: on a phone the table scrolls inside the
-                document rather than widening it. */}
+          {/* Three columns and a date range: on a phone the table scrolls inside the
+              document rather than widening it. */}
+          <div className="table-scroll">
+            <table className="data data--flush">
+              <thead>
+                <tr>
+                  <th scope="col">{t('inv.description')}</th>
+                  <th scope="col">{t('inv.period')}</th>
+                  <th scope="col" className="num">{t('col.amount')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inv.lines.map((l, i) => (
+                  <tr key={`${l.product ?? l.productKey}-${i}`} className={l.sub ? 'is-sub' : undefined}>
+                    <td>
+                      {lineLabel(l)}
+                      {l.taxable !== false && <sup>*</sup>}
+                    </td>
+                    <td className="serial">
+                      {l.from && (
+                        <bdi>
+                          {l.from} – {l.to}
+                        </bdi>
+                      )}
+                    </td>
+                    <td className="num">{formatAmount(convert(l.amountUsdMinor, currency), locale)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="form__note">
+            * {t('inv.taxNote')} <span className="serial">{rate}%</span>
+          </p>
+
+          <dl className="totals">
+            <div className="totals__row">
+              <dt>{t('cart.subtotal')}</dt>
+              <dd>{formatAmount(convert(sub, currency), locale)}</dd>
+            </div>
+            <div className="totals__row">
+              <dt>
+                {t('inv.tax')} <span className="serial">{rate}%</span>
+              </dt>
+              <dd>{formatAmount(convert(inv.taxUsdMinor, currency), locale)}</dd>
+            </div>
+            {inv.creditUsdMinor ? (
+              <div className="totals__row totals__row--credit">
+                <dt>{t('inv.creditApplied')}</dt>
+                <dd>−{formatAmount(convert(inv.creditUsdMinor, currency), locale)}</dd>
+              </div>
+            ) : null}
+            <div className="totals__row totals__row--grand">
+              <dt>{t('cart.total')}</dt>
+              <dd>{money(inv.totalUsdMinor)}</dd>
+            </div>
+          </dl>
+        </article>
+
+        <section className="card card--flush">
+          <header className="card__head card__head--flush">
+            <h2 className="card__heading">{t('inv.ledger')}</h2>
+          </header>
+          {ledger.length > 0 ? (
             <div className="table-scroll">
-              <table className="data data--flush">
+              <table className="data">
                 <thead>
                   <tr>
-                    <th scope="col">{t('inv.description')}</th>
-                    <th scope="col">{t('inv.period')}</th>
+                    <th scope="col">{t('account.date')}</th>
+                    <th scope="col">{t('txn.kind')}</th>
+                    <th scope="col">{t('checkout.method')}</th>
+                    <th scope="col">{t('txn.reference')}</th>
                     <th scope="col" className="num">{t('col.amount')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {inv.lines.map((l, i) => (
-                    <tr key={`${l.product ?? l.productKey}-${i}`} className={l.sub ? 'is-sub' : undefined}>
-                      <td>
-                        {lineLabel(l)}
-                        {l.taxable !== false && <sup>*</sup>}
-                      </td>
-                      <td className="serial">
-                        {l.from && (
+                  {ledger.map((x) => {
+                    const g = GATEWAYS.find((gg) => gg.id === x.gateway);
+                    return (
+                      <tr key={x.id}>
+                        <td className="serial"><bdi>{x.at}</bdi></td>
+                        <td>
+                          <Tag tone={x.kind === 'refund' ? 'bad' : x.kind === 'credit' ? 'neutral' : 'ok'}>
+                            {t(`txn.${x.kind}` as never)}
+                          </Tag>
+                        </td>
+                        <td>{g ? t(g.labelKey as never) : x.gateway === 'credit' ? t('pay.credit') : x.gateway}</td>
+                        <td className="serial"><bdi>{x.reference}</bdi></td>
+                        <td className={`num${x.amountUsdMinor < 0 ? ' is-out' : ''}`}>
                           <bdi>
-                            {l.from} – {l.to}
+                            {x.amountUsdMinor < 0 ? '−' : ''}
+                            {money(Math.abs(x.amountUsdMinor))}
                           </bdi>
-                        )}
-                      </td>
-                      <td className="num">{formatAmount(convert(l.amountUsdMinor, currency), locale)}</td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-            <p className="form__note">
-              * {t('inv.taxNote')} <span className="serial">{rate}%</span>
-            </p>
-
-            <dl className="totals">
-              <div className="totals__row">
-                <dt>{t('cart.subtotal')}</dt>
-                <dd>{formatAmount(convert(sub, currency), locale)}</dd>
-              </div>
-              <div className="totals__row">
-                <dt>
-                  {t('inv.tax')} <span className="serial">{rate}%</span>
-                </dt>
-                <dd>{formatAmount(convert(inv.taxUsdMinor, currency), locale)}</dd>
-              </div>
-              {inv.creditUsdMinor ? (
-                <div className="totals__row totals__row--credit">
-                  <dt>{t('inv.creditApplied')}</dt>
-                  <dd>−{formatAmount(convert(inv.creditUsdMinor, currency), locale)}</dd>
-                </div>
-              ) : null}
-              <div className="totals__row totals__row--grand">
-                <dt>{t('cart.total')}</dt>
-                <dd>{money(inv.totalUsdMinor)}</dd>
-              </div>
-            </dl>
-          </article>
-
-          <section className="card card--flush">
-            <header className="card__head card__head--flush">
-              <h2 className="card__heading">{t('inv.ledger')}</h2>
-            </header>
-            {ledger.length > 0 ? (
-              <div className="table-scroll">
-                <table className="data">
-                  <thead>
-                    <tr>
-                      <th scope="col">{t('account.date')}</th>
-                      <th scope="col">{t('txn.kind')}</th>
-                      <th scope="col">{t('checkout.method')}</th>
-                      <th scope="col">{t('txn.reference')}</th>
-                      <th scope="col" className="num">{t('col.amount')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ledger.map((x) => {
-                      const g = GATEWAYS.find((gg) => gg.id === x.gateway);
-                      return (
-                        <tr key={x.id}>
-                          <td className="serial"><bdi>{x.at}</bdi></td>
-                          <td>
-                            <Tag tone={x.kind === 'refund' ? 'bad' : x.kind === 'credit' ? 'neutral' : 'ok'}>
-                              {t(`txn.${x.kind}` as never)}
-                            </Tag>
-                          </td>
-                          <td>{g ? t(g.labelKey as never) : x.gateway === 'credit' ? t('pay.credit') : x.gateway}</td>
-                          <td className="serial"><bdi>{x.reference}</bdi></td>
-                          <td className={`num${x.amountUsdMinor < 0 ? ' is-out' : ''}`}>
-                            <bdi>
-                              {x.amountUsdMinor < 0 ? '−' : ''}
-                              {money(Math.abs(x.amountUsdMinor))}
-                            </bdi>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="empty empty--inset">
-                <IconWallet size={28} />
-                <p className="empty__title">{t('inv.noPayments')}</p>
-                <p className="empty__note">{t('inv.noPaymentsNote')}</p>
-              </div>
-            )}
-            <dl className="totals invoice__balance">
-              <div className="totals__row totals__row--grand">
-                <dt>{t('inv.balanceDue')}</dt>
-                <dd>{money(balance)}</dd>
-              </div>
-            </dl>
-          </section>
-        </div>
+          ) : (
+            <div className="empty empty--inset">
+              <IconWallet size={28} />
+              <p className="empty__title">{t('inv.noPayments')}</p>
+              <p className="empty__note">{t('inv.noPaymentsNote')}</p>
+            </div>
+          )}
+          <dl className="totals invoice__balance">
+            <div className="totals__row totals__row--grand">
+              <dt>{t('inv.balanceDue')}</dt>
+              <dd>{money(balance)}</dd>
+            </div>
+          </dl>
+        </section>
 
         <div className="dash__side">
           {unpaid ? (

@@ -955,8 +955,14 @@ ok('Escape closes the note', (await p.$$('.cur__ask')).length === 0);
 
 // C-15 / C-17: the invoice takes its own payment, per method, with the invoice as reference.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
-await p.waitForSelector('.with-side .invoice');
-ok('the invoice document sits beside its payment', (await p.$$('.with-side .invoice')).length === 1);
+await p.waitForSelector('.invoice-detail .invoice');
+ok(
+  'the invoice document runs the width of the layout it is in',
+  await p.$eval('.invoice-detail', (wrap) => {
+    const doc = wrap.querySelector('.invoice');
+    return !!doc && Math.abs(doc.getBoundingClientRect().width - wrap.getBoundingClientRect().width) < 1;
+  }),
+);
 ok('an unpaid invoice has an empty ledger, not a hidden one', (await p.$$('.card--flush .empty')).length === 1);
 await p.selectOption('.dash__side select.field', 'instapay');
 await p.waitForTimeout(120);
