@@ -270,6 +270,11 @@ export function CardEntry() {
  *
  * ?state=return renders the second moment. ?gateway= names the provider; ?invoice= sends the
  * return to the invoice that was being paid rather than to the order confirmation.
+ *
+ * ?setup=card is the third caller: a card being saved to an account rather than charged. The
+ * bank still asks — saving a card for future renewals needs the same confirmation a payment
+ * does — but nothing is being paid, so the copy says so and the return goes to the card list
+ * instead of to an order that was never placed.
  */
 export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) {
   const { t } = useLocale();
@@ -279,6 +284,7 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
   const inv = useInvoiceParam()?.inv;
   const gateway = GATEWAYS.find((g) => g.id === params.get('gateway'));
   const redirect = kind === 'redirect';
+  const setup = params.get('setup') === 'card';
   const provider = gateway ? gateway.marks.join(' / ') || t(gateway.labelKey as never) : '';
 
   const returnHash = (() => {
@@ -286,7 +292,12 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
     q.set('state', 'return');
     return `${redirect ? '/checkout/redirect' : '/checkout/3ds'}?${q.toString()}`;
   })();
-  const finishTo = inv ? `/account/invoices/${inv.id}` : '/confirmation';
+
+  // Three callers, three places to land: a saved card back on the card list, an invoice back
+  // on itself, a cart on the order confirmation. `&primary=1` rides along so the list knows
+  // the card arrived as the primary one.
+  const addedTo = `/account/payment-methods?added=1${params.get('primary') === '1' ? '&primary=1' : ''}`;
+  const finishTo = setup ? addedTo : inv ? `/account/invoices/${inv.id}` : '/confirmation';
 
   return (
     <OrderPage title={t(redirect ? 'redir.title' : 'tds.title')}>
@@ -296,11 +307,15 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
             <span className="stage__mark stage__mark--ok" aria-hidden="true">
               <IconCheck size={28} />
             </span>
-            <h2 className="stage__title">{t(redirect ? 'redir.backTitle' : 'tds.backTitle')}</h2>
-            <p className="stage__body">{t(redirect ? 'redir.backBody' : 'tds.backBody')}</p>
+            <h2 className="stage__title">
+              {t(setup ? 'tds.setupBackTitle' : redirect ? 'redir.backTitle' : 'tds.backTitle')}
+            </h2>
+            <p className="stage__body">
+              {t(setup ? 'tds.setupBackBody' : redirect ? 'redir.backBody' : 'tds.backBody')}
+            </p>
             <div className="acts u-mt-16">
               <Button size="lg" onClick={() => navigate(finishTo)}>
-                {t('tds.finish')}
+                {t(setup ? 'tds.setupFinish' : 'tds.finish')}
                 <IconArrow size={17} />
               </Button>
             </div>
@@ -319,7 +334,9 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
                 t('tds.goTitle')
               )}
             </h2>
-            <p className="stage__body">{t(redirect ? 'redir.goBody' : 'tds.goBody')}</p>
+            <p className="stage__body">
+              {t(setup ? 'tds.setupGoBody' : redirect ? 'redir.goBody' : 'tds.goBody')}
+            </p>
 
             {/* The bank's page is not ours to draw, and pretending otherwise in a review build
                 is how a reviewer ends up approving a screen that will never exist. */}
@@ -339,7 +356,12 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
                 <IconExternal size={17} />
                 {t(redirect ? 'redir.go' : 'tds.go')}
               </Button>
-              <Link className="btn btn--md btn--quiet" to="/order/failed">
+              {/* Cancelling a payment is a failed order; cancelling a card setup is simply not
+                  adding a card, so it goes back to the list rather than to a failure screen. */}
+              <Link
+                className="btn btn--md btn--quiet"
+                to={setup ? '/account/payment-methods' : '/order/failed'}
+              >
                 {t('tds.cancel')}
               </Link>
             </div>

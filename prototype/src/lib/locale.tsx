@@ -808,6 +808,22 @@ export const STRINGS = {
   'tds.backBody': { ar: 'فاضل نسجّل الطلب.', en: 'All that is left is recording the order.' },
   'tds.finish': { ar: 'خلّص الطلب', en: 'Finish the order' },
 
+  /*
+   * The same two moments when the card is being saved rather than charged. The bank still
+   * asks, but nothing is being paid, so the copy cannot say a payment went through — a
+   * confirmation that claims money moved is the one sentence a card-setup screen must not say.
+   */
+  'tds.setupGoBody': {
+    ar: 'البنك هيسألك تأكيد إن الكارت بتاعك. مفيش أي مبلغ بيتدفع هنا.',
+    en: 'Your bank will ask you to confirm the card is yours. Nothing is being paid here.',
+  },
+  'tds.setupBackTitle': { ar: 'البنك أكّد الكارت', en: 'Your bank confirmed the card' },
+  'tds.setupBackBody': {
+    ar: 'فاضل نحفظه في حسابك.',
+    en: 'All that is left is saving it to your account.',
+  },
+  'tds.setupFinish': { ar: 'احفظ الكارت', en: 'Save the card' },
+
   // ── transfer instructions: O-10 and O-11 ──────────────────────────────────
   'bank.title': { ar: 'تحويل بنكي', en: 'Bank transfer' },
   'bank.lede': {
@@ -1634,6 +1650,30 @@ export const STRINGS = {
   'pm.primary': { ar: 'الأساسية', en: 'Primary' },
   'pm.makePrimary': { ar: 'اجعلها الأساسية', en: 'Make primary' },
   'pm.add': { ar: 'أضف بطاقة', en: 'Add a card' },
+  'pm.addLede': {
+    ar: 'الكارت بيتحفظ عشان التجديدات تتدفع لوحدها. مفيش حاجة بتتخصم دلوقتي.',
+    en: 'The card is saved so renewals can pay themselves. Nothing is charged now.',
+  },
+  'pm.addPrimary': { ar: 'خليها الأساسية', en: 'Make it the primary card' },
+  'pm.addPrimaryNote': {
+    ar: 'التجديدات هتتخصم من الكارت ده بدل الحالي.',
+    en: 'Renewals will come off this card instead of the current one.',
+  },
+  'pm.addPrimaryFirst': {
+    ar: 'أول كارت بيبقى الأساسي لوحده.',
+    en: 'The first card becomes the primary one on its own.',
+  },
+  'pm.addVerify': { ar: 'تحقّق من البنك', en: 'A check from your bank' },
+  'pm.addVerifyNote': {
+    ar: 'البنك ممكن يحجز مبلغ بسيط عشان يتأكد من الكارت، وبيرجّعه لوحده خلال كام يوم.',
+    en: 'Your bank may hold a small amount to verify the card, and releases it again within a few days.',
+  },
+  'pm.addSubmit': { ar: 'أضف الكارت', en: 'Add the card' },
+  'pm.addedTitle': { ar: 'الكارت اتضاف', en: 'The card was added' },
+  'pm.addedNote': {
+    ar: 'هتلاقيه في القايمة تحت، وتقدر تشيله في أي وقت.',
+    en: 'You will find it in the list below, and you can remove it at any time.',
+  },
 
   'tkt.all': { ar: 'الكل', en: 'All' },
   'tkt.open': { ar: 'افتح تذكرة', en: 'Open a ticket' },

@@ -617,6 +617,38 @@ await p.waitForSelector('.method-row');
   ok('removing a saved card removes it', after === before - 1, `${before} -> ${after}`);
 }
 
+// Adding a card is not a payment. It used to borrow the checkout's payment screen, so it asked
+// for a bank confirmation of 0.00, offered a "save this card" toggle in the one flow where
+// saving is the point, and finished on a confirmation for an order nobody had placed.
+await p.evaluate(() => (location.hash = '#/account/payment-methods/new'));
+await p.waitForSelector('.slot');
+{
+  // Counted through evaluate rather than $eval: the count that matters most here is zero,
+  // and $eval has no elements to run against when the screen is right.
+  const count = (sel) => p.evaluate((s) => document.querySelectorAll(s).length, sel);
+  const figures = await count('.figure__n');
+  const switches = await count('.switch-row input');
+  ok('adding a card asks for no amount', figures === 0, `${figures} figure(s)`);
+  ok('…and offers the one choice that is its own', switches === 1, `${switches} switch(es)`);
+
+  await p.click('.acts .btn--primary');
+  await p.waitForSelector('.stage');
+  const going = await p.evaluate(() => location.hash);
+  ok('…and goes to the bank as a setup, not a charge', going.includes('setup=card'), going);
+
+  await p.click('.stage .btn--primary');
+  await p.waitForSelector('.stage__mark--ok');
+  await p.click('.stage .btn--primary');
+  await p.waitForSelector('.method-row');
+  const landed = await p.evaluate(() => location.hash);
+  const rows = await count('.method-row');
+  const primary = await count('.method-row .tag');
+  ok('…and comes back to the cards, not to an order',
+    landed.startsWith('#/account/payment-methods?added='), landed);
+  ok('…with the card that was just added on the list', rows === 3, `${rows} row(s)`);
+  ok('…and exactly one card is the primary one', primary === 1, `${primary} marked`);
+}
+
 // The transfer form was a dead end: submit did nothing at all.
 await p.evaluate(() => (location.hash = '#/transfer'));
 await p.waitForSelector('form.panel');

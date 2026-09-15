@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
@@ -14,6 +14,7 @@ import {
   IconCheck,
   IconWallet,
   IconAlert,
+  IconShield,
 } from '../../components/icons';
 import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
@@ -679,19 +680,45 @@ export function AddFunds() {
 /** Payment Methods — spec 5.4 and 11: saved cards for recurring billing. */
 export function PaymentMethods() {
   const { t } = useLocale();
-  const [cards, setCards] = useState(PAYMENT_METHODS_SAVED);
+  const [params] = useSearchParams();
+
+  /*
+   * `?added=1` is how the card-setup flow reports back, and `&primary=1` whether the card
+   * arrived as the primary one. The card has to be in the list when it does: a flow that ends
+   * on a list that looks exactly as it did before reads as a flow that silently failed. There
+   * is no server here to have saved anything, so the prototype shows the card one would have.
+   */
+  const added = params.get('added') === '1';
+  const addedPrimary = added && params.get('primary') === '1';
+  const [note, setNote] = useState(added);
+  const [cards, setCards] = useState(() =>
+    added
+      ? [
+          { id: 'pm-new', kind: 'Visa', last4: '1881', expiry: '11/30', primary: addedPrimary },
+          ...PAYMENT_METHODS_SAVED.map((m) => ({ ...m, primary: m.primary && !addedPrimary })),
+        ]
+      : PAYMENT_METHODS_SAVED,
+  );
+
+  // The add screen says something different about the primary switch for the first card on an
+  // account, and it cannot see this list — so the list tells it on the way in.
+  const addTo = `/account/payment-methods/new${cards.length === 0 ? '?first=1' : ''}`;
 
   return (
     <AccountLayout
       title={t('acc.methods')}
       lede={t('pm.lede')}
       actions={
-        <Link className="btn btn--md btn--secondary" to="/checkout/card">
+        <Link className="btn btn--md btn--secondary" to={addTo}>
           <IconPlus size={15} />
           {t('pm.add')}
         </Link>
       }
     >
+      <SavedNote saved={note ? t('pm.addedTitle') : null} onDismiss={() => setNote(false)}>
+        {t('pm.addedNote')}
+      </SavedNote>
+
       {cards.length > 0 ? (
         <div className="card card--flush">
           {cards.map((m) => (
@@ -736,12 +763,129 @@ export function PaymentMethods() {
           ))}
         </div>
       ) : (
+        /* An empty list is the one state that most needs the way out of it, and the way out
+           used to be only in the page header. */
         <div className="card empty">
           <IconInvoice size={28} />
           <p className="empty__title">{t('empty.methods')}</p>
           <p className="empty__note">{t('pm.lede')}</p>
+          <Link className="btn btn--md btn--secondary" to={addTo}>
+            <IconPlus size={15} />
+            {t('pm.add')}
+          </Link>
         </div>
       )}
+    </AccountLayout>
+  );
+}
+
+/**
+ * Add a card — the account-side half of spec 5.4.
+ *
+ * Saving a card is not a purchase, and it used to be treated as one: the button on the card
+ * list pointed at the checkout's payment screen, so adding a card asked for a bank
+ * confirmation of `0.00`, offered a "save this card" toggle for the one flow where saving is
+ * the entire point, put the cart behind its Back button, and finished on a confirmation for an
+ * order nobody had placed.
+ *
+ * This is the same Stripe slot with the checkout's arithmetic taken out and the one decision
+ * that does belong here put in: whether the renewals move to this card. The trip to the bank
+ * stays — a card kept for future renewals needs the same confirmation a payment does — so the
+ * button goes to 3-D Secure in setup mode, which knows to come back to the list.
+ */
+export function AddCard() {
+  const { t } = useLocale();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  // The first card on an account is its primary one whether or not anybody asks. The switch
+  // says so rather than offering a choice with one answer, and cannot be turned off into a
+  // state — an account with a card and no primary card — that renewals have no way to read.
+  // `?first=1` is the list saying it had nothing in it, which is a thing only the list knows.
+  const first = params.get('first') === '1' || PAYMENT_METHODS_SAVED.length === 0;
+  const [primary, setPrimary] = useState(first);
+
+  return (
+    <AccountLayout
+      title={t('pm.add')}
+      lede={t('pm.addLede')}
+      crumbs={[
+        { label: t('acc.portalHome'), to: '/account' },
+        { label: t('acc.methods'), to: '/account/payment-methods' },
+        { label: t('pm.add') },
+      ]}
+    >
+      <div className="with-side">
+        <div className="dash__main">
+          <section className="card">
+            <header className="card__head">
+              <h2 className="card__heading">{t('card.details')}</h2>
+            </header>
+
+            {/* Stripe's fields, and the reason this is a marked space rather than a drawing of
+                three inputs, are the same here as at the checkout — see CardEntry in Order. */}
+            <div className="slot" role="group" aria-label={t('card.slotLabel')}>
+              <span className="slot__tag">{t('card.slotTag')}</span>
+              <p className="slot__note">{t('card.slotNote')}</p>
+            </div>
+
+            {/* The first card on an account is its primary one either way, so there is nothing
+                to decide and no switch: a control locked to its only answer is the kind of
+                dead thing that makes a person doubt the rest of the screen. It is said as a
+                fact instead, and the card still leaves here as the primary one. */}
+            {first ? (
+              <p className="hint">{t('pm.addPrimaryFirst')}</p>
+            ) : (
+              <label className="switch-row u-mt-16">
+                <span>
+                  <span className="switch-row__label">{t('pm.addPrimary')}</span>
+                  <span className="switch-row__note">{t('pm.addPrimaryNote')}</span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={primary}
+                  onChange={(e) => setPrimary(e.target.checked)}
+                />
+              </label>
+            )}
+          </section>
+
+          <div className="notice notice--spaced">
+            <IconShield size={20} />
+            <div>
+              <p className="card__body">{t('card.secure')}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="dash__side">
+          <section className="card">
+            <header className="card__head">
+              <h2 className="card__heading">
+                <IconAlert size={17} />
+                {t('pm.addVerify')}
+              </h2>
+            </header>
+
+            {/* Where the checkout puts the amount due. Nothing is due, and a `0.00` standing in
+                for it reads as a total that failed to load — so the panel carries the one money
+                fact that is true of saving a card: the bank may briefly hold a little of it. */}
+            <p className="card__body">{t('pm.addVerifyNote')}</p>
+
+            <div className="acts u-mt-16">
+              <Button
+                size="md"
+                onClick={() => navigate(`/checkout/3ds?setup=card${primary ? '&primary=1' : ''}`)}
+              >
+                {t('pm.addSubmit')}
+              </Button>
+              <Link className="btn btn--md btn--quiet" to="/account/payment-methods">
+                {t('action.back')}
+              </Link>
+            </div>
+          </section>
+        </div>
+      </div>
     </AccountLayout>
   );
 }
