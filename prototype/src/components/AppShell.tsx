@@ -27,7 +27,8 @@ import { CurrencySelect } from './CurrencySelect';
 import { CookieConsent } from './CookieConsent';
 import { useLocale, type Locale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
-import { ACCOUNT, INVOICES, TICKETS, NOTIFICATIONS } from '../lib/account';
+import { ACCOUNT, TICKETS, NOTIFICATIONS } from '../lib/account';
+import { useAccountState } from '../lib/accountState';
 
 /**
  * The client-area application shell — spec 5.4 and 9.
@@ -60,7 +61,10 @@ interface Section {
  * decisions — and the groups match how the spec itself sections 9.
  */
 function useGroups(): { label: string; items: Section[] }[] {
-  const unpaid = INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue').length;
+  /* The badge counts what is still owed, so it has to count the editable copy — an invoice
+     cancelled two screens ago is not something the sidebar should still be asking about. */
+  const { invoices } = useAccountState();
+  const unpaid = invoices.filter((i) => i.status === 'unpaid' || i.status === 'overdue').length;
   const openTickets = TICKETS.filter((x) => x.status !== 'closed').length;
 
   return [

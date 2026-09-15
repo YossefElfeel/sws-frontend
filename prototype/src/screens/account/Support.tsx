@@ -34,6 +34,7 @@ import {
   SERVICES,
   type TicketStatus,
 } from '../../lib/account';
+import { useAccountState } from '../../lib/accountState';
 import { SYSTEMS, INCIDENTS } from '../../lib/marketing';
 import { Select } from '../../components/Select';
 
@@ -206,8 +207,26 @@ export function TicketNew() {
    */
   const from = SERVICES.find((s) => s.id === params.get('service'));
 
-  const [dept, setDept] = useState('tech');
-  const [subject, setSubject] = useState(from ? `${from.product} — ${from.domain}: ` : '');
+  /*
+   * The same courtesy for an invoice, and for the same reason.
+   *
+   * The invoices list has an Edit item that arrives here, because an invoice's own lines are
+   * not the client's to change — see `dev.invoiceActions`. So the subject opens naming the
+   * invoice, and the department opens on Sales and Billing rather than on Technical Support,
+   * which is where a question about a charge would otherwise have to be re-routed by hand.
+   */
+  const invoiceId = params.get('invoice');
+  const { invoice } = useAccountState();
+  const about = invoiceId ? invoice(invoiceId) : undefined;
+
+  const [dept, setDept] = useState(about ? 'sales' : 'tech');
+  const [subject, setSubject] = useState(
+    about
+      ? `${t('inv.forInvoice')} ${about.number}: `
+      : from
+        ? `${from.product} — ${from.domain}: `
+        : '',
+  );
   const [body, setBody] = useState('');
 
   const suggestions = useMemo(() => {

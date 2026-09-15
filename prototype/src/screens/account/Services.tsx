@@ -38,7 +38,6 @@ import { useSaved, SavedNote } from '../../lib/saved';
 import { useAccountState } from '../../lib/accountState';
 import { convert, formatAmount, ADDONS, GATEWAYS } from '../../lib/catalog';
 import {
-  INVOICES,
   PAYMENT_METHODS_SAVED,
   CPANEL_APPS,
   NEEDS_ATTENTION,
@@ -456,7 +455,9 @@ export function ServiceDetail() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
   const { id } = useParams<{ id: string }>();
-  const { service, updateService, domains } = useAccountState();
+  /* `allInvoices` rather than `invoices`: the name is taken below by the ones that belong to
+     this service, and the tab has to follow a cancellation made on the invoices screen. */
+  const { service, updateService, domains, invoices: allInvoices } = useAccountState();
   const { add } = useCart();
   const navigate = useNavigate();
   const svc = service(id ?? '');
@@ -512,7 +513,7 @@ export function ServiceDetail() {
       ? t(gateway.labelKey as never)
       : svc.paymentMethod;
 
-  const invoices = INVOICES.filter((i) =>
+  const invoices = allInvoices.filter((i) =>
     i.lines.some((l) => l.product === svc.product && l.domain === svc.domain),
   );
   const dom = domains.find((d) => d.name === svc.domain);

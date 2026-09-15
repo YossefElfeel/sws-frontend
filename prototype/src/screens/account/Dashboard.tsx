@@ -23,15 +23,16 @@ import {
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
+import { useAccountState } from '../../lib/accountState';
 import { convert, formatAmount } from '../../lib/catalog';
 import {
   SERVICES,
   DOMAINS,
-  INVOICES,
   TICKETS,
   ANNOUNCEMENTS,
   ACCOUNT,
   renews,
+  invoiceBalanceUsdMinor,
   NEEDS_ATTENTION,
 } from '../../lib/account';
 
@@ -126,12 +127,17 @@ function IdentityCard() {
 export function Dashboard() {
   const { t, locale, bi } = useLocale();
   const { currency } = usePrefs();
+  /* Cancelling an invoice on the invoices screen has to show up here, so this reads the
+     account's editable copy rather than the fixture behind it. */
+  const { invoices } = useAccountState();
 
   const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
 
-  const unpaid = INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
+  const unpaid = invoices.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
   const openTickets = TICKETS.filter((x) => x.status !== 'closed');
-  const dueTotal = unpaid.reduce((s, i) => s + i.totalUsdMinor, 0);
+  /* The balance, not the total — one of the owing invoices is part-paid, and the tile beside
+     this one links to the invoice that will ask for the balance. See Invoices(). */
+  const dueTotal = unpaid.reduce((s, i) => s + invoiceBalanceUsdMinor(i), 0);
   const active = SERVICES.filter((s) => s.status === 'active').length;
 
   /*

@@ -1803,6 +1803,16 @@
   background: var(--sws-banner-danger-bg);
 }
 
+/*
+ * Armed, and asking. The ground fills rather than the text merely changing, because the item
+ * is not being described any more — it is one press from happening, and a label swap alone is
+ * the kind of change a reader discovers afterwards.
+ */
+.rowmenu__item.is-armed {
+  background: var(--sws-banner-danger-bg);
+  font-weight: var(--sws-weight-semibold);
+}
+
 /* ── pagination ────────────────────────────────────────────────────────────── */
 
 /*
