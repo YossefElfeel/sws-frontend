@@ -50,44 +50,62 @@ export function HostingLayout({
 
       <section className="section shell">
         <div className="with-rail">
-          <aside className="rail" aria-label={t('rail.categories')}>
-            <RailGroup id="hosting-categories" label={t('rail.categories')}>
-              {FAMILIES.map((f) => (
-                <li key={f.id}>
-                  <NavLink className="rail__link" to={f.path}>
-                    {t(f.titleKey as never)}
-                  </NavLink>
-                </li>
-              ))}
-            </RailGroup>
+          {/*
+            Two menus, not one menu with two headings.
 
-            <RailGroup id="hosting-actions" label={t('rail.actions')}>
-              <li>
-                <Link className="rail__link" to="/domains/pricing">
-                  <IconArrow size={15} />
-                  {t('rail.pricing')}
-                </Link>
-              </li>
-              <li>
-                <Link className="rail__link" to="/domains">
-                  <IconArrow size={15} />
-                  {t('rail.register')}
-                </Link>
-              </li>
-              <li>
-                <Link className="rail__link" to="/transfer">
-                  <IconArrow size={15} />
-                  {t('rail.transfer')}
-                </Link>
-              </li>
-              <li>
-                <Link className="rail__link" to="/cart">
-                  <IconCart size={15} />
-                  {t('rail.viewCart')}
-                </Link>
-              </li>
-            </RailGroup>
-          </aside>
+            The categories are where you are — eight pages, one of them the one you are reading.
+            The actions are things you go and do, and three of the four leave this section of the
+            site entirely. In a single panel the twelve links read as one list that happened to
+            have a label in the middle of it, and the reader had nothing but that label telling
+            them the second half was a different kind of thing. Two panels say it before the
+            labels are read at all.
+
+            Each is its own landmark too, so the categories and the actions are two things to a
+            screen reader as well as to an eye — which the one panel labelled "Categories", with
+            the actions inside it, was not.
+          */}
+          <div className="rail-stack">
+            <aside className="rail" aria-label={t('rail.categories')}>
+              <RailGroup id="hosting-categories" label={t('rail.categories')}>
+                {FAMILIES.map((f) => (
+                  <li key={f.id}>
+                    <NavLink className="rail__link" to={f.path}>
+                      {t(f.titleKey as never)}
+                    </NavLink>
+                  </li>
+                ))}
+              </RailGroup>
+            </aside>
+
+            <aside className="rail" aria-label={t('rail.actions')}>
+              <RailGroup id="hosting-actions" label={t('rail.actions')}>
+                <li>
+                  <Link className="rail__link" to="/domains/pricing">
+                    <IconArrow size={15} />
+                    {t('rail.pricing')}
+                  </Link>
+                </li>
+                <li>
+                  <Link className="rail__link" to="/domains">
+                    <IconArrow size={15} />
+                    {t('rail.register')}
+                  </Link>
+                </li>
+                <li>
+                  <Link className="rail__link" to="/transfer">
+                    <IconArrow size={15} />
+                    {t('rail.transfer')}
+                  </Link>
+                </li>
+                <li>
+                  <Link className="rail__link" to="/cart">
+                    <IconCart size={15} />
+                    {t('rail.viewCart')}
+                  </Link>
+                </li>
+              </RailGroup>
+            </aside>
+          </div>
 
           <div className="with-rail__body">{children}</div>
         </div>
