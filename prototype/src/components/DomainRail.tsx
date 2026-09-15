@@ -65,11 +65,10 @@ export function DomainPage({
           pages are where you are inside this domain, and the three actions are errands — one of
           them renews this domain, and the other two leave it behind for a different one.
 
-          What is different here is what the split can be made of. In the client area the rail
-          keeps no box of its own — the ground is already the recessed tint and the cards are
-          what lifts off it — so two panels would be two invisible boxes and would separate
-          nothing. The divide is a rule instead, which is furniture rather than merchandise and
-          is what this room uses anyway.
+          A panel each, the same two the hosting and transfer rails draw. This rail used to keep
+          no box at all, so the split had to be a rule drawn between two edgeless things; the
+          panel is back — see the note on the domain rail in app.css — and two panels separate
+          themselves without needing one.
         */}
         <div className="rail-stack">
           <aside className="rail rail--domain" aria-label={t('svc.manage')}>
