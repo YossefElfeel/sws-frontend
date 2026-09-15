@@ -1,15 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Button } from '../components/Button';
 import { Banner } from '../components/Banner';
 import { Select } from '../components/Select';
 import { DomainDoors } from '../components/DomainDoors';
+import { DomainTable, TldShortlist } from '../components/DomainResults';
 import { IconCheck, IconSearch } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
-import { TLDS, convert, formatAmount, type Tld } from '../lib/catalog';
+import {
+  TLDS,
+  availabilityFor,
+  convert,
+  formatAmount,
+  splitDomain,
+  type Tld,
+} from '../lib/catalog';
 
 /**
  * Domain search.
@@ -51,35 +59,12 @@ export function Domains() {
   const field = useRef<HTMLInputElement>(null);
 
   /*
-   * Someone who types "somion.net" is asking about .net, not about a name called "somionnet".
-   * Splitting the extension off here is what lets the headline result answer the question that
-   * was actually asked; without it the extension was silently folded into the stem.
+   * Both of these live in catalog.ts. The order flow's domain step asks the same two questions
+   * one screen later and used to answer them with its own arithmetic, which is how the two
+   * screens came to disagree about whether somion.shop was free.
    */
-  const raw = searched.trim().toLowerCase();
-  const dot = raw.indexOf('.');
-  const typed = dot > 0 ? TLDS.find((x) => x.tld === raw.slice(dot)) : undefined;
-  const stem = (typed ? raw.slice(0, dot) : raw).replace(/[^a-z0-9-]/g, '');
-
-  // Deterministic from the stem, so the same search always answers the same way.
-  const availability = useMemo(() => {
-    if (!stem) return new Map<string, boolean>();
-    const hash = [...stem].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-    return new Map(TLDS.map((row, i) => [row.tld, ((hash >> i) & 1) === 1]));
-  }, [stem]);
-
-  const freeCount = TLDS.filter((row) => availability.get(row.tld)).length;
-
-  /*
-   * Available first once a search has answered. A taken row is a dead end, and there were four
-   * of them above the first name the visitor could actually buy. Before a search this is a
-   * price list and keeps the price list's own order.
-   */
-  const rows = useMemo(() => {
-    if (!stem) return TLDS;
-    return [...TLDS].sort(
-      (a, b) => Number(availability.get(b.tld) === true) - Number(availability.get(a.tld) === true),
-    );
-  }, [stem, availability]);
+  const { stem, typed } = splitDomain(searched);
+  const availability = availabilityFor(stem);
   // The extension typed, or the one chosen beside the field — the result the search is about.
   const hero = typed ?? TLDS.find((x) => x.tld === tld) ?? TLDS[0];
   const heroFree = stem ? availability.get(hero.tld) === true : false;
@@ -229,155 +214,23 @@ export function Domains() {
           </div>
         )}
 
-        {/*
-          The shortlist, before a search only.
+        <TldShortlist
+          stem={stem}
+          onPick={(row) => {
+            setTld(row.tld);
+            field.current?.focus();
+          }}
+        />
 
-          Four extensions with their two prices on them is the fastest answer to "what does a
-          domain cost here", and it is the state a visitor lands in. Once a search has answered,
-          the answer is the card above and the table below, and the same four extensions
-          repeated a third time in between would be noise rather than a shortcut.
-
-          The button chooses rather than buys, for the reason the table's action column already
-          gives: before a search there is no product in a row, because an extension on its own
-          cannot be bought. It sets the select and puts the cursor where the name goes.
-        */}
-        {!stem && (
-          <div className="section__head section__head--sub">
-            <h2 className="section__title section__title--sm" id="pop-head">
-              {t('domain.popularTlds')}
-            </h2>
-            <p className="section__note">{t('domain.popularNote')}</p>
-          </div>
-        )}
-
-        {!stem && (
-          <ul className="tld-cards" aria-labelledby="pop-head">
-            {TLDS.filter((row) => row.featured).map((row) => (
-              <li className="tld-card" key={row.tld}>
-                <p className="tld-card__name serial" dir="ltr">
-                  {row.tld}
-                </p>
-                <p className="tld-card__price">
-                  <span className="serial">
-                    {formatAmount(convert(row.registerUsdMinor, currency), locale)} {currency}
-                  </span>
-                  <span className="tld-card__per">/ {t('cycle.perYear')}</span>
-                </p>
-                {/* The renewal, on the card. It is the whole point of this page. */}
-                <p className="tld-card__renew">
-                  {t('domain.renew')}{' '}
-                  <span className="serial">
-                    {formatAmount(convert(row.renewUsdMinor, currency), locale)} {currency}
-                  </span>{' '}
-                  {t('dom.perYear')}
-                </p>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => {
-                    setTld(row.tld);
-                    field.current?.focus();
-                  }}
-                >
-                  {t('domain.pick')}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="section__head section__head--sub">
-          <h2 className="section__title section__title--sm" id="tld-head">
-            {stem ? (
-              <>
-                {t('domain.resultsFor')}{' '}
-                <bdi className="serial" dir="ltr">
-                  {stem}
-                </bdi>
-              </>
-            ) : (
-              t('domain.tldtitle')
-            )}
-          </h2>
-          <p className="section__note">
-            {stem ? (
-              <bdi>
-                <span className="serial">{freeCount}</span> {t('domain.freeOf')}{' '}
-                <span className="serial">{TLDS.length}</span>
-              </bdi>
-            ) : (
-              t('domain.tldnote')
-            )}
-          </p>
-        </div>
-
-        <div className="panel table-scroll">
-          <table className="data">
-            <thead>
-              <tr>
-                <th scope="col">{t(stem ? 'domain.colDomain' : 'domain.colTld')}</th>
-                <th scope="col" className="num">
-                  {t('domain.register')}
-                </th>
-                <th scope="col" className="num">
-                  {t('domain.renew')}
-                </th>
-                <th scope="col" className="num">
-                  <span className="u-visually-hidden">{t('domain.colAction')}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => {
-                const free = stem ? availability.get(row.tld) === true : undefined;
-                const tagClass = free ? 'tag tag--ok' : 'tag tag--taken';
-                return (
-                  <tr key={row.tld}>
-                    <td>
-                      <span className="domain-cell">
-                        <span className="lead serial">
-                          <bdi>{stem ? `${stem}${row.tld}` : row.tld}</bdi>
-                        </span>
-                        {free !== undefined && (
-                          <span className={tagClass}>
-                            {free && <IconCheck size={13} />}
-                            {t(free ? 'domain.available' : 'domain.taken')}
-                          </span>
-                        )}
-                      </span>
-                    </td>
-                    <td className="num">
-                      {formatAmount(convert(row.registerUsdMinor, currency), locale)} {currency}
-                    </td>
-                    <td className="num">
-                      {formatAmount(convert(row.renewUsdMinor, currency), locale)} {currency}
-                    </td>
-                    {/*
-                      One slot, two jobs. Before a search there is no product in this row — an
-                      extension on its own cannot be bought — so a disabled Add stood there as a
-                      column of dead controls; the slot carries the popular mark instead, which
-                      is information rather than a refusal. After a search the same slot holds a
-                      real Add on every row that can take one, so the column reads as a list of
-                      things that work. The column keeps its width across both, so nothing on
-                      the page moves when the answer arrives.
-                    */}
-                    <td className="num">
-                      {free === undefined
-                        ? row.featured && (
-                            <span className="tag tag--neutral">{t('domainstep.popular')}</span>
-                          )
-                        : free && (
-                            <Button size="sm" variant="secondary" onClick={() => addDomain(row)}>
-                              {t('action.add')}
-                            </Button>
-                          )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DomainTable
+          stem={stem}
+          availability={availability}
+          action={(row) => (
+            <Button size="sm" variant="secondary" onClick={() => addDomain(row)}>
+              {t('action.add')}
+            </Button>
+          )}
+        />
       </section>
     </Layout>
   );

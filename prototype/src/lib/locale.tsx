@@ -182,6 +182,9 @@ export const STRINGS = {
   'action.armed': { ar: 'اضغط أكّد الحذف عشان تتم الإزالة، أو إلغاء عشان تسيبها.', en: 'Press confirm delete to remove it, or cancel to leave it.' },
   'action.search': { ar: 'ابحث', en: 'Search' },
   'action.add': { ar: 'أضف', en: 'Add' },
+  'action.save': { ar: 'احفظ', en: 'Save' },
+  /* The dismiss on a dialog that only shows something and has nothing to agree to. */
+  'action.close': { ar: 'إغلاق', en: 'Close' },
 
   'cycle.monthly': { ar: 'شهريًا', en: 'Monthly' },
   'cycle.annually': { ar: 'سنويًا', en: 'Annually' },
@@ -410,7 +413,15 @@ export const STRINGS = {
   'domainstep.available': { ar: 'متاح', en: 'is available' },
   'domainstep.unavailable': { ar: 'غير متاح', en: 'is not available' },
   'domainstep.popular': { ar: 'الأكثر شيوعًا', en: 'Most Popular' },
-  'domainstep.selectedCount': { ar: 'دومين مختار', en: 'domain(s) selected' },
+  // Was one key doing two jobs: the domain step counted a local toggle with it and the
+  // add-ons step counted add-ons with it, so that screen read "0 domains selected" while
+  // three add-ons sat above it. Each now says what it is actually counting.
+  'domainstep.chosen': { ar: 'هيتربط بالباقة', en: 'will be linked to the plan' },
+  'domainstep.addonCount': { ar: 'إضافة مختارة', en: 'add-on(s) selected' },
+  // A table row on this step chooses the one domain the hosting line carries; it does not
+  // buy a second one, so it does not say Add.
+  'domainstep.pickRow': { ar: 'اختار ده', en: 'Choose' },
+  'domainstep.pickedRow': { ar: 'مختار', en: 'Chosen' },
   'domainstep.use': { ar: 'استخدم', en: 'Use' },
 
   'domainsconf.title': { ar: 'إعدادات الدومين', en: 'Domains Configuration' },
@@ -739,6 +750,21 @@ export const STRINGS = {
   'cur.switch': { ar: 'غيّر العملة', en: 'Change it' },
   'cur.keep': { ar: 'سيبها زي ما هي', en: 'Leave it' },
 
+  /*
+   * The seven currencies, each named as well as coded. A three-letter code is a label for
+   * someone who already knows which one is theirs; the name is what tells everyone else.
+   * KWD and SAR sit two rows apart in the list and read alike at a glance — the names are
+   * what stop the choice being a coin toss.
+   */
+  'cur.menu': { ar: 'اختار العملة', en: 'Choose a currency' },
+  'cur.name.USD': { ar: 'دولار أمريكي', en: 'US Dollar' },
+  'cur.name.AED': { ar: 'درهم إماراتي', en: 'UAE Dirham' },
+  'cur.name.CHF': { ar: 'فرنك سويسري', en: 'Swiss Franc' },
+  'cur.name.EGP': { ar: 'جنيه مصري', en: 'Egyptian Pound' },
+  'cur.name.EUR': { ar: 'يورو', en: 'Euro' },
+  'cur.name.KWD': { ar: 'دينار كويتي', en: 'Kuwaiti Dinar' },
+  'cur.name.SAR': { ar: 'ريال سعودي', en: 'Saudi Riyal' },
+
   'reg.title': { ar: 'بيانات مالك الدومين', en: 'Domain registrant' },
   'reg.lede': {
     ar: 'الجهة المسجِّلة بتطلب البيانات دي وبتتسجّل باسمك.',
@@ -807,6 +833,22 @@ export const STRINGS = {
   'tds.backTitle': { ar: 'البنك أكّد', en: 'Your bank confirmed' },
   'tds.backBody': { ar: 'فاضل نسجّل الطلب.', en: 'All that is left is recording the order.' },
   'tds.finish': { ar: 'خلّص الطلب', en: 'Finish the order' },
+
+  /*
+   * The same two moments when the card is being saved rather than charged. The bank still
+   * asks, but nothing is being paid, so the copy cannot say a payment went through — a
+   * confirmation that claims money moved is the one sentence a card-setup screen must not say.
+   */
+  'tds.setupGoBody': {
+    ar: 'البنك هيسألك تأكيد إن الكارت بتاعك. مفيش أي مبلغ بيتدفع هنا.',
+    en: 'Your bank will ask you to confirm the card is yours. Nothing is being paid here.',
+  },
+  'tds.setupBackTitle': { ar: 'البنك أكّد الكارت', en: 'Your bank confirmed the card' },
+  'tds.setupBackBody': {
+    ar: 'فاضل نحفظه في حسابك.',
+    en: 'All that is left is saving it to your account.',
+  },
+  'tds.setupFinish': { ar: 'احفظ الكارت', en: 'Save the card' },
 
   // ── transfer instructions: O-10 and O-11 ──────────────────────────────────
   'bank.title': { ar: 'تحويل بنكي', en: 'Bank transfer' },
@@ -1438,6 +1480,113 @@ export const STRINGS = {
   'vpsm.usedMib': { ar: 'المستخدم، ميجابايت', en: 'In use, MiB' },
   'vpsm.readKib': { ar: 'قراءة، كيلوبايت/ث', en: 'Read, KiB/s' },
   'vpsm.writeKib': { ar: 'كتابة، كيلوبايت/ث', en: 'Write, KiB/s' },
+
+  // ── the server controls — spec 9.3 ────────────────────────────────────────
+  // The graphs say what the machine has been doing. These say what to do about it, which is
+  // why they sit above them. Every label is a verb on a machine, not a feature name: the
+  // reader is here because something is wrong, and a noun does not tell them what will happen.
+  'vpsc.title': { ar: 'التحكم في الخادم', en: 'Server controls' },
+  'vpsc.powerGroup': { ar: 'تشغيل وإيقاف', en: 'Power' },
+  'vpsc.manageGroup': { ar: 'إدارة الخادم', en: 'Server management' },
+  'vpsc.state.running': { ar: 'شغّال', en: 'Running' },
+  'vpsc.state.stopped': { ar: 'متوقّف', en: 'Stopped' },
+  'vpsc.state.rescue': { ar: 'وضع الإنقاذ', en: 'Rescue mode' },
+
+  'vpsc.start': { ar: 'تشغيل', en: 'Start' },
+  'vpsc.stop': { ar: 'إيقاف', en: 'Stop' },
+  'vpsc.powerOff': { ar: 'فصل الكهرباء', en: 'Power off' },
+  'vpsc.restart': { ar: 'إعادة تشغيل', en: 'Restart' },
+  'vpsc.reinstall': { ar: 'إعادة تثبيت', en: 'Reinstall' },
+  'vpsc.vnc': { ar: 'كونسول VNC', en: 'VNC access' },
+  'vpsc.rootPw': { ar: 'تغيير باسورد root', en: 'Reset root password' },
+  'vpsc.hostname': { ar: 'تغيير اسم الخادم', en: 'Change hostname' },
+  'vpsc.rescue': { ar: 'وضع الإنقاذ', en: 'Rescue' },
+
+  // Start is the one press with nothing to lose, so it is the one press with no dialog.
+  'vpsc.startDone': { ar: 'الخادم بيشتغل', en: 'The server is starting' },
+
+  'vpsc.stopTitle': { ar: 'إيقاف الخادم؟', en: 'Stop the server?' },
+  'vpsc.stopLede': {
+    ar: 'الخادم هياخد أمر إيقاف عادي، يقفل اللي شغال عنده الأول وبعدين يطفي. المواقع عليه هتبقى مقفولة لحد ما تشغّله تاني.',
+    en: 'The machine is asked to shut down in the usual way, so what is running on it closes first. Anything it serves is off until you start it again.',
+  },
+  'vpsc.stopDone': { ar: 'أمر الإيقاف اتبعت', en: 'Stop requested' },
+
+  'vpsc.powerOffTitle': { ar: 'فصل الكهرباء عن الخادم؟', en: 'Power off the server?' },
+  'vpsc.powerOffLede': {
+    ar: 'ده مش إيقاف عادي — الكهرباء بتتفصل على طول، زي ما تشيل الكابل.',
+    en: 'This is not a shutdown. The power is cut at once, the way pulling the cable cuts it.',
+  },
+  'vpsc.powerOffWarn': { ar: 'اللي لسه ما اتحفظش ممكن يضيع', en: 'Unsaved work can be lost' },
+  'vpsc.powerOffWarnNote': {
+    ar: 'قواعد البيانات والملفات اللي بيتكتب فيها في اللحظة دي ممكن تتقفل ناقصة. لو الخادم بيرد، «إيقاف» أأمن.',
+    en: 'A database or a file mid-write can be left incomplete. If the machine still answers, Stop is the safer way.',
+  },
+  'vpsc.powerOffDone': { ar: 'الكهرباء اتفصلت', en: 'Power cut' },
+
+  'vpsc.restartTitle': { ar: 'إعادة تشغيل الخادم؟', en: 'Restart the server?' },
+  'vpsc.restartLede': {
+    ar: 'الخادم هيقفل ويرجع يفتح لوحده. المواقع عليه هتقع دقيقة تقريبًا.',
+    en: 'The machine shuts down and comes back on its own. What it serves is off for about a minute.',
+  },
+  'vpsc.restartDone': { ar: 'أمر إعادة التشغيل اتبعت', en: 'Restart requested' },
+
+  'vpsc.reinstallTitle': { ar: 'إعادة تثبيت النظام', en: 'Reinstall the operating system' },
+  'vpsc.reinstallLede': {
+    ar: 'الخادم هيرجع زي ما اتسلّم أول مرة، بالنظام اللي تختاره.',
+    en: 'The machine goes back to the state it was handed over in, with the system you pick.',
+  },
+  'vpsc.reinstallWarn': { ar: 'القرص بيتمسح بالكامل', en: 'The disk is erased' },
+  'vpsc.reinstallWarnNote': {
+    ar: 'كل الملفات وقواعد البيانات والإعدادات على الخادم بتروح، ومفيش رجوع. خُد نسخة احتياطية الأول.',
+    en: 'Every file, database and setting on the machine goes, and there is no undo. Take a backup first.',
+  },
+  'vpsc.image': { ar: 'النظام', en: 'Operating system' },
+  'vpsc.reinstallGo': { ar: 'امسح وأعد التثبيت', en: 'Erase and reinstall' },
+  'vpsc.reinstallDone': { ar: 'إعادة التثبيت اتطلبت', en: 'Reinstall requested' },
+
+  'vpsc.vncTitle': { ar: 'كونسول VNC', en: 'VNC console' },
+  'vpsc.vncLede': {
+    ar: 'شاشة الخادم نفسه — الطريق الوحيد لما SSH يبقى مقفول أو الشبكة واقعة.',
+    en: "The machine's own screen — the way in when SSH is shut or the network is down.",
+  },
+
+  'vpsc.rootPwTitle': { ar: 'تغيير باسورد root', en: 'Reset the root password' },
+  'vpsc.rootPwLede': {
+    ar: 'هنعمل باسورد جديد لـ root ونبعته على إيميل الحساب.',
+    en: "A new root password is generated and sent to the account's email address.",
+  },
+  'vpsc.rootPwWarn': { ar: 'أي حاجة بتستخدم الباسورد القديم هتقف', en: 'Anything using the old password stops' },
+  'vpsc.rootPwWarnNote': {
+    ar: 'السكربتات والنسخ الاحتياطي والأدوات اللي بتدخل بـ root بالباسورد هتفشل لحد ما تتحدّث. مفاتيح SSH ما بتتأثرش.',
+    en: 'Scripts, backups and tools that sign in as root with a password fail until they are updated. SSH keys are not affected.',
+  },
+  'vpsc.rootPwGo': { ar: 'غيّر الباسورد', en: 'Reset the password' },
+  'vpsc.rootPwDone': { ar: 'تغيير الباسورد اتطلب', en: 'Password reset requested' },
+
+  'vpsc.hostnameTitle': { ar: 'تغيير اسم الخادم', en: 'Change the hostname' },
+  'vpsc.hostnameLede': {
+    ar: 'الاسم ده بيظهر في سجلات الخادم وفي هيدر الإيميل اللي بيطلع منه.',
+    en: "The name that appears in the machine's own logs and in the headers of mail it sends.",
+  },
+  'vpsc.hostnameBad': {
+    ar: 'حروف إنجليزية وأرقام وشرطة بس، والشرطة ما تبدأش ولا تخلص بيها.',
+    en: 'Letters, digits and hyphens only, and not starting or ending on a hyphen.',
+  },
+  'vpsc.hostnameDone': { ar: 'اسم الخادم اتغيّر', en: 'Hostname changed' },
+
+  'vpsc.rescueTitle': { ar: 'تشغيل وضع الإنقاذ', en: 'Boot into rescue mode' },
+  'vpsc.rescueLede': {
+    ar: 'الخادم هيقوم بنظام صغير في الرام بدل اللي على القرص، والقرص بيبقى موجود تقدر تصلّحه.',
+    en: 'The machine boots a small system in memory instead of the one on its disk, and the disk is there to be repaired.',
+  },
+  'vpsc.rescueWarn': { ar: 'مواقعك مش هتشتغل وإنت في الوضع ده', en: 'Nothing you host runs while it is in rescue' },
+  'vpsc.rescueWarnNote': {
+    ar: 'ده وضع تصليح مش وضع تشغيل. أول ما تخلص، «إعادة تشغيل» بترجّع الخادم لنظامه.',
+    en: 'It is a repair mode, not a running one. Restart puts the machine back on its own system when you are done.',
+  },
+  'vpsc.rescueGo': { ar: 'شغّل وضع الإنقاذ', en: 'Boot into rescue' },
+  'vpsc.rescueDone': { ar: 'الخادم في وضع الإنقاذ', en: 'The server is in rescue mode' },
   'svc.left': { ar: 'متبقّي', en: 'left' },
   'dom.registration': { ar: 'بيانات التسجيل', en: 'Registration' },
   'funds.adding': { ar: 'هتضيف', en: 'Adding' },
@@ -1634,6 +1783,30 @@ export const STRINGS = {
   'pm.primary': { ar: 'الأساسية', en: 'Primary' },
   'pm.makePrimary': { ar: 'اجعلها الأساسية', en: 'Make primary' },
   'pm.add': { ar: 'أضف بطاقة', en: 'Add a card' },
+  'pm.addLede': {
+    ar: 'الكارت بيتحفظ عشان التجديدات تتدفع لوحدها. مفيش حاجة بتتخصم دلوقتي.',
+    en: 'The card is saved so renewals can pay themselves. Nothing is charged now.',
+  },
+  'pm.addPrimary': { ar: 'خليها الأساسية', en: 'Make it the primary card' },
+  'pm.addPrimaryNote': {
+    ar: 'التجديدات هتتخصم من الكارت ده بدل الحالي.',
+    en: 'Renewals will come off this card instead of the current one.',
+  },
+  'pm.addPrimaryFirst': {
+    ar: 'أول كارت بيبقى الأساسي لوحده.',
+    en: 'The first card becomes the primary one on its own.',
+  },
+  'pm.addVerify': { ar: 'تحقّق من البنك', en: 'A check from your bank' },
+  'pm.addVerifyNote': {
+    ar: 'البنك ممكن يحجز مبلغ بسيط عشان يتأكد من الكارت، وبيرجّعه لوحده خلال كام يوم.',
+    en: 'Your bank may hold a small amount to verify the card, and releases it again within a few days.',
+  },
+  'pm.addSubmit': { ar: 'أضف الكارت', en: 'Add the card' },
+  'pm.addedTitle': { ar: 'الكارت اتضاف', en: 'The card was added' },
+  'pm.addedNote': {
+    ar: 'هتلاقيه في القايمة تحت، وتقدر تشيله في أي وقت.',
+    en: 'You will find it in the list below, and you can remove it at any time.',
+  },
 
   'tkt.all': { ar: 'الكل', en: 'All' },
   'tkt.open': { ar: 'افتح تذكرة', en: 'Open a ticket' },
@@ -1760,7 +1933,18 @@ export const STRINGS = {
   'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
   'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
   'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
-  'con.done': { ar: 'إغلاق', en: 'Done' },
+  'con.new': { ar: 'جهة اتصال جديدة', en: 'New contact' },
+  'con.newNote': {
+    ar: 'اسمه وإيميله والصلاحيات اللي هيشتغل بيها. الإيميل ده اللي هيدخل بيه.',
+    en: 'Their name, their email, and what they are allowed to do. The email is what they sign in with.',
+  },
+  'con.create': { ar: 'أضف الجهة', en: 'Add contact' },
+  'con.added': { ar: 'الجهة اتضافت', en: 'Contact added' },
+  'con.mailBad': {
+    ar: 'اكتب إيميل كامل وصح — الجهة بتدخل بيه.',
+    en: 'Enter a complete, valid email — the contact signs in with it.',
+  },
+  'con.mailTaken': { ar: 'فيه جهة اتصال بالإيميل ده خلاص.', en: 'A contact with this email already exists.' },
 
 
   /* Table toolbars — the search field and filter pills above every client-area table. The
@@ -2019,6 +2203,23 @@ export const STRINGS = {
     ar: 'رقم التسجيل الضريبي بيتحدد لكل سوق (القرار I12) وهيتضاف هنا أول ما يتأكد.',
     en: 'The tax registration number is decided per market (decision I12) and is added here once confirmed.',
   },
+  /*
+   * The three server acts that reach past WHMCS itself. WHMCS ships the buttons as a module
+   * (ModuleCustomButton), but what each one does — and the list of images it offers — belongs
+   * to the virtualisation panel behind the product, not to the billing system.
+   */
+  'dev.vpsImages': {
+    ar: 'قايمة الأنظمة دي مثال. اللي هيظهر فعلًا بييجي من لوحة الفيرتشوالايزيشن ورا المنتج ولازم يتأكد منها.',
+    en: 'This list is a placeholder. The images actually on offer come from the virtualisation panel behind the product and have to be confirmed against it.',
+  },
+  'dev.vpsVnc': {
+    ar: 'الكونسول نفسه بيفتحه الـ panel مش WHMCS — محتاج توكن مؤقت ومنفذ من الـ module قبل ما الزرار ده يفتح حاجة.',
+    en: 'The console is opened by the panel, not by WHMCS — this needs a short-lived token and a port from the module before the button opens anything.',
+  },
+  'dev.vpsRootPw': {
+    ar: 'الباسورد الجديد بيتولّد في الـ panel. محتاج نتأكد إزاي بيوصل للعميل — إيميل، ولا يظهر مرة واحدة هنا.',
+    en: 'The new password is generated by the panel. How it reaches the client needs confirming — by email, or shown once here.',
+  },
 
   // Service detail — C-03 extended.
   'svc.overview': { ar: 'نظرة عامة', en: 'Overview' },
@@ -2087,6 +2288,21 @@ export const STRINGS = {
   'dom.dnsNoneNote': { ar: 'أضف أول سجل من النموذج اللي فوق.', en: 'Add the first record from the form above.' },
   'dom.dnsExternal': { ar: 'الدومين ده بيستخدم خوادم أسماء خارجية، فالسجلات اللي هنا مش هتتطبّق لحد ما ترجّعه لخوادمنا. الخوادم الحالية:', en: 'This domain uses external nameservers, so records here do not apply until it points back to ours. Current nameservers:' },
   'dom.ttl': { ar: 'TTL', en: 'TTL' },
+  /*
+   * The record types, as WHMCS names them. Five are codes a person types into a zone file and
+   * reads the same in both languages; the two redirects are words, so they translate — and
+   * "Stealth Forward" is the one name in the menu nobody can guess, hence the note under it.
+   */
+  'dns.A': { ar: 'A', en: 'A' },
+  'dns.AAAA': { ar: 'AAAA', en: 'AAAA' },
+  'dns.CNAME': { ar: 'CNAME', en: 'CNAME' },
+  'dns.URL': { ar: 'تحويل', en: 'Forward' },
+  'dns.TXT': { ar: 'TXT', en: 'TXT' },
+  'dns.MX': { ar: 'MX', en: 'MX' },
+  'dns.FRAME': { ar: 'تحويل مخفي', en: 'Stealth Forward' },
+  'dom.forwardNote': { ar: 'الزائر هيتنقل للعنوان اللي هنا، وهيلاقيه مكتوب في شريط العنوان عنده.', en: 'The visitor is sent to the address you enter here, and the address bar shows it.' },
+  'dom.forwardBad': { ar: 'اكتب العنوان كامل ببدايته، زي https://example.com/shop', en: 'Write the full address with its scheme, like https://example.com/shop' },
+  'dom.frameNote': { ar: 'الصفحة هتتفتح جوه إطار، وشريط العنوان هيفضل مكتوب فيه دومينك مش العنوان اللي هنا.', en: 'The page opens inside a frame, and the address bar keeps your domain instead of the address you enter here.' },
   'dom.contacts': { ar: 'بيانات الدومين', en: 'Domain contacts' },
   'dom.contactsLede': { ar: 'مهم جدًا تفضل بيانات مالك الدومين محدّثة، عشان ماتخسرش الدومين لو حصل نزاع أو نقل.', en: 'Keep the owner details current — they are what decides who keeps the domain in a dispute or a transfer.' },
   'dom.contact.registrant': { ar: 'المالك', en: 'Registrant' },

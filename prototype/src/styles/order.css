@@ -473,6 +473,20 @@
 .result__price {
   margin-inline-start: auto;
   font-weight: var(--sws-weight-bold);
+  text-align: end;
+}
+
+/*
+ * The renewal under the registration price. The search screen gives it a table column of its
+ * own; the order step has no such column, and this is the screen somebody is one click away
+ * from paying on, so the number goes on the card rather than a page they would have to leave
+ * for.
+ */
+.result__renew {
+  display: block;
+  font-size: var(--sws-font-size-caption);
+  font-weight: var(--sws-weight-regular);
+  color: var(--sws-text-secondary);
 }
 
 /* The line under the verdict when the name is gone: where to look next. */
@@ -494,32 +508,6 @@
 .section__title--sm {
   margin-block: var(--sws-space-32) var(--sws-space-16);
   font-size: var(--sws-font-size-h3);
-}
-
-.tlds {
-  display: grid;
-  gap: var(--sws-space-12);
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-}
-
-.tld {
-  display: grid;
-  gap: var(--sws-space-8);
-  justify-items: center;
-  padding: var(--sws-space-16);
-  background: var(--sws-surface-raised);
-  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  border-radius: var(--sws-radius-lg);
-}
-
-.tld__name {
-  font-size: var(--sws-font-size-h3);
-  font-weight: var(--sws-weight-bold);
-}
-
-.tld__price {
-  font-size: var(--sws-font-size-caption);
-  color: var(--sws-text-secondary);
 }
 
 .step-foot {

@@ -1855,6 +1855,13 @@ button.stat {
 }
 
 /* ── knowledgebase ─────────────────────────────────────────────────────────── */
+/*
+ * The base dress in account.css is a stack of lifted cards. In here the list is ruled rows
+ * inside one card, like every other list on these screens: the card carries the frame and its
+ * radius, the rows carry nothing but the hairline between them. A row with a radius of its own
+ * inside a rounded frame is two frames for one list — it showed on hover, where the sunken
+ * ground rounded off corners the row does not own.
+ */
 
 .app__main .kb-list {
   gap: 0;
@@ -2040,19 +2047,10 @@ button.stat {
 }
 
 /*
- * The knowledgebase list is shared with the marketing surfaces, where it is a stack of lifted
- * cards. In here it is ruled rows inside one card, like every other list on these screens.
- */
-.app__main .kb-item {
-  border-radius: var(--sws-radius-lg);
-  box-shadow: none;
-}
-
-/*
  * The status board is shared with the public status page (M-16), where its blocks are lifted
  * marketing cards at the xl radius. In here xl does not exist, so the headline takes the
- * client-area radius and the incidents become bordered blocks on the flat ground — the same
- * move the knowledgebase list makes above, for the same reason.
+ * client-area radius and the incidents become bordered blocks on the flat ground, so one
+ * screen does not read as two.
  *
  * The systems list gives up its frame entirely. It is already inside a card that names it, and
  * a shadowed 24px card inset 24px into a bordered 16px one is the double frame this file spent
@@ -2124,8 +2122,31 @@ button.stat {
 
 /* ── the invoice, which is a document before it is a screen ────────────────── */
 
-.app__main .invoice {
-  max-width: 46rem;
+/*
+ * The document used to hold a printable measure — 46rem inside the client area, 52rem outside
+ * it — on the reading that an invoice is a page and a page has a width. Two rules made that
+ * cost more than it bought. The pay panel already took a column of its own beside the
+ * document, so the measure was not what decided the width: the column was, and the cap then
+ * took a further 24px off *that*, leaving the document a hair narrower than the ledger card
+ * directly beneath it and the two cards' edges out of line. And the column the panel held ran
+ * the full height of the layout while the panel itself filled a third of it, so a screen of
+ * empty ground sat beside the invoice for the length of the document.
+ *
+ * The document now runs the width of the content area and the panel drops beside the ledger
+ * (see .invoice-detail in account.css). The header's own "pay now" carries the action at the
+ * top of the screen, which is what kept the panel in the first column.
+ */
+
+/*
+ * The totals are the figures the document is read for, and .totals__row justifies its two ends
+ * apart: at the document's old measure that was a readable span, at the content area's it is
+ * most of a screen between a label and its number. The block sits at the end edge instead, on
+ * the column the amounts in the table above already use, so the eye pairs them in one glance
+ * and the document's last figure lands under the ones it is the sum of.
+ */
+.invoice .totals {
+  max-inline-size: 22rem;
+  margin-inline-start: auto;
 }
 
 /*
@@ -2785,19 +2806,24 @@ button.stat {
 
 /* ── 2026-09-07: the locked currency, the developer note ─────────────────────── */
 
-/* The lock is a button in the select's clothes. It has to clear the 44px target on its own,
-   because the select it replaces was measured through its label. */
-.cur__lock {
+/* A button in the select's clothes — the whole currency control, locked or not. It has to
+   clear the 44px target on its own, because the select it replaced was measured through the
+   label wrapped around it, and there is no label now. */
+.cur__trigger {
   background: none;
   border: 0;
-  font: inherit;
-  color: inherit;
   cursor: pointer;
   min-inline-size: var(--sws-touch-target-min);
   min-block-size: var(--sws-touch-target-min);
+  /* Only what the UA button stylesheet breaks. Size, weight and colour stay with the two
+     dressing classes, which already own them for every other control on their bar; a blanket
+     `font: inherit` here would quietly out-rank both and size the control off the bar's own
+     type instead. */
+  font-family: inherit;
+  line-height: inherit;
 }
 
-.cur__lock:focus-visible {
+.cur__trigger:focus-visible {
   outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
   outline-offset: 2px;
   border-radius: var(--sws-radius-sm);

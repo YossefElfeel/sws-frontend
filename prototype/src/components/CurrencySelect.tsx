@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { IconCoin, IconChevron, IconLock } from './icons';
+import { IconCoin, IconChevron, IconLock, IconCheck } from './icons';
 import { Button } from './Button';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
@@ -25,6 +25,17 @@ import { ACCOUNT, BILLING_LOCKED } from '../lib/account';
  * account currency so every figure in the account is in the money the person actually pays.
  *
  * With an empty cart there is nothing to be surprised by, so nothing interrupts.
+ *
+ * ── why the seven options are not a <select>
+ *
+ * Spec 4.2 asks for seven currencies. A native select gave seven three-letter codes in a list
+ * the operating system draws: no names, no mark on the one in force, no relation to anything
+ * else on the bar. But the code is the part you only recognise once you already know it —
+ * someone looking for their own money is looking for "جنيه مصري", and EGP is what they read
+ * *after* they have found the row. So every option carries its name beside its code, the one
+ * in force carries a tick, and the list is the same raised panel as the other menus in the
+ * shell. All three states of this control — the list, the question, the lock — now open in
+ * the same place, at the same width, in the same clothes.
  */
 export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
   const { t, locale } = useLocale();
@@ -33,6 +44,9 @@ export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
   const [pending, setPending] = useState<Currency | null>(null);
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLSpanElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const confirm = useRef<HTMLButtonElement>(null);
 
   const locked = variant === 'app' && BILLING_LOCKED;
 
@@ -40,10 +54,28 @@ export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
     if (locked && currency !== ACCOUNT.currency) setCurrency(ACCOUNT.currency);
   }, [locked, currency, setCurrency]);
 
-  // The note closes on the next thing you do, like the notification panel does.
+  // The panel closes on the next thing you do, like the notification panel does — and it is
+  // one flag for both panels, because the list and the locked note hang off the same trigger
+  // and only one of them can ever be under it.
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        trigger.current?.focus();
+        return;
+      }
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      // A list you opened from the keyboard has to be walkable from the keyboard.
+      const items = Array.from(
+        panel.current?.querySelectorAll<HTMLElement>('[role="menuitemradio"]') ?? [],
+      );
+      if (items.length === 0) return;
+      e.preventDefault();
+      const here = items.indexOf(document.activeElement as HTMLElement);
+      const step = e.key === 'ArrowDown' ? 1 : -1;
+      items[(here + step + items.length) % items.length].focus();
+    };
     const onDown = (e: MouseEvent) => {
       if (!wrap.current?.contains(e.target as Node)) setOpen(false);
     };
@@ -55,14 +87,38 @@ export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
     };
   }, [open]);
 
+  // Opening the list lands you on the currency you are already in, so the first arrow press
+  // steps away from where you are rather than into the top of a list of seven.
+  useEffect(() => {
+    if (!open || locked) return;
+    panel.current?.querySelector<HTMLElement>('[aria-checked="true"]')?.focus();
+  }, [open, locked]);
+
+  // The question replaces the list under the same trigger, so that is where focus has to go:
+  // otherwise a keyboard is left holding a button whose menu has just disappeared. And having
+  // put a keyboard inside a dialog, Escape has to mean the same thing there as it does in the
+  // list — which here is "Leave it", the answer that changes nothing.
+  useEffect(() => {
+    if (!pending) return;
+    confirm.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setPending(null);
+      trigger.current?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [pending]);
+
   const cls = variant === 'masthead' ? 'masthead__select' : 'app__select app__select--currency';
 
   if (locked) {
     return (
       <span className="cur" ref={wrap}>
         <button
+          ref={trigger}
           type="button"
-          className={`${cls} cur__lock`}
+          className={`${cls} cur__trigger`}
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -95,31 +151,53 @@ export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
   }
 
   const request = (next: Currency) => {
-    if (next === currency) return;
-    if (lines.length === 0) {
-      setCurrency(next);
+    setOpen(false);
+    if (next !== currency && lines.length > 0) {
+      setPending(next);
       return;
     }
-    setPending(next);
+    if (next !== currency) setCurrency(next);
+    trigger.current?.focus();
   };
 
   return (
-    <span className="cur">
-      <label className={cls}>
+    <span className="cur" ref={wrap}>
+      <button
+        ref={trigger}
+        type="button"
+        className={`${cls} cur__trigger`}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
         {variant === 'masthead' && <IconCoin />}
         <span className="u-visually-hidden">{t('currency.label')}</span>
-        <select
-          value={currency}
-          onChange={(e) => request(e.target.value as Currency)}
-        >
-          {CURRENCIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+        <span className="serial">{currency}</span>
         <IconChevron size={variant === 'masthead' ? 14 : 13} />
-      </label>
+      </button>
+
+      {open && (
+        <div ref={panel} className="cur__menu" role="menu" aria-label={t('cur.menu')}>
+          {CURRENCIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              className="cur__opt"
+              role="menuitemradio"
+              aria-checked={c === currency}
+              onClick={() => request(c)}
+            >
+              {/* The tick keeps its column whether or not it is drawn, so the seven rows read
+                  as one list rather than as six rows and an indented one. */}
+              <span className="cur__tick" aria-hidden="true">
+                {c === currency && <IconCheck size={15} />}
+              </span>
+              <span className="cur__code serial">{c}</span>
+              <span className="cur__name">{t(`cur.name.${c}`)}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {pending && (
         <div className="cur__ask" role="dialog" aria-label={t('cur.title')}>
@@ -146,15 +224,24 @@ export function CurrencySelect({ variant }: { variant: 'masthead' | 'app' }) {
 
           <div className="cur__acts">
             <Button
+              ref={confirm}
               size="sm"
               onClick={() => {
                 setCurrency(pending);
                 setPending(null);
+                trigger.current?.focus();
               }}
             >
               {t('cur.switch')}
             </Button>
-            <Button size="sm" variant="quiet" onClick={() => setPending(null)}>
+            <Button
+              size="sm"
+              variant="quiet"
+              onClick={() => {
+                setPending(null);
+                trigger.current?.focus();
+              }}
+            >
               {t('cur.keep')}
             </Button>
           </div>

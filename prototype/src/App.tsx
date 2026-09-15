@@ -59,7 +59,7 @@ import {
   DomainForwarding,
   DomainTransferOut,
 } from './screens/account/DomainPages';
-import { Invoices, InvoiceDetail, AddFunds, PaymentMethods } from './screens/account/Billing';
+import { Invoices, InvoiceDetail, AddFunds, PaymentMethods, AddCard } from './screens/account/Billing';
 import {
   Tickets,
   TicketNew,
@@ -236,6 +236,7 @@ export function App() {
               <Route path="/account/transactions" element={<Transactions />} />
               <Route path="/account/payment-failed" element={<PaymentFailed />} />
               <Route path="/account/payment-methods" element={<PaymentMethods />} />
+              <Route path="/account/payment-methods/new" element={<AddCard />} />
               <Route path="/account/tickets" element={<Tickets />} />
               <Route path="/account/tickets/new" element={<TicketNew />} />
               <Route path="/account/tickets/:id" element={<TicketThread />} />

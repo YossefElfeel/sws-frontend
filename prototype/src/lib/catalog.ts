@@ -383,6 +383,39 @@ export const TLDS: Tld[] = [
   { tld: '.eg', registerUsdMinor: 899, transferUsdMinor: 999, renewUsdMinor: 1099 },
 ];
 
+/*
+ * One lookup, shared by both screens that answer "is this name free" — the domain search and
+ * the order flow's domain step.
+ *
+ * There used to be two. The search hashed the stem and gave every extension its own bit; the
+ * order step hashed the whole name with a different seed and returned one verdict for all ten.
+ * They disagreed in the obvious way — somion.shop was free on the search and taken one screen
+ * later in the order — and the order step's answer did not move when the extension beside the
+ * field did, which is the single thing a domain checker exists to do. Neither of those is a
+ * preference, so there is nothing to configure per screen: the function is the answer, and two
+ * screens importing it cannot drift apart again.
+ */
+export function availabilityFor(stem: string): Map<string, boolean> {
+  if (!stem) return new Map<string, boolean>();
+  const hash = [...stem].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  return new Map(TLDS.map((row, i) => [row.tld, ((hash >> i) & 1) === 1]));
+}
+
+/**
+ * Someone who types "somion.net" is asking about .net, not about a name called "somionnet".
+ * Splitting the extension off is what lets the headline result answer the question that was
+ * actually asked; without it the extension is silently folded into the stem.
+ */
+export function splitDomain(raw: string): { stem: string; typed?: Tld } {
+  const lower = raw.trim().toLowerCase();
+  const dot = lower.indexOf('.');
+  const typed = dot > 0 ? TLDS.find((x) => x.tld === lower.slice(dot)) : undefined;
+  return {
+    stem: (typed ? lower.slice(0, dot) : lower).replace(/[^a-z0-9-]/g, ''),
+    typed,
+  };
+}
+
 /** Spec screenshots show tax at 14.00% on the order summary. */
 export const TAX_RATE = 0.14;
 
