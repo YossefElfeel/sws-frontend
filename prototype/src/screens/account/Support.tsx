@@ -212,7 +212,7 @@ export function TicketNew() {
    *
    * A payment that went wrong is the worst moment to ask somebody to go and find their
    * invoice number, so the invoice screen sends it. And the invoices list has an Edit item
-   * that arrives here too, because an invoice s own lines are not the client s to change —
+   * that arrives here too, because an invoice's own lines are not the client's to change —
    * see `dev.invoiceActions`. Either way the subject opens naming the invoice and the
    * department opens on Sales and Billing rather than Technical Support, which is the queue
    * that can actually look at a charge.
