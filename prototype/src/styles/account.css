@@ -1332,20 +1332,62 @@
  * switches inside it are the sunken things — an editor that was sunken too would swallow them.
  * The frame clips, so no corner handling is needed here.
  */
-.perm-edit {
-  margin: 0;
+.contact-edit {
   padding: 0 var(--sws-space-24) var(--sws-space-24);
-  border: 0;
-  animation: perm-edit-in var(--sws-duration-base) var(--sws-ease-standard);
+  animation: contact-edit-in var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+/*
+ * The contact being written, where the contact is going to be: in the frame, over the list it
+ * is joining, carrying the same open-edge mark a row being changed carries. A dialog would
+ * cover the list you are adding to, and the answer to "is this name already here" is that
+ * list.
+ *
+ * It takes a full padding block rather than the editor's three sides, because nothing sits
+ * above it — the toolbar's own rule is what it opens under.
+ */
+.contact-new {
+  padding: var(--sws-space-24);
+  border-inline-start: var(--sws-rule-heavy) solid var(--sws-action-primary);
+  border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  animation: contact-edit-in var(--sws-duration-base) var(--sws-ease-standard);
+}
+
+.contact-new__title {
+  margin: 0;
+  font-size: var(--sws-font-size-body);
+  font-weight: var(--sws-weight-bold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+.contact-new__note {
+  margin: var(--sws-space-4) 0 var(--sws-space-16);
+  font-size: var(--sws-font-size-caption);
+  color: var(--sws-text-secondary);
 }
 
 /* Durations collapse to zero under prefers-reduced-motion, so this resolves to an instant
    appearance rather than needing its own media query. */
-@keyframes perm-edit-in {
+@keyframes contact-edit-in {
   from {
     opacity: 0;
     transform: translateY(calc(var(--sws-space-4) * -1));
   }
+}
+
+/* A <fieldset> arrives with a border and padding of its own, which would draw a second box
+   around the switches inside an editor that is already one. */
+.perm-edit {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* The permissions follow the name and the address, so they are separated from them the way
+   two stacked fields are — the same 16 `.field-grid` puts between its own rows. */
+.contact-edit .perm-edit,
+.contact-new .perm-edit {
+  margin-block-start: var(--sws-space-16);
 }
 
 /* A <legend> carries its own inline padding from the UA sheet, which would push the label out
@@ -1361,7 +1403,7 @@
   gap: var(--sws-space-8);
 }
 
-.perm-edit__foot {
+.contact-edit__foot {
   display: flex;
   align-items: center;
   gap: var(--sws-space-8);
@@ -1381,7 +1423,8 @@
     padding-inline: var(--sws-space-16);
   }
 
-  .perm-edit {
+  .contact-edit,
+  .contact-new {
     padding-inline: var(--sws-space-16);
   }
 

@@ -413,7 +413,15 @@ export const STRINGS = {
   'domainstep.available': { ar: 'متاح', en: 'is available' },
   'domainstep.unavailable': { ar: 'غير متاح', en: 'is not available' },
   'domainstep.popular': { ar: 'الأكثر شيوعًا', en: 'Most Popular' },
-  'domainstep.selectedCount': { ar: 'دومين مختار', en: 'domain(s) selected' },
+  // Was one key doing two jobs: the domain step counted a local toggle with it and the
+  // add-ons step counted add-ons with it, so that screen read "0 domains selected" while
+  // three add-ons sat above it. Each now says what it is actually counting.
+  'domainstep.chosen': { ar: 'هيتربط بالباقة', en: 'will be linked to the plan' },
+  'domainstep.addonCount': { ar: 'إضافة مختارة', en: 'add-on(s) selected' },
+  // A table row on this step chooses the one domain the hosting line carries; it does not
+  // buy a second one, so it does not say Add.
+  'domainstep.pickRow': { ar: 'اختار ده', en: 'Choose' },
+  'domainstep.pickedRow': { ar: 'مختار', en: 'Chosen' },
   'domainstep.use': { ar: 'استخدم', en: 'Use' },
 
   'domainsconf.title': { ar: 'إعدادات الدومين', en: 'Domains Configuration' },
@@ -810,6 +818,22 @@ export const STRINGS = {
   'tds.backTitle': { ar: 'البنك أكّد', en: 'Your bank confirmed' },
   'tds.backBody': { ar: 'فاضل نسجّل الطلب.', en: 'All that is left is recording the order.' },
   'tds.finish': { ar: 'خلّص الطلب', en: 'Finish the order' },
+
+  /*
+   * The same two moments when the card is being saved rather than charged. The bank still
+   * asks, but nothing is being paid, so the copy cannot say a payment went through — a
+   * confirmation that claims money moved is the one sentence a card-setup screen must not say.
+   */
+  'tds.setupGoBody': {
+    ar: 'البنك هيسألك تأكيد إن الكارت بتاعك. مفيش أي مبلغ بيتدفع هنا.',
+    en: 'Your bank will ask you to confirm the card is yours. Nothing is being paid here.',
+  },
+  'tds.setupBackTitle': { ar: 'البنك أكّد الكارت', en: 'Your bank confirmed the card' },
+  'tds.setupBackBody': {
+    ar: 'فاضل نحفظه في حسابك.',
+    en: 'All that is left is saving it to your account.',
+  },
+  'tds.setupFinish': { ar: 'احفظ الكارت', en: 'Save the card' },
 
   // ── transfer instructions: O-10 and O-11 ──────────────────────────────────
   'bank.title': { ar: 'تحويل بنكي', en: 'Bank transfer' },
@@ -1637,6 +1661,30 @@ export const STRINGS = {
   'pm.primary': { ar: 'الأساسية', en: 'Primary' },
   'pm.makePrimary': { ar: 'اجعلها الأساسية', en: 'Make primary' },
   'pm.add': { ar: 'أضف بطاقة', en: 'Add a card' },
+  'pm.addLede': {
+    ar: 'الكارت بيتحفظ عشان التجديدات تتدفع لوحدها. مفيش حاجة بتتخصم دلوقتي.',
+    en: 'The card is saved so renewals can pay themselves. Nothing is charged now.',
+  },
+  'pm.addPrimary': { ar: 'خليها الأساسية', en: 'Make it the primary card' },
+  'pm.addPrimaryNote': {
+    ar: 'التجديدات هتتخصم من الكارت ده بدل الحالي.',
+    en: 'Renewals will come off this card instead of the current one.',
+  },
+  'pm.addPrimaryFirst': {
+    ar: 'أول كارت بيبقى الأساسي لوحده.',
+    en: 'The first card becomes the primary one on its own.',
+  },
+  'pm.addVerify': { ar: 'تحقّق من البنك', en: 'A check from your bank' },
+  'pm.addVerifyNote': {
+    ar: 'البنك ممكن يحجز مبلغ بسيط عشان يتأكد من الكارت، وبيرجّعه لوحده خلال كام يوم.',
+    en: 'Your bank may hold a small amount to verify the card, and releases it again within a few days.',
+  },
+  'pm.addSubmit': { ar: 'أضف الكارت', en: 'Add the card' },
+  'pm.addedTitle': { ar: 'الكارت اتضاف', en: 'The card was added' },
+  'pm.addedNote': {
+    ar: 'هتلاقيه في القايمة تحت، وتقدر تشيله في أي وقت.',
+    en: 'You will find it in the list below, and you can remove it at any time.',
+  },
 
   'tkt.all': { ar: 'الكل', en: 'All' },
   'tkt.open': { ar: 'افتح تذكرة', en: 'Open a ticket' },
@@ -1763,7 +1811,18 @@ export const STRINGS = {
   'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
   'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
   'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
-  'con.done': { ar: 'إغلاق', en: 'Done' },
+  'con.new': { ar: 'جهة اتصال جديدة', en: 'New contact' },
+  'con.newNote': {
+    ar: 'اسمه وإيميله والصلاحيات اللي هيشتغل بيها. الإيميل ده اللي هيدخل بيه.',
+    en: 'Their name, their email, and what they are allowed to do. The email is what they sign in with.',
+  },
+  'con.create': { ar: 'أضف الجهة', en: 'Add contact' },
+  'con.added': { ar: 'الجهة اتضافت', en: 'Contact added' },
+  'con.mailBad': {
+    ar: 'اكتب إيميل كامل وصح — الجهة بتدخل بيه.',
+    en: 'Enter a complete, valid email — the contact signs in with it.',
+  },
+  'con.mailTaken': { ar: 'فيه جهة اتصال بالإيميل ده خلاص.', en: 'A contact with this email already exists.' },
 
 
   /* Table toolbars — the search field and filter pills above every client-area table. The
