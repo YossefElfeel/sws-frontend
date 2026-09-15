@@ -1760,7 +1760,18 @@ export const STRINGS = {
   'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
   'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
   'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
-  'con.done': { ar: 'إغلاق', en: 'Done' },
+  'con.new': { ar: 'جهة اتصال جديدة', en: 'New contact' },
+  'con.newNote': {
+    ar: 'اسمه وإيميله والصلاحيات اللي هيشتغل بيها. الإيميل ده اللي هيدخل بيه.',
+    en: 'Their name, their email, and what they are allowed to do. The email is what they sign in with.',
+  },
+  'con.create': { ar: 'أضف الجهة', en: 'Add contact' },
+  'con.added': { ar: 'الجهة اتضافت', en: 'Contact added' },
+  'con.mailBad': {
+    ar: 'اكتب إيميل كامل وصح — الجهة بتدخل بيه.',
+    en: 'Enter a complete, valid email — the contact signs in with it.',
+  },
+  'con.mailTaken': { ar: 'فيه جهة اتصال بالإيميل ده خلاص.', en: 'A contact with this email already exists.' },
 
 
   /* Table toolbars — the search field and filter pills above every client-area table. The
