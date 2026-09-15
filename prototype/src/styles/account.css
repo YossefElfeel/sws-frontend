@@ -990,12 +990,23 @@
 }
 
 /*
- * An invoice is a document before it is a screen, and the document runs the width of the page
- * it is on — see the note on .app__main .invoice in app.css for what the measure was costing.
+ * The document and the balance stand level.
  *
- * The pay panel used to hold the second column for the whole height of the layout; it now
- * takes that column beside the ledger, one row down, so the document has the content area to
- * itself and the ground under the panel is the ledger rather than nothing.
+ * The document ran the full content width for a while, on the reading that an invoice is a page
+ * and a page has no column beside it. Two things came of it, and both are why it does not any
+ * more. The amount owed ended up a screen below the amount billed — worse once the page head
+ * gave up its own Pay now — and the document, given twice the width its own contents want,
+ * spent most of a card on empty ground: the totals sit at the end edge and nothing sits beside
+ * them.
+ *
+ * So the balance card takes the second column from the top, and the document takes the first.
+ * The two edges the reader compares are then one glance apart. What the document fills is its
+ * column — which is what the printable measure used to stop it doing, leaving it a hair
+ * narrower than the ledger beneath it; the measure stays gone.
+ *
+ * 24px between them, not 16: it is the gap every other two-column screen in the client area
+ * already uses, and a document beside a card is the least likely pair on which to start
+ * spending a different one.
  */
 .invoice-detail {
   display: grid;
@@ -1011,10 +1022,6 @@
 @media (min-width: 1024px) {
   .invoice-detail {
     grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
-  }
-
-  .invoice-detail > .invoice {
-    grid-column: 1 / -1;
   }
 }
 
