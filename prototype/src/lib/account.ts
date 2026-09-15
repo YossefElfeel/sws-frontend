@@ -447,8 +447,16 @@ export const DOMAINS: DomainRecord[] = [
   },
 ];
 
-export type DnsType = 'A' | 'AAAA' | 'CNAME' | 'MX' | 'TXT';
-export const DNS_TYPES: DnsType[] = ['A', 'AAAA', 'CNAME', 'MX', 'TXT'];
+/*
+ * The seven types WHMCS's DNS management offers, in its order. The last two are not zone
+ * records but redirects: WHMCS carries them as URL and FRAME and shows them as Forward and
+ * Stealth Forward, so the code is what the record stores and the label is what a person reads.
+ */
+export type DnsType = 'A' | 'AAAA' | 'CNAME' | 'URL' | 'TXT' | 'MX' | 'FRAME';
+export const DNS_TYPES: DnsType[] = ['A', 'AAAA', 'CNAME', 'URL', 'TXT', 'MX', 'FRAME'];
+
+/** Both redirects send the visitor elsewhere; only one of them says so in the address bar. */
+export const isDnsRedirect = (type: DnsType) => type === 'URL' || type === 'FRAME';
 
 export interface DnsRecord {
   id: string;
@@ -465,6 +473,8 @@ export const DNS_RECORDS: DnsRecord[] = [
   { id: 'r3', type: 'MX', host: '@', value: 'mail.somion.ch', ttl: 3600 },
   { id: 'r4', type: 'TXT', host: '@', value: 'v=spf1 include:somion.ch ~all', ttl: 3600 },
   { id: 'r5', type: 'CNAME', host: 'cdn', value: 'cdn.somion.ch', ttl: 1800 },
+  { id: 'r6', type: 'URL', host: 'shop', value: 'https://atelier-kamal.com/shop', ttl: 3600 },
+  { id: 'r7', type: 'FRAME', host: 'portfolio', value: 'https://atelier-kamal.com/work', ttl: 3600 },
 ];
 
 /** dom-3 is empty on purpose: its nameservers are elsewhere, which is the DNS page's empty state. */

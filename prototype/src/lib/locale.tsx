@@ -2018,6 +2018,21 @@ export const STRINGS = {
   'dom.dnsNoneNote': { ar: 'أضف أول سجل من النموذج اللي فوق.', en: 'Add the first record from the form above.' },
   'dom.dnsExternal': { ar: 'الدومين ده بيستخدم خوادم أسماء خارجية، فالسجلات اللي هنا مش هتتطبّق لحد ما ترجّعه لخوادمنا. الخوادم الحالية:', en: 'This domain uses external nameservers, so records here do not apply until it points back to ours. Current nameservers:' },
   'dom.ttl': { ar: 'TTL', en: 'TTL' },
+  /*
+   * The record types, as WHMCS names them. Five are codes a person types into a zone file and
+   * reads the same in both languages; the two redirects are words, so they translate — and
+   * "Stealth Forward" is the one name in the menu nobody can guess, hence the note under it.
+   */
+  'dns.A': { ar: 'A', en: 'A' },
+  'dns.AAAA': { ar: 'AAAA', en: 'AAAA' },
+  'dns.CNAME': { ar: 'CNAME', en: 'CNAME' },
+  'dns.URL': { ar: 'تحويل', en: 'Forward' },
+  'dns.TXT': { ar: 'TXT', en: 'TXT' },
+  'dns.MX': { ar: 'MX', en: 'MX' },
+  'dns.FRAME': { ar: 'تحويل مخفي', en: 'Stealth Forward' },
+  'dom.forwardNote': { ar: 'الزائر هيتنقل للعنوان اللي هنا، وهيلاقيه مكتوب في شريط العنوان عنده.', en: 'The visitor is sent to the address you enter here, and the address bar shows it.' },
+  'dom.forwardBad': { ar: 'اكتب العنوان كامل ببدايته، زي https://example.com/shop', en: 'Write the full address with its scheme, like https://example.com/shop' },
+  'dom.frameNote': { ar: 'الصفحة هتتفتح جوه إطار، وشريط العنوان هيفضل مكتوب فيه دومينك مش العنوان اللي هنا.', en: 'The page opens inside a frame, and the address bar keeps your domain instead of the address you enter here.' },
   'dom.contacts': { ar: 'بيانات الدومين', en: 'Domain contacts' },
   'dom.contactsLede': { ar: 'مهم جدًا تفضل بيانات مالك الدومين محدّثة، عشان ماتخسرش الدومين لو حصل نزاع أو نقل.', en: 'Keep the owner details current — they are what decides who keeps the domain in a dispute or a transfer.' },
   'dom.contact.registrant': { ar: 'المالك', en: 'Registrant' },
