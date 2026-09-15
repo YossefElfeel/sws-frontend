@@ -244,6 +244,33 @@ export const SERVICES: Service[] = [
     usageAt: '2026-08-11 00:00',
     addons: [],
   },
+  /*
+   * A VPS that is actually running. The only one in here was cancelled, which left the server
+   * page reviewable in one state and the four usage graphs reviewable in none — a graph of a
+   * machine that has been switched off is a flat line, and a flat line proves nothing about the
+   * chart drawing it. The cancelled one stays: it is the fixture that exercises `renews()`.
+   */
+  {
+    id: 'svc-2470',
+    product: 'VPS 4',
+    domain: 'nile-analytics.com',
+    status: 'active',
+    nextDue: '2026-10-14',
+    cycle: 'monthly',
+    amountUsdMinor: 3200,
+    since: '2026-03-14',
+    server: 'ch-zrh-vps02',
+    ip: '185.42.118.61',
+    diskUsedGb: 47.2,
+    diskTotalGb: 160,
+    bandwidthUsedGb: 310,
+    bandwidthTotalGb: 8000,
+    kind: 'vps',
+    autoRenew: true,
+    paymentMethod: 'pm1',
+    usageAt: '2026-09-14 12:00',
+    addons: ['monitoring:plus'],
+  },
   {
     id: 'svc-1848',
     product: 'VPS 2',
