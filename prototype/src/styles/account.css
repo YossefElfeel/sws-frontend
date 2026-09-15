@@ -1622,6 +1622,13 @@
  * to the bottom by an auto margin. Descriptions are a different length in every card, so
  * without that the button rows would sit at three different heights across one row of cards.
  */
+/* The picker sits over the cards it governs, so it is ruled to the same width as the row of
+   them — its end and the end of the last card are one line, at every width the grid takes. */
+.addon-pick {
+  inline-size: 100%;
+  margin-block-end: var(--sws-space-16);
+}
+
 .addon-cards {
   display: grid;
   gap: var(--sws-space-16);

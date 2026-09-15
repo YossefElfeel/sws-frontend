@@ -1,6 +1,7 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { DomainPage } from '../../components/DomainRail';
+import { DomainAddonCards } from '../../components/DomainAddonCards';
 import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
 import { Tag, DOMAIN_TONE } from '../../components/Tag';
@@ -14,7 +15,6 @@ import {
   IconCheck,
   IconCopy,
   IconArrow,
-  IconShield,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
@@ -908,128 +908,17 @@ export function DomainPrivateNs() {
 /* ── add-ons — C-39 ─────────────────────────────────────────────────────────── */
 
 export function DomainAddonsPage() {
-  const { t, locale } = useLocale();
-  const { currency } = usePrefs();
-  const { dom, updateDomain, saved, mark, clear } = useDomainPage();
+  const { t } = useLocale();
+  const { dom } = useDomainPage();
 
   if (!dom) return <Navigate to="/account/domains" replace />;
-  const base = `/account/domains/${dom.id}`;
-
-  const rows: {
-    key: string;
-    titleKey: string;
-    noteKey: string;
-    icon: ReactNode;
-    on: boolean;
-    patch: Partial<DomainRecord>;
-    manage?: string;
-    /* Where the add-on is managed when it is off — the card says so rather than going quiet. */
-    manageKey?: string;
-  }[] = [
-    {
-      key: 'dns',
-      titleKey: 'domainsconf.dns',
-      noteKey: 'domainsconf.dnsNote',
-      icon: <IconGlobe size={26} />,
-      on: dom.dnsManagement,
-      patch: { dnsManagement: !dom.dnsManagement },
-      manage: `${base}/dns`,
-      manageKey: 'dom.dns',
-    },
-    {
-      key: 'id',
-      titleKey: 'domainsconf.id',
-      noteKey: 'domainsconf.idNote',
-      icon: <IconShield size={26} />,
-      on: dom.whoisPrivacy,
-      patch: { whoisPrivacy: !dom.whoisPrivacy },
-      /* Privacy has no screen of its own: it is a yes or a no, and the switch here is all of
-         it. The transfer-out page shows the same state because a locked identity is part of
-         what stops a transfer, but it is not a second place to set it. */
-    },
-    {
-      key: 'forwarding',
-      titleKey: 'domainsconf.forwarding',
-      noteKey: 'domainsconf.forwardingNote',
-      icon: <IconMail size={26} />,
-      on: dom.emailForwarding,
-      patch: { emailForwarding: !dom.emailForwarding },
-      manage: `${base}/forwarding`,
-      manageKey: 'dom.forwarding',
-    },
-  ];
 
   return (
     <DomainPage dom={dom} sectionKey="dom.addons">
-      <SavedNote saved={saved} onDismiss={clear} />
       <p className="card__body u-mb-16">{t('dom.addonsLede')}</p>
-
-      {/*
-        One card per add-on, because each is a thing you decide about on its own — what it is,
-        what it costs, whether it is on, and the one or two ways in. As ruled rows they read as
-        a table of settings; as cards they read as the three services they are, which is what
-        the reference the product owner is working from shows.
-
-        The three are one object: the same edges, the same inner padding, the heading and the
-        glyph in the same place on each, and the button row pinned to the bottom of the card
-        rather than to the end of a description that is a different length in every one.
-      */}
-      <div className="addon-cards">
-        {rows.map((r) => (
-          <article className="card addon-card" key={r.key}>
-            <span className="addon-card__icon" aria-hidden="true">
-              {r.icon}
-            </span>
-            <h2 className="addon-card__name">{t(r.titleKey as never)}</h2>
-            <p className="addon-card__note">{t(r.noteKey as never)}</p>
-            <p className="addon-card__price serial">
-              {formatAmount(0, locale)} {currency} / {t('domainsconf.perYear')}
-            </p>
-
-            {/* The state sits with the buttons it is the state of, above the row it labels. */}
-            <p className="addon-card__state">
-              {r.on ? (
-                <Tag tone="ok">
-                  <IconCheck size={13} />
-                  {t('dom.enabled')}
-                </Tag>
-              ) : (
-                <Tag tone="neutral">{t('dom.disabled')}</Tag>
-              )}
-            </p>
-
-            <div className="addon-card__acts">
-              {r.manage && (
-                /*
-                 * Reachable whether the add-on is on or off. Off, the screen behind it is what
-                 * explains the thing well enough to decide — the DNS records this domain would
-                 * carry, the forwards it would honour — and a button that vanishes with the
-                 * switch leaves somebody deciding from one sentence.
-                 */
-                <Link className="btn btn--md btn--primary" to={r.manage}>
-                  {t('svc.manage')}
-                  <IconArrow size={15} />
-                </Link>
-              )}
-              {/*
-                Managing leads, switching off follows. Somebody opening this tab is far more
-                often here to change a record than to turn the add-on off, and the reference
-                orders them the same way.
-              */}
-              <Button
-                size="md"
-                variant={r.on ? 'danger' : 'primary'}
-                onClick={() => {
-                  updateDomain(dom.id, r.patch);
-                  mark();
-                }}
-              >
-                {t(r.on ? 'dom.disable' : 'dom.enable')}
-              </Button>
-            </div>
-          </article>
-        ))}
-      </div>
+      {/* The cards, the switches, and the dialog behind each switch-off, are one component,
+          shared with the hosting section's add-ons page so that the two cannot drift apart. */}
+      <DomainAddonCards dom={dom} />
     </DomainPage>
   );
 }

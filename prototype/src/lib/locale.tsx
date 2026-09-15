@@ -457,22 +457,53 @@ export const STRINGS = {
   'rail.categories': { ar: 'الفئات', en: 'Categories' },
   'rail.actions': { ar: 'إجراءات', en: 'Actions' },
 
-  // ── hosting add-ons — spec 7.2 step three, lifted out of the order flow ─────
-  // The three things a plan can carry, described before somebody is three screens into
-  // buying rather than after. Each card leads to the page that already sells it.
+  // ── the add-ons tab — the three extra services a domain carries ────────────
+  // The same three cards a domain shows on its own Add-ons tab, from the same component, with
+  // a picker in front of them: one page that answers which domain has which of them on.
   'rail.addons': { ar: 'الخدمات الإضافية', en: 'Add-ons' },
   'hostaddon.lede': {
-    ar: 'الحاجات اللي تقدر تضيفها لأي خطة استضافة. شوف كل واحدة بتعمل إيه وبتبدأ من كام قبل ما تختار خطتك.',
-    en: 'What a hosting plan can carry. What each one does and what it starts at, before you pick a plan rather than after.',
+    ar: 'الخدمات الإضافية اللي بتيجي مع أي دومين عندك. اختار الدومين وشوف المفعّل منها، وفعّل أو وقّف اللي إنت عايزه.',
+    en: 'The extra services every domain of yours carries. Pick a domain to see which are on, and turn any of them on or off.',
   },
-  'hostaddon.from': { ar: 'من', en: 'From' },
-  'hostaddon.see': { ar: 'شوف الخطط', en: 'See the tiers' },
-  'hostaddon.freeTier': { ar: 'فيه باقة مجانية', en: 'Has a free tier' },
-  'hostaddon.withPlan': {
-    ar: 'كل دي بتتضاف على خطة استضافة، وتقدر تختارها وإنت بتطلب.',
-    en: 'Each of these attaches to a hosting plan, and you can pick them while you order.',
+  'hostaddon.pick': { ar: 'الدومين', en: 'Domain' },
+  'hostaddon.more': {
+    ar: 'باقي إعدادات الدومين — السيرفرات وبيانات المالك والنقل — في صفحة الدومين نفسه.',
+    en: 'The rest of a domain’s settings — nameservers, owner details, transfers — live on its own page.',
   },
-  'hostaddon.seePlans': { ar: 'اتفرّج على خطط الاستضافة', en: 'See the hosting plans' },
+  'hostaddon.openDomain': { ar: 'افتح صفحة الدومين', en: 'Open the domain' },
+  'hostaddon.none': { ar: 'مفيش دومينات على الحساب ده لسه.', en: 'No domains on this account yet.' },
+
+  // Switching one of the three off asks first, and the dialog says what it costs. Switching
+  // one on does not ask: a confirmation in front of a harmless act teaches people to press
+  // through confirmations, which is how the one that matters gets pressed through too.
+  'domaddon.onDomain': { ar: 'على الدومين', en: 'On the domain' },
+  'domaddon.idOffTitle': { ar: 'توقف حماية بيانات المالك؟', en: 'Turn off ID protection?' },
+  'domaddon.idOffLede': {
+    ar: 'الحماية بتحط بيانات وسيط مكان بياناتك في سجل WHOIS العام. لو وقفتها، بياناتك إنت هي اللي هتظهر.',
+    en: 'The add-on stands a proxy’s details in the public WHOIS record where yours would be. Turn it off and your own are what shows.',
+  },
+  'domaddon.idOffWarn': { ar: 'ده بينشر بيانات شخصية', en: 'This publishes personal details' },
+  'domaddon.idOffWarnNote': {
+    ar: 'اسم مالك الدومين وعنوانه وإيميله وتليفونه هيبقوا متاحين لأي حد يستعلم عن الدومين — وده مصدر معروف للرسايل المزعجة ومحاولات النصب على أصحاب الدومينات.',
+    en: 'The owner’s name, address, email and phone become available to anyone who looks the domain up — a known source of the spam and the registrar-impersonation mail domain owners get.',
+  },
+  'domaddon.dnsOffTitle': { ar: 'توقف إدارة DNS؟', en: 'Turn off DNS management?' },
+  'domaddon.dnsOffLede': {
+    ar: 'السجلات المحفوظة مش هتتمسح، بس سيرفراتنا هتبطل ترد بيها. الموقع أو البريد المعتمد عليها ممكن يقف لحد ما توجّه الدومين لمكان تاني.',
+    en: 'The saved records are not deleted, but our nameservers stop answering with them. A site or a mailbox relying on them can go dark until the domain points somewhere else.',
+  },
+  'domaddon.fwdOffTitle': { ar: 'توقف تحويل البريد؟', en: 'Turn off email forwarding?' },
+  'domaddon.fwdOffLede': {
+    ar: 'التحويلات اللي ضفتها هتفضل محفوظة، بس الرسايل الجاية على العناوين دي هتبطل توصل لبريدك.',
+    en: 'The forwards you added are kept, but mail arriving at those addresses stops reaching your mailbox.',
+  },
+  'domaddon.idOn': { ar: 'حماية بيانات المالك اتفعّلت', en: 'ID protection is on' },
+  'domaddon.idOff': { ar: 'حماية بيانات المالك اتوقفت', en: 'ID protection is off' },
+  'domaddon.dnsOn': { ar: 'إدارة DNS اتفعّلت', en: 'DNS management is on' },
+  'domaddon.dnsOff': { ar: 'إدارة DNS اتوقفت', en: 'DNS management is off' },
+  'domaddon.fwdOn': { ar: 'تحويل البريد اتفعّل', en: 'Email forwarding is on' },
+  'domaddon.fwdOff': { ar: 'تحويل البريد اتوقف', en: 'Email forwarding is off' },
+
   'rail.renew': { ar: 'تجديد دومين', en: 'Renew domains' },
   'rail.register': { ar: 'تسجيل دومين جديد', en: 'Register a new domain' },
   'rail.transfer': { ar: 'نقل دومين', en: 'Transfer in a domain' },

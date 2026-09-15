@@ -1,97 +1,70 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { HostingLayout } from '../components/HostingLayout';
-import { IconShield, IconSpark, IconPulse, IconArrow } from '../components/icons';
+import { DomainAddonCards } from '../components/DomainAddonCards';
+import { Select } from '../components/Select';
 import { useLocale } from '../lib/locale';
-import { usePrefs } from '../lib/prefs';
-import { convert, formatAmount, ADDONS } from '../lib/catalog';
+import { useAccountState } from '../lib/accountState';
 
 /**
- * The add-ons a hosting plan can carry — spec 7.2's third step, given a page of its own.
+ * The add-ons tab — the three extra services that ride on a domain.
  *
- * Until now the only place these three were described was inside the order flow, at the step
- * after somebody had already chosen a plan. That is the wrong moment to meet them for the
- * first time: a person deciding between Single and Ultra wants to know a certificate is
- * fifteen dollars a year before they are three screens into buying something, not after.
+ * Identity protection, DNS management and email forwarding each have a tab of their own under
+ * a single domain already. This page is the other way round: one place that answers "which of
+ * my domains has privacy on?" without opening three domains in turn to find out.
  *
- * So the rail gets a page that says what each one is, what it starts at, and where to go for
- * it — and every card leads somewhere that already sells the thing, rather than to a switch
- * this page has no plan to attach to.
+ * Which is why the picker is at the top and not a heading. The cards below are the same three
+ * cards the domain's own tab shows, from the same component, acting on the same record — the
+ * switch thrown here reads as thrown there a moment later.
  */
-
-/** Where each add-on is actually sold. All three are pages the site already has. */
-const DESTINATION: Record<string, { to: string; icon: JSX.Element }> = {
-  ssl: { to: '/ssl', icon: <IconShield size={26} /> },
-  builder: { to: '/builder', icon: <IconSpark size={26} /> },
-  monitoring: { to: '/hosting/monitoring', icon: <IconPulse size={26} /> },
-};
-
 export function HostingAddons() {
-  const { t, locale } = useLocale();
-  const { currency } = usePrefs();
+  const { t } = useLocale();
+  const { domains } = useAccountState();
+  const [picked, setPicked] = useState(domains[0]?.id ?? '');
+
+  /* Falls back rather than blanking: a domain can leave the list while its id is still held. */
+  const dom = domains.find((d) => d.id === picked) ?? domains[0];
 
   return (
     <HostingLayout
       title={t('rail.addons')}
       lede={t('hostaddon.lede')}
-      crumbs={[
-        { label: t('nav.hosting'), to: '/hosting/shared' },
-        { label: t('rail.addons') },
-      ]}
+      crumbs={[{ label: t('nav.hosting'), to: '/hosting/shared' }, { label: t('rail.addons') }]}
     >
-      <div className="addon-cards">
-        {ADDONS.map((group) => {
-          const dest = DESTINATION[group.id];
-          /*
-           * "From" is the cheapest option somebody actually pays for. Every group opens with a
-           * `none` at zero and two of the three carry a free tier as well, so the lowest price
-           * in the list is 0.00 for all three — a price row that says free three times, under
-           * three products two of which are not.
-           */
-          const paid = group.options.filter((o) => o.id !== 'none' && o.priceUsdMinor > 0);
-          const from = paid.reduce(
-            (low, o) => (o.priceUsdMinor < low.priceUsdMinor ? o : low),
-            paid[0],
-          );
-          const free = group.options.some((o) => o.id !== 'none' && o.priceUsdMinor === 0);
+      {dom ? (
+        <>
+          <label className="field-label addon-pick">
+            <span className="eyebrow">{t('hostaddon.pick')}</span>
+            {/*
+              The page's own direction, not the value's. The extension pickers are dir="ltr"
+              because ".com" is a fragment that bidi will smudge against whatever sits beside
+              it; a domain name is a whole strong-LTR run and needs no help reading. Forcing
+              LTR on a field this wide only moves the value to the far end of the row from the
+              label that names it, and puts the chevron on the wrong side of an Arabic page.
+            */}
+            <Select value={dom.id} onChange={(e) => setPicked(e.target.value)}>
+              {domains.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </Select>
+          </label>
 
-          return (
-            <article className="card addon-card" key={group.id}>
-              <span className="addon-card__icon" aria-hidden="true">
-                {dest.icon}
-              </span>
-              <h2 className="addon-card__name">{t(group.titleKey as never)}</h2>
-              <p className="addon-card__note">{t(group.bodyKey as never)}</p>
-              <p className="addon-card__price serial">
-                {t('hostaddon.from')}{' '}
-                <bdi>
-                  {formatAmount(convert(from.priceUsdMinor, currency), locale)} {currency}
-                </bdi>{' '}
-                {t(from.per === 'year' ? 'dom.perYear' : 'cycle.perMonth')}
-              </p>
+          <DomainAddonCards dom={dom} />
 
-              {/* A free tier is a reason to look, so it is said on the card rather than found
-                  two screens in. It is not the price, which is why it is not in the price. */}
-              <p className="addon-card__state">
-                {free && <span className="tag tag--ok">{t('hostaddon.freeTier')}</span>}
-              </p>
-
-              <div className="addon-card__acts">
-                <Link className="btn btn--md btn--primary" to={dest.to}>
-                  {t('hostaddon.see')}
-                  <IconArrow size={15} />
-                </Link>
-              </div>
-            </article>
-          );
-        })}
-      </div>
-
-      {/* The other half of the answer: these attach to a plan, and the plans are one press
-          away. Without it the page is a shop window with no door back into the shop. */}
-      <p className="section__lede u-mt-16">
-        {t('hostaddon.withPlan')}{' '}
-        <Link to="/hosting/shared">{t('hostaddon.seePlans')}</Link>
-      </p>
+          {/* The rest of what a domain carries is a press away. Without it this page is three
+              switches with no way down into the thing they belong to. */}
+          <p className="section__lede u-mt-16">
+            {t('hostaddon.more')}{' '}
+            <Link to={`/account/domains/${dom.id}`}>{t('hostaddon.openDomain')}</Link>
+          </p>
+        </>
+      ) : (
+        <p className="section__lede">
+          {t('hostaddon.none')} <Link to="/domains">{t('rail.register')}</Link>
+        </p>
+      )}
     </HostingLayout>
   );
 }
