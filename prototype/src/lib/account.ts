@@ -544,6 +544,30 @@ export const INVOICES: Invoice[] = [
     taxUsdMinor: 168,
     totalUsdMinor: 1367,
   },
+  /**
+   * Overdue, and part-paid — the two things this list could not be reviewed in.
+   *
+   * `delta-fisheries.com` is the suspended service in SERVICES and this is what suspended it:
+   * a manual bank transfer for an August term that never arrived in full. What did arrive is
+   * one transfer of 5.00 against 8.55, which is the ordinary failure of a manual gateway —
+   * someone converts at their own rate, or sends what is in the account that day — and it is
+   * why the balance on an invoice has to be arithmetic over its ledger rather than a second
+   * copy of the total. Every fixture before this one was either settled in full or untouched,
+   * so the figure and the sum agreed by accident and proved nothing.
+   */
+  {
+    id: 'inv-4291',
+    number: 'INV-20260805-4291',
+    date: '2026-08-05',
+    due: '2026-08-12',
+    status: 'overdue',
+    method: 'bank',
+    lines: [
+      { product: 'Pro', domain: 'delta-fisheries.com', cycle: 'monthly', from: '2026-08-05', to: '2026-09-04', amountUsdMinor: 750 },
+    ],
+    taxUsdMinor: 105,
+    totalUsdMinor: 855,
+  },
   {
     id: 'inv-4310',
     number: 'INV-20260801-4310',
@@ -592,6 +616,27 @@ export const INVOICES: Invoice[] = [
     lines: [{ product: 'Ultra', domain: 'atelier-kamal.com', cycle: 'monthly', from: '2026-07-14', to: '2026-08-13', amountUsdMinor: 1000 }],
     taxUsdMinor: 140,
     totalUsdMinor: 1140,
+  },
+  /**
+   * Cancelled — raised by the renewal cron, then withdrawn before it came due.
+   *
+   * The VPS on `maadi-labs.net` is the cancelled service in SERVICES, and this is the invoice
+   * its cancellation caught: issued a fortnight ahead of the 30 June term, voided when the
+   * request came in. Nothing was ever paid against it and nothing is owed on it, which is the
+   * distinction every screen that reads an invoice has to hold — a cancelled one is neither a
+   * paid one nor a debt, and until now no row on the account made them say which.
+   */
+  {
+    id: 'inv-4121',
+    number: 'INV-20260616-4121',
+    date: '2026-06-16',
+    due: '2026-06-30',
+    status: 'cancelled',
+    lines: [
+      { product: 'VPS 2', domain: 'maadi-labs.net', cycle: 'monthly', from: '2026-06-30', to: '2026-07-29', amountUsdMinor: 1700 },
+    ],
+    taxUsdMinor: 238,
+    totalUsdMinor: 1938,
   },
   {
     id: 'inv-4062',
@@ -894,6 +939,16 @@ export interface Txn {
  * ones ticket #7688 describes.
  */
 export const TRANSACTIONS: Txn[] = [
+  /* The short transfer on the overdue invoice — 5.00 against 8.55, so 3.55 is still owed. */
+  {
+    id: 'txn-5544',
+    at: '2026-08-20',
+    kind: 'payment',
+    invoice: 'INV-20260805-4291',
+    gateway: 'bank',
+    reference: 'TRF-99188',
+    amountUsdMinor: 500,
+  },
   {
     id: 'txn-5520',
     at: '2026-08-12',
@@ -975,8 +1030,13 @@ export function invoiceLedger(inv: Invoice): Txn[] {
 /**
  * total − credit applied − (payments + refunds). A credit row in the ledger is the same money
  * as creditUsdMinor shown a second way, so it is not counted twice.
+ *
+ * A cancelled invoice owes nothing whatever its total says. The arithmetic below would have
+ * reported 19.38 due on the withdrawn VPS renewal — the figure the invoice would have carried
+ * had it stood — and a balance on a void document is a demand for money nobody is owed.
  */
 export function invoiceBalanceUsdMinor(inv: Invoice): number {
+  if (inv.status === 'cancelled') return 0;
   const settled = invoiceLedger(inv)
     .filter((x) => x.kind !== 'credit')
     .reduce((s, x) => s + x.amountUsdMinor, 0);

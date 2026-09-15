@@ -114,6 +114,7 @@ export const ROUTES = [
   { name: 'acc-invoice-paid', path: '#/account/invoices/inv-3950' },
   { name: 'acc-status', path: '#/account/status' },
   { name: 'acc-status-clear', path: '#/account/status?state=clear' },
+
   // 2026-09-15 — saving a card is its own screen rather than the checkout's payment screen
   // (C-19's `add` state). Both variants of it, the card list as it looks on the way back, and
   // the two bank moments in setup mode, where nothing is being paid.
@@ -122,4 +123,12 @@ export const ROUTES = [
   { name: 'acc-payment-methods-added', path: '#/account/payment-methods?added=1&primary=1' },
   { name: '3ds-setup-go', path: '#/checkout/3ds?setup=card' },
   { name: '3ds-setup-back', path: '#/checkout/3ds?setup=card&state=return' },
+
+  // 2026-09-15 — the two invoice states the account had no row in, and the request the
+  // invoices row menu opens. The list itself is already covered by acc-invoices; what needed
+  // its own entry is each document, since the sidebar beside it differs per state: a part-paid
+  // overdue one still takes a payment, a cancelled one takes nothing.
+  { name: 'acc-invoice-overdue', path: '#/account/invoices/inv-4291' },
+  { name: 'acc-invoice-cancelled', path: '#/account/invoices/inv-4121' },
+  { name: 'acc-ticket-new-invoice', path: '#/account/tickets/new?invoice=inv-4291' },
 ];

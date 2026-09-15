@@ -32,9 +32,9 @@ import {
   ARTICLES,
   KB_CATEGORIES,
   SERVICES,
-  INVOICES,
   type TicketStatus,
 } from '../../lib/account';
+import { useAccountState } from '../../lib/accountState';
 import { SYSTEMS, INCIDENTS } from '../../lib/marketing';
 import { Select } from '../../components/Select';
 
@@ -208,17 +208,26 @@ export function TicketNew() {
   const from = SERVICES.find((s) => s.id === params.get('service'));
 
   /*
-   * The same courtesy for money. A payment that went wrong is the worst moment to ask someone
-   * to go and find their invoice number, so the invoice screen sends it, and the department
-   * opens on Sales and Billing rather than on Technical Support — the queue that can actually
-   * look at a charge.
+   * The same courtesy for an invoice, and now for two reasons.
+   *
+   * A payment that went wrong is the worst moment to ask somebody to go and find their
+   * invoice number, so the invoice screen sends it. And the invoices list has an Edit item
+   * that arrives here too, because an invoice s own lines are not the client s to change —
+   * see `dev.invoiceActions`. Either way the subject opens naming the invoice and the
+   * department opens on Sales and Billing rather than Technical Support, which is the queue
+   * that can actually look at a charge.
+   *
+   * The lookup goes through account state rather than the INVOICES fixture: an invoice the
+   * account has cancelled or taken off its list must not come back here as a live subject.
    */
-  const invoice = INVOICES.find((i) => i.id === params.get('invoice'));
+  const invoiceId = params.get('invoice');
+  const { invoice } = useAccountState();
+  const about = invoiceId ? invoice(invoiceId) : undefined;
 
-  const [dept, setDept] = useState(invoice ? 'sales' : 'tech');
+  const [dept, setDept] = useState(about ? 'sales' : 'tech');
   const [subject, setSubject] = useState(
-    invoice
-      ? `${invoice.number}: `
+    about
+      ? `${t('inv.forInvoice')} ${about.number}: `
       : from
         ? `${from.product} — ${from.domain}: `
         : '',

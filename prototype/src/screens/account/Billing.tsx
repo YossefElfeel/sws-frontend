@@ -17,11 +17,16 @@ import {
   IconShield,
   IconCoin,
   IconSupport,
+  IconClose,
+  IconPencil,
+  IconTrash,
 } from '../../components/icons';
+import { RowMenu, type RowMenuItem } from '../../components/RowMenu';
 import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import { useLocale } from '../../lib/locale';
 import { useSaved, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
+import { useAccountState } from '../../lib/accountState';
 import {
   convert,
   formatAmount,
@@ -31,7 +36,6 @@ import {
   TAX_RATE,
 } from '../../lib/catalog';
 import {
-  INVOICES,
   PAYMENT_METHODS_SAVED,
   ACCOUNT,
   COMPANY,
@@ -65,18 +69,41 @@ function RefundTag({ inv }: { inv: Invoice }) {
 export function Invoices() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
+  const { invoices, updateInvoice, removeInvoice } = useAccountState();
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<InvoiceStatus | 'all'>('all');
+  const { saved, mark, clear } = useSaved(6000);
+  /*
+   * One banner for three different things — a PDF that is not wired up, an invoice cancelled,
+   * an invoice taken off the list — so the body has to travel with the title rather than sit
+   * under it as a constant. The two are always set together, by `say`.
+   */
+  const [note, setNote] = useState<string | null>(null);
+  const say = (title: string, body: string) => {
+    setNote(body);
+    mark(title);
+  };
+
+  const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
 
   // An invoice is looked up by its number or by what it was for, so the line items are part of
   // the haystack: "the one with the .eg domain on it" is how people describe an invoice.
-  const rows = INVOICES.filter(
+  const rows = invoices.filter(
     (i) =>
       (filter === 'all' || i.status === filter) &&
       matches(q, i.number, i.date, i.due, ...i.lines.map((l) => `${l.product} ${l.domain ?? ''}`)),
   );
-  const owing = INVOICES.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
-  const owed = owing.reduce((s, i) => s + i.totalUsdMinor, 0);
+  const owing = invoices.filter((i) => i.status === 'unpaid' || i.status === 'overdue');
+  /*
+   * What is owed, not what was billed.
+   *
+   * These used to be one number, because every unpaid fixture was untouched. One of them
+   * carries a part payment now, so the totals add up to more than the debt — and the figure
+   * this card prints is the one the Pay button beside it will ask for, which is the balance.
+   * The payment screens have always read `invoiceBalanceUsdMinor`; this is the card agreeing
+   * with them rather than with the column.
+   */
+  const owed = owing.reduce((s, i) => s + invoiceBalanceUsdMinor(i), 0);
 
   return (
     <AccountLayout
@@ -93,6 +120,10 @@ export function Invoices() {
         </>
       }
     >
+      <SavedNote saved={saved} onDismiss={clear}>
+        {note ? t(note as never) : undefined}
+      </SavedNote>
+
       {/* What is owed belongs above the list of everything ever billed, not inside it. */}
       {owing.length > 0 && (
         <Card
@@ -154,37 +185,71 @@ export function Invoices() {
                 <th scope="col" className="num">{t('col.amount')}</th>
                 <th scope="col">{t('account.status')}</th>
                 <th scope="col" />
+                {/* Named for a screen reader, and `data__own` so the hidden label has a
+                    positioned ancestor to resolve against — see `.data__own`. */}
+                <th scope="col" className="data__own">
+                  <span className="u-visually-hidden">{t('inv.rowMenu')}</span>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((inv) => (
-                <tr key={inv.id}>
-                  <td><span className="lead serial"><bdi>{inv.number}</bdi></span></td>
-                  <td className="serial"><bdi>{inv.date}</bdi></td>
-                  <td className="serial"><bdi>{inv.due}</bdi></td>
-                  <td className="num">
-                    {formatAmount(convert(inv.totalUsdMinor, currency), locale)} {currency}
-                  </td>
-                  <td>
-                    <p className="tags">
-                      <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
-                      <RefundTag inv={inv} />
-                    </p>
-                  </td>
-                  <td className="num">
-                    <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
-                      {t('inv.view')}
-                      <IconArrow size={14} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {rows.map((inv) => {
+                const balance = invoiceBalanceUsdMinor(inv);
+                return (
+                  <tr key={inv.id}>
+                    <td><span className="lead serial"><bdi>{inv.number}</bdi></span></td>
+                    <td className="serial"><bdi>{inv.date}</bdi></td>
+                    <td className="serial"><bdi>{inv.due}</bdi></td>
+                    <td className="num">
+                      <span className="serial">{money(inv.totalUsdMinor)}</span>
+                      {/* A part payment splits the total from the debt, and this column is
+                          headed "amount" — so what is still owed is named under it rather than
+                          left for the reader to work out from a ledger two screens away. */}
+                      {balance > 0 && balance !== inv.totalUsdMinor && (
+                        <span className="data__sub">
+                          {t('inv.balanceDue')} <span className="serial">{money(balance)}</span>
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <p className="tags">
+                        <Tag tone={INVOICE_TONE[inv.status]}>{t(`inv.${inv.status}` as never)}</Tag>
+                        <RefundTag inv={inv} />
+                      </p>
+                    </td>
+                    <td className="num">
+                      <Link className="btn btn--sm btn--secondary" to={`/account/invoices/${inv.id}`}>
+                        {t('inv.view')}
+                        <IconArrow size={14} />
+                      </Link>
+                    </td>
+                    <td className="data__own">
+                      <RowMenu
+                        label={`${t('inv.rowMenu')} — ${inv.number}`}
+                        items={invoiceRowItems(inv, t, {
+                          pdf: () => say(t('inv.pdfPending'), 'inv.pdfPendingNote'),
+                          cancel: () => {
+                            updateInvoice(inv.id, { status: 'cancelled' });
+                            say(t('inv.cancelledMsg'), 'inv.cancelledMsgNote');
+                          },
+                          remove: () => {
+                            removeInvoice(inv.id);
+                            say(t('inv.removedMsg'), 'inv.removedMsgNote');
+                          },
+                        })}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
-      <TableCount shown={rows.length} total={INVOICES.length} />
+      <TableCount shown={rows.length} total={invoices.length} />
+
+      {rows.length > 0 && <DevNote>{t('dev.invoiceActions')}</DevNote>}
     </AccountLayout>
   );
 }
@@ -347,6 +412,67 @@ function PaymentHelp({ inv, unpaid }: { inv: Invoice; unpaid: boolean }) {
 }
 
 /**
+ * Edit, cancel, remove — and the PDF the list could not reach before.
+ *
+ * What an invoice offers depends on what it is. A settled one has nothing to edit and nothing
+ * to cancel, and offering either would be handing a dead end to someone who came for the
+ * record. A withdrawn one has nothing to pay and nothing to change, and is the only kind the
+ * account may take off its own list — an invoice that is still owed cannot be tidied away, or
+ * the list stops being the answer to "what do I owe".
+ *
+ * Neither of the two that take something away happens on one press: `confirmLabel` makes the
+ * menu ask again, in place.
+ */
+function invoiceRowItems(
+  inv: Invoice,
+  t: (key: never) => string,
+  act: { pdf: () => void; cancel: () => void; remove: () => void },
+): RowMenuItem[] {
+  const items: RowMenuItem[] = [
+    {
+      id: 'pdf',
+      label: t('inv.pdf' as never),
+      icon: <IconInvoice size={16} />,
+      onSelect: act.pdf,
+    },
+  ];
+
+  if (inv.status === 'unpaid' || inv.status === 'overdue') {
+    items.push(
+      {
+        id: 'edit',
+        label: t('inv.edit' as never),
+        icon: <IconPencil size={16} />,
+        /* The lines are not the client's to change, so Edit opens the conversation that can
+           change them, with the invoice already named — see `dev.invoiceActions`. */
+        to: `/account/tickets/new?invoice=${inv.id}`,
+      },
+      {
+        id: 'cancel',
+        label: t('inv.cancelInvoice' as never),
+        confirmLabel: t('inv.cancelConfirm' as never),
+        icon: <IconClose size={16} />,
+        onSelect: act.cancel,
+        danger: true,
+      },
+    );
+  }
+
+  if (inv.status === 'cancelled') {
+    items.push({
+      id: 'remove',
+      label: t('inv.deleteInvoice' as never),
+      confirmLabel: t('inv.deleteConfirm' as never),
+      icon: <IconTrash size={16} />,
+      onSelect: act.remove,
+      danger: true,
+    });
+  }
+
+  return items;
+}
+
+/**
  * Single invoice — spec 9.4, C-15, and the paying of it, C-17.
  *
  * The document keeps a document's measure rather than filling the app's width: an invoice is
@@ -363,7 +489,8 @@ export function InvoiceDetail() {
   const { t, locale, bi } = useLocale();
   const { currency } = usePrefs();
   const { id } = useParams<{ id: string }>();
-  const inv = INVOICES.find((i) => i.id === id);
+  const { invoice } = useAccountState();
+  const inv = invoice(id ?? '');
   const { saved, mark, clear } = useSaved(6000);
 
   const gateways = gatewaysFor(currency);
@@ -383,7 +510,17 @@ export function InvoiceDetail() {
   const sub = inv.lines.reduce((s, l) => s + l.amountUsdMinor, 0);
   const rate = Math.round((inv.taxRate ?? TAX_RATE) * 100);
   const paidWith = GATEWAYS.find((g) => g.id === inv.method);
-  const unpaid = inv.status !== 'paid' && inv.status !== 'cancelled';
+  /*
+   * Three endings, not two.
+   *
+   * `unpaid` used to be "neither paid nor cancelled", which put the cancelled invoices in the
+   * same branch as the settled ones — and that branch says "Paid in full". Nothing had been
+   * paid on a withdrawn renewal and nothing ever would be, so the one state the client area
+   * had no fixture for was also the one it described wrongly. Each of the three now says its
+   * own thing.
+   */
+  const voided = inv.status === 'cancelled';
+  const unpaid = !voided && inv.status !== 'paid';
   const ledger = invoiceLedger(inv);
   const refund = refundFor(inv);
   const balance = invoiceBalanceUsdMinor(inv);
@@ -596,8 +733,15 @@ export function InvoiceDetail() {
           ) : (
             <div className="empty empty--inset">
               <IconWallet size={28} />
-              <p className="empty__title">{t('inv.noPayments')}</p>
-              <p className="empty__note">{t('inv.noPaymentsNote')}</p>
+              {/* "No payments yet" and "once you pay, the transaction appears here" are both
+                  about a payment that is still coming. On a withdrawn invoice none is, and the
+                  wait is the wrong thing to describe. */}
+              <p className="empty__title">
+                {t(voided ? 'inv.noPaymentsVoid' : 'inv.noPayments')}
+              </p>
+              <p className="empty__note">
+                {t(voided ? 'inv.noPaymentsVoidNote' : 'inv.noPaymentsNote')}
+              </p>
             </div>
           )}
           <dl className="totals invoice__balance">
@@ -664,6 +808,35 @@ export function InvoiceDetail() {
                   {t('account.pay')}
                   <IconArrow size={15} />
                 </Link>
+              </div>
+            </section>
+          ) : voided ? (
+            /* Calm, not urgent: a cancelled invoice asks nothing of the reader. It carries the
+               dates it was raised and fell due, because those are the only facts it has — and
+               no payment method, since no method was ever used on it. */
+            <section className="card card--calm">
+              <header className="card__head">
+                <h2 className="card__heading">
+                  <IconClose size={17} />
+                  {t('inv.void')}
+                </h2>
+              </header>
+              <p className="credit__note">{t('inv.voidNote')}</p>
+              <dl className="kv">
+                <div>
+                  <dt>{t('account.date')}</dt>
+                  <dd className="serial"><bdi>{inv.date}</bdi></dd>
+                </div>
+                <div>
+                  <dt>{t('inv.due')}</dt>
+                  <dd className="serial"><bdi>{inv.due}</bdi></dd>
+                </div>
+              </dl>
+              <div className="acts u-mt-16">
+                <Button size="md" variant="secondary" onClick={() => mark(t('inv.pdfPending'))}>
+                  <IconInvoice size={15} />
+                  {t('inv.pdf')}
+                </Button>
               </div>
             </section>
           ) : (

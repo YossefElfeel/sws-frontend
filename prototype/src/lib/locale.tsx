@@ -180,6 +180,9 @@ export const STRINGS = {
   'action.confirmRemove': { ar: 'أكّد الحذف', en: 'Confirm delete' },
   'action.cancel': { ar: 'إلغاء', en: 'Cancel' },
   'action.armed': { ar: 'اضغط أكّد الحذف عشان تتم الإزالة، أو إلغاء عشان تسيبها.', en: 'Press confirm delete to remove it, or cancel to leave it.' },
+  /* The row menu arms in place and has no cancel button beside the item — Escape is the way
+     back out, so the announcement names the key instead of a button that is not there. */
+  'action.armedMenu': { ar: 'اضغط عليه تاني عشان يتم، أو Escape عشان تسيبه.', en: 'Press it again to go ahead, or Escape to leave it.' },
   'action.search': { ar: 'ابحث', en: 'Search' },
   'action.add': { ar: 'أضف', en: 'Add' },
   'action.save': { ar: 'احفظ', en: 'Save' },
@@ -2120,6 +2123,39 @@ export const STRINGS = {
   'inv.line.domainRegistration': { ar: 'تسجيل دومين', en: 'Domain registration' },
   'inv.forInvoice': { ar: 'للفاتورة', en: 'For invoice' },
 
+  // The row menu on the invoices list. What it offers depends on the invoice: there is
+  // nothing to edit or cancel on one that is settled, and nothing to take off the list but
+  // one that has been withdrawn.
+  'inv.rowMenu': { ar: 'إجراءات الفاتورة', en: 'Invoice actions' },
+  'inv.edit': { ar: 'تعديل الفاتورة', en: 'Edit invoice' },
+  'inv.cancelInvoice': { ar: 'إلغاء الفاتورة', en: 'Cancel invoice' },
+  'inv.cancelConfirm': { ar: 'أكّد إلغاء الفاتورة', en: 'Confirm cancel invoice' },
+  'inv.deleteInvoice': { ar: 'شيل الفاتورة من القائمة', en: 'Remove from my list' },
+  'inv.deleteConfirm': { ar: 'أكّد الشيل', en: 'Confirm removal' },
+  'inv.cancelledMsg': { ar: 'الفاتورة اتلغت', en: 'Invoice cancelled' },
+  'inv.cancelledMsgNote': {
+    ar: 'مابقى عليها حاجة مستحقة، وفضلت في القائمة بحالة «ملغاة» — الفواتير مابتتشالش من السجل من نفسها.',
+    en: 'Nothing is owed on it any more. It stays on the list marked cancelled — an invoice does not leave the record on its own.',
+  },
+  'inv.removedMsg': { ar: 'الفاتورة اتشالت من القائمة', en: 'Invoice removed from your list' },
+  'inv.removedMsgNote': {
+    ar: 'اتشالت من العرض بس. السجل المحاسبي بيفضل موجود عند سوميون، والشيل مابيمسحوش.',
+    en: 'It is gone from this view only. The accounting record stays with Somion; removing it here does not erase it.',
+  },
+
+  // A cancelled invoice, read on its own page: neither paid nor owed.
+  'inv.void': { ar: 'الفاتورة دي ملغاة', en: 'This invoice was cancelled' },
+  /* The ordinary empty ledger says "once you pay" — a promise a withdrawn invoice cannot
+     keep, and the sentence a reader would take as "the payment has not landed yet". */
+  'inv.noPaymentsVoid': { ar: 'مفيش دفعات عليها', en: 'Nothing was paid' },
+  'inv.noPaymentsVoidNote': {
+    ar: 'الفاتورة اتلغت قبل ما تتدفع، ومفيش حاجة جاية عليها.',
+    en: 'It was cancelled before it was paid, and nothing is coming against it.',
+  },
+  'inv.voidNote': {
+    ar: 'مفيش حاجة مستحقة عليها ومفيش حاجة اتدفعت فيها. موجودة للسجل بس.',
+    en: 'Nothing is owed on it and nothing was paid against it. What is here is the record.',
+  },
   /*
    * The refund, said as a state rather than as a row in a ledger. Every note answers the one
    * question the state raises — "so where is my money right now" — and the sent one refuses to
@@ -2202,6 +2238,10 @@ export const STRINGS = {
   'dev.taxId': {
     ar: 'رقم التسجيل الضريبي بيتحدد لكل سوق (القرار I12) وهيتضاف هنا أول ما يتأكد.',
     en: 'The tax registration number is decided per market (decision I12) and is added here once confirmed.',
+  },
+  'dev.invoiceActions': {
+    ar: 'تعديل الفاتورة وإلغاءها وحذفها كلها إجراءات إدارية في WHMCS (UpdateInvoice و SetInvoiceStatus و DeleteInvoice) — ولا واحد فيهم متاح للعميل من نفسه. القائمة هنا بتقترح القواعد: «تعديل» بيفتح طلب للمبيعات والفوترة بالفاتورة معاه لأن البنود نفسها مش بتتعدّل من بره، الإلغاء على الفواتير غير المدفوعة بس، والشيل على الملغاة بس — والتلاتة محتاجين hook.',
+    en: 'Editing, cancelling and deleting an invoice are all admin actions in WHMCS (UpdateInvoice, SetInvoiceStatus, DeleteInvoice) — none of them is something a client can do alone. The menu here proposes the rules: Edit opens a billing request carrying the invoice, because the lines themselves cannot be edited from outside; Cancel is offered on unpaid invoices only, and removal on cancelled ones only. All three need a hook.',
   },
   /*
    * The three server acts that reach past WHMCS itself. WHMCS ships the buttons as a module

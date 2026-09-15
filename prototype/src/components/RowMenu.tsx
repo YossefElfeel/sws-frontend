@@ -13,6 +13,12 @@ export interface RowMenuItem {
   onSelect?: () => void;
   /** Takes something away — cancelling, deleting, closing. */
   danger?: boolean;
+  /**
+   * What the item reads once it is armed. Set it and the item needs two presses: the first
+   * swaps the label to this, the second runs `onSelect`. Leave it off for an item that is
+   * safe to hit by accident.
+   */
+  confirmLabel?: string;
 }
 
 /**
@@ -32,8 +38,18 @@ export interface RowMenuItem {
  * closes it; that is the honest behaviour for a menu anchored to a row you just scrolled away.
  */
 export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] }) {
-  const { dir } = useLocale();
+  const { dir, t } = useLocale();
   const [open, setOpen] = useState(false);
+  /**
+   * Which item is asking a second time, if any.
+   *
+   * Cancelling an invoice and taking one off the list are both a press away from each other in
+   * a four-item menu, and there is no undo behind either. `ConfirmButton` makes the same case
+   * for the row actions it guards and answers it the same way: arm in place, so the reader
+   * keeps looking at the row — and here at the menu — that tells them they picked the right
+   * one. A dialog over a menu would be a second floating layer over a first.
+   */
+  const [armed, setArmed] = useState<string | null>(null);
   const [at, setAt] = useState<CSSProperties>({});
   const btnRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -58,11 +74,23 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
     if (open) place();
   }, [open, place]);
 
+  /* A menu that closes armed would open armed, one press from the thing it asked about. */
+  useEffect(() => {
+    if (!open) setArmed(null);
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        /* One step at a time: Escape disarms, and Escape again closes. Collapsing the two
+           would mean a keyboard reader could not back out of the question without also
+           losing the menu it was asked in. */
+        if (armed) {
+          setArmed(null);
+          return;
+        }
         close();
         btnRef.current?.focus();
         return;
@@ -80,8 +108,8 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
       focusable[next].focus();
     };
     const onDown = (e: MouseEvent) => {
-      const t = e.target as Node;
-      if (!panelRef.current?.contains(t) && !btnRef.current?.contains(t)) close();
+      const node = e.target as Node;
+      if (!panelRef.current?.contains(node) && !btnRef.current?.contains(node)) close();
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('mousedown', onDown);
@@ -94,7 +122,7 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
       window.removeEventListener('scroll', close, true);
       window.removeEventListener('resize', close);
     };
-  }, [open]);
+  }, [open, armed]);
 
   return (
     <>
@@ -114,13 +142,16 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
       {open && (
         <div ref={panelRef} className="rowmenu" style={at} role="menu" aria-label={label}>
           {items.map((item) => {
+            const asking = armed === item.id;
             const body = (
               <>
                 {item.icon}
-                <span>{item.label}</span>
+                <span>{asking ? item.confirmLabel : item.label}</span>
               </>
             );
-            const cls = `rowmenu__item${item.danger ? ' rowmenu__item--danger' : ''}`;
+            const cls =
+              `rowmenu__item${item.danger ? ' rowmenu__item--danger' : ''}` +
+              (asking ? ' is-armed' : '');
             return item.to ? (
               <Link
                 key={item.id}
@@ -138,6 +169,12 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
                 className={cls}
                 role="menuitem"
                 onClick={() => {
+                  /* Pointing at one item puts the question on that item and takes it off
+                     whichever one was asking before. */
+                  if (item.confirmLabel && !asking) {
+                    setArmed(item.id);
+                    return;
+                  }
                   setOpen(false);
                   item.onSelect?.();
                 }}
@@ -146,6 +183,11 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
               </button>
             );
           })}
+          {armed && (
+            <span className="u-visually-hidden" role="status">
+              {t('action.armedMenu')}
+            </span>
+          )}
         </div>
       )}
     </>

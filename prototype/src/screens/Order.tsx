@@ -16,7 +16,8 @@ import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
 import { convert, formatAmount, gatewaysFor, GATEWAYS } from '../lib/catalog';
-import { INVOICES, ACCOUNT, invoiceBalanceUsdMinor } from '../lib/account';
+import { ACCOUNT, invoiceBalanceUsdMinor } from '../lib/account';
+import { useAccountState } from '../lib/accountState';
 import { Select } from '../components/Select';
 
 /** A fixed reference so the screenshots of these screens do not change between runs. */
@@ -31,8 +32,9 @@ const REF = 'SWS-26090114';
  */
 function useInvoiceParam() {
   const [params] = useSearchParams();
+  const { invoice } = useAccountState();
   const id = params.get('invoice');
-  const inv = id ? INVOICES.find((i) => i.id === id) : undefined;
+  const inv = id ? invoice(id) : undefined;
   if (!inv) return undefined;
   const balance = invoiceBalanceUsdMinor(inv);
   const credit = params.get('credit') === '1' ? Math.min(ACCOUNT.creditUsdMinor, balance) : 0;

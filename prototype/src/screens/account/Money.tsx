@@ -28,10 +28,10 @@ import {
   DOMAINS,
   TRANSACTIONS,
   FAILED_PAYMENT,
-  INVOICES,
   AFFILIATE,
   type TxnKind,
 } from '../../lib/account';
+import { useAccountState } from '../../lib/accountState';
 
 /**
  * Manual renewal (C-08, spec 9.2 and 9.3).
@@ -297,7 +297,8 @@ export function PaymentFailed() {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
   const f = FAILED_PAYMENT;
-  const inv = INVOICES.find((i) => i.id === f.invoiceId);
+  const { invoice } = useAccountState();
+  const inv = invoice(f.invoiceId);
   const gateway = GATEWAYS.find((g) => g.id === f.gateway);
 
   const money = (minor: number) => `${formatAmount(convert(minor, currency), locale)} ${currency}`;
