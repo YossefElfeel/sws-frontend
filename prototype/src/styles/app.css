@@ -2860,6 +2860,20 @@ button.stat {
  */
 .app__main .rail--domain {
   display: block;
+  /*
+   * The rail steps the other way in here, and that is the whole of the fix.
+   *
+   * Out on a marketing page the rail is `surface-sunken` on a `surface-page` body: a step DOWN
+   * from what is behind it. In the client area `.app` is itself painted `surface-sunken`, so a
+   * rail carrying the same token was the same colour as the ground it sat on — not a faint
+   * panel, the same paint, with only its hairline to prove it was there. That is what the
+   * original note meant by "the ground already is the recessed tint", and it was right; I had
+   * measured `body` rather than the element actually behind the rail, which is `.app`.
+   *
+   * So it takes `surface-page` instead — a step UP from `.app`, the same distance the marketing
+   * rail steps down from the body. Same relationship, mirrored, no new value.
+   */
+  background: var(--sws-surface-page);
 }
 
 /* Inside the shell there is no marketing header to clear, so the stack sticks higher. */
