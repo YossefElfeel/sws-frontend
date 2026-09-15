@@ -2858,21 +2858,27 @@ button.stat {
  * two menus inside it read as two: a panel each, rather than a rule drawn between two things
  * with no edges of their own.
  */
-.app__main .rail--domain {
+/*
+ * Every menu inside the shell, and the rule is written that way on purpose.
+ *
+ * Out on a marketing page a rail is `surface-sunken` on a `surface-page` body: a step DOWN from
+ * what is behind it. In the client area `.app` is itself painted `surface-sunken`, so a rail
+ * carrying the same token was the same paint as the ground it sat on — not a faint panel, no
+ * panel, with only its hairline to prove it was there. That is what the original note meant by
+ * "the ground already is the recessed tint", and it was right; I had measured `body` rather than
+ * the element actually behind the rail, which is `.app`.
+ *
+ * So a rail in here takes `surface-page`: a step UP from `.app`, the same distance the marketing
+ * rail steps down from the body. Same relationship, mirrored, no new value.
+ *
+ * `.rail`, not `.rail--domain`. The domain rail is the only one in the shell today, and a rule
+ * naming it would have been a rule about that page rather than about this room — the next menu
+ * added in here would arrive invisible and nobody would know why. The main sidebar is not a
+ * `.rail` and is not touched: it is the application's own furniture, it already has its own
+ * ground, and it is the one menu that should not look like the others.
+ */
+.app__main .rail {
   display: block;
-  /*
-   * The rail steps the other way in here, and that is the whole of the fix.
-   *
-   * Out on a marketing page the rail is `surface-sunken` on a `surface-page` body: a step DOWN
-   * from what is behind it. In the client area `.app` is itself painted `surface-sunken`, so a
-   * rail carrying the same token was the same colour as the ground it sat on — not a faint
-   * panel, the same paint, with only its hairline to prove it was there. That is what the
-   * original note meant by "the ground already is the recessed tint", and it was right; I had
-   * measured `body` rather than the element actually behind the rail, which is `.app`.
-   *
-   * So it takes `surface-page` instead — a step UP from `.app`, the same distance the marketing
-   * rail steps down from the body. Same relationship, mirrored, no new value.
-   */
   background: var(--sws-surface-page);
 }
 
