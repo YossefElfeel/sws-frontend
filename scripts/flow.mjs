@@ -1086,11 +1086,24 @@ ok('Escape closes the note', (await p.$$('.cur__ask')).length === 0);
 // C-15 / C-17: the invoice takes its own payment, per method, with the invoice as reference.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
 await p.waitForSelector('.invoice-detail .invoice');
+/*
+ * The two figures a reader compares on this screen are the amount billed and the amount still
+ * owed, and they are on different cards. So the cards start level and stand a gap apart — the
+ * assertion is the pairing, because it is the thing a later layout change would quietly undo.
+ * The document fills its own column, which is what the printable measure used to stop it doing.
+ */
 ok(
-  'the invoice document runs the width of the layout it is in',
+  'the document and the balance card stand level, one gap apart',
   await p.$eval('.invoice-detail', (wrap) => {
     const doc = wrap.querySelector('.invoice');
-    return !!doc && Math.abs(doc.getBoundingClientRect().width - wrap.getBoundingClientRect().width) < 1;
+    const side = wrap.querySelector('.dash__side');
+    const main = wrap.querySelector('.dash__main');
+    if (!doc || !side || !main) return false;
+    const d = doc.getBoundingClientRect();
+    const s = side.getBoundingClientRect();
+    const m = main.getBoundingClientRect();
+    const gap = s.x > d.x ? s.x - d.right : d.x - s.right;
+    return Math.abs(d.top - s.top) < 1 && Math.abs(d.width - m.width) < 1 && Math.round(gap) === 24;
   }),
 );
 ok('an unpaid invoice has an empty ledger, not a hidden one', (await p.$$('.card--flush .empty')).length === 1);

@@ -2124,30 +2124,17 @@ button.stat {
 
 /*
  * The document used to hold a printable measure — 46rem inside the client area, 52rem outside
- * it — on the reading that an invoice is a page and a page has a width. Two rules made that
- * cost more than it bought. The pay panel already took a column of its own beside the
- * document, so the measure was not what decided the width: the column was, and the cap then
- * took a further 24px off *that*, leaving the document a hair narrower than the ledger card
- * directly beneath it and the two cards' edges out of line. And the column the panel held ran
- * the full height of the layout while the panel itself filled a third of it, so a screen of
- * empty ground sat beside the invoice for the length of the document.
+ * it — on the reading that an invoice is a page and a page has a width. The measure was not
+ * what decided the width: the column beside the payment card was, and the cap then took a
+ * further 24px off *that*, leaving the document a hair narrower than the ledger card directly
+ * beneath it and the two cards' edges out of line. The document fills its column instead.
  *
- * The document now runs the width of the content area and the panel drops beside the ledger
- * (see .invoice-detail in account.css). The header's own "pay now" carries the action at the
- * top of the screen, which is what kept the panel in the first column.
+ * It briefly filled the whole content area rather than the column, and carried a capped totals
+ * block at the end edge to keep a label within a glance of its figure across that width. Both
+ * are gone together: the column is back (see .invoice-detail in account.css), and at a column's
+ * width .totals__row reads the way it reads in the cart and at checkout — which is also what
+ * closes the field of empty ground the wide document had left beside its own totals.
  */
-
-/*
- * The totals are the figures the document is read for, and .totals__row justifies its two ends
- * apart: at the document's old measure that was a readable span, at the content area's it is
- * most of a screen between a label and its number. The block sits at the end edge instead, on
- * the column the amounts in the table above already use, so the eye pairs them in one glance
- * and the document's last figure lands under the ones it is the sum of.
- */
-.invoice .totals {
-  max-inline-size: 22rem;
-  margin-inline-start: auto;
-}
 
 /*
  * The document table's head carries no fill.
