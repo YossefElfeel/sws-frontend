@@ -1958,3 +1958,49 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* ── 2026-09-15: the hosting rail is two menus ─────────────────────────────── */
+/*
+ * Categories and Actions are two panels rather than two headings inside one, because they are
+ * two kinds of thing: the categories are where you are, and three of the four actions leave
+ * this section of the site entirely. One panel made twelve links read as a single list with a
+ * label dropped into the middle of it.
+ *
+ * The stack is what holds the column together, and it takes the sticky that used to be on the
+ * rail itself. Two sticky panels in one column stick independently: the first would pin at the
+ * top and the second would slide up and sit on it.
+ */
+.rail-stack {
+  display: grid;
+  gap: var(--sws-space-16);
+  align-content: start;
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .rail-stack {
+    position: sticky;
+    inset-block-start: var(--sws-space-96);
+  }
+
+  .rail-stack > .rail {
+    position: static;
+  }
+}
+
+/*
+ * On a phone each rail is already a strip with 12px of its own padding above and below, so two
+ * of them are 24 apart before the stack adds anything — a quarter of an inch of nothing between
+ * two rows of chips, on the screen that can least afford it. The stack adds no gap of its own
+ * and the strips inside it give back half their padding: 16 between them, which is twice the
+ * gap a thumb needs to tell two targets apart and a third of the height it was spending.
+ */
+@media (max-width: 899px) {
+  .rail-stack {
+    gap: 0;
+  }
+
+  .rail-stack > .rail {
+    padding-block: var(--sws-space-8);
+  }
+}

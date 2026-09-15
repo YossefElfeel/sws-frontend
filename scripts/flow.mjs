@@ -231,7 +231,10 @@ await p.evaluate(() => (location.hash = '#/account/domains/dom-1/dns'));
 await p.waitForSelector('.data tbody tr');
 const dns = await p.$$eval('.data tbody tr', (n) => n.length);
 ok('DNS records listed', dns >= 5, `${dns} records`);
-ok('the domain rail lists eight pages', (await p.$$eval('.rail--domain .rail__list:first-of-type .rail__link', (n) => n.length)) === 8);
+// The manage menu, which is the first of the rail's two. `:first-of-type` on the list used to
+// pick it out when both groups shared one <aside>; they are two <aside>s now, so every list is
+// first of its type and the old selector counted all eleven links.
+ok('the domain rail lists eight pages', (await p.$$eval('.rail-stack > .rail--domain:first-child .rail__link', (n) => n.length)) === 8);
 // The rail's headings are disclosures too, and like the sidebar's they arrive open.
 const railOpen = await p.$$eval('.rail--domain .rail__list', (n) => n.filter((u) => !u.hidden).length);
 ok('the domain rail arrives open', railOpen === 2, `${railOpen} of 2 open`);
