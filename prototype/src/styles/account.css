@@ -1629,9 +1629,17 @@
   align-items: stretch;
 }
 
+/*
+ * Flex, not grid, for one reason: the auto margin below has to be able to claim the leftover
+ * height. In a grid with align-content:start the free space belongs to the container and sits
+ * after the last row, where no item margin can reach it — so the button row only looked pinned
+ * while every card happened to hold the same content. The first card without a state chip put
+ * its buttons 24px above its neighbours' and proved it.
+ */
 .addon-card {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--sws-space-8);
   block-size: 100%;
 }

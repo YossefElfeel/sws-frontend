@@ -1182,6 +1182,45 @@ await p.selectOption('.bar__end .tfilter__select', 'resolved');
 await p.waitForTimeout(120);
 ok('the incident filter filters', (await p.$$eval('.incident', (n) => n.length)) === 2);
 
+/*
+ * The hosting add-ons tab — spec 7.2 step three, on a page of its own.
+ *
+ * Two things are worth holding: that the rail carries it at all, and that every card's button
+ * lands somewhere that sells the thing. A cross-sell page whose cards go nowhere is the exact
+ * dead end deadends.mjs exists to catch, and it cannot catch a link that resolves to a real
+ * route with nothing on it.
+ */
+await p.evaluate(() => (location.hash = '#/hosting/shared'));
+await p.waitForSelector('.rail-stack');
+ok('the hosting rail carries the add-ons tab', (await p.$$('a[href="#/hosting/addons"]')).length === 1);
+await p.evaluate(() => (location.hash = '#/hosting/addons'));
+await p.waitForSelector('.addon-card');
+{
+  const cards = await p.$$eval('.addon-card', (n) => n.length);
+  ok('one card per add-on group', cards === 3, `${cards} card(s)`);
+  /*
+   * The button row is pinned to the foot of the card, which only shows up when the cards hold
+   * different content — SSL has no free tier and the other two do, so this is the case that
+   * caught the grid version silently leaving one row 24px high.
+   */
+  ok(
+    'the buttons sit level across cards of unequal content',
+    await p.$$eval('.addon-card', (n) => {
+      const tops = n.map((c) => Math.round(c.querySelector('.addon-card__acts').getBoundingClientRect().top));
+      const tags = n.filter((c) => c.querySelector('.tag')).length;
+      return new Set(tops).size === 1 && tags > 0 && tags < n.length;
+    }),
+  );
+
+  const hrefs = await p.$$eval('.addon-card a.btn', (n) => n.map((a) => a.getAttribute('href')));
+  for (const href of hrefs) {
+    await p.evaluate((h) => (location.hash = h.replace(/^#/, '')), href);
+    await p.waitForTimeout(150);
+    const sells = await p.$$eval('.plan, .offer, .data', (n) => n.length);
+    ok(`  ${href} sells something`, sells > 0, `${sells} priced item(s)`);
+  }
+}
+
 // ADR-0003: Latin numerals everywhere, including inside Arabic copy.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
 await p.waitForSelector('.invoice');

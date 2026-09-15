@@ -7,6 +7,7 @@ import { AccountStateProvider } from './lib/accountState';
 
 import { Home } from './screens/Home';
 import { Family } from './screens/Family';
+import { HostingAddons } from './screens/HostingAddons';
 import { Domains } from './screens/Domains';
 import { Transfer } from './screens/Transfer';
 import { Configure } from './screens/Configure';
@@ -169,6 +170,9 @@ export function App() {
               {/* Marketing — spec 5.1 */}
               <Route path="/" element={<Home />} />
               <Route path="/hosting" element={<Navigate to="/hosting/shared" replace />} />
+              {/* Before /hosting/:family, or the catch-all reads "addons" as a product family
+                  and renders an empty category page under its own name. */}
+              <Route path="/hosting/addons" element={<HostingAddons />} />
               <Route path="/hosting/:family" element={<Family />} />
               <Route path="/ssl" element={<Family />} />
               <Route path="/builder" element={<Family />} />

@@ -456,6 +456,23 @@ export const STRINGS = {
 
   'rail.categories': { ar: 'الفئات', en: 'Categories' },
   'rail.actions': { ar: 'إجراءات', en: 'Actions' },
+
+  // ── hosting add-ons — spec 7.2 step three, lifted out of the order flow ─────
+  // The three things a plan can carry, described before somebody is three screens into
+  // buying rather than after. Each card leads to the page that already sells it.
+  'rail.addons': { ar: 'الخدمات الإضافية', en: 'Add-ons' },
+  'hostaddon.lede': {
+    ar: 'الحاجات اللي تقدر تضيفها لأي خطة استضافة. شوف كل واحدة بتعمل إيه وبتبدأ من كام قبل ما تختار خطتك.',
+    en: 'What a hosting plan can carry. What each one does and what it starts at, before you pick a plan rather than after.',
+  },
+  'hostaddon.from': { ar: 'من', en: 'From' },
+  'hostaddon.see': { ar: 'شوف الخطط', en: 'See the tiers' },
+  'hostaddon.freeTier': { ar: 'فيه باقة مجانية', en: 'Has a free tier' },
+  'hostaddon.withPlan': {
+    ar: 'كل دي بتتضاف على خطة استضافة، وتقدر تختارها وإنت بتطلب.',
+    en: 'Each of these attaches to a hosting plan, and you can pick them while you order.',
+  },
+  'hostaddon.seePlans': { ar: 'اتفرّج على خطط الاستضافة', en: 'See the hosting plans' },
   'rail.renew': { ar: 'تجديد دومين', en: 'Renew domains' },
   'rail.register': { ar: 'تسجيل دومين جديد', en: 'Register a new domain' },
   'rail.transfer': { ar: 'نقل دومين', en: 'Transfer in a domain' },
