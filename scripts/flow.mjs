@@ -298,7 +298,13 @@ await p.waitForSelector('.data tbody tr');
 
 // 9.2 support raised from a service arrives knowing which one.
 await p.evaluate(() => (location.hash = '#/account/services/svc-8841'));
-await p.waitForSelector('.app__main');
+/*
+ * `.meters`, not `.app__main`. The shell is on the screen already — it was on the screen for the
+ * services list this step navigates from — so waiting for it resolves on the previous route and
+ * the links get read before the service page has mounted. The usage card belongs to this page
+ * and nothing else, so waiting for it waits for the arrival rather than for the furniture.
+ */
+await p.waitForSelector('.meters');
 {
   const href = await p.$$eval('a', (n) =>
     n.map((a) => a.getAttribute('href') ?? '').find((h) => h.includes('tickets/new?service=')),

@@ -2845,18 +2845,48 @@ button.stat {
 }
 
 /*
- * The rule is the same in both rooms: the rail is the ground, the cards are what lifts off it.
- * On a marketing page the ground is near-white, so the rail takes the recessed tint. In here
- * the ground already is the recessed tint and the shell's cards are white boxes on it — so the
- * rail keeps no box of its own at all, and it is the hover and the current page that come
- * forward out of it. Given a panel here it would be a white hairlined box beside white
- * hairlined boxes, which is the thing being fixed rather than a version of it.
+ * The domain rail keeps the panel, the same one the hosting and transfer rails draw.
+ *
+ * It used to strip it, on the grounds that "in here the ground already is the recessed tint",
+ * so a panel would be a box against its own colour. Measured, that is not what the two rooms
+ * are: the client area's ground is `--sws-surface-page` at #F8F9FC and the rail's panel is
+ * `--sws-surface-sunken` at #F1F3F9 — the same pair, and the same distance apart, as on a
+ * marketing page. The reason recorded for the exception did not describe the colours it was
+ * about, and the exception left one rail in the product that looked like nothing.
+ *
+ * So there is one rail now and it looks the same wherever it is, which is also what makes the
+ * two menus inside it read as two: a panel each, rather than a rule drawn between two things
+ * with no edges of their own.
  */
-.app__main .rail--domain {
+/*
+ * Every menu inside the shell, and the rule is written that way on purpose.
+ *
+ * Out on a marketing page a rail is `surface-sunken` on a `surface-page` body: a step DOWN from
+ * what is behind it. In the client area `.app` is itself painted `surface-sunken`, so a rail
+ * carrying the same token was the same paint as the ground it sat on — not a faint panel, no
+ * panel, with only its hairline to prove it was there. That is what the original note meant by
+ * "the ground already is the recessed tint", and it was right; I had measured `body` rather than
+ * the element actually behind the rail, which is `.app`.
+ *
+ * So a rail in here takes `surface-page`: a step UP from `.app`, the same distance the marketing
+ * rail steps down from the body. Same relationship, mirrored, no new value.
+ *
+ * `.rail`, not `.rail--domain`. The domain rail is the only one in the shell today, and a rule
+ * naming it would have been a rule about that page rather than about this room — the next menu
+ * added in here would arrive invisible and nobody would know why. The main sidebar is not a
+ * `.rail` and is not touched: it is the application's own furniture, it already has its own
+ * ground, and it is the one menu that should not look like the others.
+ */
+.app__main .rail {
   display: block;
-  inset-block-start: var(--sws-space-16);
-  background: none;
-  border-color: transparent;
+  background: var(--sws-surface-page);
+}
+
+/* Inside the shell there is no marketing header to clear, so the stack sticks higher. */
+@media (min-width: 900px) {
+  .app__main .rail-stack {
+    inset-block-start: var(--sws-space-16);
+  }
 }
 
 .shortcuts {
@@ -3196,32 +3226,6 @@ button.stat {
   margin-block-start: var(--sws-space-16);
 }
 
-/*
- * The domain rail is two menus too, and it cannot say so the way the hosting rail does.
- *
- * Out on a marketing page each menu is a recessed panel, and two panels separate themselves.
- * In here the rail keeps no box at all — see `.rail--domain` above — so two of them would be
- * two invisible boxes with a gap, which is not a division, it is a bigger margin.
- *
- * So the second menu draws a rule across the column. It is the same hairline the headings
- * already use, doing the same job one level up: furniture, not a card.
- */
-.app__main .rail-stack > .rail--domain + .rail--domain {
-  padding-block-start: var(--sws-space-16);
-  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  /*
-   * The corners go with it. `.rail` carries an `lg` radius for the panel it draws out on a
-   * marketing page; in here there is no panel, and a straight rule inheriting that radius bends
-   * up at both ends like the lid of a box that is not there.
-   */
-  border-radius: 0;
-}
-
-/* The rule replaces the gap rather than adding to it: a line with 16 either side of it reads as
-   a divider, and a line with 32 reads as two things that happen to have a line between them. */
-.app__main .rail-stack {
-  gap: 0;
-}
 
 /* ── 2026-09-15: the VPS usage graphs — spec 9.3 ───────────────────────────── */
 /*
