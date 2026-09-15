@@ -89,7 +89,7 @@ export function DomainAddons() {
 
         <div className="step-foot">
           <p className="step-foot__count">
-            <span className="serial">{addons.length}</span> {t('domainstep.selectedCount')}
+            <span className="serial">{addons.length}</span> {t('domainstep.addonCount')}
           </p>
           <span className="step-foot__acts">
             <Link className="btn btn--md btn--quiet" to={`/domain/${line.id}`}>
