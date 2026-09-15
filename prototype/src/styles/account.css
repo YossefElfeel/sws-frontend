@@ -1610,105 +1610,88 @@
 }
 
 /*
- * The add-ons list is a table in everything but its markup, and it was built as a row of
- * flexible boxes: the text took one share of the width, a growing spacer took the rest, and
- * the state sat at the *start* of that spacer. So "مفعّل" landed wherever the sentence above it
- * happened to end — a different place on every row, and nowhere near the buttons it is the
- * state of. The row that has no إدارة button moved it again.
+ * The add-ons are three cards, not three rows.
  *
- * Three shared columns instead, one grid for the whole list rather than one flex row per
- * add-on. The state and the actions each get a column as wide as the widest row needs, so
- * they line up down the card and the state is read as the label on the buttons beside it,
- * which is what it is.
+ * As ruled rows they read as a table of settings — a shared grid, one line each, the state
+ * and the buttons in columns measured across the list. That was right while the page was a
+ * list of switches. It is three services, each with a name, a price, a state and its own way
+ * in, and the reference the product is built against puts each in a card of its own.
+ *
+ * They are one object: auto-fit so a row holds as many as fit and the rest wrap rather than
+ * shrink below a readable measure, and a card is a grid whose last row is the buttons, pushed
+ * to the bottom by an auto margin. Descriptions are a different length in every card, so
+ * without that the button rows would sit at three different heights across one row of cards.
  */
-.addon-list {
+.addon-cards {
   display: grid;
+  gap: var(--sws-space-16);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  align-items: stretch;
 }
 
-.addon-row__text {
+.addon-card {
   display: grid;
-  align-content: center;
-  gap: 2px;
-  min-inline-size: 0;
+  align-content: start;
+  gap: var(--sws-space-8);
+  block-size: 100%;
 }
 
-.addon-row__text .method-row__name {
-  min-inline-size: 0;
+/* The glyph is the card’s mark, not an icon beside a word, so it stands on its own line. */
+.addon-card__icon {
+  display: grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  margin-block-end: var(--sws-space-4);
+  border-radius: var(--sws-radius-md);
+  background: var(--sws-action-subtle-bg);
+  color: var(--sws-action-primary);
 }
 
-.addon-row__state,
-.addon-row__acts {
+.addon-card__name {
+  margin: 0;
+  font-size: var(--sws-font-size-body-lg);
+  font-weight: var(--sws-weight-semibold);
+  line-height: var(--sws-line-height-h3);
+  color: var(--sws-text-primary);
+}
+
+.addon-card__note {
+  margin: 0;
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+.addon-card__price {
+  margin: 0;
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-body-sm);
+}
+
+/* auto margin: the state and the buttons under it sit at the foot of every card, level across
+   the row, whatever length the description above them ran to. */
+.addon-card__state {
+  margin-block: auto 0;
+  margin-inline: 0;
+  padding-block-start: var(--sws-space-8);
+}
+
+.addon-card__acts {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: var(--sws-space-8);
 }
 
-@media (min-width: 600px) {
-  .addon-list {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-  }
-
-  /*
-   * The rows are grid rows, not boxes — that is what lets the three columns be measured across
-   * the whole list rather than per row. Each cell therefore carries its own padding and its own
-   * share of the rule, and the cells are left to stretch so that the three pieces of one row's
-   * rule meet at the same height.
-   *
-   * The space between the columns is padding inside the cells and not a `column-gap`, because a
-   * gap is a hole the cell's border cannot cross: a 16px one cut the row's hairline into three
-   * pieces with two breaks in it, which reads as a rule that failed to draw rather than as a
-   * column.
-   */
-  .addon-row {
-    display: contents;
-  }
-
-  .addon-row > * {
-    padding: var(--sws-space-16) var(--sws-space-8);
-    border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  }
-
-  .addon-row > :first-child {
-    padding-inline-start: var(--sws-space-24);
-  }
-
-  .addon-row > :last-child {
-    padding-inline-end: var(--sws-space-24);
-  }
-
-  .addon-row:last-child > * {
-    border-block-end: 0;
-  }
+/*
+ * Same case as .modal__foot: .btn--danger is quiet at rest because a danger sitting among
+ * ordinary options should not be easy to reach by accident. Here it is one of the two acts the
+ * card exists to offer, declared on the card rather than hidden in it — and with no edge it
+ * read as a link beside a real button. It gets its frame back, and only here.
+ */
+.addon-card__acts .btn--danger {
+  border-color: var(--sws-status-danger);
 }
 
-/* Under 600px three columns have nowhere to go, so the row becomes two lines: what the add-on
-   is, and under it the state and the buttons — kept together at the end of that line, which is
-   the whole point of the three columns above and does not stop being the point on a phone. */
-@media (max-width: 599px) {
-  .addon-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: var(--sws-space-12);
-    padding: var(--sws-space-16);
-    border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  }
-
-  .addon-row:last-child {
-    border-block-end: 0;
-  }
-
-  .addon-row__text {
-    flex: 1 1 100%;
-  }
-
-  /* Empty on an add-on that is off, and an empty flex item still spends the row's gap. */
-  .addon-row__state:empty {
-    display: none;
-  }
-}
 
 
 /* ── sort: the key, then its direction ─────────────────────────────────────── */

@@ -2374,6 +2374,8 @@ export const STRINGS = {
   'dom.addons': { ar: 'الخدمات الإضافية', en: 'Add-ons' },
   'dom.addonsLede': { ar: 'الملحقات التالية متاحة للدومين ده. كلها ببلاش، وتقدر تفعّلها أو توقفها وقت ما تحب.', en: 'These add-ons are available for this domain. All are free, and you can turn them on or off whenever you like.' },
   'dom.enabled': { ar: 'مفعّل', en: 'Enabled' },
+  /* The off state is said, not left blank: a card with no chip reads as one still loading. */
+  'dom.disabled': { ar: 'مش مفعّل', en: 'Not enabled' },
   'dom.enable': { ar: 'تفعيل', en: 'Enable' },
   'dom.disable': { ar: 'تعطيل', en: 'Disable' },
   'dom.forwarding': { ar: 'تحويل البريد', en: 'Email forwarding' },
