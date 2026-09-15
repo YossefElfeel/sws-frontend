@@ -1103,18 +1103,42 @@ export function DomainTransferOut() {
 
   if (!dom) return <Navigate to="/account/domains" replace />;
   const lock = dom.registrarLock;
+  const flip = (patch: Partial<DomainRecord>) => {
+    updateDomain(dom.id, patch);
+    mark();
+  };
 
   return (
     <DomainPage dom={dom} sectionKey="dom.transferOut">
       <SavedNote saved={saved} onDismiss={clear} />
 
+      {/*
+        One card, named after what the switches on it do. WHOIS privacy sits beside the
+        registrar lock because they answer the same question — who may read this domain's
+        owner, and who may move it — and because the person who came here to leave is the
+        person most likely to want the other switch settled before they go. Both are the
+        same two switches Overview carries; the store is shared, so a flip here reads the
+        same there.
+      */}
       <section className="card">
         <header className="card__head">
-          <h2 className="card__heading">{t('dom.transferOut')}</h2>
+          <h2 className="card__heading">{t('dom.protection')}</h2>
         </header>
-        <p className="card__body">{t('dom.transferOutLede')}</p>
 
-        <div className="form u-mt-16">
+        <div className="form">
+          <label className="switch-row">
+            <span>
+              <span className="switch-row__label">{t('dom.privacy')}</span>
+              <span className="switch-row__note">{t('dom.privacyNote')}</span>
+            </span>
+            <input
+              type="checkbox"
+              name="privacy"
+              checked={dom.whoisPrivacy}
+              onChange={(e) => flip({ whoisPrivacy: e.target.checked })}
+            />
+          </label>
+
           <label className="switch-row">
             <span>
               <span className="switch-row__label">{t('dom.lock')}</span>
@@ -1125,9 +1149,8 @@ export function DomainTransferOut() {
               name="lock"
               checked={lock}
               onChange={(e) => {
-                updateDomain(dom.id, { registrarLock: e.target.checked });
+                flip({ registrarLock: e.target.checked });
                 if (e.target.checked) setEpp(false);
-                mark();
               }}
             />
           </label>
@@ -1135,8 +1158,10 @@ export function DomainTransferOut() {
           {/* Transfer out is only possible with the lock off, so the state is explained
               right here rather than left as a button that silently refuses. */}
           <div className="acts__sep">
+            <p className="form__note u-mb-16">{t('dom.transferOutLede')}</p>
+
             <Button size="md" variant="danger" disabled={lock} onClick={() => setEpp(true)}>
-              {t('dom.eppRequest')}
+              {t('dom.transferOut')}
             </Button>
             {lock && <p className="form__note">{t('dom.lockedNote')}</p>}
 
