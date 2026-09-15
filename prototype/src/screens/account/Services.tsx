@@ -871,7 +871,7 @@ export function ServiceDetail() {
                 </Link>
               )}
               {live && svc.kind !== 'vps' && (
-                <Link className="btn btn--md btn--secondary" to={`/cpanel?domain=${svc.domain}&app=webmail`}>
+                <Link className="btn btn--md btn--secondary" to={`/cpanel/webmail?domain=${svc.domain}`}>
                   <IconMail size={15} />
                   {t('svc.webmail')}
                 </Link>
@@ -886,7 +886,7 @@ export function ServiceDetail() {
                 </Link>
               )}
               {live && svc.builder && (
-                <Link className="btn btn--md btn--secondary" to={`/cpanel?domain=${svc.domain}&app=builder`}>
+                <Link className="btn btn--md btn--secondary" to={`/cpanel/builder?domain=${svc.domain}`}>
                   <IconExternal size={15} />
                   {t('svc.builder')}
                 </Link>

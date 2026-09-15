@@ -86,6 +86,18 @@ export const ROUTES = [
   { name: 'err-403', path: '#/error/403' },
   { name: 'err-maintenance', path: '#/error/maintenance' },
   { name: 'cpanel-sso', path: '#/cpanel' },
+  // A page per panel tool. They are ten screens, not one screen with ten names, so the mobile
+  // walk sees ten — the Domains one in particular carries a paragraph the others do not.
+  { name: 'cpanel-email', path: '#/cpanel/email' },
+  { name: 'cpanel-forwarders', path: '#/cpanel/forwarders' },
+  { name: 'cpanel-autoresponders', path: '#/cpanel/autoresponders' },
+  { name: 'cpanel-files', path: '#/cpanel/files' },
+  { name: 'cpanel-backups', path: '#/cpanel/backups' },
+  { name: 'cpanel-domains', path: '#/cpanel/domains' },
+  { name: 'cpanel-cron', path: '#/cpanel/cron' },
+  { name: 'cpanel-mysql', path: '#/cpanel/mysql' },
+  { name: 'cpanel-phpmyadmin', path: '#/cpanel/phpmyadmin' },
+  { name: 'cpanel-awstats', path: '#/cpanel/awstats' },
   { name: 'sys-banners', path: '#/system/banners' },
   { name: 'not-found', path: '#/no/such/page' },
 

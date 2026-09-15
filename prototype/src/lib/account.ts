@@ -316,19 +316,27 @@ export const SERVICES: Service[] = [
 ];
 
 /** The cPanel destinations the service page links to; the transition screen names them. */
-export const CPANEL_APPS: { id: string; labelKey: string }[] = [
-  { id: 'email', labelKey: 'cp.email' },
-  { id: 'forwarders', labelKey: 'cp.forwarders' },
-  { id: 'autoresponders', labelKey: 'cp.autoresponders' },
-  { id: 'files', labelKey: 'cp.files' },
-  { id: 'backups', labelKey: 'cp.backups' },
-  { id: 'domains', labelKey: 'cp.domains' },
-  { id: 'cron', labelKey: 'cp.cron' },
-  { id: 'mysql', labelKey: 'cp.mysql' },
-  { id: 'phpmyadmin', labelKey: 'cp.phpmyadmin' },
-  { id: 'awstats', labelKey: 'cp.awstats' },
-  { id: 'webmail', labelKey: 'cp.webmail' },
-  { id: 'builder', labelKey: 'cp.builder' },
+/**
+ * The panel's tools, and the one line each that says what it is for.
+ *
+ * The note is not decoration: every one of these opens in cPanel rather than here, so the
+ * sentence on the way in is the last chance to tell somebody they are about to open the wrong
+ * tool — which is most of what "Domains" costs people, since the client area has a list by
+ * that name too and it is a different list.
+ */
+export const CPANEL_APPS: { id: string; labelKey: string; noteKey: string }[] = [
+  { id: 'email', labelKey: 'cp.email', noteKey: 'cp.emailNote' },
+  { id: 'forwarders', labelKey: 'cp.forwarders', noteKey: 'cp.forwardersNote' },
+  { id: 'autoresponders', labelKey: 'cp.autoresponders', noteKey: 'cp.autorespondersNote' },
+  { id: 'files', labelKey: 'cp.files', noteKey: 'cp.filesNote' },
+  { id: 'backups', labelKey: 'cp.backups', noteKey: 'cp.backupsNote' },
+  { id: 'domains', labelKey: 'cp.domains', noteKey: 'cp.domainsNote' },
+  { id: 'cron', labelKey: 'cp.cron', noteKey: 'cp.cronNote' },
+  { id: 'mysql', labelKey: 'cp.mysql', noteKey: 'cp.mysqlNote' },
+  { id: 'phpmyadmin', labelKey: 'cp.phpmyadmin', noteKey: 'cp.phpmyadminNote' },
+  { id: 'awstats', labelKey: 'cp.awstats', noteKey: 'cp.awstatsNote' },
+  { id: 'webmail', labelKey: 'cp.webmail', noteKey: 'cp.webmailNote' },
+  { id: 'builder', labelKey: 'cp.builder', noteKey: 'cp.builderNote' },
 ];
 
 /** The four WHOIS roles a registry keeps for a domain. */

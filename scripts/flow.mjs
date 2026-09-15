@@ -1136,6 +1136,7 @@ ok('the ledger lists what moved', (await p.$$eval('.card--flush .data tbody tr',
 await p.evaluate(() => (location.hash = '#/account/services/svc-8841'));
 await p.waitForSelector('.shortcuts');
 ok('ten cPanel shortcuts', (await p.$$eval('.shortcuts a', (n) => n.length)) === 10);
+
 const firstUpgrade = await p.$eval('a[href*="upgrade"]', (a) => a.getAttribute('href'));
 ok('the first upgrade link is the plan change', firstUpgrade.endsWith('/upgrade'), firstUpgrade);
 ok('exactly one cancel link', (await p.$$('a[href*="cancel"]')).length === 1);
@@ -1147,6 +1148,75 @@ ok('the invoices for this service are what it opens on', (await p.$$eval('.card 
 await p.click('.card .filters__btn:nth-child(2)');
 await p.waitForTimeout(120);
 ok('…and the domain it is attached to is beside them', (await p.$$('.card a[href*="/account/domains/"]')).length === 1);
+
+/*
+ * And ten destinations, not one destination linked ten times.
+ *
+ * Every one of these opens in cPanel, which is not ours to draw, so the temptation is a single
+ * handoff screen that every shortcut points at. That screen is indistinguishable from a broken
+ * list: press File Manager, press MySQL, arrive at the same heading twice. Each tool has a page
+ * that is titled by the tool and says what the tool is for, which is also the last chance to
+ * stop somebody opening the wrong one.
+ */
+{
+  const hrefs = await p.$$eval('.shortcuts a', (n) => n.map((a) => a.getAttribute('href')));
+  ok('each shortcut has its own address', new Set(hrefs).size === 10, `${new Set(hrefs).size} distinct`);
+
+  const heads = [];
+  for (const href of hrefs) {
+    await p.evaluate((h) => (location.hash = h.replace(/^#/, '')), href);
+    await p.waitForTimeout(140);
+    heads.push(await p.$eval('h1', (e) => e.textContent.trim()));
+  }
+  ok('each one lands on a page titled by its own tool', new Set(heads).size === 10, `${new Set(heads).size} distinct`);
+  ok(
+    '  and none of them is the generic handoff',
+    heads.every((h) => h !== 'بنحوّلك على cPanel'),
+  );
+
+  /* cPanel calls a thing Domains and so does the client area, and they are different lists.
+     That page is the one place the difference can be said before the trip is wasted. */
+  await p.evaluate(() => (location.hash = '#/cpanel/domains'));
+  await p.waitForSelector('.stage');
+  ok(
+    'the Domains tool says which Domains it is not',
+    (await p.$$eval('.stage a[href="#/account/domains"]', (n) => n.length)) === 1,
+  );
+
+  /* Unnamed, it is still the interstitial it was: the service page's own cPanel button has no
+     tool to name. */
+  await p.evaluate(() => (location.hash = '#/cpanel'));
+  await p.waitForSelector('.stage');
+  ok(
+    'the panel itself still has its handoff',
+    (await p.$eval('h1', (e) => e.textContent.trim())) === 'بنحوّلك على cPanel',
+  );
+}
+
+/*
+ * The dashboard carries the same two answers the service page does — how much room is left, and
+ * where the thing I do every day is — for the account's main hosting service. Both cards are one
+ * implementation shared with the service page, so what is worth holding here is that the
+ * dashboard renders them at all, against the primary service, and that its shortcut list is the
+ * full ten rather than a truncated taste of them.
+ */
+await p.evaluate(() => (location.hash = '#/account'));
+await p.waitForSelector('.shortcuts');
+{
+  const meters = await p.$$eval('.meter', (n) => n.length);
+  ok('the dashboard shows disk and transfer', meters === 2, `${meters} meter(s)`);
+  ok(
+    '  each meter reads as a number, not just a bar',
+    await p.$$eval('.meter__track', (n) => n.length === 2 && n.every((x) => (x.getAttribute('aria-label') ?? '').length > 6)),
+  );
+  ok('the dashboard shortcut list is the full ten', (await p.$$eval('.shortcuts a', (n) => n.length)) === 10);
+  ok(
+    '  and every one of them carries the domain it is for',
+    await p.$$eval('.shortcuts a', (n) =>
+      n.every((a) => (a.getAttribute('href') ?? '').includes('domain=atelier-kamal.com')),
+    ),
+  );
+}
 
 // O-01 for a VPS: server settings gate Continue until they are real.
 await p.evaluate(() => (location.hash = '#/configure/vps-2'));

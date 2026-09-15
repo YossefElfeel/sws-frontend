@@ -13,6 +13,7 @@ import {
 } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { CPANEL_APPS } from '../lib/account';
+import { APP_ICON } from '../components/ServiceUsage';
 
 /**
  * Error pages — S-01.
@@ -113,7 +114,7 @@ export function ErrorPage({ kind: fixed }: { kind?: ErrKind }) {
 }
 
 /**
- * cPanel transition — S-03.
+ * cPanel transition — S-03, and a page for each of the panel's tools.
  *
  * cPanel is entirely outside our control: different typeface, different density, English-only
  * in places, and left-to-right whatever the reader's language. Dropping someone into it with
@@ -121,31 +122,51 @@ export function ErrorPage({ kind: fixed }: { kind?: ErrKind }) {
  *
  * So this screen does the one useful thing available: it says what is about to change, and
  * how to get back. It is a half-second interstitial, not a wall.
+ *
+ * Named with a tool — /cpanel/files — it is that tool's page rather than one page that ten
+ * shortcuts all arrive at. The shortcut lists on the dashboard and the service page are ten
+ * links each, and ten links landing on the same screen under the same heading are, to the
+ * reader, one link drawn ten times. So the tool's name is the heading, its glyph is the mark,
+ * and the line under it says what the tool is for — the last chance to catch somebody who is
+ * about to open the wrong one. cPanel still draws the tool itself; that part is not ours.
  */
 export function CpanelTransition() {
   const { t } = useLocale();
   const [params] = useSearchParams();
+  const { app: named } = useParams<{ app: string }>();
   const [going, setGoing] = useState(false);
   const domain = params.get('domain') ?? 'atelier-kamal.com';
-  // A shortcut on the service page names where in cPanel it lands; the handoff says so too.
-  const app = CPANEL_APPS.find((a) => a.id === params.get('app'));
+  /* The path names the tool. The query still does too, for any link made before it did. */
+  const app = CPANEL_APPS.find((a) => a.id === (named ?? params.get('app')));
 
   return (
     <Layout>
       <section className="section shell">
         <div className="stage">
           <span className="stage__mark" aria-hidden="true">
-            <IconServer size={28} />
+            {app?.id && APP_ICON[app.id] ? APP_ICON[app.id](28) : <IconServer size={28} />}
           </span>
-          <h1 className="stage__title">{t('sso.title')}</h1>
-          <p className="stage__body">{t('sso.body')}</p>
+          <h1 className="stage__title">{app ? t(app.labelKey as never) : t('sso.title')}</h1>
+          <p className="stage__body">{app ? t(app.noteKey as never) : t('sso.body')}</p>
 
           <p className="sso__domain serial">
             <bdi>{domain}</bdi>
           </p>
+
+          {/* On a tool's page the heading is the tool, so the sentence about cPanel moves down
+              here. It is the second thing to know, not the first. */}
           {app && (
+            <p className="card__body">{t('sso.handoff')}</p>
+          )}
+
+          {/*
+            Domains is the one name both panels use, and they mean different things by it.
+            Somebody who came looking for the domain they renew with us is then one press from
+            the right list rather than one trip through the wrong panel.
+          */}
+          {app?.id === 'domains' && (
             <p className="card__body">
-              {t('sso.opening')} <strong>{t(app.labelKey as never)}</strong>
+              {t('cp.domainsElse')} <Link to="/account/domains">{t('cp.domainsElseLink')}</Link>
             </p>
           )}
 
