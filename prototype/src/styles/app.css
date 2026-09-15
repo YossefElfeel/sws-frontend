@@ -3195,3 +3195,30 @@ button.stat {
   gap: var(--sws-space-8);
   margin-block-start: var(--sws-space-16);
 }
+
+/*
+ * The domain rail is two menus too, and it cannot say so the way the hosting rail does.
+ *
+ * Out on a marketing page each menu is a recessed panel, and two panels separate themselves.
+ * In here the rail keeps no box at all — see `.rail--domain` above — so two of them would be
+ * two invisible boxes with a gap, which is not a division, it is a bigger margin.
+ *
+ * So the second menu draws a rule across the column. It is the same hairline the headings
+ * already use, doing the same job one level up: furniture, not a card.
+ */
+.app__main .rail-stack > .rail--domain + .rail--domain {
+  padding-block-start: var(--sws-space-16);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  /*
+   * The corners go with it. `.rail` carries an `lg` radius for the panel it draws out on a
+   * marketing page; in here there is no panel, and a straight rule inheriting that radius bends
+   * up at both ends like the lid of a box that is not there.
+   */
+  border-radius: 0;
+}
+
+/* The rule replaces the gap rather than adding to it: a line with 16 either side of it reads as
+   a divider, and a line with 32 reads as two things that happen to have a line between them. */
+.app__main .rail-stack {
+  gap: 0;
+}

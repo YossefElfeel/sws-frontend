@@ -60,38 +60,53 @@ export function DomainPage({
       }
     >
       <div className="with-rail with-rail--domain">
-        <aside className="rail rail--domain" aria-label={t('svc.manage')}>
-          <RailGroup id="domain-manage" label={t('svc.manage')}>
-            {PAGES.map((p) => (
-              <li key={p.slug}>
-                <NavLink className="rail__link" to={p.slug ? `${base}/${p.slug}` : base} end={!p.slug}>
-                  {t(p.key as never)}
-                </NavLink>
-              </li>
-            ))}
-          </RailGroup>
+        {/*
+          The same two menus the hosting rail was split into, for the same reason: the eight
+          pages are where you are inside this domain, and the three actions are errands — one of
+          them renews this domain, and the other two leave it behind for a different one.
 
-          <RailGroup id="domain-actions" label={t('rail.actions')}>
-            <li>
-              <Link className="rail__link" to={`/account/renew/${dom.id}`}>
-                <IconArrow size={15} />
-                {t('dom.renew')}
-              </Link>
-            </li>
-            <li>
-              <Link className="rail__link" to="/domains">
-                <IconPlus size={15} />
-                {t('rail.register')}
-              </Link>
-            </li>
-            <li>
-              <Link className="rail__link" to="/transfer">
-                <IconArrow size={15} />
-                {t('rail.transfer')}
-              </Link>
-            </li>
-          </RailGroup>
-        </aside>
+          What is different here is what the split can be made of. In the client area the rail
+          keeps no box of its own — the ground is already the recessed tint and the cards are
+          what lifts off it — so two panels would be two invisible boxes and would separate
+          nothing. The divide is a rule instead, which is furniture rather than merchandise and
+          is what this room uses anyway.
+        */}
+        <div className="rail-stack">
+          <aside className="rail rail--domain" aria-label={t('svc.manage')}>
+            <RailGroup id="domain-manage" label={t('svc.manage')}>
+              {PAGES.map((p) => (
+                <li key={p.slug}>
+                  <NavLink className="rail__link" to={p.slug ? `${base}/${p.slug}` : base} end={!p.slug}>
+                    {t(p.key as never)}
+                  </NavLink>
+                </li>
+              ))}
+            </RailGroup>
+          </aside>
+
+          <aside className="rail rail--domain" aria-label={t('rail.actions')}>
+            <RailGroup id="domain-actions" label={t('rail.actions')}>
+              <li>
+                <Link className="rail__link" to={`/account/renew/${dom.id}`}>
+                  <IconArrow size={15} />
+                  {t('dom.renew')}
+                </Link>
+              </li>
+              <li>
+                <Link className="rail__link" to="/domains">
+                  <IconPlus size={15} />
+                  {t('rail.register')}
+                </Link>
+              </li>
+              <li>
+                <Link className="rail__link" to="/transfer">
+                  <IconArrow size={15} />
+                  {t('rail.transfer')}
+                </Link>
+              </li>
+            </RailGroup>
+          </aside>
+        </div>
 
         <div className="with-rail__body">{children}</div>
       </div>
