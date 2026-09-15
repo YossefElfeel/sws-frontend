@@ -498,3 +498,13 @@ export function IconClock({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+/** The power mark: a ring the stroke enters from the top, same as every switch on a machine. */
+export function IconPower({ size = 18, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 3.5v7.5" />
+      <path d="M17.5 7a7.5 7.5 0 1 1-11 0" />
+    </svg>
+  );
+}

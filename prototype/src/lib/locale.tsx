@@ -182,6 +182,9 @@ export const STRINGS = {
   'action.armed': { ar: 'اضغط أكّد الحذف عشان تتم الإزالة، أو إلغاء عشان تسيبها.', en: 'Press confirm delete to remove it, or cancel to leave it.' },
   'action.search': { ar: 'ابحث', en: 'Search' },
   'action.add': { ar: 'أضف', en: 'Add' },
+  'action.save': { ar: 'احفظ', en: 'Save' },
+  /* The dismiss on a dialog that only shows something and has nothing to agree to. */
+  'action.close': { ar: 'إغلاق', en: 'Close' },
 
   'cycle.monthly': { ar: 'شهريًا', en: 'Monthly' },
   'cycle.annually': { ar: 'سنويًا', en: 'Annually' },
@@ -1477,6 +1480,113 @@ export const STRINGS = {
   'vpsm.usedMib': { ar: 'المستخدم، ميجابايت', en: 'In use, MiB' },
   'vpsm.readKib': { ar: 'قراءة، كيلوبايت/ث', en: 'Read, KiB/s' },
   'vpsm.writeKib': { ar: 'كتابة، كيلوبايت/ث', en: 'Write, KiB/s' },
+
+  // ── the server controls — spec 9.3 ────────────────────────────────────────
+  // The graphs say what the machine has been doing. These say what to do about it, which is
+  // why they sit above them. Every label is a verb on a machine, not a feature name: the
+  // reader is here because something is wrong, and a noun does not tell them what will happen.
+  'vpsc.title': { ar: 'التحكم في الخادم', en: 'Server controls' },
+  'vpsc.powerGroup': { ar: 'تشغيل وإيقاف', en: 'Power' },
+  'vpsc.manageGroup': { ar: 'إدارة الخادم', en: 'Server management' },
+  'vpsc.state.running': { ar: 'شغّال', en: 'Running' },
+  'vpsc.state.stopped': { ar: 'متوقّف', en: 'Stopped' },
+  'vpsc.state.rescue': { ar: 'وضع الإنقاذ', en: 'Rescue mode' },
+
+  'vpsc.start': { ar: 'تشغيل', en: 'Start' },
+  'vpsc.stop': { ar: 'إيقاف', en: 'Stop' },
+  'vpsc.powerOff': { ar: 'فصل الكهرباء', en: 'Power off' },
+  'vpsc.restart': { ar: 'إعادة تشغيل', en: 'Restart' },
+  'vpsc.reinstall': { ar: 'إعادة تثبيت', en: 'Reinstall' },
+  'vpsc.vnc': { ar: 'كونسول VNC', en: 'VNC access' },
+  'vpsc.rootPw': { ar: 'تغيير باسورد root', en: 'Reset root password' },
+  'vpsc.hostname': { ar: 'تغيير اسم الخادم', en: 'Change hostname' },
+  'vpsc.rescue': { ar: 'وضع الإنقاذ', en: 'Rescue' },
+
+  // Start is the one press with nothing to lose, so it is the one press with no dialog.
+  'vpsc.startDone': { ar: 'الخادم بيشتغل', en: 'The server is starting' },
+
+  'vpsc.stopTitle': { ar: 'إيقاف الخادم؟', en: 'Stop the server?' },
+  'vpsc.stopLede': {
+    ar: 'الخادم هياخد أمر إيقاف عادي، يقفل اللي شغال عنده الأول وبعدين يطفي. المواقع عليه هتبقى مقفولة لحد ما تشغّله تاني.',
+    en: 'The machine is asked to shut down in the usual way, so what is running on it closes first. Anything it serves is off until you start it again.',
+  },
+  'vpsc.stopDone': { ar: 'أمر الإيقاف اتبعت', en: 'Stop requested' },
+
+  'vpsc.powerOffTitle': { ar: 'فصل الكهرباء عن الخادم؟', en: 'Power off the server?' },
+  'vpsc.powerOffLede': {
+    ar: 'ده مش إيقاف عادي — الكهرباء بتتفصل على طول، زي ما تشيل الكابل.',
+    en: 'This is not a shutdown. The power is cut at once, the way pulling the cable cuts it.',
+  },
+  'vpsc.powerOffWarn': { ar: 'اللي لسه ما اتحفظش ممكن يضيع', en: 'Unsaved work can be lost' },
+  'vpsc.powerOffWarnNote': {
+    ar: 'قواعد البيانات والملفات اللي بيتكتب فيها في اللحظة دي ممكن تتقفل ناقصة. لو الخادم بيرد، «إيقاف» أأمن.',
+    en: 'A database or a file mid-write can be left incomplete. If the machine still answers, Stop is the safer way.',
+  },
+  'vpsc.powerOffDone': { ar: 'الكهرباء اتفصلت', en: 'Power cut' },
+
+  'vpsc.restartTitle': { ar: 'إعادة تشغيل الخادم؟', en: 'Restart the server?' },
+  'vpsc.restartLede': {
+    ar: 'الخادم هيقفل ويرجع يفتح لوحده. المواقع عليه هتقع دقيقة تقريبًا.',
+    en: 'The machine shuts down and comes back on its own. What it serves is off for about a minute.',
+  },
+  'vpsc.restartDone': { ar: 'أمر إعادة التشغيل اتبعت', en: 'Restart requested' },
+
+  'vpsc.reinstallTitle': { ar: 'إعادة تثبيت النظام', en: 'Reinstall the operating system' },
+  'vpsc.reinstallLede': {
+    ar: 'الخادم هيرجع زي ما اتسلّم أول مرة، بالنظام اللي تختاره.',
+    en: 'The machine goes back to the state it was handed over in, with the system you pick.',
+  },
+  'vpsc.reinstallWarn': { ar: 'القرص بيتمسح بالكامل', en: 'The disk is erased' },
+  'vpsc.reinstallWarnNote': {
+    ar: 'كل الملفات وقواعد البيانات والإعدادات على الخادم بتروح، ومفيش رجوع. خُد نسخة احتياطية الأول.',
+    en: 'Every file, database and setting on the machine goes, and there is no undo. Take a backup first.',
+  },
+  'vpsc.image': { ar: 'النظام', en: 'Operating system' },
+  'vpsc.reinstallGo': { ar: 'امسح وأعد التثبيت', en: 'Erase and reinstall' },
+  'vpsc.reinstallDone': { ar: 'إعادة التثبيت اتطلبت', en: 'Reinstall requested' },
+
+  'vpsc.vncTitle': { ar: 'كونسول VNC', en: 'VNC console' },
+  'vpsc.vncLede': {
+    ar: 'شاشة الخادم نفسه — الطريق الوحيد لما SSH يبقى مقفول أو الشبكة واقعة.',
+    en: "The machine's own screen — the way in when SSH is shut or the network is down.",
+  },
+
+  'vpsc.rootPwTitle': { ar: 'تغيير باسورد root', en: 'Reset the root password' },
+  'vpsc.rootPwLede': {
+    ar: 'هنعمل باسورد جديد لـ root ونبعته على إيميل الحساب.',
+    en: "A new root password is generated and sent to the account's email address.",
+  },
+  'vpsc.rootPwWarn': { ar: 'أي حاجة بتستخدم الباسورد القديم هتقف', en: 'Anything using the old password stops' },
+  'vpsc.rootPwWarnNote': {
+    ar: 'السكربتات والنسخ الاحتياطي والأدوات اللي بتدخل بـ root بالباسورد هتفشل لحد ما تتحدّث. مفاتيح SSH ما بتتأثرش.',
+    en: 'Scripts, backups and tools that sign in as root with a password fail until they are updated. SSH keys are not affected.',
+  },
+  'vpsc.rootPwGo': { ar: 'غيّر الباسورد', en: 'Reset the password' },
+  'vpsc.rootPwDone': { ar: 'تغيير الباسورد اتطلب', en: 'Password reset requested' },
+
+  'vpsc.hostnameTitle': { ar: 'تغيير اسم الخادم', en: 'Change the hostname' },
+  'vpsc.hostnameLede': {
+    ar: 'الاسم ده بيظهر في سجلات الخادم وفي هيدر الإيميل اللي بيطلع منه.',
+    en: "The name that appears in the machine's own logs and in the headers of mail it sends.",
+  },
+  'vpsc.hostnameBad': {
+    ar: 'حروف إنجليزية وأرقام وشرطة بس، والشرطة ما تبدأش ولا تخلص بيها.',
+    en: 'Letters, digits and hyphens only, and not starting or ending on a hyphen.',
+  },
+  'vpsc.hostnameDone': { ar: 'اسم الخادم اتغيّر', en: 'Hostname changed' },
+
+  'vpsc.rescueTitle': { ar: 'تشغيل وضع الإنقاذ', en: 'Boot into rescue mode' },
+  'vpsc.rescueLede': {
+    ar: 'الخادم هيقوم بنظام صغير في الرام بدل اللي على القرص، والقرص بيبقى موجود تقدر تصلّحه.',
+    en: 'The machine boots a small system in memory instead of the one on its disk, and the disk is there to be repaired.',
+  },
+  'vpsc.rescueWarn': { ar: 'مواقعك مش هتشتغل وإنت في الوضع ده', en: 'Nothing you host runs while it is in rescue' },
+  'vpsc.rescueWarnNote': {
+    ar: 'ده وضع تصليح مش وضع تشغيل. أول ما تخلص، «إعادة تشغيل» بترجّع الخادم لنظامه.',
+    en: 'It is a repair mode, not a running one. Restart puts the machine back on its own system when you are done.',
+  },
+  'vpsc.rescueGo': { ar: 'شغّل وضع الإنقاذ', en: 'Boot into rescue' },
+  'vpsc.rescueDone': { ar: 'الخادم في وضع الإنقاذ', en: 'The server is in rescue mode' },
   'svc.left': { ar: 'متبقّي', en: 'left' },
   'dom.registration': { ar: 'بيانات التسجيل', en: 'Registration' },
   'funds.adding': { ar: 'هتضيف', en: 'Adding' },
@@ -2023,6 +2133,23 @@ export const STRINGS = {
   'dev.taxId': {
     ar: 'رقم التسجيل الضريبي بيتحدد لكل سوق (القرار I12) وهيتضاف هنا أول ما يتأكد.',
     en: 'The tax registration number is decided per market (decision I12) and is added here once confirmed.',
+  },
+  /*
+   * The three server acts that reach past WHMCS itself. WHMCS ships the buttons as a module
+   * (ModuleCustomButton), but what each one does — and the list of images it offers — belongs
+   * to the virtualisation panel behind the product, not to the billing system.
+   */
+  'dev.vpsImages': {
+    ar: 'قايمة الأنظمة دي مثال. اللي هيظهر فعلًا بييجي من لوحة الفيرتشوالايزيشن ورا المنتج ولازم يتأكد منها.',
+    en: 'This list is a placeholder. The images actually on offer come from the virtualisation panel behind the product and have to be confirmed against it.',
+  },
+  'dev.vpsVnc': {
+    ar: 'الكونسول نفسه بيفتحه الـ panel مش WHMCS — محتاج توكن مؤقت ومنفذ من الـ module قبل ما الزرار ده يفتح حاجة.',
+    en: 'The console is opened by the panel, not by WHMCS — this needs a short-lived token and a port from the module before the button opens anything.',
+  },
+  'dev.vpsRootPw': {
+    ar: 'الباسورد الجديد بيتولّد في الـ panel. محتاج نتأكد إزاي بيوصل للعميل — إيميل، ولا يظهر مرة واحدة هنا.',
+    en: 'The new password is generated by the panel. How it reaches the client needs confirming — by email, or shown once here.',
   },
 
   // Service detail — C-03 extended.

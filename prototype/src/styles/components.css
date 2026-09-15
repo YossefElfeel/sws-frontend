@@ -1233,3 +1233,140 @@ label.consent__row {
     transition: none;
   }
 }
+
+/* ── the dialog — Modal ─────────────────────────────────────────────────────── */
+
+/*
+ * The scrim is the dialog's own element rather than a pseudo on the panel, because it has to
+ * take a click: clicking outside a dialog is how most readers close one, and a ::before cannot
+ * be a hit target of its own.
+ *
+ * It centres with flex and pads its own edges, so a panel taller than the viewport scrolls
+ * inside itself and never loses its bottom row of buttons under the fold — the failure that
+ * makes a confirm dialog on a phone unusable.
+ *
+ * It sits on its own layer above the consent bar. The bar is 90 and was the top of the stack
+ * for everything the reader did not open deliberately; at 390px it covered exactly the strip a
+ * tall dialog puts its confirm and its cancel in, which is a dialog with no way out. The bar is
+ * not modal — it can be answered after — so the dialog goes over it, and only the toast layer
+ * and the skip link stay above them both.
+ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sws-layer-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sws-space-16);
+  background: var(--sws-scrim);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.modal__panel {
+  inline-size: 100%;
+  max-inline-size: 28rem;
+  max-block-size: calc(100vh - var(--sws-space-32));
+  padding: var(--sws-space-24);
+  overflow-y: auto;
+  background: var(--sws-surface-raised);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-lg);
+  box-shadow: var(--sws-elevation-over);
+}
+
+/* Wider for a dialog that carries a field, a list or a warning rather than one sentence. */
+.modal__panel--md {
+  max-inline-size: 34rem;
+}
+
+.modal__head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--sws-space-12);
+}
+
+.modal__title {
+  margin: 0;
+  font-size: var(--sws-font-size-h3);
+  font-weight: var(--sws-weight-semibold);
+  line-height: var(--sws-line-height-h3);
+  color: var(--sws-text-primary);
+}
+
+/* The same 44px target the banner's dismiss uses, pulled back onto the panel's own padding. */
+.modal__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--sws-touch-target-min);
+  block-size: var(--sws-touch-target-min);
+  margin: calc(var(--sws-space-12) * -1) calc(var(--sws-space-8) * -1);
+  background: none;
+  border: 0;
+  border-radius: var(--sws-radius-sm);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+}
+
+.modal__close:hover {
+  color: var(--sws-text-primary);
+}
+
+/* What the act does, said before anybody agrees to it. */
+.modal__lede {
+  margin-block: var(--sws-space-8) 0;
+  color: var(--sws-text-secondary);
+}
+
+.modal__body {
+  margin-block-start: var(--sws-space-16);
+}
+
+/*
+ * The act first, its way out second, and the row wraps rather than shrinking its buttons: a
+ * confirm that has been squeezed narrower than its own word is the one control on the screen
+ * that must not be misread.
+ */
+.modal__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin-block-start: var(--sws-space-24);
+}
+
+/* ── the server control rows — ServerControls ───────────────────────────────── */
+
+/*
+ * Two rows of buttons, and they wrap rather than scroll. A power switch that has half its
+ * states off the side of a phone is a power switch you cannot trust, and the machine's current
+ * state is carried by which buttons are live — so all of them have to be on screen at once.
+ */
+.ctl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+}
+
+.ctl + .ctl {
+  margin-block-start: var(--sws-space-12);
+  padding-block-start: var(--sws-space-12);
+  border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
+}
+
+/*
+ * .btn--danger is quiet at rest by design — "cancelling a service is not the same kind of act
+ * as upgrading one, and should not wear the same button". That rule is about a danger sitting
+ * among ordinary options, where being easy to reach is the fault.
+ *
+ * A dialog is the other case. The reader has already reached for it; it is the reason the
+ * dialog is open, and it is the only act in the footer. Left quiet it draws less than the
+ * Cancel beside it, which does have a frame — so the confirm reads as the secondary of the
+ * two and the way out reads as the act. It gets its edge back here, and only here: still not
+ * filled red, but unmistakably a button before it is pointed at.
+ */
+.modal__foot .btn--danger {
+  border-color: var(--sws-status-danger);
+}
