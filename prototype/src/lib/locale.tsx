@@ -1419,6 +1419,25 @@ export const STRINGS = {
 
   // ── client-area screens ───────────────────────────────────────────────────
   'svc.usage': { ar: 'الاستهلاك', en: 'Usage' },
+
+  // ── the VPS graphs — spec 9.3 ─────────────────────────────────────────────
+  // A server page answers a question a cPanel page never gets asked: what has this machine been
+  // doing. Four graphs, in the order somebody reads them when something is wrong.
+  'vpsm.title': { ar: 'أداء الخادم', en: 'Server activity' },
+  'vpsm.note': {
+    ar: 'آخر ساعتين. الأرقام من الخادم نفسه، مش من مقياس تاني.',
+    en: 'The last two hours, read from the machine itself.',
+  },
+  'vpsm.cpu': { ar: 'المعالج', en: 'CPU' },
+  'vpsm.memory': { ar: 'الذاكرة', en: 'Memory' },
+  'vpsm.network': { ar: 'الشبكة', en: 'Network' },
+  'vpsm.disk': { ar: 'القرص', en: 'Disk' },
+  // Each label carries its own unit, because the legend is the only place a unit gets said once.
+  // A chart with a single series was naming it in the legend and again in a caption underneath.
+  'vpsm.load': { ar: 'متوسط الحمل %', en: 'Load average %' },
+  'vpsm.usedMib': { ar: 'المستخدم، ميجابايت', en: 'In use, MiB' },
+  'vpsm.readKib': { ar: 'قراءة، كيلوبايت/ث', en: 'Read, KiB/s' },
+  'vpsm.writeKib': { ar: 'كتابة، كيلوبايت/ث', en: 'Write, KiB/s' },
   'svc.left': { ar: 'متبقّي', en: 'left' },
   'dom.registration': { ar: 'بيانات التسجيل', en: 'Registration' },
   'funds.adding': { ar: 'هتضيف', en: 'Adding' },

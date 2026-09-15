@@ -9,6 +9,8 @@ import { StatRow, type StatItem } from '../../components/Stat';
 import { TableToolbar, TableFilter, TableSort, matches } from '../../components/TableToolbar';
 import { TablePager, PAGE_SIZE } from '../../components/TablePager';
 import { RowMenu, type RowMenuItem } from '../../components/RowMenu';
+import { UsageChart } from '../../components/UsageChart';
+import { VPS_METRICS, SAMPLED_AT } from '../../lib/telemetry';
 import {
   IconArrow,
   IconExternal,
@@ -626,6 +628,30 @@ export function ServiceDetail() {
               </span>
             </p>
           </section>
+
+          {/*
+            The graphs, and only on a machine that is running. A cPanel account has no processor
+            of its own to report on, and a stopped VPS has nothing to draw but four flat lines —
+            which reads as a broken chart rather than as an idle server.
+          */}
+          {live && svc.kind === 'vps' && (
+            <section className="card">
+              <header className="card__head">
+                <h2 className="card__heading">{t('vpsm.title')}</h2>
+              </header>
+              <div className="charts">
+                {VPS_METRICS.map((m) => (
+                  <UsageChart key={m.id} metric={m} />
+                ))}
+              </div>
+              <p className="form__note">
+                {t('vpsm.note')} {t('svc.usageAt')}{' '}
+                <span className="serial">
+                  <bdi>{SAMPLED_AT}</bdi>
+                </span>
+              </p>
+            </section>
+          )}
 
           <section className="card">
             <header className="card__head">
