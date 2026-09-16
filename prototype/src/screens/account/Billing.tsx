@@ -18,6 +18,7 @@ import {
   IconCoin,
   IconSupport,
   IconClose,
+  IconInfo,
   IconTrash,
   IconEye,
 } from '../../components/icons';
@@ -1153,6 +1154,92 @@ export function PaymentMethods() {
  * stays — a card kept for future renewals needs the same confirmation a payment does — so the
  * button goes to 3-D Secure in setup mode, which knows to come back to the list.
  */
+/**
+ * Which method to keep on file — the step that was missing.
+ *
+ * Add opened the card form directly, so the only method an account could keep was a card. The
+ * Egyptian wallet is tokenisable and was unreachable; two of the five gateways this product
+ * already supports were not offered at all.
+ *
+ * The list is `storable`, not every gateway. A bank transfer and an InstaPay send are somebody
+ * moving money by hand and cannot be repeated on our say-so, so offering to "save" one would
+ * promise an auto-renewal that will never run — the one failure on this screen a customer
+ * discovers when a service stops. They are named underneath instead, because a customer who
+ * pays by InstaPay every month looks for them here first and an absence with no reason reads
+ * as a missing feature.
+ *
+ * Where it goes next is the gateway's own flow: inline collects the card here, redirect is
+ * authorised at the provider and lands back on the list.
+ */
+export function AddPaymentMethod() {
+  const { t } = useLocale();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const first = params.get('first') === '1';
+  const storable = GATEWAYS.filter((g) => g.storable);
+  const [choice, setChoice] = useState(storable[0]?.id ?? '');
+
+  return (
+    <AccountLayout
+      title={t('pm.choose')}
+      lede={t('pm.chooseLede')}
+      crumbs={[
+        { label: t('acc.portalHome'), to: '/account' },
+        { label: t('acc.methods'), to: '/account/payment-methods' },
+        { label: t('pm.choose') },
+      ]}
+    >
+      <Card>
+        <ul className="methods">
+          {storable.map((g) => (
+            <li key={g.id}>
+              <label className={`method${choice === g.id ? ' is-selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="pm-kind"
+                  value={g.id}
+                  checked={choice === g.id}
+                  onChange={() => setChoice(g.id)}
+                />
+                <span className="method__label">
+                  {t(g.labelKey as never)}
+                  <span className="method__note">{t(g.noteKey as never)}</span>
+                </span>
+              </label>
+            </li>
+          ))}
+        </ul>
+
+        <div className="form__foot">
+          <Button
+            size="md"
+            onClick={() => {
+              const g = GATEWAYS.find((x) => x.id === choice);
+              if (!g) return;
+              navigate(
+                g.flow === 'inline'
+                  ? `/account/payment-methods/new/card${first ? '?first=1' : ''}`
+                  : `/checkout/redirect?gateway=${g.id}&setup=${g.id}`,
+              );
+            }}
+          >
+            {t('pm.continue')}
+            <IconArrow size={15} />
+          </Button>
+        </div>
+      </Card>
+
+      <div className="notice notice--spaced">
+        <IconInfo size={20} />
+        <div>
+          <h2 className="card__title">{t('pm.manualTitle')}</h2>
+          <p className="card__body">{t('pm.manualNote')}</p>
+        </div>
+      </div>
+    </AccountLayout>
+  );
+}
+
 export function AddCard() {
   const { t } = useLocale();
   const navigate = useNavigate();

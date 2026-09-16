@@ -889,16 +889,18 @@ export const STRINGS = {
    * asks, but nothing is being paid, so the copy cannot say a payment went through — a
    * confirmation that claims money moved is the one sentence a card-setup screen must not say.
    */
+  /* Method-neutral since the wallet reaches this screen too: it is not a card, and the thing
+     confirming it is not a bank. */
   'tds.setupGoBody': {
-    ar: 'البنك هيسألك تأكيد إن الكارت بتاعك. مفيش أي مبلغ بيتدفع هنا.',
-    en: 'Your bank will ask you to confirm the card is yours. Nothing is being paid here.',
+    ar: 'هيتطلب منك تأكيد إن طريقة الدفع دي بتاعتك. مفيش أي مبلغ بيتدفع هنا.',
+    en: 'You will be asked to confirm this payment method is yours. Nothing is being paid here.',
   },
-  'tds.setupBackTitle': { ar: 'البنك أكّد الكارت', en: 'Your bank confirmed the card' },
+  'tds.setupBackTitle': { ar: 'طريقة الدفع اتأكدت', en: 'Your payment method is confirmed' },
   'tds.setupBackBody': {
-    ar: 'فاضل نحفظه في حسابك.',
+    ar: 'فاضل نحفظها في حسابك.',
     en: 'All that is left is saving it to your account.',
   },
-  'tds.setupFinish': { ar: 'احفظ الكارت', en: 'Save the card' },
+  'tds.setupFinish': { ar: 'احفظ طريقة الدفع', en: 'Save the payment method' },
 
   // ── transfer instructions: O-10 and O-11 ──────────────────────────────────
   'bank.title': { ar: 'تحويل بنكي', en: 'Bank transfer' },
@@ -1858,6 +1860,19 @@ export const STRINGS = {
   'pm.primary': { ar: 'الأساسية', en: 'Primary' },
   'pm.makePrimary': { ar: 'اجعلها الأساسية', en: 'Make primary' },
   'pm.add': { ar: 'أضف بطاقة', en: 'Add a card' },
+  'pm.choose': { ar: 'أضف طريقة دفع', en: 'Add a payment method' },
+  'pm.chooseLede': {
+    ar: 'اختار الطريقة اللي عايز تحفظها للتجديد التلقائي.',
+    en: 'Choose the method you want kept on file for automatic renewal.',
+  },
+  'pm.continue': { ar: 'كمّل', en: 'Continue' },
+  /* The two that are missing are missing for a reason, and a customer who pays by InstaPay
+     every month will look for them here first. */
+  'pm.manualTitle': { ar: 'التحويل البنكي وإنستاباي', en: 'Bank transfer and InstaPay' },
+  'pm.manualNote': {
+    ar: 'دول مابيتحفظوش، لأن التحويل بيتم منك إنت مش مننا — فمش ممكن يتخصم لوحده. تقدر تختارهم وقت دفع أي فاتورة.',
+    en: 'These are not kept on file: the transfer is made by you rather than by us, so nothing can be charged automatically. You can choose either one when paying any invoice.',
+  },
   'pm.addLede': {
     ar: 'الكارت بيتحفظ عشان التجديدات تتدفع لوحدها. مفيش حاجة بتتخصم دلوقتي.',
     en: 'The card is saved so renewals can pay themselves. Nothing is charged now.',

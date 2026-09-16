@@ -288,6 +288,19 @@ export interface Gateway {
   details?: { labelKey: string; value: string }[];
   /** What to do once the money has left, for manual flows. */
   afterKey?: string;
+  /**
+   * Whether the account can keep this method on file and charge it again.
+   *
+   * A decision rather than an inference from `flow`, because the flow does not settle it: the
+   * Egyptian wallet redirects and is still tokenisable, while TWINT and Klarna redirect and
+   * are authorised per payment — there is nothing to keep. A bank transfer and an InstaPay
+   * send are somebody moving money by hand, which cannot be repeated on our say-so at all.
+   *
+   * This is what the saved-methods list is a list of. Offering to "save" a method that cannot
+   * be charged again would promise an auto-renewal that will not happen, which is the one
+   * failure on that screen a customer only discovers when a service stops.
+   */
+  storable?: boolean;
 }
 
 export const GATEWAYS: Gateway[] = [
@@ -296,6 +309,7 @@ export const GATEWAYS: Gateway[] = [
     labelKey: 'pay.stripeCard',
     marks: ['Stripe'],
     flow: 'inline',
+    storable: true,
     noteKey: 'pay.note.stripeCard',
     instructionsKey: 'pay.how.stripeCard',
   },
@@ -313,6 +327,7 @@ export const GATEWAYS: Gateway[] = [
     marks: ['Mastercard', 'VISA', 'Meeza'],
     egpOnly: true,
     flow: 'redirect',
+    storable: true,
     noteKey: 'pay.note.wallet',
     instructionsKey: 'pay.how.wallet',
   },
