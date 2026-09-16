@@ -799,6 +799,15 @@
   box-shadow: var(--sws-shadow-card);
 }
 
+/*
+ * The panel's heading. .card__title carries no margin of its own — inside a .card the head
+ * element sets that — so here the title sat directly on the first figure with nothing between
+ * the name of the summary and the summary.
+ */
+.checkout__aside > .card__title {
+  margin-block-end: var(--sws-space-16);
+}
+
 .summary {
   margin-block-end: var(--sws-space-16);
 }
@@ -810,6 +819,20 @@
   padding-block: var(--sws-space-12);
   border-block-end: var(--sws-rule-hair) solid var(--sws-border-subtle);
   font-size: var(--sws-font-size-body-sm);
+}
+
+/* The heading above already holds the line off; its own top padding would count that gap twice. */
+.summary__line:first-child {
+  padding-block-start: 0;
+}
+
+/*
+ * The figure is the column the eye runs down. It keeps its width whatever the product is
+ * called, and a price is one thing, so it is never broken over two lines.
+ */
+.summary__line > :last-child {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 /* ── totals ────────────────────────────────────────────────────────────────── */
@@ -836,18 +859,43 @@
   margin: 0;
   font-weight: var(--sws-weight-semibold);
   font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
 }
 
+/*
+ * The label and the figure were both set at h3, and in the 304px summary panel "الإجمالي
+ * المستحق اليوم" beside "19.38 USD" is 317px of text: the row wrapped in both columns at once,
+ * so the one number this panel exists to state arrived broken over two lines.
+ *
+ * Only the figure grows now. The label stays at the size of the rows above it and takes its
+ * rank from the rule, the ink and the weight instead — which is what an invoice does anyway,
+ * the amount being what is read and the label only what names it. That buys back enough width
+ * for a five-figure EGP total to sit beside the longest label the flow uses.
+ *
+ * The figure never shrinks and never breaks. If a total is longer still, the row wraps and the
+ * figure takes the line under the label whole, rather than squeezing the label into a column
+ * three words deep.
+ */
 .totals__row--grand {
+  flex-wrap: wrap;
+  gap: var(--sws-space-12);
   margin-block-start: var(--sws-space-8);
   padding-block-start: var(--sws-space-16);
   border-block-start: var(--sws-rule-hair) solid var(--sws-border-subtle);
-  font-size: var(--sws-font-size-h3);
 }
 
 .totals__row--grand dt {
   color: var(--sws-text-primary);
   font-weight: var(--sws-weight-semibold);
+}
+
+.totals__row--grand dd {
+  flex: 0 0 auto;
+  /* Holds the figure against the far edge on the wrapped line too, where space-between has
+     nothing to push it away from. */
+  margin-inline-start: auto;
+  font-size: var(--sws-font-size-h3);
+  line-height: var(--sws-line-height-h3);
 }
 
 .totals + .btn,
