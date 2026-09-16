@@ -143,9 +143,9 @@ ok('availability resolves deterministically', typeof resolved === 'boolean', res
 
 // Spec 7.1 cart + promo
 await p.evaluate(() => (location.hash = '#/cart'));
-await p.waitForSelector('.promo');
+await p.waitForSelector('.coupon');
 await p.fill('#promo', 'SWS10');
-await p.click('.promo__form .btn');
+await p.click('.coupon__form .btn');
 await p.waitForTimeout(150);
 ok('promo code applies a discount', (await p.$$eval('.totals__row--credit', (n) => n.length)) === 1);
 
@@ -1215,6 +1215,59 @@ await p.waitForSelector('.shortcuts');
     await p.$$eval('.shortcuts a', (n) =>
       n.every((a) => (a.getAttribute('href') ?? '').includes('domain=atelier-kamal.com')),
     ),
+  );
+}
+
+/*
+ * What the dashboard does with the height its rows are ruled to.
+ *
+ * The pairs share row tracks, so a row is as tall as its taller card and the shorter one is
+ * left holding the difference. That is the deal `.dash--paired` makes and it is the right one
+ * — but it only works while the two cards in a pair are within reach of each other, and one
+ * pair was not. `.shortcuts` lays out in 11rem tracks; the narrow column gives it 359px inside
+ * its padding, one pixel under the two tracks and a gap it needs. Ten links fell into a single
+ * column ten rows tall, and two meters beside it held 347px of nothing.
+ *
+ * So the test is the layout, not the pixel: the list has to get more than one track, and no
+ * card may sit in a row with a void in it. The budget is generous — a card's own bottom padding
+ * is 24px of the measurement — and the pair that failed was four times over it.
+ */
+await p.evaluate(() => (location.hash = '#/account'));
+await p.waitForSelector('.dash--paired');
+{
+  const tracks = await p.$eval('.shortcuts', (e) => getComputedStyle(e).gridTemplateColumns.split(' ').length);
+  ok('the shortcut list gets the width to reflow', tracks >= 2, `${tracks} track(s)`);
+
+  const worst = await p.$$eval('.dash--paired > .card', (n) =>
+    n
+      .map((c) => ({
+        head: c.querySelector('.card__heading')?.textContent.trim() ?? '?',
+        slack: Math.round(c.getBoundingClientRect().bottom - c.lastElementChild.getBoundingClientRect().bottom),
+      }))
+      .sort((a, b) => b.slack - a.slack)[0],
+  );
+  ok('no card is left holding a void', worst.slack <= 120, `worst: ${worst.head} at ${worst.slack}px`);
+
+  /*
+   * The marked card, marked by more than colour — SC 1.4.1. Border, heading and shadow all
+   * move, so the one card the screen wants read first is still the one that stands out to
+   * somebody who cannot tell its blue from the grey next to it.
+   */
+  ok(
+    'the identity card is marked, and by more than its colour',
+    await p.$$eval('.dash--paired > .card', (n) => {
+      const feat = n.find((c) => c.classList.contains('card--feature'));
+      const plain = n.find((c) => !c.classList.contains('card--feature') && !c.classList.contains('card--urgent'));
+      if (!feat || !plain) return false;
+      const a = getComputedStyle(feat);
+      const b = getComputedStyle(plain);
+      return (
+        a.borderTopColor !== b.borderTopColor &&
+        a.boxShadow !== b.boxShadow &&
+        getComputedStyle(feat.querySelector('.card__heading')).color !==
+          getComputedStyle(plain.querySelector('.card__heading')).color
+      );
+    }),
   );
 }
 

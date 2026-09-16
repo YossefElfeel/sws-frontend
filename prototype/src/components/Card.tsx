@@ -13,9 +13,15 @@ import type { ReactNode } from 'react';
  * Passing the heading as a prop is what makes that unrepresentable: a card with a heading has a
  * head, and the head is the only thing that can render one.
  *
- * `tone` carries the two states a card can be in beyond neutral, and both are marked by more
- * than colour — `urgent` reddens the border AND the heading with its glyph, `calm` greens the
- * border and tints the ground.
+ * `tone` carries the states a card can be in beyond neutral, and each is marked by more than
+ * colour — `urgent` reddens the border AND the heading with its glyph, `calm` greens the border
+ * and tints the ground, `feature` takes the brand edge and lifts off the page.
+ *
+ * `feature` is the odd one of the three: urgent and calm report a state the account is in, and
+ * this one reports nothing. It marks the card the screen wants read first among equals, which
+ * on the dashboard is who you are signed in as. It stays on the ordinary surface for that
+ * reason — the tinted grounds on this screen belong to the house ads, and a tinted identity
+ * card would read as one.
  */
 export function Card({
   heading,
@@ -33,7 +39,7 @@ export function Card({
   icon?: ReactNode;
   /** The "view all" or equivalent, at the far end of the head. */
   action?: ReactNode;
-  tone?: 'urgent' | 'calm';
+  tone?: 'urgent' | 'calm' | 'feature';
   /** Content runs to the card's own edges — a table, a list of ruled rows. */
   flush?: boolean;
   headingId?: string;
@@ -44,6 +50,7 @@ export function Card({
     'card',
     tone === 'urgent' ? 'card--urgent' : '',
     tone === 'calm' ? 'card--calm' : '',
+    tone === 'feature' ? 'card--feature' : '',
     flush ? 'card--flush' : '',
     className,
   ]

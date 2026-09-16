@@ -1107,6 +1107,26 @@ button.stat {
   background: var(--sws-banner-success-bg);
 }
 
+/*
+ * The marked card — brand edge, brand heading, and the page's own card shadow so it sits a
+ * layer above its neighbours.
+ *
+ * Three things rather than one, because a border alone at this weight is nearly invisible next
+ * to a card whose border is only a shade lighter, and colour alone is not a mark anybody can
+ * rely on (SC 1.4.1). The ground stays the ordinary surface: `--sws-action-subtle-bg` is what
+ * the house ad is painted with on this same screen, and the identity card wearing it would be
+ * read as something being sold.
+ */
+.card--feature {
+  border-color: var(--sws-action-primary);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.card--feature .card__heading,
+.card--feature .card__heading svg {
+  color: var(--sws-action-primary);
+}
+
 /* ── the amount owed ───────────────────────────────────────────────────────── */
 
 /*
@@ -3009,6 +3029,23 @@ button.stat {
 .dash--paired > .card > .calm {
   flex: 1 1 auto;
   align-items: center;
+}
+
+/*
+ * The credit figure is the third card of that kind, and it was the one missed: a number, the
+ * sentence under it and the way to add more, pinned to the top of a row ruled by the service
+ * list beside it, with 134px of the card empty underneath.
+ *
+ * It is a column rather than a row like `.due`, so it is `justify-content` that centres it —
+ * `align-items: center` here would pull the figure off the reading edge, which is the one place
+ * a figure has to stay.
+ */
+.dash--paired > .card > .credit-block {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 /* ── 2026-09-14: the house ads ─────────────────────────────────────────────── */
