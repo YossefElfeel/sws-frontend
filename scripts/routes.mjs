@@ -119,6 +119,7 @@ export const ROUTES = [
   { name: 'acc-domain-ns-custom', path: '#/account/domains/dom-3/nameservers' },
   { name: 'acc-domain-dns', path: '#/account/domains/dom-1/dns' },
   { name: 'acc-domain-dns-empty', path: '#/account/domains/dom-3/dns' },
+  { name: 'acc-status-system', path: '#/account/status/api' },
   { name: 'acc-domain-contacts', path: '#/account/domains/dom-2/contacts' },
   { name: 'acc-domain-private-ns', path: '#/account/domains/dom-1/private-ns' },
   { name: 'acc-domain-addons', path: '#/account/domains/dom-1/addons' },

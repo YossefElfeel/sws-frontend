@@ -68,6 +68,7 @@ import {
   Knowledgebase,
   KbArticle,
   NetworkStatus,
+  SystemDetail,
 } from './screens/account/Support';
 import { Announcements, Affiliates, Security, Contacts } from './screens/account/Profile';
 import {
@@ -250,6 +251,7 @@ export function App() {
               <Route path="/account/knowledgebase/:slug" element={<KbArticle />} />
               <Route path="/account/announcements" element={<Announcements />} />
               <Route path="/account/status" element={<NetworkStatus />} />
+              <Route path="/account/status/:systemId" element={<SystemDetail />} />
               <Route path="/account/affiliates" element={<Affiliates />} />
               <Route path="/account/affiliates/withdraw" element={<AffiliateWithdraw />} />
               <Route path="/account/notifications" element={<NotificationPrefs />} />

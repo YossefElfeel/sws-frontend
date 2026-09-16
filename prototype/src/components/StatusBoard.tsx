@@ -1,4 +1,5 @@
-import { IconCheck, IconAlert } from './icons';
+import { Link } from 'react-router-dom';
+import { IconCheck, IconAlert, IconArrow } from './icons';
 import { Tag, type TagTone } from './Tag';
 import { useLocale } from '../lib/locale';
 import type { SystemRow, Incident, SystemState } from '../lib/marketing';
@@ -51,15 +52,35 @@ export function StatusHeadline({ worst }: { worst: SystemState }) {
   );
 }
 
-export function SystemList({ systems }: { systems: SystemRow[] }) {
+/*
+ * The list is an index, and an index that cannot be opened is a dead end: six chips answer
+ * "is it me?" and nothing answers "since when, and has this happened before?". Where a caller
+ * passes `hrefFor`, the name becomes the way in and its ::after takes the whole row, so the
+ * target is the 44px band rather than the word. The public page passes nothing and keeps the
+ * list it had.
+ */
+export function SystemList({
+  systems,
+  hrefFor,
+}: {
+  systems: SystemRow[];
+  hrefFor?: (system: SystemRow) => string;
+}) {
   const { t } = useLocale();
   return (
     <ul className="sys">
       {systems.map((s) => (
-        <li className="sys__row" key={s.id}>
+        <li className={`sys__row${hrefFor ? ' sys__row--link' : ''}`} key={s.id}>
           <span className={`sys__dot sys__dot--${s.state}`} aria-hidden="true" />
-          <span className="sys__name">{t(s.labelKey as never)}</span>
+          {hrefFor ? (
+            <Link className="sys__name sys__link" to={hrefFor(s)}>
+              {t(s.labelKey as never)}
+            </Link>
+          ) : (
+            <span className="sys__name">{t(s.labelKey as never)}</span>
+          )}
           <Tag tone={STATE_TONE[s.state]}>{t(`status.state.${s.state}` as never)}</Tag>
+          {hrefFor && <IconArrow size={15} className="sys__arrow" />}
         </li>
       ))}
     </ul>

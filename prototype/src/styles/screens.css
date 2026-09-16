@@ -613,6 +613,83 @@
   pointer-events: none;
 }
 
+/*
+ * 2026-09-16: the menu, in the engines that will hand it over.
+ *
+ * The closed control has been ours since the chevron replaced the platform arrow, but the
+ * list that opened under it was still the operating system's — a hard system blue on the
+ * selected row, a different metric on every platform, and not one value in it from this
+ * palette. On an Arabic page it also opened left-aligned, because the native menu never saw
+ * the page's direction.
+ *
+ * `base-select` hands the picker to CSS. Everywhere it has not shipped this whole block is
+ * inert and the native menu opens exactly as it does today, which is why this is an
+ * enhancement rather than a replacement: the control stays a real <select>, so the keyboard,
+ * the phone, the form, and the twelve places the gates drive it with selectOption all keep
+ * working. A custom listbox would have bought the same menu and paid for it in all four.
+ */
+@supports (appearance: base-select) {
+  .select > .field,
+  .select > .field::picker(select) {
+    appearance: base-select;
+  }
+
+  /* We already draw one, 16px in, and have since the native arrow was put away. */
+  .select > .field::picker-icon {
+    display: none;
+  }
+
+  .select > .field::picker(select) {
+    min-inline-size: anchor-size(self-inline);
+    margin-block-start: var(--sws-space-4);
+    padding: var(--sws-space-4);
+    border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+    border-radius: var(--sws-radius-lg);
+    background: var(--sws-surface-raised);
+    box-shadow: var(--sws-shadow-lift);
+    /* The list is a list, not a page: past eight or so it scrolls rather than covering the
+       screen it was opened from. */
+    max-block-size: 20rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .select > .field option {
+    display: flex;
+    align-items: center;
+    /* 44px of hit area, the same floor every other control on these screens clears. */
+    min-block-size: 44px;
+    padding: var(--sws-space-8) var(--sws-space-12);
+    border-radius: var(--sws-radius-md);
+    color: var(--sws-text-primary);
+    font-size: var(--sws-font-size-body-sm);
+    cursor: pointer;
+  }
+
+  /* The tick the base appearance reserves room for says what the tint already says, and it
+     reserves that room on every row including the ones without it. */
+  .select > .field option::checkmark {
+    display: none;
+  }
+
+  .select > .field option:hover,
+  .select > .field option:focus {
+    background: var(--sws-surface-sunken);
+    outline: none;
+  }
+
+  .select > .field option:checked {
+    background: var(--sws-action-subtle-bg);
+    color: var(--sws-action-quiet);
+    font-weight: var(--sws-weight-semibold);
+  }
+
+  .select > .field:open .select__chev,
+  .select:has(> .field:open) .select__chev {
+    color: var(--sws-action-primary);
+  }
+}
+
 .field-grid {
   display: grid;
   gap: var(--sws-space-16);
@@ -1115,6 +1192,48 @@
 
 .sys__row:last-child {
   border-block-end: 0;
+}
+
+/* A row that opens. The name carries the link and its ::after takes the band, so the target is
+   the whole 44px row rather than one word in the middle of it. */
+.sys__row--link {
+  position: relative;
+}
+
+.sys__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sys__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.sys__arrow {
+  margin-inline-start: auto;
+  flex: none;
+  color: var(--sws-text-secondary);
+  transition: color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.sys__row--link:hover {
+  background: var(--sws-surface-sunken);
+}
+
+.sys__row--link:hover .sys__arrow {
+  color: var(--sws-action-primary);
+}
+
+/* The ring belongs to the row the link covers, not to the word it sits on. */
+.sys__row--link:focus-within {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: calc(var(--sws-focus-ring-width) * -1);
+}
+
+.sys__link:focus-visible {
+  outline: none;
 }
 
 .sys__dot {
