@@ -1108,23 +1108,47 @@ button.stat {
 }
 
 /*
- * The marked card — brand edge, brand heading, and the page's own card shadow so it sits a
- * layer above its neighbours.
+ * The marked card — brand ground, brand edge, brand heading, and the page's own card shadow so
+ * it sits a layer above its neighbours.
  *
- * Three things rather than one, because a border alone at this weight is nearly invisible next
- * to a card whose border is only a shade lighter, and colour alone is not a mark anybody can
- * rely on (SC 1.4.1). The ground stays the ordinary surface: `--sws-action-subtle-bg` is what
- * the house ad is painted with on this same screen, and the identity card wearing it would be
- * read as something being sold.
+ * Four channels rather than one, because colour alone is not a mark anybody can rely on
+ * (SC 1.4.1) — and because the first three on their own were not a mark anybody could SEE. The
+ * border is `--sws-rule-hair`, one pixel, and a one-pixel indigo line around a card whose
+ * neighbour has a one-pixel grey one is a difference you have to go looking for. That is what
+ * `.card--urgent` gets away with: red on a card headed "something needs you", where the heading
+ * and its glyph are doing the work. This card is marked for prominence rather than for alarm,
+ * and prominence has to be visible from across the screen or it is not prominence.
+ *
+ * So the ground carries it, the way `.card--calm` already tints a card in this same grid. The
+ * house ad above is painted with this token too, which was the argument against — but the ad is
+ * a wide banner with artwork and a dismiss button, and nothing about a card in the grid reads
+ * as one.
  */
 .card--feature {
+  /* Double weight. The hairline is what every other card wears, and an indigo hairline beside a
+     grey one is a difference you find by comparing rather than by looking. The card is
+     border-box, so the extra pixel comes out of the padding and the outer box still rules to
+     the same row track as its pair. */
+  border-width: calc(var(--sws-rule-hair) * 2);
   border-color: var(--sws-action-primary);
+  background: var(--sws-action-subtle-bg);
   box-shadow: var(--sws-shadow-card);
 }
 
 .card--feature .card__heading,
 .card--feature .card__heading svg {
   color: var(--sws-action-primary);
+}
+
+/*
+ * `--sws-card-tile-bg` IS `--sws-action-subtle-bg`, so on a tinted card the initials disc would
+ * be painted in the ground it sits on and vanish. It takes the solid colour instead, which is
+ * the better answer anyway: the one circular block on the screen, in full brand, is most of
+ * what makes this card the one the eye lands on first.
+ */
+.card--feature .ident__avatar {
+  background: var(--sws-action-primary);
+  color: var(--sws-text-on-action);
 }
 
 /* ── the amount owed ───────────────────────────────────────────────────────── */

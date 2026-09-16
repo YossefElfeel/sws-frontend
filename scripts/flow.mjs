@@ -1261,11 +1261,17 @@ await p.waitForSelector('.dash--paired');
       if (!feat || !plain) return false;
       const a = getComputedStyle(feat);
       const b = getComputedStyle(plain);
+      const ink = (c) => getComputedStyle(c.querySelector('.card__heading')).color;
+      /* Five channels. Counting them is the point: the first version of this card moved three
+         of the five and the reviewer reported it as unchanged, because the two it did not move
+         — the ground and the weight of the line around it — are the two you see from across a
+         screen. Any one of these regressing on its own leaves a mark somebody has to hunt for. */
       return (
+        a.backgroundColor !== b.backgroundColor &&
         a.borderTopColor !== b.borderTopColor &&
+        parseFloat(a.borderTopWidth) > parseFloat(b.borderTopWidth) &&
         a.boxShadow !== b.boxShadow &&
-        getComputedStyle(feat.querySelector('.card__heading')).color !==
-          getComputedStyle(plain.querySelector('.card__heading')).color
+        ink(feat) !== ink(plain)
       );
     }),
   );
