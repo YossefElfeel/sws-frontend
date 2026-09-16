@@ -1,15 +1,19 @@
 /**
  * The remaining product families — spec 5.1 and 6.3.
  *
- * The spec is specific that these pages share one template but not one presentation: VPS uses
- * a comparison table because its options are too technical for simple cards, and SSL uses cards
- * grouped by certificate type with a "most ordered" badge. Those differences are encoded here
- * rather than left to each screen to reinvent.
+ * These pages share one template, and now one presentation: a row of price cards, the shape
+ * spec 6.2 sets for shared hosting. What is genuinely SSL's own — grouping by certificate type
+ * and a "most ordered" badge — rides on the cards as data rather than as a layout of its own.
  *
- * Website Builder was a third — spec 6.3 asks it to lead with a template preview — and is a
- * card family now at the product owner's request. The 'preview' layout went with it rather than
- * staying as a value nothing selects: a union listing a presentation no family uses sends the
- * next reader looking for a screen that is not there.
+ * The spec allowed two exceptions and neither survived the page. Website Builder was to lead
+ * with a template preview, and is cards now at the product owner's request. VPS was to be a
+ * comparison table because its options are "too technical for cards" — but four servers
+ * compared on four numbers are four plans, and the table put their names, their prices and
+ * their order buttons in three places no other product on the site keeps them.
+ *
+ * The 'layout' field that encoded those exceptions went with them. A field every family answers
+ * the same way is not a fact about the family, and a union listing a presentation no screen
+ * renders sends the next reader looking for a screen that is not there.
  */
 
 export type Family =
@@ -27,19 +31,17 @@ export interface FamilyMeta {
   path: string;
   titleKey: string;
   ledeKey: string;
-  /** How this family is presented. See the note above on the one that changed. */
-  layout: 'cards' | 'table';
 }
 
 export const FAMILIES: FamilyMeta[] = [
-  { id: 'shared', path: '/hosting/shared', titleKey: 'fam.shared', ledeKey: 'fam.shared.lede', layout: 'cards' },
-  { id: 'wordpress', path: '/hosting/wordpress', titleKey: 'fam.wordpress', ledeKey: 'fam.wordpress.lede', layout: 'cards' },
-  { id: 'cloud', path: '/hosting/cloud', titleKey: 'fam.cloud', ledeKey: 'fam.cloud.lede', layout: 'cards' },
-  { id: 'email', path: '/hosting/email', titleKey: 'fam.email', ledeKey: 'fam.email.lede', layout: 'cards' },
-  { id: 'vps', path: '/hosting/vps', titleKey: 'fam.vps', ledeKey: 'fam.vps.lede', layout: 'table' },
-  { id: 'monitoring', path: '/hosting/monitoring', titleKey: 'fam.monitoring', ledeKey: 'fam.monitoring.lede', layout: 'cards' },
-  { id: 'ssl', path: '/ssl', titleKey: 'fam.ssl', ledeKey: 'fam.ssl.lede', layout: 'cards' },
-  { id: 'builder', path: '/builder', titleKey: 'fam.builder', ledeKey: 'fam.builder.lede', layout: 'cards' },
+  { id: 'shared', path: '/hosting/shared', titleKey: 'fam.shared', ledeKey: 'fam.shared.lede' },
+  { id: 'wordpress', path: '/hosting/wordpress', titleKey: 'fam.wordpress', ledeKey: 'fam.wordpress.lede' },
+  { id: 'cloud', path: '/hosting/cloud', titleKey: 'fam.cloud', ledeKey: 'fam.cloud.lede' },
+  { id: 'email', path: '/hosting/email', titleKey: 'fam.email', ledeKey: 'fam.email.lede' },
+  { id: 'vps', path: '/hosting/vps', titleKey: 'fam.vps', ledeKey: 'fam.vps.lede' },
+  { id: 'monitoring', path: '/hosting/monitoring', titleKey: 'fam.monitoring', ledeKey: 'fam.monitoring.lede' },
+  { id: 'ssl', path: '/ssl', titleKey: 'fam.ssl', ledeKey: 'fam.ssl.lede' },
+  { id: 'builder', path: '/builder', titleKey: 'fam.builder', ledeKey: 'fam.builder.lede' },
 ];
 
 /** A generic priced offer, used by every family that presents as cards. */
@@ -131,16 +133,13 @@ export const BUILDER: Offer[] = [
   },
 ];
 
-export const OFFERS: Partial<Record<Family, Offer[]>> = {
-  wordpress: WORDPRESS,
-  cloud: CLOUD,
-  email: EMAIL,
-  monitoring: MONITORING,
-  ssl: SSL,
-  builder: BUILDER,
-};
-
-/** VPS — spec 6.3 asks for a comparison table, not cards. */
+/**
+ * VPS — the servers as figures.
+ *
+ * The row stays the product data rather than the card: Configure reads these four numbers to
+ * print the machine it is about to provision, and the cards below are built from the same four,
+ * so the pricing page and the order step cannot end up quoting different servers.
+ */
 export interface VpsRow {
   id: string;
   name: string;
@@ -159,5 +158,36 @@ export const VPS: VpsRow[] = [
   { id: 'vps-8', name: 'VPS 8', vcpu: 8, ramGb: 16, storageGb: 320, bandwidthTb: 16, monthlyUsdMinor: 6100 },
 ];
 
+/**
+ * Included with every server. None of it is a claim written to fill out a card: each line is a
+ * field the Configure step makes you fill in before the order can be placed.
+ */
+const VPS_INCLUDED = ['Full root access', 'Choice of operating system', 'Your own nameservers'];
+
+/** The VPS page's cards, derived from the rows above so a server is specified in one place. */
+export const VPS_OFFERS: Offer[] = VPS.map((v) => ({
+  id: v.id,
+  name: v.name,
+  monthlyUsdMinor: v.monthlyUsdMinor,
+  featured: v.featured,
+  specs: [
+    `${v.vcpu} vCPU`,
+    `${v.ramGb} GB RAM`,
+    `${v.storageGb} GB storage`,
+    `${v.bandwidthTb} TB bandwidth`,
+  ],
+  extras: VPS_INCLUDED,
+}));
+
 /** Spec 6.3: the OS choice that goes with a VPS order. */
 export const VPS_OS = ['Ubuntu 24.04 LTS', 'Debian 12', 'AlmaLinux 9', 'Rocky Linux 9', 'Windows Server 2022'];
+
+export const OFFERS: Partial<Record<Family, Offer[]>> = {
+  wordpress: WORDPRESS,
+  cloud: CLOUD,
+  email: EMAIL,
+  vps: VPS_OFFERS,
+  monitoring: MONITORING,
+  ssl: SSL,
+  builder: BUILDER,
+};

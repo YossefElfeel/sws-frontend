@@ -307,7 +307,7 @@ async function type(name, value) {
 /* ── Q. order a VPS, with the server settings it cannot be provisioned without ─ */
 await journey('Order a VPS', [
   ['vps', () => start('#/hosting/vps')],
-  ['order', () => click(['.data tbody tr .btn--primary', '.data tbody tr .btn'])],
+  ['order', () => click(['.plan--featured .btn', '.plans .plan .btn'])],
   ['configure', async () => { if (!(await hash()).includes('configure/vps-')) throw new Error('no configure step'); }],
   ['server settings', async () => {
     await type('hostname', 'srv1.atelier-kamal.com');
