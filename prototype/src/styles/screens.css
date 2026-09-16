@@ -1736,3 +1736,71 @@
 .tld-card .btn {
   inline-size: 100%;
 }
+
+/* ── the 90-day status strip ───────────────────────────────────────────────── */
+.strip {
+  margin: 0;
+  padding: var(--sws-space-24);
+  border-radius: var(--sws-radius-xl);
+  background: var(--sws-card-bg);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.strip__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sws-space-8);
+  margin-block-end: var(--sws-space-12);
+  font-size: var(--sws-font-size-body-sm);
+  font-weight: var(--sws-weight-semibold);
+  letter-spacing: var(--sws-tracking-snug);
+}
+
+.strip__count {
+  color: var(--sws-text-secondary);
+  font-weight: var(--sws-weight-regular);
+  font-size: var(--sws-font-size-caption);
+}
+
+/* 90 columns that share what there is. At 390px each one is about 2px wide with its gap,
+   which is still a readable band of colour because that is all it has to be. */
+.strip__plot {
+  display: flex;
+  gap: 1px;
+  block-size: 40px;
+}
+
+.strip__day {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  border-radius: 1px;
+  background: var(--sws-status-success);
+}
+
+.strip__day--degraded {
+  background: var(--sws-status-warning);
+}
+
+.strip__day--maintenance {
+  background: var(--sws-action-primary);
+}
+
+.strip__day--down {
+  background: var(--sws-status-danger);
+}
+
+.strip__axis {
+  display: flex;
+  justify-content: space-between;
+  margin-block-start: var(--sws-space-8);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-caption);
+}
+
+.strip__note {
+  margin: var(--sws-space-12) 0 0;
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-caption);
+}

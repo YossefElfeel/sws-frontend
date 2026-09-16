@@ -1098,6 +1098,14 @@ export const STRINGS = {
   'status.cover.billing': { ar: 'الفواتير والدفع وإضافة الرصيد.', en: 'Invoices, payments, and adding credit.' },
   'status.cover.api': { ar: 'الـ API اللي بتتحكم بيه في خدماتك من بره اللوحة.', en: 'The API you drive your services with from outside the panel.' },
   'status.covers': { ar: 'بيغطّي إيه', en: 'What it covers' },
+  'status.ninety': { ar: 'آخر 90 يوم', en: 'The last 90 days' },
+  'status.marked': { ar: 'يوم متسجّل عليه عطل', en: 'days with a recorded incident' },
+  /* The strip draws our records, not a measurement, and it has to say which — otherwise a
+     wall of green reads as an uptime claim nobody here has verified. */
+  'status.stripNote': {
+    ar: 'ده اللي متسجّل عندنا: اليوم اللي مفيش عليه عطل مكتوب بيتعرض أخضر. مش نسبة تشغيل مقاسة.',
+    en: 'This is what we have on record: a day with no incident written against it is drawn green. It is not a measured uptime figure.',
+  },
   'status.since': { ar: 'في الحالة دي من', en: 'In this state since' },
   'status.systemHistory': { ar: 'أعطال النظام ده', en: 'Incidents on this system' },
   'status.systemNone': { ar: 'مفيش أعطال متسجّلة على النظام ده.', en: 'No incidents recorded on this system.' },

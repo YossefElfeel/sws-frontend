@@ -85,6 +85,55 @@ export const INCIDENTS: Incident[] = [
   },
 ];
 
+/**
+ * The last 90 days of one system, a day at a time.
+ *
+ * What this is not is an uptime figure, and the distinction is the whole reason it can ship.
+ * It plots the incidents this file already holds and nothing else: a day takes the state of
+ * the worst incident that touched that system that day, and a day with nothing against it is
+ * drawn operational. That is a statement about our records rather than a measurement of the
+ * network, which is why the strip says so under itself instead of printing a percentage.
+ *
+ * The window ends on a fixed date, for the reason the telemetry window does: a review build
+ * whose strip shifts a column every midnight cannot be compared against yesterday's
+ * screenshot.
+ */
+export const STATUS_WINDOW_END = '2026-09-16';
+export const STATUS_WINDOW_DAYS = 90;
+
+export interface StatusDay {
+  date: string;
+  state: SystemState;
+}
+
+/** Worst wins the day, so a system that was down and later slow reads as down. */
+const STATE_RANK: Record<SystemState, number> = {
+  operational: 0,
+  maintenance: 1,
+  degraded: 2,
+  down: 3,
+};
+
+export function systemDays(systemId: string, days = STATUS_WINDOW_DAYS): StatusDay[] {
+  const end = new Date(`${STATUS_WINDOW_END}T00:00:00Z`);
+  const out: StatusDay[] = [];
+
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const day = new Date(end);
+    day.setUTCDate(day.getUTCDate() - i);
+    const date = day.toISOString().slice(0, 10);
+
+    let state: SystemState = 'operational';
+    for (const incident of INCIDENTS) {
+      if (!incident.systems.includes(systemId) || incident.at !== date) continue;
+      if (STATE_RANK[incident.state] > STATE_RANK[state]) state = incident.state;
+    }
+    out.push({ date, state });
+  }
+
+  return out;
+}
+
 /* ── data centres: M-19 ─────────────────────────────────────────────────────── */
 /*
  * The Swiss location is the positioning (PRODUCT.md P25), so it is stated plainly. What is not

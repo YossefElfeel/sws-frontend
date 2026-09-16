@@ -10,6 +10,7 @@ import {
   IncidentList,
   worstOf,
   STATE_TAG,
+  StatusStrip,
 } from '../../components/StatusBoard';
 import {
   IconArrow,
@@ -871,6 +872,10 @@ export function SystemDetail() {
             </span>
           </p>
         </div>
+      </div>
+
+      <div className="u-mt-16">
+        <StatusStrip systemId={system.id} />
       </div>
 
       <Card heading={t('status.covers')} icon={<IconInfo size={17} />} className="u-mt-16">
