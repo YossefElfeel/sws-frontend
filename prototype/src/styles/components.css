@@ -523,8 +523,18 @@
   letter-spacing: var(--sws-tracking-tight);
 }
 
+/*
+ * The head and the section under it were each paying in full for the same gap — 24px below
+ * the title, 64px above the content — so 88px of empty page stood between a page's name and
+ * the page. The head owns that space now, and the section it introduces starts flush against
+ * it. .section keeps its 64px everywhere else, where it separates two things of equal rank.
+ */
 .page-head {
-  padding-block: var(--sws-space-48) var(--sws-space-24);
+  padding-block: var(--sws-space-48) var(--sws-space-32);
+}
+
+.page-head + .section {
+  padding-block-start: 0;
 }
 
 /* ── footer ────────────────────────────────────────────────────────────────── */
