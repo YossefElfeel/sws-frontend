@@ -1,0 +1,506 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-16T09:09:12.003Z",
+  "title": "Design System: Orgtik Web Services",
+  "extensions": {
+    "colorMeta": {
+      "action-primary": {
+        "role": "primary",
+        "displayName": "Action Primary",
+        "canonical": "#4E4FEB",
+        "purpose": "The measured production indigo, sampled off a live primary button rather than chosen here.",
+        "tonalRamp": [
+          "#080845",
+          "#0E0F7C",
+          "#1415B3",
+          "#1E20E6",
+          "#5556EC",
+          "#8889F2",
+          "#BABBF7",
+          "#E8E8FC"
+        ]
+      },
+      "action-quiet": {
+        "role": "primary",
+        "displayName": "Action Quiet",
+        "canonical": "#2F30A8",
+        "purpose": "Link text, where the indigo is too light to clear 4.5:1 on white.",
+        "tonalRamp": [
+          "#11113C",
+          "#1E1F6C",
+          "#2B2C9B",
+          "#3C3DC8",
+          "#6C6CD6",
+          "#9798E2",
+          "#C3C4EE",
+          "#EBEBF9"
+        ]
+      },
+      "action-subtle-bg": {
+        "role": "primary",
+        "displayName": "Action Subtle",
+        "canonical": "#EEEEFE",
+        "purpose": "Selected states and icon tiles; the ground the identity card stands on.",
+        "tonalRamp": [
+          "#040448",
+          "#080882",
+          "#0B0BBC",
+          "#1313F1",
+          "#4D4DF5",
+          "#8282F8",
+          "#B7B7FB",
+          "#E7E7FE"
+        ]
+      },
+      "status-success": {
+        "role": "secondary",
+        "displayName": "Running Green",
+        "canonical": "#146132",
+        "purpose": "A thing that is running, a charge that cleared. Darkened from its natural value so it clears 4.5:1 against its own 10% tint.",
+        "tonalRamp": [
+          "#0D3F21",
+          "#18723B",
+          "#22A555",
+          "#30D470",
+          "#63DF93",
+          "#91E8B3",
+          "#C0F2D3",
+          "#EAFBF0"
+        ]
+      },
+      "status-danger": {
+        "role": "secondary",
+        "displayName": "Owed Red",
+        "canonical": "#B3181B",
+        "purpose": "An outage, a failed charge — and a discount, which the reader meets where the money is committed.",
+        "tonalRamp": [
+          "#43090A",
+          "#791012",
+          "#AF181A",
+          "#E12326",
+          "#E9595B",
+          "#EF8A8C",
+          "#F6BCBD",
+          "#FCE9E9"
+        ]
+      },
+      "status-warning": {
+        "role": "secondary",
+        "displayName": "Degraded Amber",
+        "canonical": "#8A4308",
+        "purpose": "Slow, expiring, high priority. Explicitly not an outage.",
+        "tonalRamp": [
+          "#482304",
+          "#823F08",
+          "#BC5B0B",
+          "#F17813",
+          "#F5994D",
+          "#F8B782",
+          "#FBD6B7",
+          "#FEF1E7"
+        ]
+      },
+      "status-info": {
+        "role": "secondary",
+        "displayName": "Notice Blue",
+        "canonical": "#1D4ED8",
+        "purpose": "A neutral notice.",
+        "tonalRamp": [
+          "#091843",
+          "#102C79",
+          "#183FAF",
+          "#2355E1",
+          "#597EE9",
+          "#8AA5EF",
+          "#BCCBF6",
+          "#E9EEFC"
+        ]
+      },
+      "surface-page": {
+        "role": "neutral",
+        "displayName": "Page Ground",
+        "canonical": "#F8F9FC",
+        "purpose": "The ground everything sits on.",
+        "tonalRamp": [
+          "#171F36",
+          "#293760",
+          "#3C508B",
+          "#5069B4",
+          "#7B8EC6",
+          "#A2AFD7",
+          "#C9D1E8",
+          "#EDF0F7"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Surface",
+        "canonical": "#FFFFFF",
+        "purpose": "Cards, bars, the sidebar.",
+        "tonalRamp": [
+          "#262626",
+          "#454545",
+          "#636363",
+          "#828282",
+          "#A1A1A1",
+          "#BDBDBD",
+          "#D9D9D9",
+          "#F2F2F2"
+        ]
+      },
+      "surface-sunken": {
+        "role": "neutral",
+        "displayName": "Sunken Surface",
+        "canonical": "#F1F3F9",
+        "purpose": "Wells, table heads, inset rows.",
+        "tonalRamp": [
+          "#171F36",
+          "#293760",
+          "#3C508B",
+          "#5069B4",
+          "#7B8EC6",
+          "#A2AFD7",
+          "#C9D1E8",
+          "#EDF0F7"
+        ]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Near Black",
+        "canonical": "#020617",
+        "purpose": "Body and headings.",
+        "tonalRamp": [
+          "#061246",
+          "#0B217F",
+          "#1030B7",
+          "#1941EB",
+          "#5170F0",
+          "#859AF4",
+          "#B9C5F9",
+          "#E8ECFD"
+        ]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Meta Grey",
+        "canonical": "#4B5563",
+        "purpose": "Labels, notes, meta.",
+        "tonalRamp": [
+          "#21252C",
+          "#3B434E",
+          "#566171",
+          "#717F93",
+          "#949EAE",
+          "#B4BBC6",
+          "#D3D8DE",
+          "#F0F2F4"
+        ]
+      },
+      "text-disabled": {
+        "role": "neutral",
+        "displayName": "Disabled Grey",
+        "canonical": "#6B7280",
+        "purpose": "Gated at 3:1, not the usual unchecked grey.",
+        "tonalRamp": [
+          "#23252A",
+          "#3F434B",
+          "#5B606C",
+          "#777E8D",
+          "#989EA9",
+          "#B7BBC3",
+          "#D5D8DC",
+          "#F1F2F3"
+        ]
+      },
+      "border-subtle": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#E5E7EB",
+        "purpose": "The rule between rows.",
+        "tonalRamp": [
+          "#21252B",
+          "#3C424E",
+          "#565F70",
+          "#727D92",
+          "#949DAD",
+          "#B4BAC5",
+          "#D4D7DE",
+          "#F1F2F4"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Field Edge",
+        "canonical": "#6B7280",
+        "purpose": "Field borders and dashed slots.",
+        "tonalRamp": [
+          "#23252A",
+          "#3F434B",
+          "#5B606C",
+          "#777E8D",
+          "#989EA9",
+          "#B7BBC3",
+          "#D5D8DC",
+          "#F1F2F3"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "hero": {
+        "displayName": "Hero",
+        "purpose": "The marketing first viewport, once per page. 36px on a phone."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Section openers on marketing pages. 30px on a phone."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Screen titles in the client area. 27px on a phone."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card headings. One size in both bands."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose and table cells. Carries lining-nums tabular-nums so figures in a column line up."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Table heads and group labels. Latin small-caps only: tracking-wide is dropped and the uppercase transform removed under [lang=ar], whose letterforms join."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-sm",
+        "value": "0 1px 2px rgba(2, 6, 23, 0.06)",
+        "purpose": "The quietest lift; chips and inline controls."
+      },
+      {
+        "name": "shadow-card",
+        "value": "0 4px 20px -4px rgba(2, 6, 23, 0.08), 0 1px 3px rgba(2, 6, 23, 0.04)",
+        "purpose": "Every card in the client area, at rest."
+      },
+      {
+        "name": "shadow-lift",
+        "value": "0 14px 40px -12px rgba(2, 6, 23, 0.16), 0 2px 8px rgba(2, 6, 23, 0.05)",
+        "purpose": "A surface that has left the page: menus, the select picker, popovers."
+      },
+      {
+        "name": "shadow-cta",
+        "value": "0 8px 24px -8px rgba(78, 79, 235, 0.55)",
+        "purpose": "The marketing call to action, and only there — it is the indigo's own glow, suppressed inside .app__main."
+      }
+    ],
+    "motion": [
+      {
+        "name": "duration-fast",
+        "value": "140ms",
+        "purpose": "Colour and border changes on hover and focus."
+      },
+      {
+        "name": "duration-base",
+        "value": "220ms",
+        "purpose": "Shadow and transform on a card or button."
+      },
+      {
+        "name": "duration-slow",
+        "value": "340ms",
+        "purpose": "A panel or drawer arriving."
+      },
+      {
+        "name": "duration-tear",
+        "value": "420ms",
+        "purpose": "The one long move in the product."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default: an exponential-feeling ease-out from an already-visible default."
+      },
+      {
+        "name": "ease-exit",
+        "value": "cubic-bezier(0.4, 0, 1, 1)",
+        "purpose": "Something leaving."
+      },
+      {
+        "name": "ease-stamp",
+        "value": "cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "A state that lands rather than settles."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "all durations resolve to 0ms",
+        "purpose": "Every duration token is redefined to 0ms under prefers-reduced-motion, so no component has to remember. The one spinner stops rather than slows: a slow spinner is still motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "content.compact",
+        "value": "600px"
+      },
+      {
+        "name": "content.settings",
+        "value": "700px"
+      },
+      {
+        "name": "tablet",
+        "value": "768px"
+      },
+      {
+        "name": "content.shell",
+        "value": "900px"
+      },
+      {
+        "name": "laptop",
+        "value": "1024px"
+      },
+      {
+        "name": "content.roomy",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action a screen is for. Inside the client area it drops its glow.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">ادفع الآن</button>",
+      "css": ".ds-btn{font-family: var(--sws-font-family-stack); display:inline-flex;align-items:center;justify-content:center;gap:var(--sws-space-8);min-block-size:44px;padding-inline:var(--sws-space-24);border:0;border-radius:var(--sws-radius-sm);font-size:var(--sws-font-size-body);font-weight:var(--sws-weight-medium);cursor:pointer;transition:background-color var(--sws-duration-fast) var(--sws-ease-standard),box-shadow var(--sws-duration-base) var(--sws-ease-standard)}.ds-btn-primary{background:var(--sws-action-primary);color:var(--sws-text-on-action);box-shadow:var(--sws-shadow-cta)}.ds-btn-primary:hover:not(:disabled){background:var(--sws-action-primary-hover)}.ds-btn-primary:focus-visible{outline:2px solid var(--sws-focus-ring);outline-offset:2px}.ds-btn-primary:disabled{background:var(--sws-surface-sunken);color:var(--sws-text-disabled);box-shadow:none;cursor:default}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The alternative that is still a real choice. Its text is action-quiet, not the indigo, so it clears 4.5:1 on white.",
+      "html": "<button class=\"ds-btn-secondary\">عرض الكل</button>",
+      "css": ".ds-btn-secondary{font-family: var(--sws-font-family-stack); display:inline-flex;align-items:center;justify-content:center;gap:var(--sws-space-8);min-block-size:44px;padding-inline:var(--sws-space-24);border-radius:var(--sws-radius-sm);background:var(--sws-surface-raised);color:var(--sws-action-quiet);font-size:var(--sws-font-size-body);font-weight:var(--sws-weight-medium);border:0;box-shadow:inset 0 0 0 1px var(--sws-action-primary);cursor:pointer;transition:background-color var(--sws-duration-fast) var(--sws-ease-standard)}.ds-btn-secondary:hover:not(:disabled){background:var(--sws-action-subtle-bg)}.ds-btn-secondary:focus-visible{outline:2px solid var(--sws-focus-ring);outline-offset:2px}"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Cancelling a service is not the same kind of act as upgrading one. Quiet at rest, unmistakably red when reached for, and silent when disabled — which it was not until 2026-09-16.",
+      "html": "<button class=\"ds-btn-danger\">إزالة</button>",
+      "css": ".ds-btn-danger{font-family: var(--sws-font-family-stack); display:inline-flex;align-items:center;justify-content:center;min-block-size:44px;padding-inline:var(--sws-space-24);background:transparent;border:1px solid transparent;border-radius:var(--sws-radius-sm);color:var(--sws-status-danger);font-size:var(--sws-font-size-body);font-weight:var(--sws-weight-medium);cursor:pointer;transition:background-color var(--sws-duration-fast) var(--sws-ease-standard),border-color var(--sws-duration-fast) var(--sws-ease-standard)}.ds-btn-danger:hover:not(:disabled){background:var(--sws-banner-danger-bg);border-color:var(--sws-status-danger)}.ds-btn-danger:disabled{background:var(--sws-surface-sunken);color:var(--sws-text-disabled);cursor:default}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "48px, with a hairline in border-strong rather than border-subtle, because a field has to read as a field before it is focused.",
+      "html": "<input class=\"ds-field\" placeholder=\"اكتب ردك…\" />",
+      "css": ".ds-field{font-family: var(--sws-font-family-stack); inline-size:100%;min-block-size:48px;padding-inline:var(--sws-space-16);background:var(--sws-surface-raised);border:1px solid var(--sws-border-strong);border-radius:var(--sws-radius-md);color:var(--sws-text-primary);font-size:var(--sws-font-size-body);transition:border-color var(--sws-duration-fast) var(--sws-ease-standard)}.ds-field::placeholder{color:var(--sws-text-secondary)}.ds-field:hover{border-color:var(--sws-action-primary)}.ds-field:focus-visible{outline:2px solid var(--sws-focus-ring);outline-offset:1px;border-color:var(--sws-focus-ring)}"
+    },
+    {
+      "name": "Status Tag",
+      "kind": "chip",
+      "refersTo": "tag-ok",
+      "description": "One meaning, one colour, on every screen. Each tone is its colour on that same colour at 10%; where two states share a tone, the chip word carries the difference.",
+      "html": "<span class=\"ds-tag ds-tag-ok\">يعمل</span> <span class=\"ds-tag ds-tag-bad\">الدفع فشل</span> <span class=\"ds-tag ds-tag-warn\">بطيء</span>",
+      "css": ".ds-tag{font-family: var(--sws-font-family-stack); display:inline-flex;align-items:center;gap:var(--sws-space-4);padding:var(--sws-space-4) var(--sws-space-12);border-radius:var(--sws-radius-pill);font-size:var(--sws-font-size-caption);font-weight:var(--sws-weight-semibold);white-space:nowrap}.ds-tag-ok{background:var(--sws-banner-success-bg);color:var(--sws-status-success)}.ds-tag-bad{background:var(--sws-banner-danger-bg);color:var(--sws-status-danger)}.ds-tag-warn{background:var(--sws-banner-warning-bg);color:var(--sws-status-warning)}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "One card shape in the client area: raised ground, xl corners, 32 of padding, shadow-card at rest.",
+      "html": "<div class=\"ds-card\"><h3 class=\"ds-card-h\">رصيدك</h3><p class=\"ds-card-b\">بيتخصم تلقائيًا من أول فاتورة جاية.</p></div>",
+      "css": ".ds-card{font-family: var(--sws-font-family-stack); background:var(--sws-surface-raised);border-radius:var(--sws-radius-xl);box-shadow:var(--sws-shadow-card);padding:var(--sws-space-32);max-inline-size:360px}.ds-card-h{margin:0 0 var(--sws-space-8);font-size:var(--sws-font-size-h3);font-weight:var(--sws-weight-semibold);letter-spacing:-0.01em;color:var(--sws-text-primary)}.ds-card-b{margin:0;font-size:var(--sws-font-size-body-sm);line-height:1.6;color:var(--sws-text-secondary)}"
+    },
+    {
+      "name": "Ticket Composer",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Signature. The ticket reply as one frame rather than a card wrapped round a form. The frame takes the focus ring so it lights up as one object; Enter sends and shift+enter breaks the line.",
+      "html": "<form class=\"ds-composer\"><textarea class=\"ds-composer-input\" rows=\"1\" placeholder=\"اكتب ردك…\"></textarea><div class=\"ds-composer-acts\"><span class=\"ds-composer-clip\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><path d=\"M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48\"/></svg></span><p class=\"ds-composer-hint\">jpg, png, pdf — 4MB</p><button class=\"ds-btn ds-btn-primary\" type=\"submit\">إرسال</button></div></form>",
+      "css": ".ds-composer{font-family: var(--sws-font-family-stack); display:grid;gap:var(--sws-space-12);padding:var(--sws-space-12);border:1px solid var(--sws-border-subtle);border-radius:var(--sws-radius-xl);background:var(--sws-surface-raised);box-shadow:var(--sws-shadow-card)}.ds-composer:focus-within{border-color:var(--sws-action-primary)}.ds-composer-input{font-family: var(--sws-font-family-stack); display:block;inline-size:100%;min-block-size:44px;field-sizing:content;max-block-size:12rem;padding:var(--sws-space-12);border:0;border-radius:var(--sws-radius-md);background:none;color:var(--sws-text-primary);font-size:var(--sws-font-size-body);resize:none}.ds-composer-input:focus{outline:none}.ds-composer-input::placeholder{color:var(--sws-text-secondary)}.ds-composer-acts{display:flex;align-items:center;gap:var(--sws-space-12)}.ds-composer-clip{display:inline-flex;align-items:center;justify-content:center;inline-size:44px;block-size:44px;border-radius:var(--sws-radius-md);color:var(--sws-text-secondary);cursor:pointer;transition:background-color var(--sws-duration-fast) var(--sws-ease-standard)}.ds-composer-clip:hover{background:var(--sws-surface-sunken);color:var(--sws-action-primary)}.ds-composer-hint{flex:1;margin:0;color:var(--sws-text-secondary);font-size:var(--sws-font-size-caption)}"
+    },
+    {
+      "name": "Status Strip",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Signature. Ninety days of one system, one column a day, read off recorded incidents. HTML rather than SVG so its labels stay the size the page set. Not an uptime figure, and the note under it says so.",
+      "html": "<figure class=\"ds-strip\"><figcaption class=\"ds-strip-cap\"><span>آخر 90 يوم</span><span class=\"ds-strip-count\">1 يوم متسجّل عليه عطل</span></figcaption><div class=\"ds-strip-plot\" dir=\"ltr\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class=\"warn\"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p class=\"ds-strip-note\">ده اللي متسجّل عندنا. مش نسبة تشغيل مقاسة.</p></figure>",
+      "css": ".ds-strip{font-family: var(--sws-font-family-stack); margin:0;padding:var(--sws-space-24);border-radius:var(--sws-radius-xl);background:var(--sws-surface-raised);box-shadow:var(--sws-shadow-card)}.ds-strip-cap{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--sws-space-8);margin-block-end:var(--sws-space-12);font-size:var(--sws-font-size-body-sm);font-weight:var(--sws-weight-semibold);letter-spacing:-0.01em;color:var(--sws-text-primary)}.ds-strip-count{color:var(--sws-text-secondary);font-weight:var(--sws-weight-regular);font-size:var(--sws-font-size-caption)}.ds-strip-plot{display:flex;gap:1px;block-size:40px}.ds-strip-plot i{flex:1 1 0;min-inline-size:0;border-radius:1px;background:var(--sws-status-success)}.ds-strip-plot i.warn{background:var(--sws-status-warning)}.ds-strip-note{margin:var(--sws-space-12) 0 0;color:var(--sws-text-secondary);font-size:var(--sws-font-size-caption)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Measured, not invented",
+    "overview": "The visual direction is not a concept chosen here. It is measured from the production site, because the brief pinned it there: the client area and the marketing site have to read as one product, and the marketing site already exists. The primitives were sampled rather than invented — the indigo off a live primary button, the near-black off its body text, Rubik because that is the face in use and because it carries Latin and Arabic in one family.\n\nWhat was added is the part production does not have: a semantic layer no stylesheet can reach past, a dark theme that is real rather than aspirational, and a set of rules that survive translation into Arabic. Three token layers, and primitives are never exported — there is no --sws-purple-500 to reach for, which makes the rule impossible to break by accident.\n\nThe one constraint that shapes more of this than any style decision: no proof metric has been verified. No uptime percentage, customer count, certification or testimonial appears anywhere in the artifact, and a gate greps the company pages for the shapes a fabricated one takes. Where a page would normally carry proof it carries a marked absence instead.",
+    "keyCharacteristics": [
+      "Mobile-first and bilingual by construction: logical properties throughout, and no mirrored stylesheet exists",
+      "One family, Rubik, for Latin and Arabic both, self-hosted so a review build needs no network for its typography",
+      "Three token layers, with primitives never exported",
+      "Status colours darkened from their natural values so each clears 4.5:1 against its own 10% tint",
+      "Every control clears 44px, hit-tested outward from the edges rather than measured from the box",
+      "Design intent that is not enforced is design intent that lasts one sprint: seven gates hold it"
+    ],
+    "rules": [
+      {
+        "name": "The Measured Primitive Rule",
+        "body": "Primitives are never exported. No stylesheet can reach a raw hex, which is what keeps this front end and the eventual WHMCS theme from drifting.",
+        "section": "colors"
+      },
+      {
+        "name": "The Own-Tint Rule",
+        "body": "A status colour that only works on white is a status colour that fails inside the banner it exists for. All four are darkened from their natural values to clear 4.5:1 against their own 10% tint.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Discount Colour Rule",
+        "body": "A saving is red, not green. It wore two colours depending on which screen you met it on; red won because it is the one the reader reaches last, on the screen where the money is committed.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tracking Is A Token Rule",
+        "body": "Tracking is a token, not a per-component decision. Four roles cover the ten distinct values the client area had grown, four of them on the dashboard at once.",
+        "section": "typography"
+      },
+      {
+        "name": "The Joined Letterform Rule",
+        "body": "Latin small-caps labels take tracking-wide and uppercase; every Arabic run takes tracking-normal and no transform, because its letterforms join and Arabic has no case.",
+        "section": "typography"
+      },
+      {
+        "name": "The bdi Rule",
+        "body": "dir=ltr on a block element does two things and only one of them is wanted: it isolates the Latin run and also flips the element own text-align. Use bdi to isolate without touching the box. Form controls keep dir=ltr, where it sets the typing direction and that is the point.",
+        "section": "typography"
+      },
+      {
+        "name": "The Arrow Is A Drawing Rule",
+        "body": "Logical properties handle layout, but onward has to point the way the reader is travelling. Only the forward arrow and the sign-out icon mirror under dir=rtl. A globe, a shield and a wallet are the same picture in both directions.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Flat-Inside-The-App Rule",
+        "body": "shadow-cta is the indigo own glow and belongs to the marketing call to action. Inside the client area the primary button drops it: a client area is a room you work in, not a page that is selling to you.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Row Is Genuinely 44px Rule",
+        "body": "A 38px row with a 44px pseudo-element expander gives back most of what it claims, because on a dense list the expanders of adjacent rows overlap and the one painted last wins the shared strip.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do sample a value from the shipped artifact rather than proposing one. Where this file and the artifact disagree, the artifact is right and this file is stale.",
+      "Do reach for the semantic layer only. A component token resolves through it, so both themes follow automatically.",
+      "Do use bdi to isolate a Latin run inside Arabic prose, and keep dir=ltr on form controls where it sets typing direction.",
+      "Do give a status its colour on that same colour at 10%, and let the chip word carry the difference where two states share a tone.",
+      "Do state an absence where proof would go. A marked slot is reviewable; an invented figure is a claim somebody will be held to.",
+      "Do hit-test a control outward from its edges. A legitimate pseudo-element expander counts; a measurement from the box does not."
+    ],
+    "donts": [
+      "Do not invent a proof metric — no uptime percentage, customer count, certification or testimonial. A gate greps for the shapes a fabricated one takes.",
+      "Do not put a hover state on a disabled control. Every button variant carries :not(:disabled); the danger button did not, and a transfer held shut by a registrar lock still lit up red under the pointer.",
+      "Do not mock a third-party frame. Stripe card fields and the bank 3-D Secure page render inside frames we neither own nor style: the area is a dashed slot that says whose it is, and a gate asserts it stays empty.",
+      "Do not offer to save a payment method that cannot be charged again. It promises an auto-renewal that never runs, which is the one failure a customer meets when a service stops.",
+      "Do not give tr or td a display other than table-row and table-cell to restack a table on a phone. It drops their roles out of the accessibility tree, costing the table its structure for everyone using assistive tech.",
+      "Do not add a permission, a filter or a toggle that gates nothing. A control that protects nothing still reads as protection."
+    ]
+  }
+}

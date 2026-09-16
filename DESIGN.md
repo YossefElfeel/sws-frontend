@@ -1,3 +1,134 @@
+---
+name: Orgtik Web Services
+description: Swiss infrastructure with Egyptian support and pricing, stated openly, across a bilingual marketing site and WHMCS client area.
+colors:
+  surface-page: "#F8F9FC"
+  surface-raised: "#FFFFFF"
+  surface-sunken: "#F1F3F9"
+  text-primary: "#020617"
+  text-secondary: "#4B5563"
+  text-disabled: "#6B7280"
+  text-on-action: "#FFFFFF"
+  border-subtle: "#E5E7EB"
+  border-strong: "#6B7280"
+  action-primary: "#4E4FEB"
+  action-primary-hover: "#3B3CD4"
+  action-quiet: "#2F30A8"
+  action-subtle-bg: "#EEEEFE"
+  focus-ring: "#3B3CD4"
+  status-success: "#146132"
+  status-danger: "#B3181B"
+  status-warning: "#8A4308"
+  status-info: "#1D4ED8"
+typography:
+  hero:
+    fontFamily: "Rubik, system-ui, -apple-system, sans-serif"
+    fontSize: "60px"
+    fontWeight: 700
+    lineHeight: 1.12
+    letterSpacing: "-0.02em"
+  display:
+    fontFamily: "Rubik, system-ui, -apple-system, sans-serif"
+    fontSize: "40px"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "-0.02em"
+  headline:
+    fontFamily: "Rubik, system-ui, -apple-system, sans-serif"
+    fontSize: "34px"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.01em"
+  title:
+    fontFamily: "Rubik, system-ui, -apple-system, sans-serif"
+    fontSize: "20px"
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: "-0.01em"
+  body:
+    fontFamily: "Rubik, system-ui, -apple-system, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.7
+    letterSpacing: "0"
+    fontFeature: "lining-nums tabular-nums"
+  label:
+    fontFamily: "Rubik, system-ui, -apple-system, sans-serif"
+    fontSize: "12.5px"
+    fontWeight: 600
+    lineHeight: 1.5
+    letterSpacing: "0.06em"
+rounded:
+  none: "0px"
+  sm: "8px"
+  md: "12px"
+  lg: "16px"
+  xl: "24px"
+  pill: "9999px"
+spacing:
+  "4": "4px"
+  "8": "8px"
+  "12": "12px"
+  "16": "16px"
+  "24": "24px"
+  "32": "32px"
+  "48": "48px"
+  "64": "64px"
+components:
+  button-primary:
+    backgroundColor: "{colors.action-primary}"
+    textColor: "{colors.text-on-action}"
+    rounded: "{rounded.sm}"
+    padding: "0 24px"
+    height: "44px"
+  button-primary-hover:
+    backgroundColor: "{colors.action-primary-hover}"
+    textColor: "{colors.text-on-action}"
+  button-secondary:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.action-quiet}"
+    rounded: "{rounded.sm}"
+    padding: "0 24px"
+    height: "44px"
+  button-danger:
+    backgroundColor: "transparent"
+    textColor: "{colors.status-danger}"
+    rounded: "{rounded.sm}"
+    padding: "0 24px"
+    height: "44px"
+  button-disabled:
+    backgroundColor: "{colors.surface-sunken}"
+    textColor: "{colors.text-disabled}"
+    rounded: "{rounded.sm}"
+    padding: "0 24px"
+    height: "44px"
+  card:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.text-primary}"
+    rounded: "{rounded.xl}"
+    padding: "32px"
+  card-feature:
+    backgroundColor: "{colors.action-subtle-bg}"
+    textColor: "{colors.text-primary}"
+    rounded: "{rounded.xl}"
+    padding: "32px"
+  input:
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.text-primary}"
+    rounded: "{rounded.md}"
+    padding: "0 16px"
+    height: "48px"
+  tag-ok:
+    backgroundColor: "rgba(20, 97, 50, 0.1)"
+    textColor: "{colors.status-success}"
+    rounded: "{rounded.pill}"
+    padding: "4px 12px"
+  tag-bad:
+    backgroundColor: "rgba(179, 24, 27, 0.1)"
+    textColor: "{colors.status-danger}"
+    rounded: "{rounded.pill}"
+    padding: "4px 12px"
+---
 # Design
 
 <!-- impeccable:design-schema 1 -->
@@ -6,7 +137,7 @@ This records the design system **as it shipped**, not as it was intended. Every 
 read out of `tokens/dist/tokens.css` or the built artifact; where the two ever disagree, the
 artifact is right and this file is stale.
 
-Deployed: <https://sws-frontend-mu.vercel.app/> · 96 routes · AR (default) and EN · light and
+Deployed: <https://sws-frontend-mu.vercel.app/> · 118 routes · AR (default) and EN · light and
 dark.
 
 ---
@@ -386,6 +517,49 @@ announced rather than only drawn, and the one spinner in the product stops rathe
 under `prefers-reduced-motion`: a slow spinner is still motion, and the setting is not a request
 for less of it.
 
+**Five components arrived 2026-09-16, with the review pass that asked for them.**
+
+`StatusStrip` — ninety days of one system, one column a day, on the status detail page. The
+plot is HTML rather than SVG for the reason `UsageChart` keeps its labels outside one: text
+inside a viewBox scales with it, and this is read at 390px as often as at 1440, where each
+column is 2.45px of pure colour and needs no text in it at all. It is **not an uptime figure**
+and says so underneath. Every column is read off the incidents `marketing.ts` already holds,
+and a day with nothing written against it is drawn green — which is a statement about our
+records rather than a measurement of the network. A wall of green with a percentage over it is
+the exact claim the no-verified-proof constraint exists to stop.
+
+`.composer` — the ticket reply. It had been a card with a heading, a labelled textarea, a
+labelled file field, a hint and a footer of two buttons: five rows of furniture around one
+thing you type into, at the end of a thread where nobody needs telling that the next box is
+the reply. One frame now, Enter sends and shift+enter breaks the line, and the frame carries
+the focus ring so the composer lights up as one object. The file input is the 44px target
+itself rather than hiding behind the clip — clipped to a pixel it was still a control, and
+`mobile.mjs` read it correctly as one with an icon sitting on top of it.
+
+`Select`'s menu. The closed control has been ours since the chevron replaced the platform
+arrow, but the list that opened under it was still the operating system's — a hard system blue
+on the selected row and not one value in it from this palette. `base-select` hands the picker
+to CSS in the engines that have shipped it, and everywhere else the block is inert and the
+native menu opens as before. The control stays a real `<select>`, which is the whole point: the
+keyboard, the phone, the form and the twelve places the gates drive it with `selectOption` all
+keep working. A custom listbox would have bought the same menu and paid for it in all four.
+
+`.sys__row--link` — the status index answered "is it me?" and stopped. The name carries the
+link and its `::after` takes the 44px band, so the target is the row rather than the word. The
+public page passes no `hrefFor` and keeps the list it had.
+
+`useDirty` — Save was lit on forms nobody had touched. It listens at the container and asks the
+fields themselves: text against `defaultValue`, checkbox and radio against `defaultChecked`, a
+select against the option marked selected. Putting an edit back the way it was makes the form
+clean again, which a flag set on the first keystroke would not.
+
+**A discount is red.** It wore two colours depending on which screen you met it on — green on
+the plan cards, red at the order step — for the same saving on the same purchase. Red won
+because it is the one the reader reaches last, on the screen where the money is committed.
+`status-success` keeps its own work: a thing that is running, a charge that cleared.
+
+---
+
 ## 5. The rules that were learned, not chosen
 
 Each of these came out of something being visibly wrong, and each is now held by a gate.
@@ -492,6 +666,25 @@ open are the two moments the client area can otherwise leave someone with nothin
 
 ---
 
+**The dashboard's two columns flow independently.** `--paired` put the cards straight into the
+grid so both columns shared row tracks. That ruled the page — every pair began on one line —
+and it also made every row as tall as the taller of its two cards. Stretching the short card to
+fill the difference is what the ruling cost; handing the difference back as a gap is what it
+costs once the card stops stretching, and it came to 477px down the screen with 142px of that
+in a single hole. There is no third answer inside one grid: masonry is what packs columns
+independently, and no engine this runs on has it — not `grid-template-rows: masonry`, not
+`item-pack`. So the columns are real again, every gap is the 16px the grid sets, and the page
+ends 162px sooner.
+
+The cost is the DOM order, and it is paid where it is cheapest. Grouped by column the markup is
+what the desktop needs and the reverse of what a phone needs, so below 1280 the two wrappers go
+`display: contents` and the cards interleave back by `order`. The pairs are counted rather than
+named, which survives the two cards that are not always there: usage and shortcuts are one
+child of each column, so with no live cPanel service both columns lose their third child at
+once and the rest still pair off.
+
+---
+
 ## 7. What is not designed here
 
 **Third-party frames are marked, not mocked.** Stripe's card fields and the bank's 3-D Secure
@@ -519,11 +712,11 @@ Design intent that is not enforced is design intent that lasts one sprint.
 |---|---|
 | `tokens/build.mjs --check` | dist in sync; both themes complete |
 | `tokens/a11y-gate.mjs` | 84 checks — contrast, focus, hit area |
-| `scripts/flow.mjs` | **116 checks** against a running build |
-| `scripts/capture.mjs` | 96 routes × 2 viewports, plus the two funnel steps whose path carries a cart id — overflow, empty main, console errors |
+| `scripts/flow.mjs` | **171 checks** against a running build |
+| `scripts/capture.mjs` | 118 routes × 2 viewports, plus the two funnel steps whose path carries a cart id — overflow, empty main, console errors |
 | `scripts/deadends.mjs` | no control wired to nothing, no form that only swallows its event, no screen without a way onward |
 | `scripts/journeys.mjs` | 21 journeys walked by clicking only — a link that goes nowhere stalls the walk |
-| `scripts/mobile.mjs` | 96 routes at 390px — overflow, hit area, crowding, tiny text, covered controls, crushed icons |
+| `scripts/mobile.mjs` | 118 routes at 390px — overflow, hit area, crowding, tiny text, covered controls, crushed icons |
 
 `mobile.mjs` walks every route at 390 in Arabic and looks for what a 1440px screen never shows.
 It found the marketing header failing on four counts at once — a 40px language select, a 43px
