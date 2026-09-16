@@ -149,7 +149,9 @@ function OnRouteChange() {
   useEffect(() => {
     const id = window.setTimeout(() => {
       const heading = document.querySelector('main h1')?.textContent?.trim();
-      const site = document.documentElement.lang === 'ar' ? 'سوميون' : 'Somion';
+      // One word in both locales: the brand is set in Latin even in Arabic, so there is no
+      // second spelling for the title to choose between.
+      const site = 'Orgtik';
       document.title = heading ? `${heading} — ${site}` : document.title;
     }, 0);
     return () => window.clearTimeout(id);

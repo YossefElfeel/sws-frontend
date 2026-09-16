@@ -21,7 +21,7 @@ import {
   IconWallet,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
-import { useSaved, SavedNote } from '../../lib/saved';
+import { useSaved, useDirty, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount } from '../../lib/catalog';
 import {
@@ -180,6 +180,7 @@ export function Security() {
   const [logQ, setLogQ] = useState('');
   const [logResult, setLogResult] = useState<'all' | 'ok' | 'failed'>('all');
   const { saved, mark, clear } = useSaved();
+  const details = useDirty<HTMLDivElement>();
 
   // This log is read for one reason — "was that me?" — so the filter that matters is the
   // failed attempts, and the search is an IP address someone is checking against their own.
@@ -194,7 +195,7 @@ export function Security() {
       <SavedNote saved={saved} onDismiss={clear} />
       <div className="split">
         <Card heading={t('sec.details')} icon={<IconUsers size={17} />}>
-          <div className="field-grid">
+          <div className="field-grid" ref={details.ref}>
             <label className="field-label">
               <span className="eyebrow">{t('checkout.name')}</span>
               <input className="field" defaultValue={bi(ACCOUNT.name)} />
@@ -221,7 +222,16 @@ export function Security() {
             </label>
           </div>
           <div className="form__foot">
-            <Button size="md" onClick={() => mark()}>{t('sec.save')}</Button>
+            <Button
+              size="md"
+              disabled={!details.dirty}
+              onClick={() => {
+                mark();
+                details.settle();
+              }}
+            >
+              {t('sec.save')}
+            </Button>
           </div>
         </Card>
 

@@ -90,7 +90,7 @@ export const STRINGS = {
   'hero.cta': { ar: 'شوف الباقات', en: 'See the plans' },
   'hero.cta2': { ar: 'ابحث عن دومين', en: 'Find a domain' },
 
-  'feat.title': { ar: 'ليه سوميون', en: 'Why Somion' },
+  'feat.title': { ar: 'ليه Orgtik', en: 'Why Orgtik' },
   'feat.lede': {
     ar: 'مفيش أرقام كبيرة ولا وعود عامة — دي الحاجات اللي نقدر نثبتها.',
     en: 'No headline statistics and no vague promises — these are the things we can actually show.',
@@ -129,7 +129,7 @@ export const STRINGS = {
   'per.biennially': { ar: 'كل سنتين', en: 'per 2 years' },
   'per.triennially': { ar: 'كل 3 سنين', en: 'per 3 years' },
 
-  'brand.name': { ar: 'سوميون لخدمات الويب', en: 'Somion Web Services' },
+  'brand.name': { ar: 'Orgtik لخدمات الويب', en: 'Orgtik Web Services' },
 
   skip: { ar: 'تخطَّ إلى المحتوى', en: 'Skip to content' },
 
@@ -535,7 +535,7 @@ export const STRINGS = {
   'monitoring.alerts': { ar: 'إزاي التنبيهات توصلك', en: 'How alerts reach you' },
   'monitoring.alertsBody': { ar: 'تنبيه التوقف بالبريد فورًا، ورسالة نصية في الخطط المدفوعة، وويب هوك في الخطة الأعلى.', en: 'Downtime alerts by email immediately, SMS on the paid plans, and a webhook on the top plan.' },
   'transfer.title': { ar: 'نقل دومين', en: 'Transfer a domain' },
-  'transfer.lede': { ar: 'انقل دومينك لسوميون. النقل بيضيف سنة على تاريخ الانتهاء الحالي.', en: 'Move your domain to Somion. A transfer adds a year to the current expiry date.' },
+  'transfer.lede': { ar: 'انقل دومينك لـ Orgtik. النقل بيضيف سنة على تاريخ الانتهاء الحالي.', en: 'Move your domain to Orgtik. A transfer adds a year to the current expiry date.' },
   'transfer.epp': { ar: 'كود النقل (EPP)', en: 'Authorisation code (EPP)' },
   'transfer.checking': { ar: 'بنتأكد من الدومين…', en: 'Checking the domain…' },
   'transfer.checkingNote': {
@@ -1116,8 +1116,8 @@ export const STRINGS = {
     en: 'Swiss infrastructure with Egyptian support and pricing.',
   },
   'ab.p1': {
-    ar: 'سوميون بتشغّل مواقع وبريد شركات صغيرة ومتوسطة على سيرفرات في سويسرا، وبتدعمها بفريق في مصر بيتكلم عربي ومصري وبيفهم البنوك والمحافظ اللي بتدفع بيها.',
-    en: 'Somion runs the websites and mail of small and mid-sized businesses on servers in Switzerland, supported by a team in Egypt that speaks your language and understands the banks and wallets you actually pay with.',
+    ar: 'Orgtik بتشغّل مواقع وبريد شركات صغيرة ومتوسطة على سيرفرات في سويسرا، وبتدعمها بفريق في مصر بيتكلم عربي ومصري وبيفهم البنوك والمحافظ اللي بتدفع بيها.',
+    en: 'Orgtik runs the websites and mail of small and mid-sized businesses on servers in Switzerland, supported by a team in Egypt that speaks your language and understands the banks and wallets you actually pay with.',
   },
   'ab.p2': {
     ar: 'الجمع ده مقصود: القوانين والبنية اللي في سويسرا، والقرب والسعر اللي في مصر. مش بنحاول نبقى أرخص واحد، بنحاول نبقى الأوضح.',
@@ -1921,11 +1921,11 @@ export const STRINGS = {
   'kb.cat.email': { ar: 'البريد', en: 'Email' },
   'kb.cat.billing': { ar: 'الفوترة', en: 'Billing' },
   'kb.a1.title': { ar: 'إزاي توجّه دومينك لاستضافتك', en: 'How to point your domain at your hosting' },
-  'kb.a1.body': { ar: 'غيّر خوادم الأسماء عند المُسجِّل لـ ns1.somion.ch و ns2.somion.ch. التغيير بياخد من ساعة لـ24 ساعة عشان ينتشر.', en: 'Change the nameservers at your registrar to ns1.somion.ch and ns2.somion.ch. The change takes between one and 24 hours to propagate.' },
+  'kb.a1.body': { ar: 'غيّر خوادم الأسماء عند المُسجِّل لـ ns1.orgtik.ch و ns2.orgtik.ch. التغيير بياخد من ساعة لـ24 ساعة عشان ينتشر.', en: 'Change the nameservers at your registrar to ns1.orgtik.ch and ns2.orgtik.ch. The change takes between one and 24 hours to propagate.' },
   'kb.a2.title': { ar: 'أول دخول على cPanel', en: 'Your first cPanel login' },
   'kb.a2.body': { ar: 'من صفحة الخدمة اضغط «ادخل على cPanel» — الدخول تلقائي من غير كلمة مرور تانية.', en: 'From the service page press "Log in to cPanel" — the sign-in is automatic and needs no second password.' },
   'kb.a3.title': { ar: 'إعداد البريد على الموبايل', en: 'Setting up email on your phone' },
-  'kb.a3.body': { ar: 'استخدم IMAP على mail.somion.ch، بورت 993 مع SSL للوارد و465 للصادر.', en: 'Use IMAP on mail.somion.ch, port 993 with SSL for incoming and 465 for outgoing.' },
+  'kb.a3.body': { ar: 'استخدم IMAP على mail.orgtik.ch، بورت 993 مع SSL للوارد و465 للصادر.', en: 'Use IMAP on mail.orgtik.ch, port 993 with SSL for incoming and 465 for outgoing.' },
   'kb.a5.title': { ar: 'إزاي تنقل دومينك لـ SWS', en: 'How to transfer your domain to SWS' },
   'kb.a5.body': { ar: 'افتح قفل الدومين عند المُسجِّل الحالي، اطلب كود الـEPP، وبعدين ادخل الكود في صفحة نقل الدومين. النقل بياخد من ٥ لـ٧ أيام وبيضيف سنة على مدة الدومين.', en: 'Unlock the domain at your current registrar, ask it for the EPP code, then enter that code on the domain transfer page. A transfer takes five to seven days and adds a year to the domain.' },
   'kb.a6.title': { ar: 'إزاي تقرا فاتورتك', en: 'How to read your invoice' },
@@ -2054,8 +2054,8 @@ export const STRINGS = {
   'footer.refund': { ar: 'سياسة الاسترداد', en: 'Refund policy' },
   'footer.contact': { ar: 'اتصل بنا', en: 'Contact' },
   'footer.rights': {
-    ar: 'سوميون لخدمات الويب · بنية سويسرية، دعم ومحاسبة مصرية.',
-    en: 'Somion Web Services · Swiss infrastructure, Egyptian support and billing.',
+    ar: 'Orgtik لخدمات الويب · بنية سويسرية، دعم ومحاسبة مصرية.',
+    en: 'Orgtik Web Services · Swiss infrastructure, Egyptian support and billing.',
   },
 
   /* ── 2026-09-07: the flows the competitor screenshots showed and the owner asked for ─── */
@@ -2186,8 +2186,8 @@ export const STRINGS = {
   },
   'inv.removedMsg': { ar: 'الفاتورة اتشالت من القائمة', en: 'Invoice removed from your list' },
   'inv.removedMsgNote': {
-    ar: 'اتشالت من العرض بس. السجل المحاسبي بيفضل موجود عند سوميون، والشيل مابيمسحوش.',
-    en: 'It is gone from this view only. The accounting record stays with Somion; removing it here does not erase it.',
+    ar: 'اتشالت من العرض بس. السجل المحاسبي بيفضل موجود عند Orgtik، والشيل مابيمسحوش.',
+    en: 'It is gone from this view only. The accounting record stays with Orgtik; removing it here does not erase it.',
   },
 
   // A cancelled invoice, read on its own page: neither paid nor owed.
@@ -2390,7 +2390,7 @@ export const STRINGS = {
   'dom.overview': { ar: 'نظرة عامة', en: 'Overview' },
   'dom.renewal': { ar: 'التجديد', en: 'Renewal' },
   'dom.perYear': { ar: 'في السنة', en: 'per year' },
-  'dom.nsDefault': { ar: 'استخدم خوادم أسماء سوميون', en: 'Use Somion’s nameservers' },
+  'dom.nsDefault': { ar: 'استخدم خوادم أسماء Orgtik', en: 'Use Orgtik’s nameservers' },
   'dom.nsDefaultNote': { ar: 'الاختيار الصح لو استضافتك عندنا.', en: 'The right choice if your hosting is with us.' },
   'dom.nsCustom': { ar: 'خوادم أسماء خاصة', en: 'Custom nameservers' },
   'dom.nsCustomNote': { ar: 'لو موقعك مستضاف في مكان تاني، اكتب خوادم الأسماء بتاعته.', en: 'If the site is hosted elsewhere, enter that host’s nameservers.' },

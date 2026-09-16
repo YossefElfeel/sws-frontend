@@ -30,7 +30,7 @@ type Choice = 'cart' | 'register' | 'transfer' | 'own';
  * be a second thing that looked like it, and the copy had drifted badly enough to be wrong
  * rather than merely inconsistent:
  *
- *   - its own availability arithmetic, which disagreed with the search screen — somion.shop was
+ *   - its own availability arithmetic, which disagreed with the search screen — orgtik.shop was
  *     free there and taken here — and which ignored the extension beside the field entirely, so
  *     .com and .eg always came back with the same verdict;
  *   - no renewal price, on the one screen where money is about to change hands, which is the

@@ -60,7 +60,7 @@ export function Layout({ children }: { children: ReactNode }) {
               SWS
             </span>
             <span className="masthead__wordmark">
-              <span className="masthead__word">Somion</span>
+              <span className="masthead__word">Orgtik</span>
               <span className="masthead__sub">{t('brand.tagline')}</span>
             </span>
           </Link>

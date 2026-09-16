@@ -379,7 +379,7 @@ export interface DomainRecord {
 }
 
 /** Our nameservers, which a domain uses unless someone points it elsewhere. */
-export const DEFAULT_NS = ['ns1.somion.ch', 'ns2.somion.ch'];
+export const DEFAULT_NS = ['ns1.orgtik.ch', 'ns2.orgtik.ch'];
 
 export const DOMAINS: DomainRecord[] = [
   {
@@ -478,9 +478,9 @@ export interface DnsRecord {
 export const DNS_RECORDS: DnsRecord[] = [
   { id: 'r1', type: 'A', host: '@', value: '185.42.118.203', ttl: 3600 },
   { id: 'r2', type: 'A', host: 'www', value: '185.42.118.203', ttl: 3600 },
-  { id: 'r3', type: 'MX', host: '@', value: 'mail.somion.ch', ttl: 3600 },
-  { id: 'r4', type: 'TXT', host: '@', value: 'v=spf1 include:somion.ch ~all', ttl: 3600 },
-  { id: 'r5', type: 'CNAME', host: 'cdn', value: 'cdn.somion.ch', ttl: 1800 },
+  { id: 'r3', type: 'MX', host: '@', value: 'mail.orgtik.ch', ttl: 3600 },
+  { id: 'r4', type: 'TXT', host: '@', value: 'v=spf1 include:orgtik.ch ~all', ttl: 3600 },
+  { id: 'r5', type: 'CNAME', host: 'cdn', value: 'cdn.orgtik.ch', ttl: 1800 },
   { id: 'r6', type: 'URL', host: 'shop', value: 'https://atelier-kamal.com/shop', ttl: 3600 },
   { id: 'r7', type: 'FRAME', host: 'portfolio', value: 'https://atelier-kamal.com/work', ttl: 3600 },
 ];
@@ -491,7 +491,7 @@ export const DNS_BY_DOMAIN: Record<string, DnsRecord[]> = {
   'dom-2': [
     { id: 'r1', type: 'A', host: '@', value: '185.42.118.91', ttl: 3600 },
     { id: 'r2', type: 'A', host: 'www', value: '185.42.118.91', ttl: 3600 },
-    { id: 'r3', type: 'MX', host: '@', value: 'mail.somion.ch', ttl: 3600 },
+    { id: 'r3', type: 'MX', host: '@', value: 'mail.orgtik.ch', ttl: 3600 },
   ],
   'dom-3': [],
 };
@@ -729,7 +729,7 @@ export const TICKETS: Ticket[] = [
       {
         id: 'm2',
         from: 'staff',
-        author: { ar: 'دعم سوميون', en: 'Somion Support' },
+        author: { ar: 'دعم Orgtik', en: 'Orgtik Support' },
         at: '2026-08-31 09:18',
         body: {
           ar: 'التجديد فشل لأن مجلد well-known. كان متحجوب بقاعدة إعادة توجيه. أصدرنا شهادة جديدة يدويًا وعدّلنا القاعدة عشان التجديد الجاي يكمل لوحده.',
@@ -760,7 +760,7 @@ export const TICKETS: Ticket[] = [
       {
         id: 'm2',
         from: 'staff',
-        author: { ar: 'حسابات سوميون', en: 'Somion Billing' },
+        author: { ar: 'حسابات Orgtik', en: 'Orgtik Billing' },
         at: '2026-08-12 10:05',
         body: {
           ar: 'اتأكدنا — المبلغ الزيادة اترد وهيظهر في كشف حسابك خلال 3 أيام عمل.',
@@ -810,7 +810,7 @@ export const ANNOUNCEMENTS: Announcement[] = [
 
 /** Spec 9.6. */
 export const AFFILIATE = {
-  link: 'https://sws.somion.ch/?aff=8841',
+  link: 'https://sws.orgtik.ch/?aff=8841',
   visits: 1284,
   signups: 37,
   commissionUsdMinor: 41250,
@@ -898,7 +898,7 @@ export const ACCOUNT: Account = {
  * until I12 closes.
  */
 export const COMPANY = {
-  name: 'Somion Web Services AG',
+  name: 'Orgtik Web Services AG',
   countryKey: 'dc.ch',
   taxId: null as string | null,
 };
