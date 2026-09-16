@@ -18,7 +18,6 @@ import {
   IconCoin,
   IconSupport,
   IconClose,
-  IconPencil,
   IconTrash,
   IconEye,
 } from '../../components/icons';
@@ -453,14 +452,6 @@ function invoiceRowItems(
 
   if (inv.status === 'unpaid' || inv.status === 'overdue') {
     items.push(
-      {
-        id: 'edit',
-        label: t('inv.edit' as never),
-        icon: <IconPencil size={16} />,
-        /* The lines are not the client's to change, so Edit opens the conversation that can
-           change them, with the invoice already named — see `dev.invoiceActions`. */
-        to: `/account/tickets/new?invoice=${inv.id}`,
-      },
       {
         id: 'cancel',
         label: t('inv.cancelInvoice' as never),

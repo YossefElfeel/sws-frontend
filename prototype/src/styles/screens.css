@@ -263,15 +263,20 @@
 }
 
 /* The payable figure carries the saving's colour, so the eye lands on the number being charged
-   rather than on the one that has a line through it. */
+   rather than on the one that has a line through it.
+
+   2026-09-16: that colour is the danger red, not the success green. The order step had been
+   printing its own saving in red since it was built, so one discount wore two colours
+   depending on which screen the reader met it on. Red won because it is the one the reader
+   reaches last, on the screen where the money is actually committed. */
 .plan__price--off .plan__amount {
-  color: var(--sws-status-success);
+  color: var(--sws-status-danger);
 }
 
 .plan__save {
   padding: 2px var(--sws-space-8);
-  background: var(--sws-banner-success-bg);
-  color: var(--sws-status-success);
+  background: var(--sws-banner-danger-bg);
+  color: var(--sws-status-danger);
   border-radius: var(--sws-radius-pill);
   font-size: var(--sws-font-size-caption);
   font-weight: var(--sws-weight-semibold);

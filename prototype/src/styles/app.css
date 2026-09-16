@@ -1728,7 +1728,10 @@ button.stat {
     transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
-.btn--danger:hover {
+/* The guard is the point: every other variant carries `:not(:disabled)` and this one did not,
+   so a transfer button held shut by an unlifted registrar lock still lit up red under the
+   pointer — a control that looks disabled, refuses the click, and answers the hover anyway. */
+.btn--danger:hover:not(:disabled) {
   background: var(--sws-banner-danger-bg);
   border-color: var(--sws-status-danger);
 }
@@ -2219,14 +2222,28 @@ button.stat {
   }
 }
 
+/*
+ * 2026-09-16: a hovered line is a band across the document, not a rectangle floating in a
+ * gutter. The cells used to zero their outer padding so the figures sat flush with the card's
+ * own 24px inset — which put the table box 24px inside the card, and the row background with
+ * it, so hovering a line drew a panel that stopped short of both edges.
+ *
+ * The table box now bleeds out to the card's edges and the outer cells take that padding
+ * back. Every figure lands exactly where it did; only the band it sits in got wider.
+ */
+.app__main .invoice .data--flush {
+  inline-size: calc(100% + var(--sws-space-24) * 2);
+  margin-inline: calc(var(--sws-space-24) * -1);
+}
+
 .app__main .invoice .data--flush th:first-child,
 .app__main .invoice .data--flush td:first-child {
-  padding-inline-start: 0;
+  padding-inline-start: var(--sws-space-24);
 }
 
 .app__main .invoice .data--flush th:last-child,
 .app__main .invoice .data--flush td:last-child {
-  padding-inline-end: 0;
+  padding-inline-end: var(--sws-space-24);
 }
 
 /* ── the vote at the foot of an article ────────────────────────────────────── */
@@ -3023,7 +3040,7 @@ button.stat {
  * imbalance is visible in review rather than three rows further down at some other width.
  */
 .dash--paired {
-  align-items: stretch;
+  align-items: start;
 }
 
 /*
@@ -3036,41 +3053,17 @@ button.stat {
 }
 
 /*
- * What a stretched card does with the height it did not ask for.
+ * 2026-09-16: a card is as tall as what is in it.
  *
- * A row is as tall as the taller of its two cards, which is the point — but it left the amount
- * owed pinned to the top of a 300px box with nothing under it, and a card with a third of
- * itself empty reads as one that failed to load the rest. So the card is a column, and the one
- * block that is the whole card takes the space: the debt centres in it, the calm state centres
- * in it, and a list still starts at the top where a list belongs.
- */
-.dash--paired > .card {
-  display: flex;
-  flex-direction: column;
-}
-
-.dash--paired > .card > .due,
-.dash--paired > .card > .calm {
-  flex: 1 1 auto;
-  align-items: center;
-}
-
-/*
- * The credit figure is the third card of that kind, and it was the one missed: a number, the
- * sentence under it and the way to add more, pinned to the top of a row ruled by the service
- * list beside it, with 134px of the card empty underneath.
+ * `stretch` made every row as tall as its taller card, and the shorter one kept the
+ * difference as empty ground: 93px under the announcements feed, 106px under the ticket
+ * list, 60px under the shortcuts. Three cards were centring their contents inside that
+ * surplus rather than giving it back, which reads as a card that failed to load the rest.
  *
- * It is a column rather than a row like `.due`, so it is `justify-content` that centres it —
- * `align-items: center` here would pull the figure off the reading edge, which is the one place
- * a figure has to stay.
+ * `start` keeps what --paired was built for — both columns share row tracks, so every pair
+ * still begins on one line — and drops the only part that was costing anything. The bottoms
+ * now land where each card ends. The ruling was always in the top edge.
  */
-.dash--paired > .card > .credit-block {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-}
 
 /* ── 2026-09-14: the house ads ─────────────────────────────────────────────── */
 /*
