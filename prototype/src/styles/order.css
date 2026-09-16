@@ -526,51 +526,58 @@
   color: var(--sws-text-secondary);
 }
 
-/* ── promo, agreement, gateway marks ───────────────────────────────────────── */
+/* ── the coupon box, agreement, gateway marks ──────────────────────────────── */
+/*
+ * `.coupon`, not `.coupon`. The dashboard’s house-ad rail is `.coupon` too, and these rules
+ * are loaded on every screen, so the rail was picking up this box’s 32px top margin — a
+ * checkout rule setting the spacing of an advertisement two sections of the product away.
+ * The ground and the padding it also set were overridden by the rail’s own later rule, so
+ * the margin was the only one that showed, which is exactly why it went unnoticed.
+ */
 
-.promo {
+.coupon {
   margin-block-start: var(--sws-space-32);
   padding: var(--sws-space-24);
   background: var(--sws-surface-sunken);
   border-radius: var(--sws-radius-lg);
 }
 
-.promo__form {
+.coupon__form {
   display: flex;
   gap: var(--sws-space-8);
   flex-wrap: wrap;
   margin-block-start: var(--sws-space-12);
 }
 
-.promo__field {
+.coupon__field {
   position: relative;
   flex: 1 1 16rem;
   display: flex;
   align-items: center;
 }
 
-.promo__field svg {
+.coupon__field svg {
   position: absolute;
   inset-inline-start: var(--sws-space-12);
   color: var(--sws-text-secondary);
   pointer-events: none;
 }
 
-.promo__field .field {
+.coupon__field .field {
   padding-inline-start: var(--sws-space-32);
 }
 
-.promo__msg {
+.coupon__msg {
   margin-block-start: var(--sws-space-8);
   font-size: var(--sws-font-size-body-sm);
   font-weight: var(--sws-weight-semibold);
 }
 
-.promo__msg.is-ok {
+.coupon__msg.is-ok {
   color: var(--sws-status-success);
 }
 
-.promo__msg.is-bad {
+.coupon__msg.is-bad {
   color: var(--sws-status-danger);
 }
 

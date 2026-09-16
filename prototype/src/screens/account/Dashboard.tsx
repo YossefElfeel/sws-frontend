@@ -85,7 +85,7 @@ function IdentityCard() {
     .join('');
 
   return (
-    <Card className="ident" heading={t('ident.title')} icon={<IconUsers size={17} />}>
+    <Card className="ident" tone="feature" heading={t('ident.title')} icon={<IconUsers size={17} />}>
       <div className="ident__who">
         <span className="ident__avatar" aria-hidden="true">
           {initials}
@@ -375,12 +375,16 @@ export function Dashboard() {
         </Card>
 
         <Card heading={t('dash.credit')} icon={<IconWallet size={17} />}>
-          <p className="credit serial">{money(ACCOUNT.creditUsdMinor)}</p>
-          <p className="credit__note">{t('dash.creditNote')}</p>
-          <Link className="btn btn--sm btn--secondary" to="/account/funds">
-            <IconPlus size={14} />
-            {t('acc.funds')}
-          </Link>
+          {/* Wrapped, because these three are one block and the row is ruled by the service
+              list beside them — see `.credit-block`, which is what lets it take the height. */}
+          <div className="credit-block">
+            <p className="credit serial">{money(ACCOUNT.creditUsdMinor)}</p>
+            <p className="credit__note">{t('dash.creditNote')}</p>
+            <Link className="btn btn--sm btn--secondary" to="/account/funds">
+              <IconPlus size={14} />
+              {t('acc.funds')}
+            </Link>
+          </div>
         </Card>
 
         {/*
@@ -399,9 +403,24 @@ export function Dashboard() {
          *
          * Absent when there is no live cPanel service to report on. A meter at zero over a
          * product the account does not have reads as a broken card, not as an empty one.
+         *
+         * The shortcuts take the wide column and the meters the narrow one, which is the way
+         * round their content wants. `.shortcuts` lays itself out in 11rem tracks, and the
+         * narrow column is 359px inside its padding — one pixel short of the two tracks and a
+         * gap it needs, so the ten links fell into a single column ten rows tall and the row
+         * they share carried 347px of nothing beside them. Two meters cannot fill that, and
+         * nothing else should be invented to. Widened, the same list is four rows of three and
+         * the two cards come out within a few pixels of each other.
          */}
         {primary && (
           <>
+            <Card heading={t('svc.shortcuts')} icon={<IconSpark size={17} />}>
+              <p className="card__lede">
+                <bdi>{primary.domain}</bdi>
+              </p>
+              <ServiceShortcuts domain={primary.domain} />
+            </Card>
+
             <Card
               heading={t('svc.usage')}
               icon={<IconGauge size={17} />}
@@ -422,13 +441,6 @@ export function Dashboard() {
                   <bdi>{primary.usageAt}</bdi>
                 </span>
               </p>
-            </Card>
-
-            <Card heading={t('svc.shortcuts')} icon={<IconSpark size={17} />}>
-              <p className="card__lede">
-                <bdi>{primary.domain}</bdi>
-              </p>
-              <ServiceShortcuts domain={primary.domain} />
             </Card>
           </>
         )}

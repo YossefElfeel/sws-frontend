@@ -95,10 +95,10 @@ export function Cart() {
               </div>
 
               {/* Spec 7.1: promo field with its own apply button. */}
-              <div className="promo">
+              <div className="coupon">
                 <h2 className="card__title">{t('cart.promo')}</h2>
                 <form
-                  className="promo__form"
+                  className="coupon__form"
                   onSubmit={(e) => {
                     e.preventDefault();
                     setPromoState(applyPromo(code) ? 'ok' : 'bad');
@@ -107,7 +107,7 @@ export function Cart() {
                   <label className="u-visually-hidden" htmlFor="promo">
                     {t('cart.promo')}
                   </label>
-                  <span className="promo__field">
+                  <span className="coupon__field">
                     <IconSearch size={16} />
                     <input
                       id="promo"
@@ -127,7 +127,7 @@ export function Cart() {
                   </Button>
                 </form>
                 {promoState !== 'idle' && (
-                  <p className={`promo__msg${promoState === 'ok' ? ' is-ok' : ' is-bad'}`} role="status">
+                  <p className={`coupon__msg${promoState === 'ok' ? ' is-ok' : ' is-bad'}`} role="status">
                     {t(promoState === 'ok' ? 'cart.promoOk' : 'cart.promoBad')}
                   </p>
                 )}
