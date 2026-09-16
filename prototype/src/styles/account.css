@@ -725,6 +725,113 @@
 }
 
 /* ── ticket thread ─────────────────────────────────────────────────────────── */
+/*
+ * The composer is one frame, not a card with a heading and a form inside it. What was there
+ * announced itself — a "Reply" title, a labelled textarea, a labelled file field, a hint, and
+ * a footer of two buttons — five rows of furniture around one thing you type into. A person
+ * who has reached the end of a thread does not need to be told the next box is the reply.
+ *
+ * The frame carries the focus ring for the field inside it, so the whole composer lights up
+ * as one object rather than the textarea lighting up inside a box that stays dark.
+ */
+.composer {
+  display: grid;
+  gap: var(--sws-space-12);
+  padding: var(--sws-space-12);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-xl);
+  background: var(--sws-card-bg);
+  box-shadow: var(--sws-shadow-card);
+}
+
+.composer:focus-within {
+  border-color: var(--sws-action-primary);
+}
+
+.composer__input {
+  display: block;
+  inline-size: 100%;
+  min-block-size: 44px;
+  /* Grows with the message and stops before it becomes a page of its own. */
+  field-sizing: content;
+  max-block-size: 12rem;
+  padding: var(--sws-space-12);
+  border: 0;
+  border-radius: var(--sws-radius-md);
+  background: none;
+  color: var(--sws-text-primary);
+  font: inherit;
+  font-size: var(--sws-font-size-body);
+  resize: none;
+}
+
+.composer__input:focus {
+  outline: none;
+}
+
+.composer__input::placeholder {
+  color: var(--sws-text-secondary);
+}
+
+/* What is attached, named, before it is sent — the file input's own "2 files selected" is the
+   browser's sentence, not ours, and it disappears the moment the control is re-rendered. */
+.composer__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sws-space-8);
+  margin: 0;
+  padding: 0 var(--sws-space-12);
+  list-style: none;
+}
+
+.composer__files li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sws-space-4);
+  padding: 2px var(--sws-space-8);
+  border-radius: var(--sws-radius-pill);
+  background: var(--sws-surface-sunken);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-caption);
+}
+
+.composer__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--sws-space-12);
+}
+
+/* The clip is a control, so it clears the same 44px every other control does. */
+.composer__clip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 44px;
+  block-size: 44px;
+  flex: none;
+  border-radius: var(--sws-radius-md);
+  color: var(--sws-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--sws-duration-fast) var(--sws-ease-standard);
+}
+
+.composer__clip:hover {
+  background: var(--sws-surface-sunken);
+  color: var(--sws-action-primary);
+}
+
+.composer__clip:focus-within {
+  outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
+  outline-offset: 2px;
+}
+
+.composer__hint {
+  flex: 1;
+  margin: 0;
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-caption);
+}
+
 
 .thread {
   display: grid;

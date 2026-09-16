@@ -1907,7 +1907,7 @@ export const STRINGS = {
   'tkt.send': { ar: 'إرسال', en: 'Send' },
   'tkt.cancel': { ar: 'إلغاء', en: 'Cancel' },
   'tkt.reply': { ar: 'رد', en: 'Reply' },
-  'tkt.close': { ar: 'إغلاق التذكرة', en: 'Close ticket' },
+  'tkt.replyPlaceholder': { ar: 'اكتب ردك…', en: 'Write your reply…' },
   'tkt.noneFilter': { ar: 'مفيش تذاكر بالفلاتر دي.', en: 'No tickets match these filters.' },
   'tkt.showAll': { ar: 'اعرض كل التذاكر', en: 'Show all tickets' },
 

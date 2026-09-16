@@ -694,21 +694,29 @@ await p.waitForSelector('#reply');
 {
   const before = await p.$$eval('.thread .msg', (n) => n.length);
   await p.fill('#reply', 'شكرًا، جربت وشغال.');
-  await p.click('.card .form__foot .btn:not(.btn--quiet)');
+  await p.click('.composer button[type=submit]');
   await p.waitForTimeout(200);
   const after = await p.$$eval('.thread .msg', (n) => n.length);
   ok('a sent reply joins the thread', after === before + 1, `${before} -> ${after}`);
 
   // Spec 9.5.3 puts files on the reply too, not only on the first message.
-  const replyFiles = (await p.$$('#reply ~ .field-label input[type=file], .card input[type=file]')).length;
+  const replyFiles = (await p.$('.composer input[type=file]')).length;
   const shownFiles = await p.$$eval('.msg__files li', (n) => n.length);
   ok('a reply can carry files, and a message shows them', replyFiles > 0 && shownFiles > 0,
     `${replyFiles} field, ${shownFiles} shown`);
 
-  await p.click('.card .form__foot .btn--quiet');
-  await p.waitForTimeout(150);
-  const boxGone = (await p.$$('#reply')).length === 0;
-  ok('closing a ticket removes the reply box', boxGone);
+  // Closing is support's to do, not the client's, so there is no button here to assert on.
+  // What is asserted instead is the state it produces: #7688 arrives closed, and a closed
+  // thread offers no composer. The screen used to hold its own `closed` flag, which is why
+  // that ticket arrived closed and offered a reply box anyway.
+  const clientCanClose = await p.$eval('button, .btn', (n) =>
+    n.some((b) => /إغلاق التذكرة|Close ticket/.test(b.textContent || '')));
+  ok('the client is not offered a way to close a ticket', !clientCanClose);
+
+  await p.evaluate(() => (location.hash = '#/account/tickets/tkt-7688'));
+  await p.waitForSelector('.thread');
+  const boxGone = (await p.$('#reply')).length === 0;
+  ok('a closed ticket offers no composer', boxGone);
 }
 
 // Removing a saved card removes it.
