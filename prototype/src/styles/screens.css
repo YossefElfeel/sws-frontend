@@ -1804,3 +1804,18 @@
   color: var(--sws-text-secondary);
   font-size: var(--sws-font-size-caption);
 }
+
+/* The kind of thing a service is, on the row that names it. Deliberately not a .tag: that
+   component is the status ladder, where one colour carries one meaning, and a type is not a
+   state. So this is the quietest label on the row — it tells the rows apart when the list is
+   mixed, and gets out of the way of the chip that says whether the thing is running. */
+.data__kind {
+  display: inline-block;
+  margin-block-start: var(--sws-space-4);
+  padding: 1px var(--sws-space-8);
+  border: var(--sws-rule-hair) solid var(--sws-border-subtle);
+  border-radius: var(--sws-radius-pill);
+  color: var(--sws-text-secondary);
+  font-size: var(--sws-font-size-caption);
+  white-space: nowrap;
+}

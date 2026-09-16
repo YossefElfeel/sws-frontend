@@ -1772,6 +1772,7 @@ export const STRINGS = {
   // The counts above the services table. Each is also the filter it counts, so the label has
   // to read as a category and not as a sentence about one.
   'svc.all': { ar: 'كل الخدمات', en: 'All services' },
+  'filter.allKinds': { ar: 'كل الأنواع', en: 'All types' },
   'svc.attention': { ar: 'محتاجة تدخّل', en: 'Needs attention' },
   'svc.allRunning': { ar: 'كله شغّال', en: 'All running' },
   'svc.noneSetup': { ar: 'مفيش تحت التجهيز', en: 'None in setup' },
@@ -1780,6 +1781,7 @@ export const STRINGS = {
   // The row switch. "Running" rather than "Active", because the chip beside it already says
   // Active and a column repeating the word would read as the same fact twice.
   'col.running': { ar: 'شغّالة', en: 'Running' },
+  'col.type': { ar: 'النوع', en: 'Type' },
   'svc.runOn': { ar: 'الخدمة شغّالة', en: 'Service is running' },
   'svc.runOff': { ar: 'الخدمة موقوفة', en: 'Service is stopped' },
   'svc.runLocked': { ar: 'مش ممكن تتشغّل أو تتوقف وهي في الحالة دي', en: 'Cannot be switched while it is in this state' },
