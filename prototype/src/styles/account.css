@@ -803,6 +803,7 @@
 
 /* The clip is a control, so it clears the same 44px every other control does. */
 .composer__clip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -823,6 +824,18 @@
 .composer__clip:focus-within {
   outline: var(--sws-focus-ring-width) solid var(--sws-focus-ring);
   outline-offset: 2px;
+}
+
+/*
+ * The file input IS the target rather than hiding behind the icon: transparent, and filling
+ * the label it sits in. Clipped to a pixel it was still a control, still hit-testable, and the
+ * mobile audit read it correctly as a control with an icon sitting on top of it.
+ */
+.composer__file {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .composer__hint {

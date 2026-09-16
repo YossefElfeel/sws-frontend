@@ -570,7 +570,7 @@ export function TicketThread() {
               <span className="u-visually-hidden">{t('tkt.attachments')}</span>
               <input
                 ref={fileRef}
-                className="u-visually-hidden"
+                className="composer__file"
                 type="file"
                 multiple
                 accept=".jpg,.gif,.jpeg,.png,.txt,.pdf"

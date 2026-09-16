@@ -700,7 +700,7 @@ await p.waitForSelector('#reply');
   ok('a sent reply joins the thread', after === before + 1, `${before} -> ${after}`);
 
   // Spec 9.5.3 puts files on the reply too, not only on the first message.
-  const replyFiles = (await p.$('.composer input[type=file]')).length;
+  const replyFiles = (await p.$$('.composer input[type=file]')).length;
   const shownFiles = await p.$$eval('.msg__files li', (n) => n.length);
   ok('a reply can carry files, and a message shows them', replyFiles > 0 && shownFiles > 0,
     `${replyFiles} field, ${shownFiles} shown`);
@@ -709,13 +709,13 @@ await p.waitForSelector('#reply');
   // What is asserted instead is the state it produces: #7688 arrives closed, and a closed
   // thread offers no composer. The screen used to hold its own `closed` flag, which is why
   // that ticket arrived closed and offered a reply box anyway.
-  const clientCanClose = await p.$eval('button, .btn', (n) =>
+  const clientCanClose = await p.$$eval('button, .btn', (n) =>
     n.some((b) => /إغلاق التذكرة|Close ticket/.test(b.textContent || '')));
   ok('the client is not offered a way to close a ticket', !clientCanClose);
 
   await p.evaluate(() => (location.hash = '#/account/tickets/tkt-7688'));
   await p.waitForSelector('.thread');
-  const boxGone = (await p.$('#reply')).length === 0;
+  const boxGone = (await p.$$('#reply')).length === 0;
   ok('a closed ticket offers no composer', boxGone);
 }
 
@@ -743,7 +743,17 @@ await p.waitForSelector('.method-row');
 // for a bank confirmation of 0.00, offered a "save this card" toggle in the one flow where
 // saving is the point, and finished on a confirmation for an order nobody had placed.
 await p.evaluate(() => (location.hash = '#/account/payment-methods/new'));
-await p.waitForSelector('.slot');
+await p.waitForSelector('.methods');
+{
+  // Add now starts by asking which method, because a card is no longer the only thing an
+  // account can keep on file — and the two that cannot be kept are named, not offered.
+  const offered = await p.$$eval('.method', (n) => n.length);
+  ok('adding a method asks which one', offered >= 2, `${offered} offered`);
+  await p.click('.form__foot .btn');
+  await p.waitForSelector('.slot');
+  const at = await p.evaluate(() => location.hash);
+  ok('…and the card choice reaches the card form', at.includes('/new/card'), at);
+}
 {
   // Counted through evaluate rather than $eval: the count that matters most here is zero,
   // and $eval has no elements to run against when the screen is right.
@@ -1227,26 +1237,27 @@ await p.waitForSelector('.shortcuts');
 }
 
 /*
- * What the dashboard does with the height its rows are ruled to.
+ * What the dashboard does with the height it is not using.
  *
- * The pairs share row tracks, so a row is as tall as its taller card and the shorter one is
- * left holding the difference. That is the deal `.dash--paired` makes and it is the right one
- * — but it only works while the two cards in a pair are within reach of each other, and one
- * pair was not. `.shortcuts` lays out in 11rem tracks; the narrow column gives it 359px inside
- * its padding, one pixel under the two tracks and a gap it needs. Ten links fell into a single
- * column ten rows tall, and two meters beside it held 347px of nothing.
+ * The columns flow independently now, so a card is as tall as what is in it and the slack this
+ * measures is the card's own bottom padding and nothing else. Under `.dash--paired` it was
+ * also the difference between a card and the taller one beside it, which is what the check was
+ * written to catch: the shortcut list fell into a single column ten rows tall and the two
+ * meters beside it held 347px of nothing.
  *
- * So the test is the layout, not the pixel: the list has to get more than one track, and no
- * card may sit in a row with a void in it. The budget is generous — a card's own bottom padding
- * is 24px of the measurement — and the pair that failed was four times over it.
+ * Both halves still earn their keep. The list has to get more than one track, or it is back to
+ * ten rows whatever the column does; and no card may end well above its own bottom edge, which
+ * is what a card that centres its contents in space it did not ask for looks like. The budget
+ * is generous — 24px of any reading is the padding itself — and the pair that failed was four
+ * times over it.
  */
 await p.evaluate(() => (location.hash = '#/account'));
-await p.waitForSelector('.dash--paired');
+await p.waitForSelector('.dash--flow');
 {
   const tracks = await p.$eval('.shortcuts', (e) => getComputedStyle(e).gridTemplateColumns.split(' ').length);
   ok('the shortcut list gets the width to reflow', tracks >= 2, `${tracks} track(s)`);
 
-  const worst = await p.$$eval('.dash--paired > .card', (n) =>
+  const worst = await p.$$eval('.dash--flow .card', (n) =>
     n
       .map((c) => ({
         head: c.querySelector('.card__heading')?.textContent.trim() ?? '?',
@@ -1263,7 +1274,7 @@ await p.waitForSelector('.dash--paired');
    */
   ok(
     'the identity card is marked, and by more than its colour',
-    await p.$$eval('.dash--paired > .card', (n) => {
+    await p.$$eval('.dash--flow .card', (n) => {
       const feat = n.find((c) => c.classList.contains('card--feature'));
       const plain = n.find((c) => !c.classList.contains('card--feature') && !c.classList.contains('card--urgent'));
       if (!feat || !plain) return false;

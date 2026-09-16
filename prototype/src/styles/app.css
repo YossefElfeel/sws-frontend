@@ -3039,17 +3039,41 @@ button.stat {
  * last row half empty, which is the honest failure — there is nowhere for it to hide, so the
  * imbalance is visible in review rather than three rows further down at some other width.
  */
-.dash--paired {
-  align-items: start;
+.dash--flow > .dash__main,
+.dash--flow > .dash__side {
+  min-inline-size: 0;
 }
 
 /*
- * A grid item's automatic minimum size is its content, which is how one long domain name in a
- * service row widens the whole column instead of ellipsing inside it. The two wrapper divs used
- * to carry this; the cards carry it now.
+ * Below the split the two columns stop being columns, and the cards interleave back into the
+ * one the phone actually has.
+ *
+ * `display: contents` drops the wrappers out of the box tree so their cards become items of
+ * `.dash` itself, and `order` pairs them up again — main's first beside side's first, and so
+ * on down. This is the whole cost of going back to wrappers, and it is why the cards are
+ * grouped by column in the markup rather than by pair: the desktop needs them grouped, the
+ * phone needs them interleaved, and only one of those can be the DOM order.
+ *
+ * Counted rather than named, which survives the two cards that are not always there: the
+ * usage and shortcuts pair is one child of each column, so when there is no live cPanel
+ * service both columns lose their third child at once and the rest still pair off.
  */
-.dash--paired > .card {
-  min-inline-size: 0;
+@media (max-width: 1279px) {
+  .dash--flow > .dash__main,
+  .dash--flow > .dash__side {
+    display: contents;
+  }
+
+  .dash--flow > .dash__main > :nth-child(1) { order: 1; }
+  .dash--flow > .dash__side > :nth-child(1) { order: 2; }
+  .dash--flow > .dash__main > :nth-child(2) { order: 3; }
+  .dash--flow > .dash__side > :nth-child(2) { order: 4; }
+  .dash--flow > .dash__main > :nth-child(3) { order: 5; }
+  .dash--flow > .dash__side > :nth-child(3) { order: 6; }
+  .dash--flow > .dash__main > :nth-child(4) { order: 7; }
+  .dash--flow > .dash__side > :nth-child(4) { order: 8; }
+  .dash--flow > .dash__main > :nth-child(5) { order: 9; }
+  .dash--flow > .dash__side > :nth-child(5) { order: 10; }
 }
 
 /*
