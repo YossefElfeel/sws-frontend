@@ -2035,6 +2035,26 @@ export const STRINGS = {
   'perm.tickets.note': { ar: 'يفتح تذاكر دعم ويرد عليها.', en: 'Can open support tickets and reply to them.' },
   'perm.domains': { ar: 'الدومينات', en: 'Domains' },
   'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
+  'perm.services': { ar: 'الخدمات', en: 'Services' },
+  'perm.services.note': {
+    ar: 'يشوف الاستضافات والسيرفرات ويوقّفها ويشغّلها.',
+    en: 'Can see hosting and servers, and stop or start them.',
+  },
+  'perm.affiliate': { ar: 'الأفلييت', en: 'Affiliate' },
+  'perm.affiliate.note': {
+    ar: 'يشوف العمولة ويطلب سحبها.',
+    en: 'Can see commission and request a withdrawal.',
+  },
+  'perm.profile': { ar: 'بيانات الحساب', en: 'Account details' },
+  'perm.profile.note': {
+    ar: 'يعدّل بيانات الحساب والعنوان.',
+    en: 'Can change the account’s details and address.',
+  },
+  'perm.orders': { ar: 'الطلبات', en: 'Orders' },
+  'perm.orders.note': {
+    ar: 'يطلب خدمات جديدة ويرقّي القديمة — ده بيصرف فلوس.',
+    en: 'Can order new services and upgrade existing ones — this spends money.',
+  },
   'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
   'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
   'con.new': { ar: 'جهة اتصال جديدة', en: 'New contact' },

@@ -870,7 +870,29 @@ export const LOGIN_LOG = [
  * contact can hold any subset of it and nothing outside it, which is what the editor on the
  * contacts screen enumerates.
  */
-export const PERMISSIONS = ['invoices', 'tickets', 'domains'] as const;
+/*
+ * Every entry names a screen this client area actually has, which is the constraint that
+ * keeps the list honest: a permission with nothing behind it is a promise the product cannot
+ * keep, and a toggle that gates nothing is worse than an absent one because it reads as
+ * protection.
+ *
+ * Three of these were all there was, and they left the common delegations unexpressible: a
+ * bookkeeper who should see invoices and nothing else already worked, but a technical contact
+ * who should restart a server could not be described at all, and neither could the ordinary
+ * arrangement where one person may open tickets but must not buy anything.
+ *
+ * Order is the ladder from reading to spending, so the riskiest is last rather than lost in
+ * the middle of the row.
+ */
+export const PERMISSIONS = [
+  'invoices',
+  'tickets',
+  'domains',
+  'services',
+  'affiliate',
+  'profile',
+  'orders',
+] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
 export interface Contact {
