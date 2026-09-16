@@ -818,6 +818,46 @@ export const AFFILIATE = {
   balanceUsdMinor: 13250,
 };
 
+/**
+ * Who signed up through the link.
+ *
+ * The four tiles say 37 signups and stop, which is the one number an affiliate cannot act on:
+ * it does not say which campaign worked, when the last one landed, or which commissions are
+ * still to clear.
+ *
+ * WHAT IS NOT HERE IS THE POINT. A referred customer is not the affiliate's customer, and
+ * their name, their email and their domain are theirs. An affiliate programme that hands them
+ * over turns a referral link into a way of harvesting contact details, so the identity is
+ * masked at the fixture rather than in the view — there is no unmasked copy for a later screen
+ * to reach for by accident. What is left is what the affiliate has a claim to: that somebody
+ * signed up, roughly who, when, what kind of thing they bought, and what it earned.
+ *
+ * The commission state is the other half. "Pending" is a signup inside the refund window and
+ * "approved" is one that has cleared it, which is why a balance is smaller than a total and
+ * why that is not a mistake.
+ */
+export type ReferralState = 'pending' | 'approved' | 'paid';
+
+export interface Referral {
+  id: string;
+  /** Already masked. See above — the full value is deliberately not carried. */
+  who: string;
+  at: string;
+  /** The family, not the domain: which product earned it, not whose site it is. */
+  product: string;
+  state: ReferralState;
+  commissionUsdMinor: number;
+}
+
+export const REFERRALS: Referral[] = [
+  { id: 'ref-6', who: 'm•••@gmail.com', at: '2026-09-12', product: 'Cloud Pro', state: 'pending', commissionUsdMinor: 1700 },
+  { id: 'ref-5', who: 'a•••@outlook.com', at: '2026-09-04', product: 'Shared Single', state: 'pending', commissionUsdMinor: 750 },
+  { id: 'ref-4', who: 's•••@orgtik.ch', at: '2026-08-21', product: 'VPS 2', state: 'approved', commissionUsdMinor: 1250 },
+  { id: 'ref-3', who: 'h•••@gmail.com', at: '2026-08-09', product: 'Mail 25', state: 'approved', commissionUsdMinor: 900 },
+  { id: 'ref-2', who: 'n•••@yahoo.com', at: '2026-07-28', product: 'WP Grow', state: 'paid', commissionUsdMinor: 1100 },
+  { id: 'ref-1', who: 't•••@gmail.com', at: '2026-07-15', product: 'Shared Ultra', state: 'paid', commissionUsdMinor: 1150 },
+];
+
 /** Spec 9.7 login activity log. */
 export const LOGIN_LOG = [
   { id: 'l1', at: '2026-09-01 08:12', ip: '156.209.44.18', where: { ar: 'القاهرة، مصر', en: 'Cairo, EG' }, ok: true },

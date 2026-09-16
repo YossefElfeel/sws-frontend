@@ -250,15 +250,19 @@ export function Services() {
                         {/* The link stretches over its whole cell — see `.data__link::after`.
                             A plan name is four characters wide in places ("Pro", "Mail 5"),
                             and a 23px target is under the bar in every guideline there is. */}
-                        <Link className="lead data__link" to={`/account/services/${s.id}`}>
-                          {s.product}
-                        </Link>
+                        {/* The type rides on the name's line rather than under the domain.
+                            On its own row it cost every one of eleven rows a third line for a
+                            word that is two. Not a Tag: that component is the status ladder,
+                            one meaning per colour, and a type is not a state. */}
+                        <span className="data__lead">
+                          <Link className="lead data__link" to={`/account/services/${s.id}`}>
+                            {s.product}
+                          </Link>
+                          <span className="data__kind">{t(`svc.kind.${s.kind}` as never)}</span>
+                        </span>
                         <span className="data__sub serial">
                           <bdi>{s.domain}</bdi>
                         </span>
-                        {/* Not a Tag: that component is the status ladder, one meaning per
-                            colour, and a type is not a state. */}
-                        <span className="data__kind">{t(`svc.kind.${s.kind}` as never)}</span>
                       </td>
                       {/* A service that has ended has no next renewal, and the date it carries
                           is the day it stopped — printing it here would dress the end of

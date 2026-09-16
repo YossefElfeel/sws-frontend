@@ -1965,6 +1965,20 @@ export const STRINGS = {
 
   'aff.lede': { ar: 'شارك رابطك واكسب عمولة على كل اشتراك.', en: 'Share your link and earn a commission on every signup.' },
   'aff.link': { ar: 'رابط الإحالة', en: 'Your referral link' },
+  'aff.referrals': { ar: 'مين اشترك من اللينك', en: 'Who signed up through your link' },
+  'aff.ref.who': { ar: 'العميل', en: 'Customer' },
+  'aff.ref.product': { ar: 'اشترك في', en: 'Signed up for' },
+  'aff.ref.commission': { ar: 'العمولة', en: 'Commission' },
+  'aff.ref.pending': { ar: 'لسه في فترة الاسترجاع', en: 'In the refund window' },
+  'aff.ref.approved': { ar: 'مستحقة', en: 'Approved' },
+  'aff.ref.paid': { ar: 'اتدفعت', en: 'Paid' },
+  /* Said once, under the list, because an affiliate who expects a name will otherwise read the
+     mask as a bug and open a ticket about it. */
+  'aff.maskNote': {
+    ar: 'بنعرض جزء من الإيميل بس. بيانات العميل اللي اشترك بتفضل عنده.',
+    en: 'Only part of the email is shown. A referred customer’s details stay theirs.',
+  },
+  'aff.refShowing': { ar: 'آخر اشتراكات من إجمالي', en: 'Most recent signups, of' },
   'aff.copy': { ar: 'نسخ', en: 'Copy' },
   'aff.copied': { ar: 'اتنسخ', en: 'Copied' },
   'aff.visits': { ar: 'زيارات', en: 'Visits' },
