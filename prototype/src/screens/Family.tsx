@@ -6,23 +6,29 @@ import { IconCheck, IconServer } from '../components/icons';
 import { useLocale } from '../lib/locale';
 import { usePrefs } from '../lib/prefs';
 import { useCart } from '../lib/cart';
-import { convert, formatAmount, discountPercent } from '../lib/catalog';
+import { convert, discountPercent } from '../lib/catalog';
 import { specText } from '../lib/specs';
-import { FAMILIES, OFFERS, VPS, type Offer } from '../lib/products';
+import { FAMILIES, OFFERS, type Offer } from '../lib/products';
 
 /**
  * Every hosting category page — spec 6.2 and 6.3.
  *
- * One route serves them all because the spec says they share a template. What differs is the
- * presentation per family: cards for the plan-shaped families, and a comparison table for VPS
- * because its options are too technical for cards.
+ * One route serves them all because the spec says they share a template, and they now share
+ * the presentation too: every family is a row of price cards.
  *
- * Website Builder used to be a third: spec 6.3 asks it to lead with a template preview, and it
- * did — a drawn wireframe beside a card offering a free trial. Both are gone at the product
- * owner's request; the page is its tiers now, like every other card family. The drawing was the
- * reason to keep it and the reason to drop it: with no template set decided, it previewed
- * nothing, and a preview of nothing at the head of a pricing page is a promise the product
- * cannot keep yet.
+ * VPS was the last holdout — a six-column comparison table, on the spec's reasoning that its
+ * options are too technical for cards. What that produced was a page nobody arrived expecting:
+ * the plan name in a first column, the price five columns along it, a button in a seventh, and
+ * none of it where the same reader had just met them on shared hosting, WordPress or cloud.
+ * The comparison survives the move — four servers, four specification lines, read down the row
+ * instead of across it — and the parts that make a price list decidable come back with it: the
+ * price at card size, the featured server visibly marked, one full-width button per plan.
+ *
+ * Website Builder went the same way earlier: spec 6.3 asks it to lead with a template preview,
+ * and it did — a drawn wireframe beside a card offering a free trial. Both are gone at the
+ * product owner's request. The drawing was the reason to keep it and the reason to drop it:
+ * with no template set decided, it previewed nothing, and a preview of nothing at the head of
+ * a pricing page is a promise the product cannot keep yet.
  */
 export function Family() {
   const { t } = useLocale();
@@ -39,28 +45,42 @@ export function Family() {
 
   return (
     <HostingLayout title={title} lede={lede}>
-      {meta.id === 'shared' && <PlanCards />}
-      {meta.layout === 'cards' && meta.id !== 'shared' && <OfferCards offers={OFFERS[meta.id] ?? []} />}
-      {meta.id === 'vps' && <VpsTable />}
+      {meta.id === 'shared' ? (
+        <PlanCards />
+      ) : (
+        <OfferCards offers={OFFERS[meta.id] ?? []} configure={meta.id === 'vps'} />
+      )}
       {meta.id === 'monitoring' && <AlertsNote />}
     </HostingLayout>
   );
 }
 
-/** The generic card grid for every family the spec presents as cards. */
-function OfferCards({ offers }: { offers: Offer[] }) {
+/**
+ * The card grid every family but shared hosting renders through.
+ *
+ * `configure` is what VPS needs and nothing else here does: a server cannot be provisioned
+ * without a hostname, a root password and an operating system, so its Order button opens
+ * Configure the way shared hosting's does. Dropping a VPS straight into the cart would sell a
+ * machine with no name and no way in.
+ */
+function OfferCards({ offers, configure = false }: { offers: Offer[]; configure?: boolean }) {
   const { t, locale } = useLocale();
   const { currency } = usePrefs();
   const { add } = useCart();
   const navigate = useNavigate();
 
   /**
-   * These families are single-price products, so ordering puts the line in the cart and takes
-   * you there. Shared hosting keeps its Configure step (spec 7.2) because that is the family
-   * with cycles and add-ons to choose; sending these here to an empty cart, as this button
-   * used to, meant "Order now" visibly did nothing.
+   * Most of these are single-price products, so ordering puts the line in the cart and takes
+   * you there — sending them to Configure, as this button used to, meant "Order now" visibly
+   * did nothing. A family that has something left to decide goes to Configure instead: shared
+   * hosting for its cycles and add-ons (spec 7.2), VPS for the settings its server is built
+   * from.
    */
   const order = (o: Offer) => {
+    if (configure) {
+      navigate(`/configure/${o.id}`);
+      return;
+    }
     add({ plan: o, cycle: 'monthly', addons: {} });
     navigate('/cart');
   };
@@ -107,65 +127,6 @@ function OfferCards({ offers }: { offers: Offer[] }) {
         ))}
       </ul>
     </div>
-  );
-}
-
-/**
- * Spec 6.3: VPS compares on specification, so it is a table rather than four cards. Ordering
- * one goes through Configure, where the OS is chosen alongside the hostname and root password
- * the server has to be provisioned with — the OS radios that used to sit under this table
- * were a choice that reached nothing.
- */
-function VpsTable() {
-  const { t, locale } = useLocale();
-  const { currency } = usePrefs();
-  const navigate = useNavigate();
-
-  return (
-    <>
-      <div className="panel table-scroll">
-        <table className="data">
-          <caption className="u-visually-hidden">{t('vps.compare')}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{t('col.item')}</th>
-              <th scope="col" className="num">{t('vps.cpu')}</th>
-              <th scope="col" className="num">{t('vps.ram')}</th>
-              <th scope="col" className="num">{t('vps.disk')}</th>
-              <th scope="col" className="num">{t('vps.bw')}</th>
-              <th scope="col" className="num">{t('col.amount')}</th>
-              <th scope="col" />
-            </tr>
-          </thead>
-          <tbody>
-            {VPS.map((row) => (
-              <tr key={row.id}>
-                <td>
-                  <span className="lead">{row.name}</span>
-                  {row.featured && <span className="tag tag--ok">{t('plan.featured')}</span>}
-                </td>
-                <td className="num">{row.vcpu}</td>
-                <td className="num">{row.ramGb} GB</td>
-                <td className="num">{row.storageGb} GB</td>
-                <td className="num">{row.bandwidthTb} TB</td>
-                <td className="num">
-                  {formatAmount(convert(row.monthlyUsdMinor, currency), locale)} {currency}
-                </td>
-                <td className="num">
-                  <Button
-                    size="sm"
-                    variant={row.featured ? 'primary' : 'secondary'}
-                    onClick={() => navigate(`/configure/${row.id}`)}
-                  >
-                    {t('plan.orderNow')}
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
   );
 }
 

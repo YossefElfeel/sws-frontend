@@ -528,7 +528,6 @@ export const STRINGS = {
 
   'ssl.mostOrdered': { ar: 'الأكثر طلبًا', en: 'Most ordered' },
   'vps.os': { ar: 'نظام التشغيل', en: 'Operating system' },
-  'vps.compare': { ar: 'مقارنة الخوادم', en: 'Compare servers' },
   'vps.cpu': { ar: 'المعالج', en: 'vCPU' },
   'vps.ram': { ar: 'الذاكرة', en: 'RAM' },
   'vps.disk': { ar: 'التخزين', en: 'Storage' },

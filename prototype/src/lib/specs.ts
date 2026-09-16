@@ -26,6 +26,10 @@ const AR: Record<string, string> = {
   '60 GB NVMe': '60 جيجابايت NVMe',
   '120 GB NVMe': '120 جيجابايت NVMe',
   '240 GB NVMe': '240 جيجابايت NVMe',
+  '40 GB storage': '40 جيجابايت تخزين',
+  '80 GB storage': '80 جيجابايت تخزين',
+  '160 GB storage': '160 جيجابايت تخزين',
+  '320 GB storage': '320 جيجابايت تخزين',
 
   // Memory and processor
   '1 GB RAM': '1 جيجابايت RAM',
@@ -35,6 +39,7 @@ const AR: Record<string, string> = {
   '4 GB RAM': '4 جيجابايت RAM',
   '8 GB RAM': '8 جيجابايت RAM',
   '16 GB RAM': '16 جيجابايت RAM',
+  '1 vCPU': '1 vCPU',
   '2 vCPU': '2 vCPU',
   '4 vCPU': '4 vCPU',
   '8 vCPU': '8 vCPU',
@@ -43,7 +48,14 @@ const AR: Record<string, string> = {
   '150 GB bandwidth': '150 جيجابايت نقل بيانات',
   '2 TB bandwidth': '2 تيرابايت نقل بيانات',
   '4 TB bandwidth': '4 تيرابايت نقل بيانات',
+  '8 TB bandwidth': '8 تيرابايت نقل بيانات',
+  '16 TB bandwidth': '16 تيرابايت نقل بيانات',
   'Unlimited bandwidth': 'نقل بيانات بلا حدود',
+
+  // VPS
+  'Full root access': 'صلاحية root كاملة',
+  'Choice of operating system': 'اختيار نظام التشغيل',
+  'Your own nameservers': 'خوادم أسماء خاصة بيك',
 
   // Mail
   '5 mailboxes': '5 صناديق بريد',
