@@ -25,15 +25,23 @@ export interface SystemRow {
   id: string;
   labelKey: string;
   state: SystemState;
+  /** What the system actually covers, in the words a customer would use for it. */
+  noteKey: string;
+  /**
+   * When the state it is in now began — which is the question a status page is opened to
+   * answer and the one a row of six chips cannot. Not an uptime figure: this is a timestamp
+   * we hold, where a percentage would be a claim nobody here has verified.
+   */
+  since: string;
 }
 
 export const SYSTEMS: SystemRow[] = [
-  { id: 'web', labelKey: 'status.sys.web', state: 'operational' },
-  { id: 'mail', labelKey: 'status.sys.mail', state: 'operational' },
-  { id: 'dns', labelKey: 'status.sys.dns', state: 'operational' },
-  { id: 'panel', labelKey: 'status.sys.panel', state: 'maintenance' },
-  { id: 'billing', labelKey: 'status.sys.billing', state: 'operational' },
-  { id: 'api', labelKey: 'status.sys.api', state: 'degraded' },
+  { id: 'web', labelKey: 'status.sys.web', state: 'operational', noteKey: 'status.cover.web', since: '2026-08-11 09:42' },
+  { id: 'mail', labelKey: 'status.sys.mail', state: 'operational', noteKey: 'status.cover.mail', since: '2026-07-30 00:00' },
+  { id: 'dns', labelKey: 'status.sys.dns', state: 'operational', noteKey: 'status.cover.dns', since: '2026-08-11 09:54' },
+  { id: 'panel', labelKey: 'status.sys.panel', state: 'maintenance', noteKey: 'status.cover.panel', since: '2026-09-01 02:00' },
+  { id: 'billing', labelKey: 'status.sys.billing', state: 'operational', noteKey: 'status.cover.billing', since: '2026-07-30 00:00' },
+  { id: 'api', labelKey: 'status.sys.api', state: 'degraded', noteKey: 'status.cover.api', since: '2026-09-14 16:20' },
 ];
 
 export interface Incident {
@@ -44,6 +52,8 @@ export interface Incident {
   bodyKey: string;
   /** Minutes, where the incident has closed. */
   minutes?: number;
+  /** The systems it touched, by `SystemRow.id`. */
+  systems: string[];
 }
 
 export const INCIDENTS: Incident[] = [
@@ -53,6 +63,7 @@ export const INCIDENTS: Incident[] = [
     state: 'maintenance',
     titleKey: 'status.inc3',
     bodyKey: 'status.inc3b',
+    systems: ['panel'],
   },
   {
     id: 'inc-2',
@@ -60,6 +71,7 @@ export const INCIDENTS: Incident[] = [
     state: 'degraded',
     titleKey: 'status.inc2',
     bodyKey: 'status.inc2b',
+    systems: ['api'],
     minutes: 38,
   },
   {
@@ -68,9 +80,59 @@ export const INCIDENTS: Incident[] = [
     state: 'down',
     titleKey: 'status.inc1',
     bodyKey: 'status.inc1b',
+    systems: ['dns', 'web'],
     minutes: 12,
   },
 ];
+
+/**
+ * The last 90 days of one system, a day at a time.
+ *
+ * What this is not is an uptime figure, and the distinction is the whole reason it can ship.
+ * It plots the incidents this file already holds and nothing else: a day takes the state of
+ * the worst incident that touched that system that day, and a day with nothing against it is
+ * drawn operational. That is a statement about our records rather than a measurement of the
+ * network, which is why the strip says so under itself instead of printing a percentage.
+ *
+ * The window ends on a fixed date, for the reason the telemetry window does: a review build
+ * whose strip shifts a column every midnight cannot be compared against yesterday's
+ * screenshot.
+ */
+export const STATUS_WINDOW_END = '2026-09-16';
+export const STATUS_WINDOW_DAYS = 90;
+
+export interface StatusDay {
+  date: string;
+  state: SystemState;
+}
+
+/** Worst wins the day, so a system that was down and later slow reads as down. */
+const STATE_RANK: Record<SystemState, number> = {
+  operational: 0,
+  maintenance: 1,
+  degraded: 2,
+  down: 3,
+};
+
+export function systemDays(systemId: string, days = STATUS_WINDOW_DAYS): StatusDay[] {
+  const end = new Date(`${STATUS_WINDOW_END}T00:00:00Z`);
+  const out: StatusDay[] = [];
+
+  for (let i = days - 1; i >= 0; i -= 1) {
+    const day = new Date(end);
+    day.setUTCDate(day.getUTCDate() - i);
+    const date = day.toISOString().slice(0, 10);
+
+    let state: SystemState = 'operational';
+    for (const incident of INCIDENTS) {
+      if (!incident.systems.includes(systemId) || incident.at !== date) continue;
+      if (STATE_RANK[incident.state] > STATE_RANK[state]) state = incident.state;
+    }
+    out.push({ date, state });
+  }
+
+  return out;
+}
 
 /* ── data centres: M-19 ─────────────────────────────────────────────────────── */
 /*

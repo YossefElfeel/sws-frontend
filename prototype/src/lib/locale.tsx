@@ -90,7 +90,7 @@ export const STRINGS = {
   'hero.cta': { ar: 'شوف الباقات', en: 'See the plans' },
   'hero.cta2': { ar: 'ابحث عن دومين', en: 'Find a domain' },
 
-  'feat.title': { ar: 'ليه سوميون', en: 'Why Somion' },
+  'feat.title': { ar: 'ليه Orgtik', en: 'Why Orgtik' },
   'feat.lede': {
     ar: 'مفيش أرقام كبيرة ولا وعود عامة — دي الحاجات اللي نقدر نثبتها.',
     en: 'No headline statistics and no vague promises — these are the things we can actually show.',
@@ -129,7 +129,7 @@ export const STRINGS = {
   'per.biennially': { ar: 'كل سنتين', en: 'per 2 years' },
   'per.triennially': { ar: 'كل 3 سنين', en: 'per 3 years' },
 
-  'brand.name': { ar: 'سوميون لخدمات الويب', en: 'Somion Web Services' },
+  'brand.name': { ar: 'Orgtik لخدمات الويب', en: 'Orgtik Web Services' },
 
   skip: { ar: 'تخطَّ إلى المحتوى', en: 'Skip to content' },
 
@@ -535,7 +535,7 @@ export const STRINGS = {
   'monitoring.alerts': { ar: 'إزاي التنبيهات توصلك', en: 'How alerts reach you' },
   'monitoring.alertsBody': { ar: 'تنبيه التوقف بالبريد فورًا، ورسالة نصية في الخطط المدفوعة، وويب هوك في الخطة الأعلى.', en: 'Downtime alerts by email immediately, SMS on the paid plans, and a webhook on the top plan.' },
   'transfer.title': { ar: 'نقل دومين', en: 'Transfer a domain' },
-  'transfer.lede': { ar: 'انقل دومينك لسوميون. النقل بيضيف سنة على تاريخ الانتهاء الحالي.', en: 'Move your domain to Somion. A transfer adds a year to the current expiry date.' },
+  'transfer.lede': { ar: 'انقل دومينك لـ Orgtik. النقل بيضيف سنة على تاريخ الانتهاء الحالي.', en: 'Move your domain to Orgtik. A transfer adds a year to the current expiry date.' },
   'transfer.epp': { ar: 'كود النقل (EPP)', en: 'Authorisation code (EPP)' },
   'transfer.checking': { ar: 'بنتأكد من الدومين…', en: 'Checking the domain…' },
   'transfer.checkingNote': {
@@ -889,16 +889,18 @@ export const STRINGS = {
    * asks, but nothing is being paid, so the copy cannot say a payment went through — a
    * confirmation that claims money moved is the one sentence a card-setup screen must not say.
    */
+  /* Method-neutral since the wallet reaches this screen too: it is not a card, and the thing
+     confirming it is not a bank. */
   'tds.setupGoBody': {
-    ar: 'البنك هيسألك تأكيد إن الكارت بتاعك. مفيش أي مبلغ بيتدفع هنا.',
-    en: 'Your bank will ask you to confirm the card is yours. Nothing is being paid here.',
+    ar: 'هيتطلب منك تأكيد إن طريقة الدفع دي بتاعتك. مفيش أي مبلغ بيتدفع هنا.',
+    en: 'You will be asked to confirm this payment method is yours. Nothing is being paid here.',
   },
-  'tds.setupBackTitle': { ar: 'البنك أكّد الكارت', en: 'Your bank confirmed the card' },
+  'tds.setupBackTitle': { ar: 'طريقة الدفع اتأكدت', en: 'Your payment method is confirmed' },
   'tds.setupBackBody': {
-    ar: 'فاضل نحفظه في حسابك.',
+    ar: 'فاضل نحفظها في حسابك.',
     en: 'All that is left is saving it to your account.',
   },
-  'tds.setupFinish': { ar: 'احفظ الكارت', en: 'Save the card' },
+  'tds.setupFinish': { ar: 'احفظ طريقة الدفع', en: 'Save the payment method' },
 
   // ── transfer instructions: O-10 and O-11 ──────────────────────────────────
   'bank.title': { ar: 'تحويل بنكي', en: 'Bank transfer' },
@@ -1070,13 +1072,13 @@ export const STRINGS = {
     ar: 'كل نظام وحالته دلوقتي، والأعطال اللي حصلت قبل كده.',
     en: 'Every system as it stands now, and what has gone wrong before.',
   },
-  'status.checked': { ar: 'بيتحدّث كل دقيقة.', en: 'Refreshed every minute.' },
+  'status.checked': { ar: 'بيتجدّد كل دقيقة.', en: 'Refreshed every minute.' },
   'status.systems': { ar: 'الأنظمة', en: 'Systems' },
   'status.history': { ar: 'الأعطال السابقة', en: 'Past incidents' },
   'status.minutes': { ar: 'دقيقة', en: 'minutes' },
   'status.all.operational': { ar: 'كل حاجة شغالة', en: 'All systems operational' },
-  'status.all.degraded': { ar: 'في نظام بيتعب', en: 'One system is degraded' },
-  'status.all.maintenance': { ar: 'في صيانة شغالة دلوقتي', en: 'Maintenance in progress' },
+  'status.all.degraded': { ar: 'في نظام بطيء', en: 'One system is degraded' },
+  'status.all.maintenance': { ar: 'في صيانة دلوقتي', en: 'Maintenance in progress' },
   'status.all.down': { ar: 'في نظام واقف', en: 'A system is down' },
   'status.state.operational': { ar: 'شغال', en: 'Operational' },
   'status.state.degraded': { ar: 'بطيء', en: 'Degraded' },
@@ -1088,6 +1090,29 @@ export const STRINGS = {
   'status.sys.panel': { ar: 'لوحة التحكم', en: 'Control panel' },
   'status.sys.billing': { ar: 'الفوترة والدفع', en: 'Billing and payments' },
   'status.sys.api': { ar: 'الـ API', en: 'API' },
+  /* What each system covers, said the way a customer would say it rather than the way the rack
+     does — the detail page exists so somebody can tell whether the thing that is slow is the
+     thing their site runs on. */
+  'status.cover.web': { ar: 'السيرفرات اللي بتشغّل مواقع العملاء وقواعد بياناتها.', en: 'The servers that run customer sites and their databases.' },
+  'status.cover.mail': { ar: 'استقبال البريد وإرساله، وصناديق IMAP و POP.', en: 'Sending and receiving mail, and the IMAP and POP boxes.' },
+  'status.cover.dns': { ar: 'خوادم الأسماء اللي بتردّ على دوميناتك.', en: 'The nameservers that answer for your domains.' },
+  'status.cover.panel': { ar: 'cPanel وكل حاجة بتتفتح من جوّاها.', en: 'cPanel and everything opened from inside it.' },
+  'status.cover.billing': { ar: 'الفواتير والدفع وإضافة الرصيد.', en: 'Invoices, payments, and adding credit.' },
+  'status.cover.api': { ar: 'الـ API اللي بتتحكم بيه في خدماتك من بره اللوحة.', en: 'The API you drive your services with from outside the panel.' },
+  'status.covers': { ar: 'بيغطّي إيه', en: 'What it covers' },
+  'status.ninety': { ar: 'آخر 90 يوم', en: 'The last 90 days' },
+  'status.marked': { ar: 'يوم متسجّل عليه عطل', en: 'days with a recorded incident' },
+  /* The strip draws our records, not a measurement, and it has to say which — otherwise a
+     wall of green reads as an uptime claim nobody here has verified. */
+  'status.stripNote': {
+    ar: 'ده اللي متسجّل عندنا: اليوم اللي مفيش عليه عطل مكتوب بيتعرض أخضر. مش نسبة تشغيل مقاسة.',
+    en: 'This is what we have on record: a day with no incident written against it is drawn green. It is not a measured uptime figure.',
+  },
+  'status.since': { ar: 'في الحالة دي من', en: 'In this state since' },
+  'status.systemHistory': { ar: 'أعطال النظام ده', en: 'Incidents on this system' },
+  'status.systemNone': { ar: 'مفيش أعطال متسجّلة على النظام ده.', en: 'No incidents recorded on this system.' },
+  'status.allSystems': { ar: 'كل الأنظمة', en: 'All systems' },
+  'status.openSystem': { ar: 'افتح تفاصيل النظام', en: 'Open system details' },
   'status.inc3': { ar: 'صيانة مجدولة على لوحة التحكم', en: 'Scheduled control-panel maintenance' },
   'status.inc3b': {
     ar: 'ترقية تخزين على zrh-web07. المواقع والبريد ما اتأثروش.',
@@ -1116,8 +1141,8 @@ export const STRINGS = {
     en: 'Swiss infrastructure with Egyptian support and pricing.',
   },
   'ab.p1': {
-    ar: 'سوميون بتشغّل مواقع وبريد شركات صغيرة ومتوسطة على سيرفرات في سويسرا، وبتدعمها بفريق في مصر بيتكلم عربي ومصري وبيفهم البنوك والمحافظ اللي بتدفع بيها.',
-    en: 'Somion runs the websites and mail of small and mid-sized businesses on servers in Switzerland, supported by a team in Egypt that speaks your language and understands the banks and wallets you actually pay with.',
+    ar: 'Orgtik بتشغّل مواقع وبريد شركات صغيرة ومتوسطة على سيرفرات في سويسرا، وبتدعمها بفريق في مصر بيتكلم عربي ومصري وبيفهم البنوك والمحافظ اللي بتدفع بيها.',
+    en: 'Orgtik runs the websites and mail of small and mid-sized businesses on servers in Switzerland, supported by a team in Egypt that speaks your language and understands the banks and wallets you actually pay with.',
   },
   'ab.p2': {
     ar: 'الجمع ده مقصود: القوانين والبنية اللي في سويسرا، والقرب والسعر اللي في مصر. مش بنحاول نبقى أرخص واحد، بنحاول نبقى الأوضح.',
@@ -1749,6 +1774,7 @@ export const STRINGS = {
   // The counts above the services table. Each is also the filter it counts, so the label has
   // to read as a category and not as a sentence about one.
   'svc.all': { ar: 'كل الخدمات', en: 'All services' },
+  'filter.allKinds': { ar: 'كل الأنواع', en: 'All types' },
   'svc.attention': { ar: 'محتاجة تدخّل', en: 'Needs attention' },
   'svc.allRunning': { ar: 'كله شغّال', en: 'All running' },
   'svc.noneSetup': { ar: 'مفيش تحت التجهيز', en: 'None in setup' },
@@ -1757,6 +1783,7 @@ export const STRINGS = {
   // The row switch. "Running" rather than "Active", because the chip beside it already says
   // Active and a column repeating the word would read as the same fact twice.
   'col.running': { ar: 'شغّالة', en: 'Running' },
+  'col.type': { ar: 'النوع', en: 'Type' },
   'svc.runOn': { ar: 'الخدمة شغّالة', en: 'Service is running' },
   'svc.runOff': { ar: 'الخدمة موقوفة', en: 'Service is stopped' },
   'svc.runLocked': { ar: 'مش ممكن تتشغّل أو تتوقف وهي في الحالة دي', en: 'Cannot be switched while it is in this state' },
@@ -1833,6 +1860,19 @@ export const STRINGS = {
   'pm.primary': { ar: 'الأساسية', en: 'Primary' },
   'pm.makePrimary': { ar: 'اجعلها الأساسية', en: 'Make primary' },
   'pm.add': { ar: 'أضف بطاقة', en: 'Add a card' },
+  'pm.choose': { ar: 'أضف طريقة دفع', en: 'Add a payment method' },
+  'pm.chooseLede': {
+    ar: 'اختار الطريقة اللي عايز تحفظها للتجديد التلقائي.',
+    en: 'Choose the method you want kept on file for automatic renewal.',
+  },
+  'pm.continue': { ar: 'كمّل', en: 'Continue' },
+  /* The two that are missing are missing for a reason, and a customer who pays by InstaPay
+     every month will look for them here first. */
+  'pm.manualTitle': { ar: 'التحويل البنكي وإنستاباي', en: 'Bank transfer and InstaPay' },
+  'pm.manualNote': {
+    ar: 'دول مابيتحفظوش، لأن التحويل بيتم منك إنت مش مننا — فمش ممكن يتخصم لوحده. تقدر تختارهم وقت دفع أي فاتورة.',
+    en: 'These are not kept on file: the transfer is made by you rather than by us, so nothing can be charged automatically. You can choose either one when paying any invoice.',
+  },
   'pm.addLede': {
     ar: 'الكارت بيتحفظ عشان التجديدات تتدفع لوحدها. مفيش حاجة بتتخصم دلوقتي.',
     en: 'The card is saved so renewals can pay themselves. Nothing is charged now.',
@@ -1892,7 +1932,7 @@ export const STRINGS = {
   'tkt.send': { ar: 'إرسال', en: 'Send' },
   'tkt.cancel': { ar: 'إلغاء', en: 'Cancel' },
   'tkt.reply': { ar: 'رد', en: 'Reply' },
-  'tkt.close': { ar: 'إغلاق التذكرة', en: 'Close ticket' },
+  'tkt.replyPlaceholder': { ar: 'اكتب ردك…', en: 'Write your reply…' },
   'tkt.noneFilter': { ar: 'مفيش تذاكر بالفلاتر دي.', en: 'No tickets match these filters.' },
   'tkt.showAll': { ar: 'اعرض كل التذاكر', en: 'Show all tickets' },
 
@@ -1921,11 +1961,11 @@ export const STRINGS = {
   'kb.cat.email': { ar: 'البريد', en: 'Email' },
   'kb.cat.billing': { ar: 'الفوترة', en: 'Billing' },
   'kb.a1.title': { ar: 'إزاي توجّه دومينك لاستضافتك', en: 'How to point your domain at your hosting' },
-  'kb.a1.body': { ar: 'غيّر خوادم الأسماء عند المُسجِّل لـ ns1.somion.ch و ns2.somion.ch. التغيير بياخد من ساعة لـ24 ساعة عشان ينتشر.', en: 'Change the nameservers at your registrar to ns1.somion.ch and ns2.somion.ch. The change takes between one and 24 hours to propagate.' },
+  'kb.a1.body': { ar: 'غيّر خوادم الأسماء عند المُسجِّل لـ ns1.orgtik.ch و ns2.orgtik.ch. التغيير بياخد من ساعة لـ24 ساعة عشان ينتشر.', en: 'Change the nameservers at your registrar to ns1.orgtik.ch and ns2.orgtik.ch. The change takes between one and 24 hours to propagate.' },
   'kb.a2.title': { ar: 'أول دخول على cPanel', en: 'Your first cPanel login' },
   'kb.a2.body': { ar: 'من صفحة الخدمة اضغط «ادخل على cPanel» — الدخول تلقائي من غير كلمة مرور تانية.', en: 'From the service page press "Log in to cPanel" — the sign-in is automatic and needs no second password.' },
   'kb.a3.title': { ar: 'إعداد البريد على الموبايل', en: 'Setting up email on your phone' },
-  'kb.a3.body': { ar: 'استخدم IMAP على mail.somion.ch، بورت 993 مع SSL للوارد و465 للصادر.', en: 'Use IMAP on mail.somion.ch, port 993 with SSL for incoming and 465 for outgoing.' },
+  'kb.a3.body': { ar: 'استخدم IMAP على mail.orgtik.ch، بورت 993 مع SSL للوارد و465 للصادر.', en: 'Use IMAP on mail.orgtik.ch, port 993 with SSL for incoming and 465 for outgoing.' },
   'kb.a5.title': { ar: 'إزاي تنقل دومينك لـ SWS', en: 'How to transfer your domain to SWS' },
   'kb.a5.body': { ar: 'افتح قفل الدومين عند المُسجِّل الحالي، اطلب كود الـEPP، وبعدين ادخل الكود في صفحة نقل الدومين. النقل بياخد من ٥ لـ٧ أيام وبيضيف سنة على مدة الدومين.', en: 'Unlock the domain at your current registrar, ask it for the EPP code, then enter that code on the domain transfer page. A transfer takes five to seven days and adds a year to the domain.' },
   'kb.a6.title': { ar: 'إزاي تقرا فاتورتك', en: 'How to read your invoice' },
@@ -1940,6 +1980,20 @@ export const STRINGS = {
 
   'aff.lede': { ar: 'شارك رابطك واكسب عمولة على كل اشتراك.', en: 'Share your link and earn a commission on every signup.' },
   'aff.link': { ar: 'رابط الإحالة', en: 'Your referral link' },
+  'aff.referrals': { ar: 'مين اشترك من اللينك', en: 'Who signed up through your link' },
+  'aff.ref.who': { ar: 'العميل', en: 'Customer' },
+  'aff.ref.product': { ar: 'اشترك في', en: 'Signed up for' },
+  'aff.ref.commission': { ar: 'العمولة', en: 'Commission' },
+  'aff.ref.pending': { ar: 'لسه في فترة الاسترجاع', en: 'In the refund window' },
+  'aff.ref.approved': { ar: 'مستحقة', en: 'Approved' },
+  'aff.ref.paid': { ar: 'اتدفعت', en: 'Paid' },
+  /* Said once, under the list, because an affiliate who expects a name will otherwise read the
+     mask as a bug and open a ticket about it. */
+  'aff.maskNote': {
+    ar: 'بنعرض جزء من الإيميل بس. بيانات العميل اللي اشترك بتفضل عنده.',
+    en: 'Only part of the email is shown. A referred customer’s details stay theirs.',
+  },
+  'aff.refShowing': { ar: 'آخر اشتراكات من إجمالي', en: 'Most recent signups, of' },
   'aff.copy': { ar: 'نسخ', en: 'Copy' },
   'aff.copied': { ar: 'اتنسخ', en: 'Copied' },
   'aff.visits': { ar: 'زيارات', en: 'Visits' },
@@ -1981,6 +2035,26 @@ export const STRINGS = {
   'perm.tickets.note': { ar: 'يفتح تذاكر دعم ويرد عليها.', en: 'Can open support tickets and reply to them.' },
   'perm.domains': { ar: 'الدومينات', en: 'Domains' },
   'perm.domains.note': { ar: 'يعدّل خوادم الأسماء وسجلات DNS.', en: 'Can change nameservers and DNS records.' },
+  'perm.services': { ar: 'الخدمات', en: 'Services' },
+  'perm.services.note': {
+    ar: 'يشوف الاستضافات والسيرفرات ويوقّفها ويشغّلها.',
+    en: 'Can see hosting and servers, and stop or start them.',
+  },
+  'perm.affiliate': { ar: 'الأفلييت', en: 'Affiliate' },
+  'perm.affiliate.note': {
+    ar: 'يشوف العمولة ويطلب سحبها.',
+    en: 'Can see commission and request a withdrawal.',
+  },
+  'perm.profile': { ar: 'بيانات الحساب', en: 'Account details' },
+  'perm.profile.note': {
+    ar: 'يعدّل بيانات الحساب والعنوان.',
+    en: 'Can change the account’s details and address.',
+  },
+  'perm.orders': { ar: 'الطلبات', en: 'Orders' },
+  'perm.orders.note': {
+    ar: 'يطلب خدمات جديدة ويرقّي القديمة — ده بيصرف فلوس.',
+    en: 'Can order new services and upgrade existing ones — this spends money.',
+  },
   'con.perms': { ar: 'الصلاحيات', en: 'Permissions' },
   'con.noPerms': { ar: 'من غير صلاحيات — يقدر يدخل بس.', en: 'No permissions — sign-in only.' },
   'con.new': { ar: 'جهة اتصال جديدة', en: 'New contact' },
@@ -2054,8 +2128,8 @@ export const STRINGS = {
   'footer.refund': { ar: 'سياسة الاسترداد', en: 'Refund policy' },
   'footer.contact': { ar: 'اتصل بنا', en: 'Contact' },
   'footer.rights': {
-    ar: 'سوميون لخدمات الويب · بنية سويسرية، دعم ومحاسبة مصرية.',
-    en: 'Somion Web Services · Swiss infrastructure, Egyptian support and billing.',
+    ar: 'Orgtik لخدمات الويب · بنية سويسرية، دعم ومحاسبة مصرية.',
+    en: 'Orgtik Web Services · Swiss infrastructure, Egyptian support and billing.',
   },
 
   /* ── 2026-09-07: the flows the competitor screenshots showed and the owner asked for ─── */
@@ -2186,8 +2260,8 @@ export const STRINGS = {
   },
   'inv.removedMsg': { ar: 'الفاتورة اتشالت من القائمة', en: 'Invoice removed from your list' },
   'inv.removedMsgNote': {
-    ar: 'اتشالت من العرض بس. السجل المحاسبي بيفضل موجود عند سوميون، والشيل مابيمسحوش.',
-    en: 'It is gone from this view only. The accounting record stays with Somion; removing it here does not erase it.',
+    ar: 'اتشالت من العرض بس. السجل المحاسبي بيفضل موجود عند Orgtik، والشيل مابيمسحوش.',
+    en: 'It is gone from this view only. The accounting record stays with Orgtik; removing it here does not erase it.',
   },
 
   // A cancelled invoice, read on its own page: neither paid nor owed.
@@ -2390,7 +2464,7 @@ export const STRINGS = {
   'dom.overview': { ar: 'نظرة عامة', en: 'Overview' },
   'dom.renewal': { ar: 'التجديد', en: 'Renewal' },
   'dom.perYear': { ar: 'في السنة', en: 'per year' },
-  'dom.nsDefault': { ar: 'استخدم خوادم أسماء سوميون', en: 'Use Somion’s nameservers' },
+  'dom.nsDefault': { ar: 'استخدم خوادم أسماء Orgtik', en: 'Use Orgtik’s nameservers' },
   'dom.nsDefaultNote': { ar: 'الاختيار الصح لو استضافتك عندنا.', en: 'The right choice if your hosting is with us.' },
   'dom.nsCustom': { ar: 'خوادم أسماء خاصة', en: 'Custom nameservers' },
   'dom.nsCustomNote': { ar: 'لو موقعك مستضاف في مكان تاني، اكتب خوادم الأسماء بتاعته.', en: 'If the site is hosted elsewhere, enter that host’s nameservers.' },

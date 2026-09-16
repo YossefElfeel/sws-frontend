@@ -40,6 +40,7 @@ import {
   renews,
   type Service,
   type ServiceStatus,
+  type ServiceKind,
 } from '../../lib/account';
 import { Select } from '../../components/Select';
 
@@ -90,6 +91,7 @@ export function Services() {
   const { saved, mark, clear } = useSaved();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState<StatusFilter>('all');
+  const [kind, setKind] = useState<KindFilter>('all');
   const [sort, setSort] = useState<SortKey>('renewal');
   const [desc, setDesc] = useState(false);
   const [page, setPage] = useState(1);
@@ -113,7 +115,10 @@ export function Services() {
   // The plan name and the domain are the two things anyone knows a service by, and the domain
   // is the one they will type — it is what the service is called in every other conversation.
   const matched = services.filter(
-    (s) => inFilter(s.status, status) && matches(q, s.product, s.domain, s.nextDue),
+    (s) =>
+      inFilter(s.status, status) &&
+      (kind === 'all' || s.kind === kind) &&
+      matches(q, s.product, s.domain, s.nextDue),
   );
 
   const sorted = [...matched].sort((a, b) => compare(a, b, sort, desc, locale));
@@ -197,6 +202,17 @@ export function Services() {
             ),
           }))}
         />
+        {/* Type narrows beside status rather than replacing it: "which of my VPSes needs
+            attention" is one question, and two filters that compose answer it. */}
+        <TableFilter
+          label={t('col.type')}
+          value={kind}
+          onChange={narrow(setKind)}
+          options={KINDS.map((k) => ({
+            value: k,
+            label: t(k === 'all' ? 'filter.allKinds' : (`svc.kind.${k}` as never)),
+          }))}
+        />
         <TableSort
           value={sort}
           onChange={narrow(setSort)}
@@ -234,9 +250,16 @@ export function Services() {
                         {/* The link stretches over its whole cell — see `.data__link::after`.
                             A plan name is four characters wide in places ("Pro", "Mail 5"),
                             and a 23px target is under the bar in every guideline there is. */}
-                        <Link className="lead data__link" to={`/account/services/${s.id}`}>
-                          {s.product}
-                        </Link>
+                        {/* The type rides on the name's line rather than under the domain.
+                            On its own row it cost every one of eleven rows a third line for a
+                            word that is two. Not a Tag: that component is the status ladder,
+                            one meaning per colour, and a type is not a state. */}
+                        <span className="data__lead">
+                          <Link className="lead data__link" to={`/account/services/${s.id}`}>
+                            {s.product}
+                          </Link>
+                          <span className="data__kind">{t(`svc.kind.${s.kind}` as never)}</span>
+                        </span>
                         <span className="data__sub serial">
                           <bdi>{s.domain}</bdi>
                         </span>
@@ -338,6 +361,10 @@ export function Services() {
 }
 
 /** Does this status belong in the current view? `attention` spans three of them. */
+/** All, or one of the three things a service can be. */
+type KindFilter = 'all' | ServiceKind;
+const KINDS: KindFilter[] = ['all', 'cpanel', 'vps', 'email'];
+
 function inFilter(status: ServiceStatus, filter: StatusFilter): boolean {
   if (filter === 'all') return true;
   if (filter === 'attention') return NEEDS_ATTENTION.includes(status);

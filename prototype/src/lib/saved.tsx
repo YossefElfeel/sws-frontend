@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react';
 import { Banner } from '../components/Banner';
 import { useLocale } from './locale';
 
@@ -48,4 +48,75 @@ export function SavedNote({
       </Banner>
     </div>
   );
+}
+
+/**
+ * Whether anything in a form has actually been changed.
+ *
+ * These forms are uncontrolled — every field carries a `defaultValue`, which is the right
+ * shape for a prototype whose fixtures are the source of truth. What it costs is that nothing
+ * knows whether a field has been touched, so Save sat lit on a form nobody had edited,
+ * offering to save changes that did not exist.
+ *
+ * Rather than make every form controlled, this listens at the container and asks the fields
+ * themselves: a text field against its `defaultValue`, a checkbox or radio against its
+ * `defaultChecked`, a select against the option marked selected. Putting an edit back the way
+ * it was makes the form clean again, which a flag set once on the first keystroke would not.
+ *
+ * `settle` is what a save does to the baseline: what is on screen becomes the new starting
+ * point, so the button goes quiet again without the page reloading.
+ */
+type Field = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+export function useDirty<T extends HTMLElement = HTMLDivElement>() {
+  const ref = useRef<T | null>(null);
+  const [dirty, setDirty] = useState(false);
+
+  const fields = () =>
+    Array.from(ref.current?.querySelectorAll<Field>('input, textarea, select') ?? []);
+
+  const check = useCallback(() => {
+    setDirty(
+      fields().some((f) => {
+        if (f instanceof HTMLSelectElement) {
+          const base = Array.from(f.options).find((o) => o.defaultSelected);
+          return f.value !== (base?.value ?? f.options[0]?.value ?? '');
+        }
+        if (f instanceof HTMLInputElement && (f.type === 'checkbox' || f.type === 'radio')) {
+          return f.checked !== f.defaultChecked;
+        }
+        return f.value !== f.defaultValue;
+      }),
+    );
+  }, []);
+
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    root.addEventListener('input', check);
+    root.addEventListener('change', check);
+    return () => {
+      root.removeEventListener('input', check);
+      root.removeEventListener('change', check);
+    };
+  }, [check]);
+
+  const settle = useCallback(() => {
+    fields().forEach((f) => {
+      if (f instanceof HTMLSelectElement) {
+        Array.from(f.options).forEach((o) => {
+          o.defaultSelected = o.selected;
+        });
+        return;
+      }
+      if (f instanceof HTMLInputElement && (f.type === 'checkbox' || f.type === 'radio')) {
+        f.defaultChecked = f.checked;
+        return;
+      }
+      f.defaultValue = f.value;
+    });
+    setDirty(false);
+  }, []);
+
+  return { dirty, ref, settle };
 }

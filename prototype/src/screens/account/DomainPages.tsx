@@ -567,6 +567,16 @@ function ContactForm({
   const [mode, setMode] = useState<'account' | 'custom'>(existing ? 'custom' : 'account');
   const [data, setData] = useState<DomainContact>(existing ?? accountContact(bi));
 
+  /*
+   * Save answers for a change, so it waits for one. The baseline is read from `existing` on
+   * every render rather than captured once: after a save the parent hands this form the
+   * contact it just stored, the baseline moves to meet it, and the button settles by itself.
+   */
+  const baseMode: 'account' | 'custom' = existing ? 'custom' : 'account';
+  const dirty =
+    mode !== baseMode ||
+    (mode === 'custom' && JSON.stringify(data) !== JSON.stringify(existing ?? accountContact(bi)));
+
   const field = (key: keyof DomainContact) => ({
     value: data[key],
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -670,7 +680,7 @@ function ContactForm({
       )}
 
       <div className="form__foot">
-        <Button type="submit" size="md">
+        <Button type="submit" size="md" disabled={!dirty}>
           {t('sec.save')}
         </Button>
       </div>
@@ -860,7 +870,7 @@ export function DomainPrivateNs() {
           </div>
           {modBad && <p className="hint hint--bad">{t('dom.nsIpBad')}</p>}
           <div className="form__foot">
-            <Button type="submit" size="md" disabled={list.length === 0}>
+            <Button type="submit" size="md" disabled={list.length === 0 || !mod.ip}>
               {t('sec.save')}
             </Button>
           </div>

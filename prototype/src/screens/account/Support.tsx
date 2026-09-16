@@ -4,13 +4,21 @@ import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Tag, TICKET_TONE, PRIORITY_TONE } from '../../components/Tag';
-import { StatusHeadline, SystemList, IncidentList, worstOf } from '../../components/StatusBoard';
+import {
+  StatusHeadline,
+  SystemList,
+  IncidentList,
+  worstOf,
+  STATE_TAG,
+  StatusStrip,
+} from '../../components/StatusBoard';
 import {
   IconArrow,
   IconPlus,
   IconBook,
   IconSupport,
   IconCheck,
+  IconAlert,
   IconInfo,
   IconPaperclip,
   IconBold,
@@ -438,13 +446,31 @@ export function TicketThread() {
   const [draft, setDraft] = useState('');
   const [files, setFiles] = useState<string[]>([]);
   const [sent, setSent] = useState<typeof TICKETS[number]['messages']>([]);
-  const [closed, setClosed] = useState(false);
   // The file input keeps its own value, so clearing our state is not enough to clear the
   // control's own "2 files selected" label after the reply has gone.
   const fileRef = useRef<HTMLInputElement>(null);
   const { saved, mark, clear } = useSaved();
 
   if (!tkt) return <Navigate to="/account/tickets" replace />;
+
+  const send = () => {
+    if (!draft.trim()) return;
+    setSent((all) => [
+      ...all,
+      {
+        id: `r-${all.length}`,
+        from: 'client' as const,
+        author: { ar: 'كمال عبدالرحمن', en: 'Kamal Abdelrahman' },
+        at: '2026-09-01 10:24',
+        body: { ar: draft, en: draft },
+        attachments: files.length > 0 ? files : undefined,
+      },
+    ]);
+    setDraft('');
+    setFiles([]);
+    if (fileRef.current) fileRef.current.value = '';
+    mark(t('tkt.sent'));
+  };
 
   return (
     <AccountLayout
@@ -483,9 +509,12 @@ export function TicketThread() {
         ))}
       </div>
 
-      {closed ? (
-        /* A closed ticket has no reply box. Leaving one there and refusing the send is worse
-           than not offering it. */
+      {tkt.status === 'closed' ? (
+        /* Closed is the ticket's own state, not a switch on this screen. The client cannot
+           close a ticket — support does — and a thread that is already closed gets no
+           composer, because leaving one there and refusing the send is worse than not
+           offering it. This screen used to hold its own `closed` flag, which meant #7688
+           arrived closed and still offered a reply box. */
         <div className="card empty">
           <IconCheck size={28} />
           <p className="empty__title">{t('tkt.closedTitle')}</p>
@@ -495,63 +524,65 @@ export function TicketThread() {
           </Link>
         </div>
       ) : (
-        <Card heading={t('tkt.reply')} icon={<IconSupport size={17} />}>
+        /* A composer, not a form: one field that grows with what is typed, the clip beside
+           it, and Send at the end — the shape of every message box the reader already uses.
+           Enter sends and shift+enter breaks the line, which is the part that makes it feel
+           like a chat rather than look like one. */
+        <form
+          className="composer"
+          onSubmit={(e) => {
+            e.preventDefault();
+            send();
+          }}
+        >
           <label className="u-visually-hidden" htmlFor="reply">
             {t('tkt.reply')}
           </label>
           <textarea
             id="reply"
-            className="field"
-            rows={5}
+            className="composer__input"
+            rows={1}
+            placeholder={t('tkt.replyPlaceholder')}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
           />
 
-          {/* Spec 9.5.3: a reply can carry files too. The names are held in state so the
-              chosen files survive until Send and then travel with the message, rather than
-              sitting in an input that quietly empties. */}
-          <label className="field-label">
-            <span className="eyebrow">{t('tkt.attachments')}</span>
-            <input
-              ref={fileRef}
-              className="field"
-              type="file"
-              multiple
-              accept=".jpg,.gif,.jpeg,.png,.txt,.pdf"
-              onChange={(e) => setFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
-            />
-          </label>
-          <p className="hint">{t('tkt.attachNote')}</p>
+          {files.length > 0 && (
+            <ul className="composer__files">
+              {files.map((f) => (
+                <li key={f}>
+                  <IconPaperclip size={13} />
+                  <bdi className="serial">{f}</bdi>
+                </li>
+              ))}
+            </ul>
+          )}
 
-          <div className="form__foot">
-            <Button
-              size="md"
-              disabled={!draft.trim()}
-              onClick={() => {
-                setSent((all) => [
-                  ...all,
-                  {
-                    id: `r-${all.length}`,
-                    from: 'client' as const,
-                    author: { ar: 'كمال عبدالرحمن', en: 'Kamal Abdelrahman' },
-                    at: '2026-09-01 10:24',
-                    body: { ar: draft, en: draft },
-                    attachments: files.length > 0 ? files : undefined,
-                  },
-                ]);
-                setDraft('');
-                setFiles([]);
-                if (fileRef.current) fileRef.current.value = '';
-                mark(t('tkt.sent'));
-              }}
-            >
+          <div className="composer__acts">
+            <label className="composer__clip">
+              <IconPaperclip size={18} />
+              <span className="u-visually-hidden">{t('tkt.attachments')}</span>
+              <input
+                ref={fileRef}
+                className="composer__file"
+                type="file"
+                multiple
+                accept=".jpg,.gif,.jpeg,.png,.txt,.pdf"
+                onChange={(e) => setFiles(Array.from(e.target.files ?? []).map((f) => f.name))}
+              />
+            </label>
+            <p className="composer__hint">{t('tkt.attachNote')}</p>
+            <Button type="submit" size="md" disabled={!draft.trim()}>
               {t('tkt.send')}
             </Button>
-            <Button size="md" variant="quiet" onClick={() => setClosed(true)}>
-              {t('tkt.close')}
-            </Button>
           </div>
-        </Card>
+        </form>
       )}
     </AccountLayout>
   );
@@ -744,7 +775,7 @@ export function NetworkStatus() {
           <header className="card__head card__head--flush">
             <h2 className="card__heading">{t('status.systems')}</h2>
           </header>
-          <SystemList systems={systems} />
+          <SystemList systems={systems} hrefFor={(sys) => `/account/status/${sys.id}`} />
         </section>
 
         <div>
@@ -794,6 +825,72 @@ export function NetworkStatus() {
           </Link>
         </div>
       </div>
+    </AccountLayout>
+  );
+}
+
+/**
+ * One system, on its own.
+ *
+ * The index answers "is it me?" and stops there. The two questions that follow it — since
+ * when, and has this happened to this system before — had nowhere to be asked, so six rows of
+ * a name and a chip were the whole of what the client area knew.
+ *
+ * What is on this page is only what we actually hold: the state, the timestamp it began, what
+ * the system covers in a customer's words, and the incidents that touched it. No uptime
+ * percentage, here least of all — a status page is the one screen where an invented 99.9% is
+ * not marketing but a number somebody will hold us to.
+ */
+export function SystemDetail() {
+  const { t } = useLocale();
+  const { systemId } = useParams();
+  const system = SYSTEMS.find((s) => s.id === systemId);
+
+  if (!system) return <Navigate to="/account/status" replace />;
+
+  const history = INCIDENTS.filter((i) => i.systems.includes(system.id));
+
+  return (
+    <AccountLayout
+      title={t(system.labelKey as never)}
+      crumbs={[
+        { label: t('acc.status'), to: '/account/status' },
+        { label: t(system.labelKey as never) },
+      ]}
+    >
+      {/* The same headline the index wears, saying this system's own state rather than the
+          worst of six — and carrying the timestamp instead of the refresh note, because on
+          one system the question is when it started, not how often the page reloads. */}
+      <div className={`headline headline--${STATE_TAG[system.state]}`}>
+        {system.state === 'operational' ? <IconCheck size={26} /> : <IconAlert size={26} />}
+        <div>
+          <p className="headline__title">{t(`status.state.${system.state}` as never)}</p>
+          <p className="headline__note">
+            {t('status.since')}{' '}
+            <span className="serial">
+              <bdi>{system.since}</bdi>
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div className="u-mt-16">
+        <StatusStrip systemId={system.id} />
+      </div>
+
+      <Card heading={t('status.covers')} icon={<IconInfo size={17} />} className="u-mt-16">
+        <p className="card__body">{t(system.noteKey as never)}</p>
+      </Card>
+
+      <h2 className="card__heading u-mt-24 u-mb-16">{t('status.systemHistory')}</h2>
+      {history.length > 0 ? (
+        <IncidentList incidents={history} />
+      ) : (
+        <div className="card empty">
+          <IconCheck size={28} />
+          <p className="empty__title">{t('status.systemNone')}</p>
+        </div>
+      )}
     </AccountLayout>
   );
 }

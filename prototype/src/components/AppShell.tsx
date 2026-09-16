@@ -216,7 +216,7 @@ export function AppShell({
               SWS
             </span>
             <span className="app__brand-text">
-              <span className="app__brand-name">Somion</span>
+              <span className="app__brand-name">Orgtik</span>
               <span className="app__brand-sub">{t('app.workspace')}</span>
             </span>
           </Link>

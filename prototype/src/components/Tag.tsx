@@ -90,3 +90,17 @@ export const PRIORITY_TONE = {
   medium: 'neutral',
   low: 'neutral',
 } as const satisfies Record<string, TagTone>;
+
+/**
+ * A commission clears a refund window before it is anyone's to withdraw.
+ *
+ * Approved and paid share a colour and are told apart by the chip's own word, the same way
+ * three service states share `bad`: both mean the commission survived, and the difference
+ * between having it and having taken it is not a difference in kind. Pending is the only one
+ * that is genuinely not yet anything, and it is not a fault either — so neutral, not warn.
+ */
+export const REFERRAL_TONE = {
+  pending: 'neutral',
+  approved: 'ok',
+  paid: 'ok',
+} as const satisfies Record<string, TagTone>;

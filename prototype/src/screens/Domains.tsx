@@ -61,7 +61,7 @@ export function Domains() {
   /*
    * Both of these live in catalog.ts. The order flow's domain step asks the same two questions
    * one screen later and used to answer them with its own arithmetic, which is how the two
-   * screens came to disagree about whether somion.shop was free.
+   * screens came to disagree about whether orgtik.shop was free.
    */
   const { stem, typed } = splitDomain(searched);
   const availability = availabilityFor(stem);

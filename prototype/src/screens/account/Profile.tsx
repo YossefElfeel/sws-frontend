@@ -5,7 +5,7 @@ import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
 import { Card } from '../../components/Card';
 import { StatRow, type StatItem } from '../../components/Stat';
-import { Tag } from '../../components/Tag';
+import { Tag, REFERRAL_TONE } from '../../components/Tag';
 import { TableToolbar, TableFilter, TableCount, matches } from '../../components/TableToolbar';
 import {
   IconCopy,
@@ -21,12 +21,13 @@ import {
   IconWallet,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
-import { useSaved, SavedNote } from '../../lib/saved';
+import { useSaved, useDirty, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
 import { convert, formatAmount } from '../../lib/catalog';
 import {
   ANNOUNCEMENTS,
   AFFILIATE,
+  REFERRALS,
   ACCOUNT,
   CONTACTS,
   LOGIN_LOG,
@@ -154,6 +155,52 @@ export function Affiliates() {
           </Button>
         </div>
       </Card>
+
+      {/* The tiles say 37 and stop. This is the half an affiliate can act on: when the last
+          one landed, what it was, and which commissions have cleared the refund window. */}
+      <div className="bar u-mt-24">
+        <h2 className="card__heading">{t('aff.referrals')}</h2>
+        <span className="bar__end tcount">
+          {t('aff.refShowing')} <span className="serial">{AFFILIATE.signups}</span>
+        </span>
+      </div>
+
+      <div className="card card--flush table-scroll">
+        <table className="data">
+          <thead>
+            <tr>
+              <th scope="col">{t('aff.ref.who')}</th>
+              <th scope="col">{t('aff.ref.product')}</th>
+              <th scope="col">{t('account.date')}</th>
+              <th scope="col">{t('account.status')}</th>
+              <th scope="col" className="num">
+                {t('aff.ref.commission')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {REFERRALS.map((r) => (
+              <tr key={r.id}>
+                <td className="serial">
+                  <bdi>{r.who}</bdi>
+                </td>
+                <td>{r.product}</td>
+                <td className="serial">
+                  <bdi>{r.at}</bdi>
+                </td>
+                <td>
+                  <Tag tone={REFERRAL_TONE[r.state]}>{t(`aff.ref.${r.state}` as never)}</Tag>
+                </td>
+                <td className="num serial">
+                  {formatAmount(convert(r.commissionUsdMinor, currency), locale)} {currency}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="hint u-mt-16">{t('aff.maskNote')}</p>
     </AccountLayout>
   );
 }
@@ -180,6 +227,7 @@ export function Security() {
   const [logQ, setLogQ] = useState('');
   const [logResult, setLogResult] = useState<'all' | 'ok' | 'failed'>('all');
   const { saved, mark, clear } = useSaved();
+  const details = useDirty<HTMLDivElement>();
 
   // This log is read for one reason — "was that me?" — so the filter that matters is the
   // failed attempts, and the search is an IP address someone is checking against their own.
@@ -194,7 +242,7 @@ export function Security() {
       <SavedNote saved={saved} onDismiss={clear} />
       <div className="split">
         <Card heading={t('sec.details')} icon={<IconUsers size={17} />}>
-          <div className="field-grid">
+          <div className="field-grid" ref={details.ref}>
             <label className="field-label">
               <span className="eyebrow">{t('checkout.name')}</span>
               <input className="field" defaultValue={bi(ACCOUNT.name)} />
@@ -221,7 +269,16 @@ export function Security() {
             </label>
           </div>
           <div className="form__foot">
-            <Button size="md" onClick={() => mark()}>{t('sec.save')}</Button>
+            <Button
+              size="md"
+              disabled={!details.dirty}
+              onClick={() => {
+                mark();
+                details.settle();
+              }}
+            >
+              {t('sec.save')}
+            </Button>
           </div>
         </Card>
 

@@ -1728,7 +1728,10 @@ button.stat {
     transform var(--sws-duration-fast) var(--sws-ease-standard);
 }
 
-.btn--danger:hover {
+/* The guard is the point: every other variant carries `:not(:disabled)` and this one did not,
+   so a transfer button held shut by an unlifted registrar lock still lit up red under the
+   pointer — a control that looks disabled, refuses the click, and answers the hover anyway. */
+.btn--danger:hover:not(:disabled) {
   background: var(--sws-banner-danger-bg);
   border-color: var(--sws-status-danger);
 }
@@ -2219,14 +2222,28 @@ button.stat {
   }
 }
 
+/*
+ * 2026-09-16: a hovered line is a band across the document, not a rectangle floating in a
+ * gutter. The cells used to zero their outer padding so the figures sat flush with the card's
+ * own 24px inset — which put the table box 24px inside the card, and the row background with
+ * it, so hovering a line drew a panel that stopped short of both edges.
+ *
+ * The table box now bleeds out to the card's edges and the outer cells take that padding
+ * back. Every figure lands exactly where it did; only the band it sits in got wider.
+ */
+.app__main .invoice .data--flush {
+  inline-size: calc(100% + var(--sws-space-24) * 2);
+  margin-inline: calc(var(--sws-space-24) * -1);
+}
+
 .app__main .invoice .data--flush th:first-child,
 .app__main .invoice .data--flush td:first-child {
-  padding-inline-start: 0;
+  padding-inline-start: var(--sws-space-24);
 }
 
 .app__main .invoice .data--flush th:last-child,
 .app__main .invoice .data--flush td:last-child {
-  padding-inline-end: 0;
+  padding-inline-end: var(--sws-space-24);
 }
 
 /* ── the vote at the foot of an article ────────────────────────────────────── */
@@ -3022,55 +3039,55 @@ button.stat {
  * last row half empty, which is the honest failure — there is nowhere for it to hide, so the
  * imbalance is visible in review rather than three rows further down at some other width.
  */
-.dash--paired {
-  align-items: stretch;
-}
-
-/*
- * A grid item's automatic minimum size is its content, which is how one long domain name in a
- * service row widens the whole column instead of ellipsing inside it. The two wrapper divs used
- * to carry this; the cards carry it now.
- */
-.dash--paired > .card {
+.dash--flow > .dash__main,
+.dash--flow > .dash__side {
   min-inline-size: 0;
 }
 
 /*
- * What a stretched card does with the height it did not ask for.
+ * Below the split the two columns stop being columns, and the cards interleave back into the
+ * one the phone actually has.
  *
- * A row is as tall as the taller of its two cards, which is the point — but it left the amount
- * owed pinned to the top of a 300px box with nothing under it, and a card with a third of
- * itself empty reads as one that failed to load the rest. So the card is a column, and the one
- * block that is the whole card takes the space: the debt centres in it, the calm state centres
- * in it, and a list still starts at the top where a list belongs.
+ * `display: contents` drops the wrappers out of the box tree so their cards become items of
+ * `.dash` itself, and `order` pairs them up again — main's first beside side's first, and so
+ * on down. This is the whole cost of going back to wrappers, and it is why the cards are
+ * grouped by column in the markup rather than by pair: the desktop needs them grouped, the
+ * phone needs them interleaved, and only one of those can be the DOM order.
+ *
+ * Counted rather than named, which survives the two cards that are not always there: the
+ * usage and shortcuts pair is one child of each column, so when there is no live cPanel
+ * service both columns lose their third child at once and the rest still pair off.
  */
-.dash--paired > .card {
-  display: flex;
-  flex-direction: column;
-}
+@media (max-width: 1279px) {
+  .dash--flow > .dash__main,
+  .dash--flow > .dash__side {
+    display: contents;
+  }
 
-.dash--paired > .card > .due,
-.dash--paired > .card > .calm {
-  flex: 1 1 auto;
-  align-items: center;
+  .dash--flow > .dash__main > :nth-child(1) { order: 1; }
+  .dash--flow > .dash__side > :nth-child(1) { order: 2; }
+  .dash--flow > .dash__main > :nth-child(2) { order: 3; }
+  .dash--flow > .dash__side > :nth-child(2) { order: 4; }
+  .dash--flow > .dash__main > :nth-child(3) { order: 5; }
+  .dash--flow > .dash__side > :nth-child(3) { order: 6; }
+  .dash--flow > .dash__main > :nth-child(4) { order: 7; }
+  .dash--flow > .dash__side > :nth-child(4) { order: 8; }
+  .dash--flow > .dash__main > :nth-child(5) { order: 9; }
+  .dash--flow > .dash__side > :nth-child(5) { order: 10; }
 }
 
 /*
- * The credit figure is the third card of that kind, and it was the one missed: a number, the
- * sentence under it and the way to add more, pinned to the top of a row ruled by the service
- * list beside it, with 134px of the card empty underneath.
+ * 2026-09-16: a card is as tall as what is in it.
  *
- * It is a column rather than a row like `.due`, so it is `justify-content` that centres it —
- * `align-items: center` here would pull the figure off the reading edge, which is the one place
- * a figure has to stay.
+ * `stretch` made every row as tall as its taller card, and the shorter one kept the
+ * difference as empty ground: 93px under the announcements feed, 106px under the ticket
+ * list, 60px under the shortcuts. Three cards were centring their contents inside that
+ * surplus rather than giving it back, which reads as a card that failed to load the rest.
+ *
+ * `start` keeps what --paired was built for — both columns share row tracks, so every pair
+ * still begins on one line — and drops the only part that was costing anything. The bottoms
+ * now land where each card ends. The ruling was always in the top edge.
  */
-.dash--paired > .card > .credit-block {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-}
 
 /* ── 2026-09-14: the house ads ─────────────────────────────────────────────── */
 /*

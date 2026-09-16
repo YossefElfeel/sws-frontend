@@ -60,7 +60,14 @@ import {
   DomainForwarding,
   DomainTransferOut,
 } from './screens/account/DomainPages';
-import { Invoices, InvoiceDetail, AddFunds, PaymentMethods, AddCard } from './screens/account/Billing';
+import {
+  Invoices,
+  InvoiceDetail,
+  AddFunds,
+  PaymentMethods,
+  AddPaymentMethod,
+  AddCard,
+} from './screens/account/Billing';
 import {
   Tickets,
   TicketNew,
@@ -68,6 +75,7 @@ import {
   Knowledgebase,
   KbArticle,
   NetworkStatus,
+  SystemDetail,
 } from './screens/account/Support';
 import { Announcements, Affiliates, Security, Contacts } from './screens/account/Profile';
 import {
@@ -149,7 +157,9 @@ function OnRouteChange() {
   useEffect(() => {
     const id = window.setTimeout(() => {
       const heading = document.querySelector('main h1')?.textContent?.trim();
-      const site = document.documentElement.lang === 'ar' ? 'سوميون' : 'Somion';
+      // One word in both locales: the brand is set in Latin even in Arabic, so there is no
+      // second spelling for the title to choose between.
+      const site = 'Orgtik';
       document.title = heading ? `${heading} — ${site}` : document.title;
     }, 0);
     return () => window.clearTimeout(id);
@@ -240,7 +250,8 @@ export function App() {
               <Route path="/account/transactions" element={<Transactions />} />
               <Route path="/account/payment-failed" element={<PaymentFailed />} />
               <Route path="/account/payment-methods" element={<PaymentMethods />} />
-              <Route path="/account/payment-methods/new" element={<AddCard />} />
+              <Route path="/account/payment-methods/new" element={<AddPaymentMethod />} />
+              <Route path="/account/payment-methods/new/card" element={<AddCard />} />
               <Route path="/account/tickets" element={<Tickets />} />
               <Route path="/account/tickets/new" element={<TicketNew />} />
               <Route path="/account/tickets/:id" element={<TicketThread />} />
@@ -248,6 +259,7 @@ export function App() {
               <Route path="/account/knowledgebase/:slug" element={<KbArticle />} />
               <Route path="/account/announcements" element={<Announcements />} />
               <Route path="/account/status" element={<NetworkStatus />} />
+              <Route path="/account/status/:systemId" element={<SystemDetail />} />
               <Route path="/account/affiliates" element={<Affiliates />} />
               <Route path="/account/affiliates/withdraw" element={<AffiliateWithdraw />} />
               <Route path="/account/notifications" element={<NotificationPrefs />} />

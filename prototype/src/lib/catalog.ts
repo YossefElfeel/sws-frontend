@@ -288,6 +288,19 @@ export interface Gateway {
   details?: { labelKey: string; value: string }[];
   /** What to do once the money has left, for manual flows. */
   afterKey?: string;
+  /**
+   * Whether the account can keep this method on file and charge it again.
+   *
+   * A decision rather than an inference from `flow`, because the flow does not settle it: the
+   * Egyptian wallet redirects and is still tokenisable, while TWINT and Klarna redirect and
+   * are authorised per payment — there is nothing to keep. A bank transfer and an InstaPay
+   * send are somebody moving money by hand, which cannot be repeated on our say-so at all.
+   *
+   * This is what the saved-methods list is a list of. Offering to "save" a method that cannot
+   * be charged again would promise an auto-renewal that will not happen, which is the one
+   * failure on that screen a customer only discovers when a service stops.
+   */
+  storable?: boolean;
 }
 
 export const GATEWAYS: Gateway[] = [
@@ -296,6 +309,7 @@ export const GATEWAYS: Gateway[] = [
     labelKey: 'pay.stripeCard',
     marks: ['Stripe'],
     flow: 'inline',
+    storable: true,
     noteKey: 'pay.note.stripeCard',
     instructionsKey: 'pay.how.stripeCard',
   },
@@ -313,6 +327,7 @@ export const GATEWAYS: Gateway[] = [
     marks: ['Mastercard', 'VISA', 'Meeza'],
     egpOnly: true,
     flow: 'redirect',
+    storable: true,
     noteKey: 'pay.note.wallet',
     instructionsKey: 'pay.how.wallet',
   },
@@ -324,9 +339,9 @@ export const GATEWAYS: Gateway[] = [
     noteKey: 'pay.note.instapay',
     instructionsKey: 'pay.how.instapay',
     details: [
-      { labelKey: 'wal.name', value: 'Somion Egypt' },
+      { labelKey: 'wal.name', value: 'Orgtik Egypt' },
       { labelKey: 'wal.number', value: '+20 100 442 8817' },
-      { labelKey: 'wal.instapay', value: 'somion@instapay' },
+      { labelKey: 'wal.instapay', value: 'orgtik@instapay' },
     ],
     afterKey: 'pay.after.manual',
   },
@@ -338,7 +353,7 @@ export const GATEWAYS: Gateway[] = [
     noteKey: 'pay.note.bank',
     instructionsKey: 'pay.how.bank',
     details: [
-      { labelKey: 'bank.beneficiary', value: 'Somion Web Services AG' },
+      { labelKey: 'bank.beneficiary', value: 'Orgtik Web Services AG' },
       { labelKey: 'bank.iban', value: 'CH93 0076 2011 6238 5295 7' },
       { labelKey: 'bank.swift', value: 'POFICHBEXXX' },
       { labelKey: 'bank.name', value: 'PostFinance AG, Bern' },
@@ -389,7 +404,7 @@ export const TLDS: Tld[] = [
  *
  * There used to be two. The search hashed the stem and gave every extension its own bit; the
  * order step hashed the whole name with a different seed and returned one verdict for all ten.
- * They disagreed in the obvious way — somion.shop was free on the search and taken one screen
+ * They disagreed in the obvious way — orgtik.shop was free on the search and taken one screen
  * later in the order — and the order step's answer did not move when the extension beside the
  * field did, which is the single thing a domain checker exists to do. Neither of those is a
  * preference, so there is nothing to configure per screen: the function is the answer, and two
@@ -402,7 +417,7 @@ export function availabilityFor(stem: string): Map<string, boolean> {
 }
 
 /**
- * Someone who types "somion.net" is asking about .net, not about a name called "somionnet".
+ * Someone who types "orgtik.net" is asking about .net, not about a name called "orgtiknet".
  * Splitting the extension off is what lets the headline result answer the question that was
  * actually asked; without it the extension is silently folded into the stem.
  */

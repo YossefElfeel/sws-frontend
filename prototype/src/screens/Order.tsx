@@ -286,7 +286,10 @@ export function ThreeDSecure({ kind = 'card' }: { kind?: 'card' | 'redirect' }) 
   const inv = useInvoiceParam()?.inv;
   const gateway = GATEWAYS.find((g) => g.id === params.get('gateway'));
   const redirect = kind === 'redirect';
-  const setup = params.get('setup') === 'card';
+  // Any `setup` value means a method is being kept on file rather than an invoice paid, so
+  // the finish lands on the methods list. It was `=== 'card'` while a card was the only
+  // method that could be saved; the wallet is tokenisable and now reaches here too.
+  const setup = params.get('setup') !== null;
   const provider = gateway ? gateway.marks.join(' / ') || t(gateway.labelKey as never) : '';
 
   const returnHash = (() => {

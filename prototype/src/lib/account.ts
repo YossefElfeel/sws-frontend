@@ -379,7 +379,7 @@ export interface DomainRecord {
 }
 
 /** Our nameservers, which a domain uses unless someone points it elsewhere. */
-export const DEFAULT_NS = ['ns1.somion.ch', 'ns2.somion.ch'];
+export const DEFAULT_NS = ['ns1.orgtik.ch', 'ns2.orgtik.ch'];
 
 export const DOMAINS: DomainRecord[] = [
   {
@@ -478,9 +478,9 @@ export interface DnsRecord {
 export const DNS_RECORDS: DnsRecord[] = [
   { id: 'r1', type: 'A', host: '@', value: '185.42.118.203', ttl: 3600 },
   { id: 'r2', type: 'A', host: 'www', value: '185.42.118.203', ttl: 3600 },
-  { id: 'r3', type: 'MX', host: '@', value: 'mail.somion.ch', ttl: 3600 },
-  { id: 'r4', type: 'TXT', host: '@', value: 'v=spf1 include:somion.ch ~all', ttl: 3600 },
-  { id: 'r5', type: 'CNAME', host: 'cdn', value: 'cdn.somion.ch', ttl: 1800 },
+  { id: 'r3', type: 'MX', host: '@', value: 'mail.orgtik.ch', ttl: 3600 },
+  { id: 'r4', type: 'TXT', host: '@', value: 'v=spf1 include:orgtik.ch ~all', ttl: 3600 },
+  { id: 'r5', type: 'CNAME', host: 'cdn', value: 'cdn.orgtik.ch', ttl: 1800 },
   { id: 'r6', type: 'URL', host: 'shop', value: 'https://atelier-kamal.com/shop', ttl: 3600 },
   { id: 'r7', type: 'FRAME', host: 'portfolio', value: 'https://atelier-kamal.com/work', ttl: 3600 },
 ];
@@ -491,7 +491,7 @@ export const DNS_BY_DOMAIN: Record<string, DnsRecord[]> = {
   'dom-2': [
     { id: 'r1', type: 'A', host: '@', value: '185.42.118.91', ttl: 3600 },
     { id: 'r2', type: 'A', host: 'www', value: '185.42.118.91', ttl: 3600 },
-    { id: 'r3', type: 'MX', host: '@', value: 'mail.somion.ch', ttl: 3600 },
+    { id: 'r3', type: 'MX', host: '@', value: 'mail.orgtik.ch', ttl: 3600 },
   ],
   'dom-3': [],
 };
@@ -729,7 +729,7 @@ export const TICKETS: Ticket[] = [
       {
         id: 'm2',
         from: 'staff',
-        author: { ar: 'دعم سوميون', en: 'Somion Support' },
+        author: { ar: 'دعم Orgtik', en: 'Orgtik Support' },
         at: '2026-08-31 09:18',
         body: {
           ar: 'التجديد فشل لأن مجلد well-known. كان متحجوب بقاعدة إعادة توجيه. أصدرنا شهادة جديدة يدويًا وعدّلنا القاعدة عشان التجديد الجاي يكمل لوحده.',
@@ -760,7 +760,7 @@ export const TICKETS: Ticket[] = [
       {
         id: 'm2',
         from: 'staff',
-        author: { ar: 'حسابات سوميون', en: 'Somion Billing' },
+        author: { ar: 'حسابات Orgtik', en: 'Orgtik Billing' },
         at: '2026-08-12 10:05',
         body: {
           ar: 'اتأكدنا — المبلغ الزيادة اترد وهيظهر في كشف حسابك خلال 3 أيام عمل.',
@@ -810,13 +810,53 @@ export const ANNOUNCEMENTS: Announcement[] = [
 
 /** Spec 9.6. */
 export const AFFILIATE = {
-  link: 'https://sws.somion.ch/?aff=8841',
+  link: 'https://sws.orgtik.ch/?aff=8841',
   visits: 1284,
   signups: 37,
   commissionUsdMinor: 41250,
   paidUsdMinor: 28000,
   balanceUsdMinor: 13250,
 };
+
+/**
+ * Who signed up through the link.
+ *
+ * The four tiles say 37 signups and stop, which is the one number an affiliate cannot act on:
+ * it does not say which campaign worked, when the last one landed, or which commissions are
+ * still to clear.
+ *
+ * WHAT IS NOT HERE IS THE POINT. A referred customer is not the affiliate's customer, and
+ * their name, their email and their domain are theirs. An affiliate programme that hands them
+ * over turns a referral link into a way of harvesting contact details, so the identity is
+ * masked at the fixture rather than in the view — there is no unmasked copy for a later screen
+ * to reach for by accident. What is left is what the affiliate has a claim to: that somebody
+ * signed up, roughly who, when, what kind of thing they bought, and what it earned.
+ *
+ * The commission state is the other half. "Pending" is a signup inside the refund window and
+ * "approved" is one that has cleared it, which is why a balance is smaller than a total and
+ * why that is not a mistake.
+ */
+export type ReferralState = 'pending' | 'approved' | 'paid';
+
+export interface Referral {
+  id: string;
+  /** Already masked. See above — the full value is deliberately not carried. */
+  who: string;
+  at: string;
+  /** The family, not the domain: which product earned it, not whose site it is. */
+  product: string;
+  state: ReferralState;
+  commissionUsdMinor: number;
+}
+
+export const REFERRALS: Referral[] = [
+  { id: 'ref-6', who: 'm•••@gmail.com', at: '2026-09-12', product: 'Cloud Pro', state: 'pending', commissionUsdMinor: 1700 },
+  { id: 'ref-5', who: 'a•••@outlook.com', at: '2026-09-04', product: 'Shared Single', state: 'pending', commissionUsdMinor: 750 },
+  { id: 'ref-4', who: 's•••@orgtik.ch', at: '2026-08-21', product: 'VPS 2', state: 'approved', commissionUsdMinor: 1250 },
+  { id: 'ref-3', who: 'h•••@gmail.com', at: '2026-08-09', product: 'Mail 25', state: 'approved', commissionUsdMinor: 900 },
+  { id: 'ref-2', who: 'n•••@yahoo.com', at: '2026-07-28', product: 'WP Grow', state: 'paid', commissionUsdMinor: 1100 },
+  { id: 'ref-1', who: 't•••@gmail.com', at: '2026-07-15', product: 'Shared Ultra', state: 'paid', commissionUsdMinor: 1150 },
+];
 
 /** Spec 9.7 login activity log. */
 export const LOGIN_LOG = [
@@ -830,7 +870,29 @@ export const LOGIN_LOG = [
  * contact can hold any subset of it and nothing outside it, which is what the editor on the
  * contacts screen enumerates.
  */
-export const PERMISSIONS = ['invoices', 'tickets', 'domains'] as const;
+/*
+ * Every entry names a screen this client area actually has, which is the constraint that
+ * keeps the list honest: a permission with nothing behind it is a promise the product cannot
+ * keep, and a toggle that gates nothing is worse than an absent one because it reads as
+ * protection.
+ *
+ * Three of these were all there was, and they left the common delegations unexpressible: a
+ * bookkeeper who should see invoices and nothing else already worked, but a technical contact
+ * who should restart a server could not be described at all, and neither could the ordinary
+ * arrangement where one person may open tickets but must not buy anything.
+ *
+ * Order is the ladder from reading to spending, so the riskiest is last rather than lost in
+ * the middle of the row.
+ */
+export const PERMISSIONS = [
+  'invoices',
+  'tickets',
+  'domains',
+  'services',
+  'affiliate',
+  'profile',
+  'orders',
+] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
 export interface Contact {
@@ -898,7 +960,7 @@ export const ACCOUNT: Account = {
  * until I12 closes.
  */
 export const COMPANY = {
-  name: 'Somion Web Services AG',
+  name: 'Orgtik Web Services AG',
   countryKey: 'dc.ch',
   taxId: null as string | null,
 };

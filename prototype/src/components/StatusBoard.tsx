@@ -1,6 +1,8 @@
-import { IconCheck, IconAlert } from './icons';
+import { Link } from 'react-router-dom';
+import { IconCheck, IconAlert, IconArrow } from './icons';
 import { Tag, type TagTone } from './Tag';
 import { useLocale } from '../lib/locale';
+import { systemDays, STATUS_WINDOW_DAYS } from '../lib/marketing';
 import type { SystemRow, Incident, SystemState } from '../lib/marketing';
 
 /**
@@ -51,15 +53,35 @@ export function StatusHeadline({ worst }: { worst: SystemState }) {
   );
 }
 
-export function SystemList({ systems }: { systems: SystemRow[] }) {
+/*
+ * The list is an index, and an index that cannot be opened is a dead end: six chips answer
+ * "is it me?" and nothing answers "since when, and has this happened before?". Where a caller
+ * passes `hrefFor`, the name becomes the way in and its ::after takes the whole row, so the
+ * target is the 44px band rather than the word. The public page passes nothing and keeps the
+ * list it had.
+ */
+export function SystemList({
+  systems,
+  hrefFor,
+}: {
+  systems: SystemRow[];
+  hrefFor?: (system: SystemRow) => string;
+}) {
   const { t } = useLocale();
   return (
     <ul className="sys">
       {systems.map((s) => (
-        <li className="sys__row" key={s.id}>
+        <li className={`sys__row${hrefFor ? ' sys__row--link' : ''}`} key={s.id}>
           <span className={`sys__dot sys__dot--${s.state}`} aria-hidden="true" />
-          <span className="sys__name">{t(s.labelKey as never)}</span>
+          {hrefFor ? (
+            <Link className="sys__name sys__link" to={hrefFor(s)}>
+              {t(s.labelKey as never)}
+            </Link>
+          ) : (
+            <span className="sys__name">{t(s.labelKey as never)}</span>
+          )}
           <Tag tone={STATE_TONE[s.state]}>{t(`status.state.${s.state}` as never)}</Tag>
+          {hrefFor && <IconArrow size={15} className="sys__arrow" />}
         </li>
       ))}
     </ul>
@@ -88,5 +110,58 @@ export function IncidentList({ incidents }: { incidents: Incident[] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+/**
+ * Ninety days of one system, one column a day.
+ *
+ * The plot is HTML rather than SVG for the reason the usage charts put their labels outside
+ * one: text inside a viewBox scales with it, and this strip is read at 390px as often as at
+ * 1440. Ninety columns of pure colour need no text inside them at all, so the whole figure
+ * stays at the size the page set.
+ *
+ * `dir="ltr"` on the plot and not on the labels, the same split the usage charts make: later
+ * is to the right of earlier whichever way the prose around it reads.
+ *
+ * Ninety spans are nothing to a screen reader, so the figure is one image with one sentence:
+ * how many days in the window have an incident recorded against them.
+ */
+export function StatusStrip({ systemId }: { systemId: string }) {
+  const { t } = useLocale();
+  const days = systemDays(systemId);
+  const marked = days.filter((d) => d.state !== 'operational');
+  const summary = `${t('status.ninety')} — ${marked.length} / ${STATUS_WINDOW_DAYS}`;
+
+  return (
+    <figure className="strip">
+      <figcaption className="strip__caption">
+        <span>{t('status.ninety')}</span>
+        <span className="strip__count">
+          <span className="serial">{marked.length}</span> {t('status.marked')}
+        </span>
+      </figcaption>
+
+      <div className="strip__plot" dir="ltr" role="img" aria-label={summary}>
+        {days.map((d) => (
+          <span
+            key={d.date}
+            className={`strip__day strip__day--${d.state}`}
+            title={`${d.date} · ${t(`status.state.${d.state}` as never)}`}
+          />
+        ))}
+      </div>
+
+      <div className="strip__axis">
+        <span className="serial">
+          <bdi>{days[0].date}</bdi>
+        </span>
+        <span className="serial">
+          <bdi>{days[days.length - 1].date}</bdi>
+        </span>
+      </div>
+
+      <p className="strip__note">{t('status.stripNote')}</p>
+    </figure>
   );
 }
