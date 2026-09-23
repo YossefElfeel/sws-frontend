@@ -47,6 +47,7 @@ export const ROUTES = [
   { name: 'acc-kb', path: '#/account/knowledgebase' },
   { name: 'acc-kb-article', path: '#/account/knowledgebase/point-domain' },
   { name: 'acc-announcements', path: '#/account/announcements' },
+  { name: 'acc-announcement', path: '#/account/announcements/n1' },
   { name: 'acc-affiliates', path: '#/account/affiliates' },
   { name: 'acc-contacts', path: '#/account/contacts' },
   { name: 'acc-security', path: '#/account/security' },

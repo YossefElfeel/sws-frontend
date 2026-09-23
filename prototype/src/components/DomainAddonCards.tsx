@@ -57,9 +57,9 @@ const ADDONS: Addon[] = [
     icon: <IconShield size={26} />,
     on: (d) => d.whoisPrivacy,
     patch: (on) => ({ whoisPrivacy: on }),
-    /* Privacy has no screen of its own: it is a yes or a no, and the switch here is all of it.
-       The transfer-out page shows the same state because a locked identity is part of what
-       stops a transfer, but it is not a second place to set it. */
+    /* Privacy has no screen of its own: it is a yes or a no, and the switch is all of it. The
+       same switch sits in the Protection card on Overview and on Transfer out — see
+       IdProtectionSwitch — under this card's name and behind this card's question. */
     offTitleKey: 'domaddon.idOffTitle',
     offLedeKey: 'domaddon.idOffLede',
     offWarnKey: 'domaddon.idOffWarn',
@@ -196,33 +196,109 @@ export function DomainAddonCards({ dom }: { dom: DomainRecord }) {
       </div>
 
       {pending && (
-        <Modal
-          open
+        <AddonOffDialog
+          addon={pending}
+          dom={dom}
+          onConfirm={() => set(pending, false)}
           onClose={() => setAsking(null)}
-          title={t(pending.offTitleKey as never)}
-          lede={t(pending.offLedeKey as never)}
-          footer={
-            <>
-              <Button size="md" variant="danger" onClick={() => set(pending, false)}>
-                {t('dom.disable')}
-              </Button>
-              <Button size="md" variant="quiet" onClick={() => setAsking(null)}>
-                {t('action.cancel')}
-              </Button>
-            </>
-          }
-        >
-          {/* The domain, in the dialog, because the hosting page's picker means the one being
-              switched off is not necessarily the one the reader last looked at. */}
-          <p className="card__body">
-            {t('domaddon.onDomain')} <span className="serial"><bdi>{dom.name}</bdi></span>
-          </p>
-          {pending.offWarnKey && (
-            <Banner severity="warning" title={t(pending.offWarnKey as never)}>
-              {t(pending.offWarnNoteKey as never)}
-            </Banner>
-          )}
-        </Modal>
+        />
+      )}
+    </>
+  );
+}
+
+/**
+ * The question in front of a switch-off, apart from the cards so it can be asked wherever the
+ * switch is. A warning that one page gave and two others skipped would still publish somebody's
+ * home address from two places out of three.
+ */
+function AddonOffDialog({
+  addon,
+  dom,
+  onConfirm,
+  onClose,
+}: {
+  addon: Addon;
+  dom: DomainRecord;
+  onConfirm: () => void;
+  onClose: () => void;
+}) {
+  const { t } = useLocale();
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={t(addon.offTitleKey as never)}
+      lede={t(addon.offLedeKey as never)}
+      footer={
+        <>
+          <Button size="md" variant="danger" onClick={onConfirm}>
+            {t('dom.disable')}
+          </Button>
+          <Button size="md" variant="quiet" onClick={onClose}>
+            {t('action.cancel')}
+          </Button>
+        </>
+      }
+    >
+      {/* The domain, in the dialog, because the hosting page's picker means the one being
+          switched off is not necessarily the one the reader last looked at. */}
+      <p className="card__body">
+        {t('domaddon.onDomain')} <span className="serial"><bdi>{dom.name}</bdi></span>
+      </p>
+      {addon.offWarnKey && (
+        <Banner severity="warning" title={t(addon.offWarnKey as never)}>
+          {t(addon.offWarnNoteKey as never)}
+        </Banner>
+      )}
+    </Modal>
+  );
+}
+
+/**
+ * ID Protection as a switch row, for the Protection cards on a domain's Overview and Transfer
+ * out pages. It is the add-on on the card above, so it carries the card's name and note rather
+ * than a second name for the same setting, and it asks the card's question before it goes off.
+ * On still does not ask, for the reason the cards give.
+ */
+export function IdProtectionSwitch({
+  dom,
+  flip,
+}: {
+  dom: DomainRecord;
+  flip: (patch: Partial<DomainRecord>) => void;
+}) {
+  const { t } = useLocale();
+  const [asking, setAsking] = useState(false);
+  const id = ADDONS.find((a) => a.key === 'id')!;
+
+  return (
+    <>
+      <label className="switch-row">
+        <span>
+          <span className="switch-row__label">{t(id.titleKey as never)}</span>
+          <span className="switch-row__note">{t(id.noteKey as never)}</span>
+        </span>
+        {/* Controlled by the record, so a switch-off that is asked about and then cancelled
+            stays on without being put back. */}
+        <input
+          type="checkbox"
+          name="privacy"
+          checked={id.on(dom)}
+          onChange={(e) => (e.target.checked ? flip(id.patch(true)) : setAsking(true))}
+        />
+      </label>
+      {asking && (
+        <AddonOffDialog
+          addon={id}
+          dom={dom}
+          onConfirm={() => {
+            flip(id.patch(false));
+            setAsking(false);
+          }}
+          onClose={() => setAsking(false)}
+        />
       )}
     </>
   );
