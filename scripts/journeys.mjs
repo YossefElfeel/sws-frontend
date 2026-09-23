@@ -382,6 +382,31 @@ await journey('Save domain contacts', [
   ['saved', async () => { if (!(await p.locator('.banner--success').count())) throw new Error('no confirmation'); }],
 ]);
 
+/* ── V. renew a service from its own page ───────────────────────────────────── */
+await journey('Renew a service', [
+  ['service', () => start('#/account/services/svc-8841')],
+  ['renew', () => click(['.dash__side a[href*="/account/renew/"]'])],
+  ['pay', () => click(['.dash__side .acts .btn'])],
+  ['recorded', async () => { if (!(await p.locator('.calm').count())) throw new Error('no confirmation'); }],
+]);
+
+/* ── W. renew a service from the list, through its row menu ─────────────────── */
+await journey('Renew from the services list', [
+  ['my services', () => start('#/account/services')],
+  ['row menu', () => click(['.data tbody tr:first-child .rowmenu__btn'])],
+  ['renew', () => click(['.rowmenu a[href*="/account/renew/"]'])],
+  ['pay', () => click(['.dash__side .acts .btn'])],
+  ['recorded', async () => { if (!(await p.locator('.calm').count())) throw new Error('no confirmation'); }],
+]);
+
+/* ── X. bring an expired service back by renewing it ────────────────────────── */
+await journey('Renew an expired service', [
+  ['expired service', () => start('#/account/services/svc-2265')],
+  ['renew', () => click(['.dash__side a[href*="/account/renew/"]'])],
+  ['pay', () => click(['.dash__side .acts .btn'])],
+  ['recorded', async () => { if (!(await p.locator('.calm').count())) throw new Error('no confirmation'); }],
+]);
+
 /* ── report ─────────────────────────────────────────────────────────────────── */
 let failed = 0;
 for (const r of results) {

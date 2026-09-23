@@ -1805,6 +1805,8 @@ export const STRINGS = {
   },
   'svc.view': { ar: 'افتح الخدمة', en: 'View service' },
   'svc.edit': { ar: 'غيّر الباقة', en: 'Edit plan' },
+  // The same word the domain pages use, on the row menu and in the billing card.
+  'svc.renew': { ar: 'جدّد', en: 'Renew' },
   'svc.server': { ar: 'بيانات الخادم', en: 'Server information' },
   'svc.hostname': { ar: 'اسم الخادم', en: 'Hostname' },
   'svc.ip': { ar: 'عنوان IP', en: 'IP address' },

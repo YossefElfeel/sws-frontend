@@ -27,6 +27,7 @@ import {
   IconEye,
   IconPencil,
   IconTrash,
+  IconCalendar,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { usePrefs } from '../../lib/prefs';
@@ -38,6 +39,7 @@ import {
   PAYMENT_METHODS_SAVED,
   NEEDS_ATTENTION,
   renews,
+  renewable,
   type Service,
   type ServiceStatus,
   type ServiceKind,
@@ -403,11 +405,13 @@ function compare(a: Service, b: Service, key: SortKey, desc: boolean, locale: st
 }
 
 /**
- * View, edit, cancel — the row's own three.
+ * View, renew, edit, cancel — the row's own four.
  *
- * A service that has expired or been cancelled keeps only the first. There is no plan to change
- * on a term that has ended and nothing left to cancel, and a menu offering both would be
- * offering two dead ends to a reader who came looking for the record.
+ * A service that has ended keeps only what still applies to it. There is no plan to change on a
+ * term that is over and nothing left to cancel, and a menu offering either would be offering a
+ * dead end to a reader who came looking for the record. Renewing is what brings an expired
+ * service back, so an expired row keeps Renew beside View; a cancelled one keeps View alone —
+ * see `renewable`.
  */
 function rowItems(s: Service, t: (key: never) => string): RowMenuItem[] {
   const items: RowMenuItem[] = [
@@ -418,6 +422,15 @@ function rowItems(s: Service, t: (key: never) => string): RowMenuItem[] {
       to: `/account/services/${s.id}`,
     },
   ];
+
+  if (renewable(s.status)) {
+    items.push({
+      id: 'renew',
+      label: t('svc.renew' as never),
+      icon: <IconCalendar size={16} />,
+      to: `/account/renew/${s.id}`,
+    });
+  }
 
   if (renews(s.status)) {
     items.push(
@@ -479,6 +492,9 @@ export function ServiceDetail() {
    * that is not there, and offering it is how a client area teaches people not to trust it.
    * So the page keeps what is still true of the record and drops what is not, and says why at
    * the top rather than leaving the reader to notice the absences.
+   *
+   * Renewing is the one act that outlasts an expiry. It is paid against the record rather than
+   * run on the machine, and it is how an expired service comes back — see `renewable`.
    */
   const live = svc ? renews(svc.status) : true;
 
@@ -852,8 +868,8 @@ export function ServiceDetail() {
               <div><dt>{t('svc.paymentMethod')}</dt><dd className="serial"><bdi>{paymentLabel}</bdi></dd></div>
             </dl>
 
-            {/* Nothing to renew once the term is over, so the switch goes rather than sitting
-                there off and unexplained. */}
+            {/* Nothing renews on its own once the term is over, so the switch goes rather than
+                sitting there off and unexplained. */}
             {live && (
               <>
                 <label className="switch-row">
@@ -878,6 +894,21 @@ export function ServiceDetail() {
                 </label>
                 <DevNote>{t('dev.autoRenew')}</DevNote>
               </>
+            )}
+
+            {/* The manual half of the same decision: renew now, for a term of your choosing,
+                whichever way the switch is set — and the half that outlasts an expiry, since
+                renewing is how an expired service comes back. Secondary, though the domain
+                page's is primary: in this page's cards, primary marks a button that acts where
+                it is — Create, Buy and activate — and every one that opens another screen,
+                Upgrade or downgrade among them, is secondary. */}
+            {renewable(svc.status) && (
+              <div className="acts u-mt-16">
+                <Link className="btn btn--md btn--secondary" to={`/account/renew/${svc.id}`}>
+                  {t('svc.renew')}
+                  <IconArrow size={15} />
+                </Link>
+              </div>
             )}
           </section>
 

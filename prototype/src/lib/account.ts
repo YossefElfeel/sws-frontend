@@ -34,6 +34,16 @@ export function renews(status: ServiceStatus): boolean {
   return status !== 'expired' && status !== 'cancelled';
 }
 
+/**
+ * The states a person can renew by hand: every one that `renews`, and an expired one as well.
+ * An expired service has no renewal ahead of it, but renewing is what brings it back. C-08 lists
+ * "expired" among manual renewal's states and leaves "cancelled" out, so a cancelled service is
+ * not offered one.
+ */
+export function renewable(status: ServiceStatus): boolean {
+  return renews(status) || status === 'expired';
+}
+
 /** The states that are asking something of the reader, as one group the list can filter to. */
 export const NEEDS_ATTENTION: ServiceStatus[] = ['suspended', 'failed', 'expired'];
 
