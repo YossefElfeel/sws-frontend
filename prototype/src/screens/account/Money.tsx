@@ -29,6 +29,7 @@ import {
   TRANSACTIONS,
   FAILED_PAYMENT,
   AFFILIATE,
+  renews,
   type TxnKind,
 } from '../../lib/account';
 import { useAccountState } from '../../lib/accountState';
@@ -182,7 +183,10 @@ export function Renew() {
                 <dd>{t(`cycle.${cycle}` as never)}</dd>
               </div>
               <div>
-                <dt>{t('renew.paidUntil')}</dt>
+                {/* An expired service is renewed here too, and its date is the day it ended
+                    rather than a term still running — so it is named the way its own page
+                    names it. */}
+                <dt>{t(svc && !renews(svc.status) ? 'svc.ended' : 'renew.paidUntil')}</dt>
                 <dd className="serial">
                   <bdi>{until}</bdi>
                 </dd>
