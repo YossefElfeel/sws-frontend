@@ -23,7 +23,8 @@ import {
 import { useLocale } from '../../lib/locale';
 import { useSaved, useDirty, SavedNote } from '../../lib/saved';
 import { usePrefs } from '../../lib/prefs';
-import { convert, formatAmount } from '../../lib/catalog';
+import { convert, formatAmount, COUNTRIES } from '../../lib/catalog';
+import { Select } from '../../components/Select';
 import {
   ANNOUNCEMENTS,
   AFFILIATE,
@@ -266,6 +267,18 @@ export function Security() {
             <label className="field-label">
               <span className="eyebrow">{t('auth.postcode')}</span>
               <input className="field serial" dir="ltr" defaultValue={ACCOUNT.postcode} />
+            </label>
+            {/* The address is not an address without it. The list is the billing form's, the
+                one the domain contacts share, so the country chosen here is one they know. */}
+            <label className="field-label">
+              <span className="eyebrow">{t('checkout.country')}</span>
+              <Select name="country" defaultValue={ACCOUNT.country}>
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.label}
+                  </option>
+                ))}
+              </Select>
             </label>
           </div>
           <div className="form__foot">
