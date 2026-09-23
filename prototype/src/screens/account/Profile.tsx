@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type RefObject } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams, Navigate } from 'react-router-dom';
 import { AccountLayout } from '../../components/AccountLayout';
 import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
@@ -19,6 +19,7 @@ import {
   IconShield,
   IconCoin,
   IconWallet,
+  IconArrow,
 } from '../../components/icons';
 import { useLocale } from '../../lib/locale';
 import { useSaved, useDirty, SavedNote } from '../../lib/saved';
@@ -70,6 +71,15 @@ export function Announcements() {
                 <bdi>{n.date}</bdi>
               </p>
               <p className="card__body">{t(n.bodyKey as never)}</p>
+              {/* Every card says the same two words, so the title rides along unseen: a screen
+                  reader listing the page's links would otherwise hear one phrase three times. */}
+              <p className="u-mt-16">
+                <Link className="card__more" to={`/account/announcements/${n.id}`}>
+                  {t('news.read')}
+                  <span className="u-visually-hidden"> — {t(n.titleKey as never)}</span>
+                  <IconArrow size={14} />
+                </Link>
+              </p>
             </Card>
           ))}
         </div>
@@ -82,6 +92,41 @@ export function Announcements() {
       )}
 
       <TableCount shown={rows.length} total={ANNOUNCEMENTS.length} />
+    </AccountLayout>
+  );
+}
+
+/**
+ * One announcement on its own page — C-28's single state, beside the list and the empty one.
+ *
+ * The list is where announcements are skimmed; this is the address one is sent to from a
+ * ticket reply or an email, so it stands alone: the title is the page's, the date sits under
+ * it, and the crumbs are the way back. Built the way a knowledgebase article is.
+ */
+export function AnnouncementDetail() {
+  const { t } = useLocale();
+  const { id } = useParams<{ id: string }>();
+  const n = ANNOUNCEMENTS.find((x) => x.id === id);
+
+  if (!n) return <Navigate to="/account/announcements" replace />;
+
+  return (
+    <AccountLayout
+      title={t(n.titleKey as never)}
+      crumbs={[
+        { label: t('acc.portalHome'), to: '/account' },
+        { label: t('acc.news'), to: '/account/announcements' },
+        { label: t(n.titleKey as never) },
+      ]}
+      meta={
+        <span className="app__meta-note serial">
+          <bdi>{n.date}</bdi>
+        </span>
+      }
+    >
+      <article className="card prose">
+        <p>{t(n.bodyKey as never)}</p>
+      </article>
     </AccountLayout>
   );
 }

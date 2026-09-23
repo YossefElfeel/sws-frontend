@@ -68,7 +68,7 @@ C-24,محادثة تذكرة,Ticket Thread,client-area,limited,P0,medium,timelin
 C-25,قاعدة المعرفة — الفئات,Knowledgebase Categories,client-area,limited,P1,low,category-grid;empty,2,6,,built,GetKBCategories,,
 C-26,مقال معرفي,Knowledgebase Article,client-area,limited,P1,low,content;was-this-helpful;related-articles,3,6,,built,GetKBArticle,,
 C-27,نتائج بحث المعرفة,Knowledgebase Search Results,client-area,limited,P1,low,results;no-results-with-ticket-suggestion,2,6,,folded,GetKBArticles,,NEW in v1.1
-C-28,الإعلانات,Announcements,client-area,limited,P2,low,list;single;empty,3,6,,built,GetAnnouncements,,
+C-28,الإعلانات,Announcements,client-area,limited,P2,low,list;single;empty,3,6,,built,GetAnnouncements,,"2026-09-23: the single state is its own page, /account/announcements/:id, reached from each card's Read announcement link"
 C-29,الأفلييت — لوحة,Affiliate Dashboard,client-area,limited,P2,medium,not-activated;activated;statistics;referral-link;marketing-materials,5,6,,built,AffiliateActivate;GetAffiliates,,
 C-30,الأفلييت — طلب سحب,Affiliate Withdrawal,client-area,limited,P2,low,form;minimum-not-met;processing;history,4,6,,built,GetAffiliates,,
 C-31,بيانات الحساب,Account Details,client-area,limited,P0,medium,view-edit;email-change-requires-confirmation;country-change-affects-tax,3,6,,folded,GetClientsDetails;UpdateClient,I12,

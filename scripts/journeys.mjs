@@ -407,6 +407,16 @@ await journey('Renew an expired service', [
   ['recorded', async () => { if (!(await p.locator('.calm').count())) throw new Error('no confirmation'); }],
 ]);
 
+/* ── Y. open one announcement from the list ─────────────────────────────────── */
+await journey('Read an announcement', [
+  ['announcements', () => start('#/account/announcements')],
+  ['read one', () => click(['.cards a[href*="/account/announcements/"]'])],
+  ['its own page', async () => {
+    if (!/\/account\/announcements\/[^/]+$/.test(await hash())) throw new Error('no announcement page');
+    if (!(await p.locator('.prose').count())) throw new Error('no body');
+  }],
+]);
+
 /* ── report ─────────────────────────────────────────────────────────────────── */
 let failed = 0;
 for (const r of results) {

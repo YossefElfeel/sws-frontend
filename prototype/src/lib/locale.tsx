@@ -1977,6 +1977,7 @@ export const STRINGS = {
   'news.n1.body': { ar: 'هنعمل ترقية للتخزين يوم 5 سبتمبر من 2 لـ4 فجرًا بتوقيت زيورخ. متوقع توقف أقل من 10 دقايق.', en: 'A storage upgrade runs on 5 September between 02:00 and 04:00 Zurich time. Expected downtime is under 10 minutes.' },
   'news.n2.title': { ar: 'إنستاباي بقت متاحة', en: 'InstaPay is now available' },
   'news.n2.body': { ar: 'تقدر تدفع فواتيرك بإنستاباي دلوقتي، جنب البطاقة والمحافظ والتحويل البنكي.', en: 'You can now pay invoices with InstaPay, alongside cards, wallets and bank transfer.' },
+  'news.read': { ar: 'اقرا الإعلان', en: 'Read announcement' },
 
   'aff.lede': { ar: 'شارك رابطك واكسب عمولة على كل اشتراك.', en: 'Share your link and earn a commission on every signup.' },
   'aff.link': { ar: 'رابط الإحالة', en: 'Your referral link' },
