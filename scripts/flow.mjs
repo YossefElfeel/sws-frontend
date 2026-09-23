@@ -1451,6 +1451,52 @@ await p.waitForSelector('.addon-card');
   );
 }
 
+/*
+ * ID Protection is also thrown from the Protection card on a domain's Overview and Transfer out.
+ * It is the add-on on the first card, so it is named the way the card names it, and switching it
+ * off asks the card's question — the one that warns a home address is about to be published.
+ * Read against the card rather than a literal, so the check holds in either language.
+ */
+{
+  const idName = await p.$eval('.addon-card .addon-card__name', (e) => e.textContent.trim());
+  const privacy = 'input[name="privacy"]';
+  const labelOf = () =>
+    p.$eval(privacy, (i) => i.closest('.switch-row').querySelector('.switch-row__label').textContent.trim());
+
+  await p.evaluate(() => (location.hash = '#/account/domains/dom-1'));
+  await p.waitForSelector(privacy);
+  ok('Overview names ID Protection as its card does', (await labelOf()) === idName, await labelOf());
+
+  await p.click(privacy);
+  await p.waitForSelector('.modal__panel');
+  ok('  switching it off asks first, with the warning', (await p.$$('.modal__body .banner')).length === 1);
+  await p.click('.modal__foot .btn--quiet');
+  await p.waitForTimeout(150);
+  ok('  cancelling leaves it on', await p.$eval(privacy, (i) => i.checked));
+
+  await p.click(privacy);
+  await p.waitForSelector('.modal__panel');
+  await p.click('.modal__foot .btn--danger');
+  await p.waitForTimeout(150);
+  ok('  confirming switches it off', !(await p.$eval(privacy, (i) => i.checked)));
+
+  await p.click(privacy);
+  await p.waitForTimeout(150);
+  ok(
+    '  switching it back on does not ask',
+    (await p.$$('.modal__panel')).length === 0 && (await p.$eval(privacy, (i) => i.checked)),
+  );
+
+  await p.evaluate(() => (location.hash = '#/account/domains/dom-1/transfer-out'));
+  await p.waitForSelector(privacy);
+  ok('Transfer out names it the same way', (await labelOf()) === idName, await labelOf());
+  await p.click(privacy);
+  await p.waitForSelector('.modal__panel');
+  ok('  and asks the same question', (await p.$$('.modal__body .banner')).length === 1);
+  await p.click('.modal__foot .btn--quiet');
+  await p.waitForTimeout(150);
+}
+
 // ADR-0003: Latin numerals everywhere, including inside Arabic copy.
 await p.evaluate(() => (location.hash = '#/account/invoices/inv-4417'));
 await p.waitForSelector('.invoice');

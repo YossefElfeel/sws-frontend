@@ -1828,8 +1828,6 @@ export const STRINGS = {
   'dom.ns': { ar: 'خادم أسماء', en: 'Nameserver' },
   'dom.addNs': { ar: 'أضف خادم أسماء', en: 'Add a nameserver' },
   'dom.protection': { ar: 'الحماية', en: 'Protection' },
-  'dom.privacy': { ar: 'خصوصية WHOIS', en: 'WHOIS privacy' },
-  'dom.privacyNote': { ar: 'بتخفي بياناتك من سجل WHOIS العام.', en: 'Hides your details from the public WHOIS record.' },
   'dom.lock': { ar: 'قفل المُسجِّل', en: 'Registrar lock' },
   'dom.lockNote': { ar: 'بيمنع أي نقل للدومين من غير إذنك.', en: 'Blocks any transfer of the domain without your consent.' },
   'dom.transferOut': { ar: 'نقل الدومين لمُسجِّل آخر', en: 'Transfer to another registrar' },

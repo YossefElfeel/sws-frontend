@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { DomainPage } from '../../components/DomainRail';
-import { DomainAddonCards } from '../../components/DomainAddonCards';
+import { DomainAddonCards, IdProtectionSwitch } from '../../components/DomainAddonCards';
 import { Button } from '../../components/Button';
 import { ConfirmButton } from '../../components/ConfirmButton';
 import { Tag, DOMAIN_TONE } from '../../components/Tag';
@@ -146,18 +146,7 @@ export function DomainOverview() {
               <h2 className="card__heading">{t('dom.protection')}</h2>
             </header>
             <div className="form">
-              <label className="switch-row">
-                <span>
-                  <span className="switch-row__label">{t('dom.privacy')}</span>
-                  <span className="switch-row__note">{t('dom.privacyNote')}</span>
-                </span>
-                <input
-                  type="checkbox"
-                  name="privacy"
-                  checked={dom.whoisPrivacy}
-                  onChange={(e) => flip({ whoisPrivacy: e.target.checked })}
-                />
-              </label>
+              <IdProtectionSwitch dom={dom} flip={flip} />
 
               <label className="switch-row">
                 <span>
@@ -1092,12 +1081,12 @@ export function DomainTransferOut() {
       <SavedNote saved={saved} onDismiss={clear} />
 
       {/*
-        One card, named after what the switches on it do. WHOIS privacy sits beside the
+        One card, named after what the switches on it do. ID Protection sits beside the
         registrar lock because they answer the same question — who may read this domain's
         owner, and who may move it — and because the person who came here to leave is the
         person most likely to want the other switch settled before they go. Both are the
         same two switches Overview carries; the store is shared, so a flip here reads the
-        same there.
+        same there, and ID Protection asks before it goes off here as it does everywhere.
       */}
       <section className="card">
         <header className="card__head">
@@ -1105,18 +1094,7 @@ export function DomainTransferOut() {
         </header>
 
         <div className="form">
-          <label className="switch-row">
-            <span>
-              <span className="switch-row__label">{t('dom.privacy')}</span>
-              <span className="switch-row__note">{t('dom.privacyNote')}</span>
-            </span>
-            <input
-              type="checkbox"
-              name="privacy"
-              checked={dom.whoisPrivacy}
-              onChange={(e) => flip({ whoisPrivacy: e.target.checked })}
-            />
-          </label>
+          <IdProtectionSwitch dom={dom} flip={flip} />
 
           <label className="switch-row">
             <span>
