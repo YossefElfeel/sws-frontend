@@ -1780,9 +1780,8 @@ export const STRINGS = {
   'svc.noneSetup': { ar: 'مفيش تحت التجهيز', en: 'None in setup' },
   'svc.inSetup': { ar: 'تحت التجهيز', en: 'Being set up' },
 
-  // The row switch. "Running" rather than "Active", because the chip beside it already says
-  // Active and a column repeating the word would read as the same fact twice.
-  'col.running': { ar: 'شغّالة', en: 'Running' },
+  // Renewal preference is independent of the service status beside it.
+  'col.autoRenew': { ar: 'تجديد تلقائي', en: 'Auto renew' },
   'col.type': { ar: 'النوع', en: 'Type' },
   'svc.runOn': { ar: 'الخدمة شغّالة', en: 'Service is running' },
   'svc.runOff': { ar: 'الخدمة موقوفة', en: 'Service is stopped' },
@@ -2393,6 +2392,7 @@ export const STRINGS = {
   'svc.autoRenewOff': { ar: 'مش هتتجدد لوحدها — هنبعتلك فاتورة تدفعها بنفسك قبل', en: 'Will not renew on its own — we send an invoice for you to pay before' },
   'svc.autoRenewOnMsg': { ar: 'التجديد التلقائي اتفعّل', en: 'Auto-renew is on' },
   'svc.autoRenewOffMsg': { ar: 'التجديد التلقائي اتوقف', en: 'Auto-renew is off' },
+  'svc.autoRenewUnavailable': { ar: 'التجديد التلقائي مش متاح للخدمات المنتهية أو الملغية', en: 'Auto-renew is unavailable for expired or cancelled services' },
   'svc.paymentMethod': { ar: 'طريقة الدفع', en: 'Payment method' },
   'svc.usageAt': { ar: 'آخر تحديث', en: 'Last updated' },
   'svc.shortcuts': { ar: 'اختصارات سريعة', en: 'Quick shortcuts' },
