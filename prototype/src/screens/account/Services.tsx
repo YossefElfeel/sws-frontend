@@ -82,9 +82,6 @@ const PER: Record<string, string> = {
   triennially: 'per.triennially',
 };
 
-/** The two states the row switch can move between. Everything else it can only report. */
-const SWITCHABLE: ServiceStatus[] = ['active', 'suspended'];
-
 /** My Services — spec 9.2 and C-02: plan, linked domain, price, status, next renewal. */
 export function Services() {
   const { t, locale } = useLocale();
@@ -126,7 +123,7 @@ export function Services() {
   const sorted = [...matched].sort((a, b) => compare(a, b, sort, desc, locale));
 
   const pages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-  // A switch flipped on the last row of a filtered page can empty that page under the reader.
+  // Keep the current page within the filtered results.
   const here = Math.min(page, pages);
   const rows = sorted.slice((here - 1) * PAGE_SIZE, here * PAGE_SIZE);
 
@@ -234,7 +231,7 @@ export function Services() {
                   <th scope="col">{t('account.nextdue')}</th>
                   <th scope="col" className="num">{t('col.amount')}</th>
                   <th scope="col">{t('account.status')}</th>
-                  <th scope="col">{t('col.running')}</th>
+                  <th scope="col">{t('col.autoRenew')}</th>
                   <th scope="col" className="data__own">
                     <span className="u-visually-hidden">{t('svc.rowMenu')}</span>
                   </th>
@@ -242,9 +239,12 @@ export function Services() {
               </thead>
               <tbody>
                 {rows.map((s) => {
-                  const on = s.status === 'active';
-                  const canSwitch = SWITCHABLE.includes(s.status);
-                  const runLabel = t(canSwitch ? (on ? 'svc.runOn' : 'svc.runOff') : 'svc.runLocked');
+                  const canRenew = renews(s.status);
+                  const renewLabel = t(
+                    canRenew
+                      ? (s.autoRenew ? 'svc.autoRenewOnMsg' : 'svc.autoRenewOffMsg')
+                      : 'svc.autoRenewUnavailable',
+                  );
 
                   return (
                     <tr key={s.id}>
@@ -289,22 +289,23 @@ export function Services() {
                         <Tag tone={SERVICE_TONE[s.status]}>{t(`status.${s.status}` as never)}</Tag>
                       </td>
                       <td>
-                        {/* The row is named inside the switch's own label, so a column of ten
-                            of them does not read as "Running, Running, Running". */}
+                        {/* Each switch names its service and shares the detail page's
+                            auto-renew setting. Ended services cannot renew automatically. */}
                         <label className="switch-cell">
                           <span className="u-visually-hidden">
-                            {runLabel} — {s.product}, {s.domain}
+                            {renewLabel} — {s.product}, {s.domain}
                           </span>
                           <input
                             type="checkbox"
+                            name="autorenew"
                             className="switch"
-                            checked={on}
-                            disabled={!canSwitch}
-                            title={runLabel}
+                            checked={canRenew && s.autoRenew}
+                            disabled={!canRenew}
+                            title={renewLabel}
                             onChange={(e) => {
                               const next = e.target.checked;
-                              updateService(s.id, { status: next ? 'active' : 'suspended' });
-                              mark(t(next ? 'svc.startedMsg' : 'svc.stoppedMsg'));
+                              updateService(s.id, { autoRenew: next });
+                              mark(t(next ? 'svc.autoRenewOnMsg' : 'svc.autoRenewOffMsg'));
                             }}
                           />
                         </label>
@@ -357,7 +358,7 @@ export function Services() {
           on an empty result would go quiet at the one moment it has something to say. */}
       <TablePager page={here} onPage={setPage} matched={sorted.length} total={services.length} />
 
-      {rows.length > 0 && <DevNote>{t('dev.suspend')}</DevNote>}
+      {rows.length > 0 && <DevNote>{t('dev.autoRenew')}</DevNote>}
     </AccountLayout>
   );
 }
